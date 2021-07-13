@@ -1,0 +1,583 @@
+###############################################################################
+#                                                                             #
+# IAR ANSI C/C++ Compiler V5.30.2.51295/W32 for ARM     02/Apr/2012  19:03:55 #
+# Copyright 1999-2009 IAR Systems AB.                                         #
+#                                                                             #
+#    Cpu mode     =  thumb                                                    #
+#    Endian       =  little                                                   #
+#    Source file  =  D:\Project\TRIO\3.F_W\TRIO_appl_src_20120401\lib_stm32\s #
+#                    rc\stm32f10x_dma.c                                       #
+#    Command line =  D:\Project\TRIO\3.F_W\TRIO_appl_src_20120401\lib_stm32\s #
+#                    rc\stm32f10x_dma.c -D NDEBUG -lcN                        #
+#                    D:\Project\TRIO\3.F_W\TRIO_appl_src_20120401\sout\ -o    #
+#                    D:\Project\TRIO\3.F_W\TRIO_appl_src_20120401\sout\       #
+#                    --debug --endian=little --cpu=Cortex-M3 -e               #
+#                    --warnings_are_errors --fpu=None --dlib_config           #
+#                    "C:\Program Files\IAR Systems\Embedded Workbench         #
+#                    5.4\arm\INC\DLib_Config_Normal.h" -I                     #
+#                    D:\Project\TRIO\3.F_W\TRIO_appl_src_20120401\include\    #
+#                    -I D:\Project\TRIO\3.F_W\TRIO_appl_src_20120401\lib_stm3 #
+#                    2\inc\ -I D:\Project\TRIO\3.F_W\TRIO_appl_src_20120401\l #
+#                    ib_stm32\src\ -I D:\Project\TRIO\3.F_W\TRIO_appl_src_201 #
+#                    20401\uC-CPU\ -I D:\Project\TRIO\3.F_W\TRIO_appl_src_201 #
+#                    20401\uC-LIB\ -I D:\Project\TRIO\3.F_W\TRIO_appl_src_201 #
+#                    20401\uCOS-II\Ports\ -I D:\Project\TRIO\3.F_W\TRIO_appl_ #
+#                    src_20120401\uCOS-II\Source\ -I                          #
+#                    D:\Project\TRIO\3.F_W\TRIO_appl_src_20120401\uC-Probe\   #
+#                    -I "C:\Program Files\IAR Systems\Embedded Workbench      #
+#                    5.4\arm\INC\" -Oh                                        #
+#    List file    =  D:\Project\TRIO\3.F_W\TRIO_appl_src_20120401\sout\stm32f #
+#                    10x_dma.lst                                              #
+#    Object file  =  D:\Project\TRIO\3.F_W\TRIO_appl_src_20120401\sout\stm32f #
+#                    10x_dma.o                                                #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\Project\TRIO\3.F_W\TRIO_appl_src_20120401\lib_stm32\src\stm32f10x_dma.c
+      1          /******************** (C) COPYRIGHT 2007 STMicroelectronics ********************
+      2          * File Name          : stm32f10x_dma.c
+      3          * Author             : MCD Application Team
+      4          * Date First Issued  : 09/29/2006
+      5          * Description        : This file provides all the DMA firmware functions.
+      6          ********************************************************************************
+      7          * History:
+      8          * 05/21/2007: V0.3
+      9          * 04/02/2007: V0.2
+     10          * 02/05/2007: V0.1
+     11          * 09/29/2006: V0.01
+     12          ********************************************************************************
+     13          * THE PRESENT SOFTWARE WHICH IS FOR GUIDANCE ONLY AIMS AT PROVIDING CUSTOMERS
+     14          * WITH CODING INFORMATION REGARDING THEIR PRODUCTS IN ORDER FOR THEM TO SAVE TIME.
+     15          * AS A RESULT, STMICROELECTRONICS SHALL NOT BE HELD LIABLE FOR ANY DIRECT,
+     16          * INDIRECT OR CONSEQUENTIAL DAMAGES WITH RESPECT TO ANY CLAIMS ARISING FROM THE
+     17          * CONTENT OF SUCH SOFTWARE AND/OR THE USE MADE BY CUSTOMERS OF THE CODING
+     18          * INFORMATION CONTAINED HEREIN IN CONNECTION WITH THEIR PRODUCTS.
+     19          *******************************************************************************/
+     20          
+     21          /* Includes ------------------------------------------------------------------*/
+     22          #include "stm32f10x_conf.h"
+     23          
+     24          /* Private typedef -----------------------------------------------------------*/
+     25          /* Private define ------------------------------------------------------------*/
+     26          /* DMA ENABLE mask */
+     27          #define CCR_ENABLE_Set          ((u32)0x00000001)
+     28          #define CCR_ENABLE_Reset        ((u32)0xFFFFFFFE)
+     29          
+     30          /* DMA Channelx interrupt pending bit masks */
+     31          #define DMA_Channel1_IT_Mask    ((u32)0x0000000F)
+     32          #define DMA_Channel2_IT_Mask    ((u32)0x000000F0)
+     33          #define DMA_Channel3_IT_Mask    ((u32)0x00000F00)
+     34          #define DMA_Channel4_IT_Mask    ((u32)0x0000F000)
+     35          #define DMA_Channel5_IT_Mask    ((u32)0x000F0000)
+     36          #define DMA_Channel6_IT_Mask    ((u32)0x00F00000)
+     37          #define DMA_Channel7_IT_Mask    ((u32)0x0F000000)
+     38          
+     39          /* DMA registers Masks */
+     40          #define CCR_CLEAR_Mask          ((u32)0xFFFF800F)
+     41          
+     42          /* Private macro -------------------------------------------------------------*/
+     43          /* Private variables ---------------------------------------------------------*/
+     44          /* Private function prototypes -----------------------------------------------*/
+     45          /* Private functions ---------------------------------------------------------*/
+     46          
+     47          /*******************************************************************************
+     48          * Function Name  : DMA_DeInit
+     49          * Description    : Deinitializes the DMA Channelx registers to their default reset
+     50          *                  values.
+     51          * Input          : - DMA_Channelx: where x can be 1, 2 to 7 to select the DMA
+     52          *                    Channel.
+     53          * Output         : None
+     54          * Return         : None
+     55          *******************************************************************************/
+     56          void DMA_DeInit(DMA_Channel_TypeDef* DMA_Channelx)
+     57          {
+     58            /* DMA Channelx disable */
+     59            DMA_Cmd(DMA_Channelx, DISABLE);
+     60          
+     61            /* Reset Channelx control register */
+     62            DMA_Channelx->CCR  = 0;
+     63            
+     64            /* Reset Channelx remaining bytes register */
+     65            DMA_Channelx->CNDTR = 0;
+     66            
+     67            /* Reset Channelx peripheral address register */
+     68            DMA_Channelx->CPAR  = 0;
+     69            
+     70            /* Reset Channelx memory address register */
+     71            DMA_Channelx->CMAR = 0;
+     72          
+     73            switch (*(u32*)&DMA_Channelx)
+     74            {
+     75              case DMA_Channel1_BASE:
+     76                /* Reset interrupt pending bits for Channel1 */
+     77                DMA->IFCR |= DMA_Channel1_IT_Mask;
+     78                break;
+     79          
+     80              case DMA_Channel2_BASE:
+     81                /* Reset interrupt pending bits for Channel2 */
+     82                DMA->IFCR |= DMA_Channel2_IT_Mask;
+     83                break;
+     84          
+     85              case DMA_Channel3_BASE:
+     86                /* Reset interrupt pending bits for Channel3 */
+     87                DMA->IFCR |= DMA_Channel3_IT_Mask;
+     88                break;
+     89          
+     90              case DMA_Channel4_BASE:
+     91                /* Reset interrupt pending bits for Channel4 */
+     92                DMA->IFCR |= DMA_Channel4_IT_Mask;
+     93                break;
+     94          
+     95              case DMA_Channel5_BASE:
+     96                /* Reset interrupt pending bits for Channel5 */
+     97                DMA->IFCR |= DMA_Channel5_IT_Mask;
+     98                break;
+     99          
+    100              case DMA_Channel6_BASE:
+    101                /* Reset interrupt pending bits for Channel6 */
+    102                DMA->IFCR |= DMA_Channel6_IT_Mask;
+    103                break;
+    104          
+    105              case DMA_Channel7_BASE:
+    106                /* Reset interrupt pending bits for Channel7 */
+    107                DMA->IFCR |= DMA_Channel7_IT_Mask;
+    108                break;
+    109          
+    110              default:
+    111                break;
+    112            }
+    113          }
+    114          
+    115          /*******************************************************************************
+    116          * Function Name  : DMA_Init
+    117          * Description    : Initializes the DMA Channelx according to the specified
+    118          *                  parameters in the DMA_InitStruct.
+    119          * Input          : - DMA_Channelx: where x can be 1, 2 to 7 to select the DMA
+    120          *                    Channel.
+    121          *                  - DMA_InitStruct: pointer to a DMA_InitTypeDef structure that
+    122          *                    contains the configuration information for the specified
+    123          *                    DMA Channel.
+    124          * Output         : None
+    125          * Return         : None
+    126          ******************************************************************************/
+    127          void DMA_Init(DMA_Channel_TypeDef* DMA_Channelx, DMA_InitTypeDef* DMA_InitStruct)
+    128          {
+    129            u32 tmpreg = 0;
+    130          
+    131            /* Check the parameters */
+    132            assert(IS_DMA_DIR(DMA_InitStruct->DMA_DIR));
+    133            assert(IS_DMA_BUFFER_SIZE(DMA_InitStruct->DMA_BufferSize));	   
+    134            assert(IS_DMA_PERIPHERAL_INC_STATE(DMA_InitStruct->DMA_PeripheralInc));  
+    135            assert(IS_DMA_MEMORY_INC_STATE(DMA_InitStruct->DMA_MemoryInc));   
+    136            assert(IS_DMA_PERIPHERAL_DATA_SIZE(DMA_InitStruct->DMA_PeripheralDataSize));
+    137            assert(IS_DMA_MEMORY_DATA_SIZE(DMA_InitStruct->DMA_MemoryDataSize));
+    138            assert(IS_DMA_MODE(DMA_InitStruct->DMA_Mode));
+    139            assert(IS_DMA_PRIORITY(DMA_InitStruct->DMA_Priority));
+    140            assert(IS_DMA_M2M_STATE(DMA_InitStruct->DMA_M2M));
+    141          
+    142          /*--------------------------- DMA Channelx CCR Configuration -----------------*/
+    143            /* Get the DMA_Channelx CCR value */
+    144            tmpreg = DMA_Channelx->CCR;
+    145            /* Clear MEM2MEM, PL, MSIZE, PSIZE, MINC, PINC, CIRCULAR and DIR bits */
+    146            tmpreg &= CCR_CLEAR_Mask;
+    147            /* Configure DMA Channelx: data transfer, data size, priority level and mode */
+    148            /* Set DIR bit according to DMA_DIR value */
+    149            /* Set CIRCULAR bit according to DMA_Mode value */
+    150            /* Set PINC bit according to DMA_PeripheralInc value */
+    151            /* Set MINC bit according to DMA_MemoryInc value */
+    152            /* Set PSIZE bits according to DMA_PeripheralDataSize value */
+    153            /* Set MSIZE bits according to DMA_MemoryDataSize value */
+    154            /* Set PL bits according to DMA_Priority value */
+    155            /* Set the MEM2MEM bit according to DMA_M2M value */
+    156            tmpreg |= DMA_InitStruct->DMA_DIR | DMA_InitStruct->DMA_Mode |
+    157                      DMA_InitStruct->DMA_PeripheralInc | DMA_InitStruct->DMA_MemoryInc |
+    158                      DMA_InitStruct->DMA_PeripheralDataSize | DMA_InitStruct->DMA_MemoryDataSize |
+    159                      DMA_InitStruct->DMA_Priority | DMA_InitStruct->DMA_M2M;
+    160            /* Write to DMA Channelx CCR */
+    161            DMA_Channelx->CCR = tmpreg;
+    162          
+    163          /*--------------------------- DMA Channelx CNBTR Configuration ---------------*/
+    164            /* Write to DMA Channelx CNBTR */
+    165            DMA_Channelx->CNDTR = DMA_InitStruct->DMA_BufferSize;
+    166          
+    167          /*--------------------------- DMA Channelx CPAR Configuration ----------------*/
+    168            /* Write to DMA Channelx CPAR */
+    169            DMA_Channelx->CPAR = DMA_InitStruct->DMA_PeripheralBaseAddr;
+    170          
+    171          /*--------------------------- DMA Channelx CMAR Configuration ----------------*/
+    172            /* Write to DMA Channelx CMAR */
+    173            DMA_Channelx->CMAR = DMA_InitStruct->DMA_MemoryBaseAddr;
+    174          }
+    175          
+    176          /*******************************************************************************
+    177          * Function Name  : DMA_StructInit
+    178          * Description    : Fills each DMA_InitStruct member with its default value.
+    179          * Input          : - DMA_InitStruct : pointer to a DMA_InitTypeDef structure
+    180          *                    which will be initialized.
+    181          * Output         : None
+    182          * Return         : None
+    183          *******************************************************************************/
+    184          void DMA_StructInit(DMA_InitTypeDef* DMA_InitStruct)
+    185          {
+    186          /*-------------- Reset DMA init structure parameters values ------------------*/
+    187            /* Initialize the DMA_PeripheralBaseAddr member */
+    188            DMA_InitStruct->DMA_PeripheralBaseAddr = 0;
+    189          
+    190            /* Initialize the DMA_MemoryBaseAddr member */
+    191            DMA_InitStruct->DMA_MemoryBaseAddr = 0;
+    192          
+    193            /* Initialize the DMA_DIR member */
+    194            DMA_InitStruct->DMA_DIR = DMA_DIR_PeripheralSRC;
+    195          
+    196            /* Initialize the DMA_BufferSize member */
+    197            DMA_InitStruct->DMA_BufferSize = 0;
+    198          
+    199            /* Initialize the DMA_PeripheralInc member */
+    200            DMA_InitStruct->DMA_PeripheralInc = DMA_PeripheralInc_Disable;
+    201          
+    202            /* Initialize the DMA_MemoryInc member */
+    203            DMA_InitStruct->DMA_MemoryInc = DMA_MemoryInc_Disable;
+    204          
+    205            /* Initialize the DMA_PeripheralDataSize member */
+    206            DMA_InitStruct->DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte;
+    207          
+    208            /* Initialize the DMA_MemoryDataSize member */
+    209            DMA_InitStruct->DMA_MemoryDataSize = DMA_MemoryDataSize_Byte;
+    210          
+    211            /* Initialize the DMA_Mode member */
+    212            DMA_InitStruct->DMA_Mode = DMA_Mode_Normal;
+    213          
+    214            /* Initialize the DMA_Priority member */
+    215            DMA_InitStruct->DMA_Priority = DMA_Priority_Low;
+    216          
+    217            /* Initialize the DMA_M2M member */
+    218            DMA_InitStruct->DMA_M2M = DMA_M2M_Disable;
+    219          }
+    220          
+    221          /*******************************************************************************
+    222          * Function Name  : DMA_Cmd
+    223          * Description    : Enables or disables the specified DMA Channelx.
+    224          * Input          : - DMA_Channelx: where x can be 1, 2 to 7 to select the DMA
+    225          *                    Channel.
+    226          *                  - NewState: new state of the DMA Channelx. 
+    227          *                    This parameter can be: ENABLE or DISABLE.
+    228          * Output         : None
+    229          * Return         : None
+    230          *******************************************************************************/
+    231          void DMA_Cmd(DMA_Channel_TypeDef* DMA_Channelx, u32 NewState)
+    232          {
+    233              // Check the parameters
+    234              assert(IS_FUNCTIONAL_STATE(NewState));
+    235            
+    236              if (NewState != DISABLE)				  
+    237              {
+    238                  // Enable the selected DMA Channelx
+    239                  DMA_Channelx->CCR |= CCR_ENABLE_Set;
+    240              }
+    241              else
+    242              {
+    243                  // Disable the selected DMA Channelx
+    244                 DMA_Channelx->CCR &= CCR_ENABLE_Reset;
+    245              }
+    246          }
+    247          
+    248          /*******************************************************************************
+    249          * Function Name  : DMA_ITConfig
+    250          * Description    : Enables or disables the specified DMA Channelx interrupts.
+    251          * Input          : - DMA_IT: specifies the DMA interrupts sources to be enabled
+    252          *                    or disabled. 
+    253          *                    This parameter can be any combination of the following values:
+    254          *                       - DMA_IT_TC:  Transfer complete interrupt mask
+    255          *                       - DMA_IT_HT:  Half transfer interrupt mask
+    256          *                       - DMA_IT_TE:  Transfer error interrupt mask
+    257          *                  - NewState: new state of the specified DMA interrupts.
+    258          *                    This parameter can be: ENABLE or DISABLE.
+    259          * Output         : None
+    260          * Return         : None
+    261          *******************************************************************************/
+    262          void DMA_ITConfig(DMA_Channel_TypeDef* DMA_Channelx, u32 DMA_IT, u32 NewState)
+    263          {
+    264              // Check the parameters
+    265              assert(IS_DMA_CONFIG_IT(DMA_IT));
+    266              assert(IS_FUNCTIONAL_STATE(NewState));
+    267            
+    268              if (NewState != DISABLE)
+    269              {
+    270                  // Enable the selected DMA interrupts
+    271                  DMA_Channelx->CCR |= DMA_IT;
+    272              }
+    273              else
+    274              {
+    275                  // Disable the selected DMA interrupts
+    276                  DMA_Channelx->CCR &= ~DMA_IT;
+    277              }
+    278          }
+    279          
+    280          /*******************************************************************************
+    281          * Function Name  : DMA_GetCurrDataCounter
+    282          * Description    : Returns the number of remaining data units in the current
+    283          *                  DMA Channelx transfer.
+    284          * Input          : - DMA_Channelx: where x can be 1, 2 to 7 to select the DMA
+    285          *                    Channel.
+    286          * Output         : None
+    287          * Return         : The number of remaining data units in the current DMA Channel
+    288          *                  transfer..
+    289          *******************************************************************************/
+    290          u16 DMA_GetCurrDataCounter(DMA_Channel_TypeDef* DMA_Channelx)
+    291          {
+    292            /* Return the current memory address value for Channelx */
+    293            return ((u16)(DMA_Channelx->CNDTR));
+    294          }
+    295          
+    296          /*******************************************************************************
+    297          * Function Name  : DMA_GetFlagStatus
+    298          * Description    : Checks whether the specified DMA Channelx flag is set or not.
+    299          * Input          : - DMA_FLAG: specifies the flag to check. 
+    300          *                    This parameter can be one of the following values:
+    301          *                       - DMA_FLAG_GL1: Channel1 global flag.
+    302          *                       - DMA_FLAG_TC1: Channel1 transfer complete flag.
+    303          *                       - DMA_FLAG_HT1: Channel1 half transfer flag.
+    304          *                       - DMA_FLAG_TE1: Channel1 transfer error flag.
+    305          *                       - DMA_FLAG_GL2: Channel2 global flag.
+    306          *                       - DMA_FLAG_TC2: Channel2 transfer complete flag.
+    307          *                       - DMA_FLAG_HT2: Channel2 half transfer flag.
+    308          *                       - DMA_FLAG_TE2: Channel2 transfer error flag.
+    309          *                       - DMA_FLAG_GL3: Channel3 global flag.
+    310          *                       - DMA_FLAG_TC3: Channel3 transfer complete flag.
+    311          *                       - DMA_FLAG_HT3: Channel3 half transfer flag.
+    312          *                       - DMA_FLAG_TE3: Channel3 transfer error flag.
+    313          *                       - DMA_FLAG_GL4: Channel4 global flag.
+    314          *                       - DMA_FLAG_TC4: Channel4 transfer complete flag.
+    315          *                       - DMA_FLAG_HT4: Channel4 half transfer flag.
+    316          *                       - DMA_FLAG_TE4: Channel4 transfer error flag.
+    317          *                       - DMA_FLAG_GL5: Channel5 global flag.
+    318          *                       - DMA_FLAG_TC5: Channel5 transfer complete flag.
+    319          *                       - DMA_FLAG_HT5: Channel5 half transfer flag.
+    320          *                       - DMA_FLAG_TE5: Channel5 transfer error flag.
+    321          *                       - DMA_FLAG_GL6: Channel6 global flag.
+    322          *                       - DMA_FLAG_TC6: Channel6 transfer complete flag.
+    323          *                       - DMA_FLAG_HT6: Channel6 half transfer flag.
+    324          *                       - DMA_FLAG_TE6: Channel6 transfer error flag.
+    325          *                       - DMA_FLAG_GL7: Channel7 global flag.
+    326          *                       - DMA_FLAG_TC7: Channel7 transfer complete flag.
+    327          *                       - DMA_FLAG_HT7: Channel7 half transfer flag.
+    328          *                       - DMA_FLAG_TE7: Channel7 transfer error flag.
+    329          * Output         : None
+    330          * Return         : The new state of DMA_FLAG (SET or RESET).
+    331          *******************************************************************************/
+    332          FlagStatus DMA_GetFlagStatus(u32 DMA_FLAG)
+    333          {
+    334            FlagStatus bitstatus = RESET;
+    335          
+    336            /* Check the parameters */
+    337            assert(IS_DMA_GET_FLAG(DMA_FLAG));
+    338          
+    339            /* Check the status of the specified DMA flag */
+    340            if ((DMA->ISR & DMA_FLAG) != (u32)RESET)
+    341            {
+    342              /* DMA_FLAG is set */
+    343              bitstatus = SET;
+    344            }
+    345            else
+    346            {
+    347              /* DMA_FLAG is reset */
+    348              bitstatus = RESET;
+    349            }
+    350            /* Return the DMA_FLAG status */
+    351            return  bitstatus;
+    352          }
+    353          
+    354          /*******************************************************************************
+    355          * Function Name  : DMA_ClearFlag
+    356          * Description    : Clears the DMA Channelx's pending flags.
+    357          * Input          : - DMA_FLAG: specifies the flag to clear. 
+    358          *                    This parameter can be any combination of the following values:
+    359          *                       - DMA_FLAG_GL1: Channel1 global flag.
+    360          *                       - DMA_FLAG_TC1: Channel1 transfer complete flag.
+    361          *                       - DMA_FLAG_HT1: Channel1 half transfer flag.
+    362          *                       - DMA_FLAG_TE1: Channel1 transfer error flag.
+    363          *                       - DMA_FLAG_GL2: Channel2 global flag.
+    364          *                       - DMA_FLAG_TC2: Channel2 transfer complete flag.
+    365          *                       - DMA_FLAG_HT2: Channel2 half transfer flag.
+    366          *                       - DMA_FLAG_TE2: Channel2 transfer error flag.
+    367          *                       - DMA_FLAG_GL3: Channel3 global flag.
+    368          *                       - DMA_FLAG_TC3: Channel3 transfer complete flag.
+    369          *                       - DMA_FLAG_HT3: Channel3 half transfer flag.
+    370          *                       - DMA_FLAG_TE3: Channel3 transfer error flag.
+    371          *                       - DMA_FLAG_GL4: Channel4 global flag.
+    372          *                       - DMA_FLAG_TC4: Channel4 transfer complete flag.
+    373          *                       - DMA_FLAG_HT4: Channel4 half transfer flag.
+    374          *                       - DMA_FLAG_TE4: Channel4 transfer error flag.
+    375          *                       - DMA_FLAG_GL5: Channel5 global flag.
+    376          *                       - DMA_FLAG_TC5: Channel5 transfer complete flag.
+    377          *                       - DMA_FLAG_HT5: Channel5 half transfer flag.
+    378          *                       - DMA_FLAG_TE5: Channel5 transfer error flag.
+    379          *                       - DMA_FLAG_GL6: Channel6 global flag.
+    380          *                       - DMA_FLAG_TC6: Channel6 transfer complete flag.
+    381          *                       - DMA_FLAG_HT6: Channel6 half transfer flag.
+    382          *                       - DMA_FLAG_TE6: Channel6 transfer error flag.
+    383          *                       - DMA_FLAG_GL7: Channel7 global flag.
+    384          *                       - DMA_FLAG_TC7: Channel7 transfer complete flag.
+    385          *                       - DMA_FLAG_HT7: Channel7 half transfer flag.
+    386          *                       - DMA_FLAG_TE7: Channel7 transfer error flag.
+    387          * Output         : None
+    388          * Return         : None
+    389          *******************************************************************************/
+    390          void DMA_ClearFlag(u32 DMA_FLAG)
+    391          {
+    392            /* Check the parameters */
+    393            assert(IS_DMA_CLEAR_FLAG(DMA_FLAG));
+    394          
+    395            /* Clear the selected DMA flags */
+    396            DMA->IFCR = DMA_FLAG;
+    397          }
+    398          
+    399          /*******************************************************************************
+    400          * Function Name  : DMA_GetITStatus
+    401          * Description    : Checks whether the specified DMA Channelx interrupt has 
+    402          *                  occurred or not.
+    403          * Input          : - DMA_IT: specifies the DMA interrupt source to check. 
+    404          *                    This parameter can be one of the following values:
+    405          *                       - DMA_IT_GL1: Channel1 global interrupt.
+    406          *                       - DMA_IT_TC1: Channel1 transfer complete interrupt.
+    407          *                       - DMA_IT_HT1: Channel1 half transfer interrupt.
+    408          *                       - DMA_IT_TE1: Channel1 transfer error interrupt.
+    409          *                       - DMA_IT_GL2: Channel2 global interrupt.
+    410          *                       - DMA_IT_TC2: Channel2 transfer complete interrupt.
+    411          *                       - DMA_IT_HT2: Channel2 half transfer interrupt.
+    412          *                       - DMA_IT_TE2: Channel2 transfer error interrupt.
+    413          *                       - DMA_IT_GL3: Channel3 global interrupt.
+    414          *                       - DMA_IT_TC3: Channel3 transfer complete interrupt.
+    415          *                       - DMA_IT_HT3: Channel3 half transfer interrupt.
+    416          *                       - DMA_IT_TE3: Channel3 transfer error interrupt.
+    417          *                       - DMA_IT_GL4: Channel4 global interrupt.
+    418          *                       - DMA_IT_TC4: Channel4 transfer complete interrupt.
+    419          *                       - DMA_IT_HT4: Channel4 half transfer interrupt.
+    420          *                       - DMA_IT_TE4: Channel4 transfer error interrupt.
+    421          *                       - DMA_IT_GL5: Channel5 global interrupt.
+    422          *                       - DMA_IT_TC5: Channel5 transfer complete interrupt.
+    423          *                       - DMA_IT_HT5: Channel5 half transfer interrupt.
+    424          *                       - DMA_IT_TE5: Channel5 transfer error interrupt.
+    425          *                       - DMA_IT_GL6: Channel6 global interrupt.
+    426          *                       - DMA_IT_TC6: Channel6 transfer complete interrupt.
+    427          *                       - DMA_IT_HT6: Channel6 half transfer interrupt.
+    428          *                       - DMA_IT_TE6: Channel6 transfer error interrupt.
+    429          *                       - DMA_IT_GL7: Channel7 global interrupt.
+    430          *                       - DMA_IT_TC7: Channel7 transfer complete interrupt.
+    431          *                       - DMA_IT_HT7: Channel7 half transfer interrupt.
+    432          *                       - DMA_IT_TE7: Channel7 transfer error interrupt.
+    433          * Output         : None
+    434          * Return         : The new state of DMA_IT (SET or RESET).
+    435          *******************************************************************************/
+    436          ITStatus DMA_GetITStatus(u32 DMA_IT)
+    437          {
+    438            ITStatus bitstatus = RESET;
+    439          
+    440            /* Check the parameters */
+    441            assert(IS_DMA_GET_IT(DMA_IT));
+    442          
+    443            /* Check the status of the specified DMA interrupt */
+    444            if ((DMA->ISR & DMA_IT) != (u32)RESET)
+    445            {
+    446              /* DMA_IT is set */
+    447              bitstatus = SET;
+    448            }
+    449            else
+    450            {
+    451              /* DMA_IT is reset */
+    452              bitstatus = RESET;
+    453            }
+    454            /* Return the DMA_IT status */
+    455            return  bitstatus;
+    456          }
+    457          
+    458          /*******************************************************************************
+    459          * Function Name  : DMA_ClearITPendingBit
+    460          * Description    : Clears the DMA Channelx’s interrupt pending bits.
+    461          * Input          : - DMA_IT: specifies the DMA interrupt pending bit to clear.
+    462          *                    This parameter can be any combination of the following values:
+    463          *                       - DMA_IT_GL1: Channel1 global interrupt.
+    464          *                       - DMA_IT_TC1: Channel1 transfer complete interrupt.
+    465          *                       - DMA_IT_HT1: Channel1 half transfer interrupt.
+    466          *                       - DMA_IT_TE1: Channel1 transfer error interrupt.
+    467          *                       - DMA_IT_GL2: Channel2 global interrupt.
+    468          *                       - DMA_IT_TC2: Channel2 transfer complete interrupt.
+    469          *                       - DMA_IT_HT2: Channel2 half transfer interrupt.
+    470          *                       - DMA_IT_TE2: Channel2 transfer error interrupt.
+    471          *                       - DMA_IT_GL3: Channel3 global interrupt.
+    472          *                       - DMA_IT_TC3: Channel3 transfer complete interrupt.
+    473          *                       - DMA_IT_HT3: Channel3 half transfer interrupt.
+    474          *                       - DMA_IT_TE3: Channel3 transfer error interrupt.
+    475          *                       - DMA_IT_GL4: Channel4 global interrupt.
+    476          *                       - DMA_IT_TC4: Channel4 transfer complete interrupt.
+    477          *                       - DMA_IT_HT4: Channel4 half transfer interrupt.
+    478          *                       - DMA_IT_TE4: Channel4 transfer error interrupt.
+    479          *                       - DMA_IT_GL5: Channel5 global interrupt.
+    480          *                       - DMA_IT_TC5: Channel5 transfer complete interrupt.
+    481          *                       - DMA_IT_HT5: Channel5 half transfer interrupt.
+    482          *                       - DMA_IT_TE5: Channel5 transfer error interrupt.
+    483          *                       - DMA_IT_GL6: Channel6 global interrupt.
+    484          *                       - DMA_IT_TC6: Channel6 transfer complete interrupt.
+    485          *                       - DMA_IT_HT6: Channel6 half transfer interrupt.
+    486          *                       - DMA_IT_TE6: Channel6 transfer error interrupt.
+    487          *                       - DMA_IT_GL7: Channel7 global interrupt.
+    488          *                       - DMA_IT_TC7: Channel7 transfer complete interrupt.
+    489          *                       - DMA_IT_HT7: Channel7 half transfer interrupt.
+    490          *                       - DMA_IT_TE7: Channel7 transfer error interrupt.
+    491          * Output         : None
+    492          * Return         : None
+    493          *******************************************************************************/
+    494          void DMA_ClearITPendingBit(u32 DMA_IT)
+    495          {
+    496            /* Check the parameters */
+    497            assert(IS_DMA_CLEAR_IT(DMA_IT));
+    498          
+    499            /* Clear the selected DMA interrupt pending bits */
+    500            DMA->IFCR = DMA_IT;
+    501          }
+    502          
+    503          /******************* (C) COPYRIGHT 2007 STMicroelectronics *****END OF FILE****/
+    504          
+
+   Maximum stack usage in bytes:
+
+     Function               .cstack
+     --------               -------
+     DMA_ClearFlag               0
+     DMA_ClearITPendingBit       0
+     DMA_Cmd                     0
+     DMA_DeInit                  8
+     DMA_GetCurrDataCounter      0
+     DMA_GetFlagStatus           0
+     DMA_GetITStatus             0
+     DMA_ITConfig                0
+     DMA_Init                    0
+     DMA_StructInit              0
+
+
+   Section sizes:
+
+     Function/Label         Bytes
+     --------------         -----
+     DMA_DeInit              128
+     DMA_Init                 60
+     DMA_StructInit           26
+     DMA_Cmd                  18
+     DMA_ITConfig             16
+     DMA_GetCurrDataCounter    6
+     DMA_GetFlagStatus         0
+     ?Subroutine0             20
+     DMA_ClearFlag             0
+     ?Subroutine1              6
+     DMA_GetITStatus           2
+     DMA_ClearITPendingBit     2
+     ??DataTable7              4
+
+ 
+ 288 bytes in section .text
+ 
+ 288 bytes of CODE memory
+
+Errors: none
+Warnings: none

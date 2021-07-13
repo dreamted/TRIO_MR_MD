@@ -1,0 +1,248 @@
+###############################################################################
+#                                                                             #
+# IAR ANSI C/C++ Compiler V5.30.2.51295/W32 for ARM     09/Jun/2011  18:42:06 #
+# Copyright 1999-2009 IAR Systems AB.                                         #
+#                                                                             #
+#    Cpu mode     =  thumb                                                    #
+#    Endian       =  little                                                   #
+#    Source file  =  C:\user\project\HFR OTM-L12\fw\appl_otmL12_20110505_v1.0 #
+#                    \code\aa_ioru.c                                          #
+#    Command line =  "C:\user\project\HFR OTM-L12\fw\appl_otmL12_20110505_v1. #
+#                    0\code\aa_ioru.c" -lcN "C:\user\project\HFR              #
+#                    OTM-L12\fw\appl_otmL12_20110505_v1.0\sout\" -lB          #
+#                    "C:\user\project\HFR OTM-L12\fw\appl_otmL12_20110505_v1. #
+#                    0\sout\" -o "C:\user\project\HFR                         #
+#                    OTM-L12\fw\appl_otmL12_20110505_v1.0\sout\"              #
+#                    --endian=little --cpu=Cortex-M3 -e --require_prototypes  #
+#                    --fpu=None --dlib_config "C:\compiler\ewarm              #
+#                    5.3\arm\INC\DLib_Config_Normal.h" -I                     #
+#                    "C:\user\project\HFR OTM-L12\fw\appl_otmL12_20110505_v1. #
+#                    0\include\" -I "C:\user\project\HFR                      #
+#                    OTM-L12\fw\appl_otmL12_20110505_v1.0\lib_stm32\inc\" -I  #
+#                    "C:\user\project\HFR OTM-L12\fw\appl_otmL12_20110505_v1. #
+#                    0\lib_stm32\src\" -I "C:\user\project\HFR                #
+#                    OTM-L12\fw\appl_otmL12_20110505_v1.0\uC-CPU\" -I         #
+#                    "C:\user\project\HFR OTM-L12\fw\appl_otmL12_20110505_v1. #
+#                    0\uC-LIB\" -I "C:\user\project\HFR                       #
+#                    OTM-L12\fw\appl_otmL12_20110505_v1.0\uCOS-II\Ports\" -I  #
+#                    "C:\user\project\HFR OTM-L12\fw\appl_otmL12_20110505_v1. #
+#                    0\uCOS-II\Source\" -I "C:\user\project\HFR               #
+#                    OTM-L12\fw\appl_otmL12_20110505_v1.0\uC-Probe\" -I       #
+#                    "C:\compiler\ewarm 5.3\arm\INC\" -Oh                     #
+#    List file    =  C:\user\project\HFR OTM-L12\fw\appl_otmL12_20110505_v1.0 #
+#                    \sout\aa_ioru.lst                                        #
+#    Object file  =  C:\user\project\HFR OTM-L12\fw\appl_otmL12_20110505_v1.0 #
+#                    \sout\aa_ioru.o                                          #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+C:\user\project\HFR OTM-L12\fw\appl_otmL12_20110505_v1.0\code\aa_ioru.c
+      1          /******************** (C) COPYRIGHT 2007 STMicroelectronics ********************
+      2          * File Name          : stm32f10x_bkp.c
+      3          * Author             : MCD Application Team
+      4          * Date First Issued  : 09/29/2006
+      5          * Description        : This file provides all the BKP firmware functions.
+      6          ********************************************************************************/
+      7          
+      8          #define IORU_C
+      9          
+     10          #include "../include/main.h"
+     11          
+     12          void IORUInit(void)
+     13          {
+     14          	IORUSer = &IORUSerB;
+     15           	IORUSer->CheckByte = pUSART2.CheckByte;
+     16          	IORUSer->RxGetByte = pUSART2.RxGetByte;
+     17          	IORUSer->PutStr = pUSART2.PutStr;
+     18          	IORUSer->TxCheckByte = pUSART2.TxCheckByte;
+     19          	
+     20          	IORUSer->TimerRx = TimerIORU0Rx;
+     21          	IORUSer->TimerEndWait = TimerIORU0EndWait;
+     22          	IORUSer->WRCSRecv = &RIORUsio;
+     23          	IORUSer->WRCSSend = &SIORUsio;
+     24          	IORUSer->PRIO = IORU0_TASK_PRIO;
+     25          	IORUSer->OSSem = OSSemCreate(1);
+     26          	
+     27          	OSTaskCreate(IORUTask, (void *)IORUSer, (OS_STK *)&IORU0TaskStk[IORU0_START_STK_SIZE - 1], IORU0_TASK_PRIO);
+     28          }
+     29          
+     30          
+     31          void IORUTask(void * pdata)
+     32          {
+     33              __ProtocolPtr *nPtr = (__ProtocolPtr *)pdata;
+     34          	
+     35          	INT8U tmplen = 0;
+     36          	INT8U id0, id1, id2;
+     37          	INT16U Recv;
+     38          	
+     39          /////////////////////////////////////////////		
+     40          	OSTimeDly(100*nPtr->PRIO);
+     41          	nPtr->WRCSRecv->cBody = 0;
+     42          
+     43          	while(1)
+     44          	{
+     45          		if(!tTestFlag)
+     46          		{
+     47          			if((nPtr->CheckByte(1, &Recv)) && WRCS_ProtocolCheck(nPtr))
+     48          			{
+     49          			#if TWO_BODY >= 2
+     50          				while(nPtr->WRCSRecv->cBody  <=  nPtr->WRCSRecv->BodyNo)
+     51          				{
+     52          			#endif
+     53          					ProtocolComCheck(nPtr);
+     54          			#if TWO_BODY >= 2
+     55          					nPtr->WRCSRecv->cBody++;
+     56          				}
+     57          			#endif
+     58          				IORULinkFailRst();
+     59          				IORURxLED(SET);
+     60          			}
+     61          			else if(!WRCS_DownLoadGiveupTimerSet(NULL))
+     62          			{
+     63          				if(IORUCheckInstalltoNext())
+     64          				{
+     65          
+     66          					IsItRtnMyVALtoSysID(&id0, &id1, &id2, MyDnrID, MyRmtID);
+     67          					#ifndef ALARM_TEST
+     68          					if(IsItGetIOURInform == NULL){
+     69          						pBodyFrameTx(id0, id1, id2, NULL, NULL, ModuleInformStsQue, nPtr, NULL);
+     70          					}
+     71          					else
+     72          					#endif
+     73          					{
+     74          						tmplen = 0;
+     75          						if(SystemTypeInfo < 2)
+     76          						{
+     77          							tmplen = (INT8U)GenIORUAidSts(IORUSndBuff);
+     78          						}
+     79          						pBodyFrameTx(id0, id1, id2, (INT8U *)IORUSndBuff, tmplen, StatusQue, nPtr, NULL);
+     80          					}
+     81          					OSTimeDly(500L);
+     82          				}
+     83          			}
+     84          		}
+     85          		OSTimeDly(200L);
+     86          	}
+     87          }
+     88          
+     89          INT8U IORUInsertCheck(void)
+     90          {
+     91          	return (BitRead(MySts->OTUInfo, mInstall));
+     92          }
+     93          
+     94          void IORUTxLED(INT8U tmpset)
+     95          {
+     96          	if(tmpset){
+     97          		TX0LEDON()
+     98          		TimerRegist(TimerTx0Led, Time10mSec*25L);
+     99          	}
+    100          	else
+    101          		TX0LEDOFF()
+    102          }
+    103          
+    104          void IORURxLED(INT8U tmpset)
+    105          {
+    106          	if(tmpset){
+    107          		TimerRegist(TimerRx0Led, Time10mSec*25L);
+    108          		RX0LEDON()
+    109          	}
+    110          	else
+    111          		RX0LEDOFF()
+    112          }
+    113          
+    114          INT8U IORUCheckInstalltoNext(void)
+    115          {
+    116          
+    117          	if(IORUInsertCheck())	return TRUE;
+    118          	else{
+    119          		IORULinkFailRst();
+    120          		IsItGetIOURInform = FALSE;
+    121          	}
+    122          	return FALSE;
+    123          }
+    124          
+    125          INT8U IsItReallIORUInsert(void)
+    126          {
+    127          	if(IORUInsertCheck() && !BitRead(MySts->OTUInfo, mLinkFail)) return TRUE;
+    128          	return FALSE;
+    129          }
+    130          
+    131          
+    132          void IORULinkFailCheck(void)
+    133          {
+    134          	if((++IORULinkFailCnt > 20))
+    135          	{
+    136          		IORULinkFailCnt = 30;
+    137          		IsItGetIOURInform = FALSE;
+    138          		BitSet(MySts->OTUInfo, mLinkFail);
+    139          		BitSet(MySts->COTInfo, mLinkFail);
+    140          		BitSet(MySts->RTInfo, mLinkFail);
+    141          
+    142          		MySts->DnrAlm.LinkFail = SET;
+    143             	}
+    144          }
+    145          
+    146          void IORULinkFailRst(void)
+    147          {
+    148          	IORULinkFailCnt = 0;
+    149          	BitRst(MySts->OTUInfo, mLinkFail);
+    150          	BitRst(MySts->COTInfo, mLinkFail);
+    151          	BitRst(MySts->RTInfo, mLinkFail);
+    152          	MySts->DnrAlm.LinkFail = RESET;
+    153          }
+    154          ////////////////////////////////////////////////////////////////////////////////
+    155          // End of Source File
+    156          /////////////////////////
+    157          
+
+   Maximum stack usage in bytes:
+
+     Function               .cstack
+     --------               -------
+     IORUCheckInstalltoNext      8
+     IORUInit                    8
+     IORUInsertCheck             0
+     IORULinkFailCheck           0
+     IORULinkFailRst             0
+     IORURxLED                   8
+     IORUTask                   56
+     IORUTxLED                   8
+     IsItReallIORUInsert         8
+
+
+   Section sizes:
+
+     Function/Label         Bytes
+     --------------         -----
+     IORUSerB               3172
+     IORUSer
+     SIORUsio
+     RIORUsio
+     IORU0TaskStk
+     IORULinkFailCnt           8
+     IsItGetIOURInform
+     IORUSndBuff
+     IORUInit                 88
+     IORUTask                228
+     IORUInsertCheck          16
+     IORUTxLED                46
+     IORURxLED                40
+     IORUCheckInstalltoNext   28
+     IsItReallIORUInsert      30
+     IORULinkFailCheck        78
+     IORULinkFailRst          62
+     ??DataTable3              4
+     ??DataTable8              4
+     ??DataTable9              4
+
+ 
+ 3 172 bytes in section .bss
+     8 bytes in section .data
+   628 bytes in section .text
+ 
+   628 bytes of CODE memory
+ 3 180 bytes of DATA memory
+
+Errors: none
+Warnings: none

@@ -1,0 +1,55 @@
+1.Ver5.0.0  2014.02.06
+ 1.초기 배포
+ 
+2. Ver5.0.1  2014.02.25
+ 2.1. 초기화 제어시 Detect offset 및 Gain Offset으로 제어 되는 현상 발생 
+    --> GUI에 초기화 제어 버튼 삭제, F/W에서도 삭재
+ 2.2. 테이블 에서 Start 값이 다른 값으로 저장되는 현상 
+    --> 원인 불명
+    - 조치 : 테이블 제어시   설정값의 +2 ~ -5dB을 벗어나면 Default값으로 되게 수정
+    - 출력 Offset도 +/- 5dB이상 벗어나면 설정 안되게 수정
+    - Gain Offsett도 +/- 10dB이상 벗어나면 설정 안되게 수정
+ 
+ 3. Ver5.0.1  2014.02.26
+ 요청사항 : BM 모드 ON에서 OFF 제어 시 BM ATT이 0으로 설정되도록 변경
+ 
+ 4. Ver5.0.2  2014.03.03
+ 요청사항 : 품질 보증팀 이재두 과정과 협의
+ 테이블 에서 Start 값을 고정되게 수정
+ 
+ 5. Ver5.0.3  2014.03.03
+  - LTE 과입력 알람레벨 설정 이상 동작
+  - LTE 과입력 알람 발생시  LTE-A 과입력 알람 발생 
+  - 테이블 에서 Length 값을 고정되게 수정
+ 
+  
+ 6. Ver5.0.4  2014.03.04 -> Alarm 체크를 10mSec에서 500mSec로 변경
+   - RVS 과입력 Alarm Count(LTE) : 자사/타사 과입력 조건이 아닌데 Count 되는 현상 수정 
+     (알람 해지 조건 수정 ) 
+   - WCDMA  Gain Balance : 5설정 시 Rvs 출력은 5dB 떨어지지만, 출력 Det은 변하지 않음
+     ( 기존 1차 버전에서 Det 위치가 최종단에서 있다가 중간으로 변경되어 AGC ATT을 계산 하게 수정함 ) 
+ 
+1. 2G,4G TX 과입력 Alarm : 규격서에는 MAX 입력 +3에서 동작하도록 되어 있으나,
+                                  현재  MIN입력 +40에서 동작 중 
+2. RVS Path 과입력 Alarm : 동작 안 함
+                                   -> 과출력에 의한 Shutdown은 정상동작
+3. RVS 과입력 Alarm Count(LTE) : 자사/타사 과입력 조건이 아닌데 Count 됨
+4. Gain Balance : 5설정 시 출력은 5dB 떨어지지만, 출력 Det은 변하지 않음
+
+
+5. Ver5.0.6  2014.3.06
+  	CPU에서프로그램 적으로 Option bytes중에 BOR_LEV: BOR reset Level이 있어 설정 
+	가능한 것이 있어 설정변경하면 해결 가능, 
+ 	Option 에서 01: BOR Level 2 (VBOR2). reset threshold level from 2.40 to 2.70 V로 설정하여 테스트 결과 정상 동작 중
+   
+6. Ver5.0.6  2014.03.11
+   RVS 과입력 Alarm Count 수정 
+
+
+
+INT32S BcdemPilotGet(BcMPilotStsStr *nPtr)
+INT32S BcdemRfStsGet(BcMRfStsStr *nPtr)
+	INT16S *tPtr = (INT16S *)nPtr; 선언이 잘못됨 
+
+   
+ expi0 1185

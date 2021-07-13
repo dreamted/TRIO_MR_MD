@@ -1,0 +1,382 @@
+###############################################################################
+#                                                                             #
+#                                                       14/Nov/2010  14:46:30 #
+# IAR ANSI C/C++ Compiler V5.20.0.20892/W32 EVALUATION for ARM                #
+# Copyright 1999-2008 IAR Systems AB.                                         #
+#                                                                             #
+#    Cpu mode     =  thumb                                                    #
+#    Endian       =  little                                                   #
+#    Source file  =  C:\user\project\HK-DEI\fw\appl_rcub_20101101\dev\adf4153 #
+#                    \adf4153.c                                               #
+#    Command line =  C:\user\project\HK-DEI\fw\appl_rcub_20101101\dev\adf4153 #
+#                    \adf4153.c -lcN C:\user\project\HK-DEI\fw\appl_rcub_2010 #
+#                    1101\sout\ -lB C:\user\project\HK-DEI\fw\appl_rcub_20101 #
+#                    101\sout\ -o C:\user\project\HK-DEI\fw\appl_rcub_2010110 #
+#                    1\sout\ --endian=little --cpu=Cortex-M3 -e               #
+#                    --require_prototypes --fpu=None --dlib_config            #
+#                    "C:\compiler\EWARM 5.20\ARM\INC\DLib_Config_Normal.h"    #
+#                    -I C:\user\project\HK-DEI\fw\appl_rcub_20101101\include\ #
+#                     -I C:\user\project\HK-DEI\fw\appl_rcub_20101101\lib_stm #
+#                    32\inc\ -I C:\user\project\HK-DEI\fw\appl_rcub_20101101\ #
+#                    lib_stm32\src\ -I C:\user\project\HK-DEI\fw\appl_rcub_20 #
+#                    101101\uC-CPU\ -I C:\user\project\HK-DEI\fw\appl_rcub_20 #
+#                    101101\uC-LIB\ -I C:\user\project\HK-DEI\fw\appl_rcub_20 #
+#                    101101\uCOS-II\Ports\ -I C:\user\project\HK-DEI\fw\appl_ #
+#                    rcub_20101101\uCOS-II\Source\ -I                         #
+#                    C:\user\project\HK-DEI\fw\appl_rcub_20101101\uC-Probe\   #
+#                    -I "C:\compiler\EWARM 5.20\ARM\INC\" -Oh                 #
+#    List file    =  C:\user\project\HK-DEI\fw\appl_rcub_20101101\sout\adf415 #
+#                    3.lst                                                    #
+#    Object file  =  C:\user\project\HK-DEI\fw\appl_rcub_20101101\sout\adf415 #
+#                    3.o                                                      #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+C:\user\project\HK-DEI\fw\appl_rcub_20101101\dev\adf4153\adf4153.c
+      1          /*******************************************************************************
+      2           *
+      3           * This module contains the function HMS39C7092 original source file, a function
+      4           * whole things  initializations - global, include function and so on
+      5           *
+      6           *
+      7           * Note that this function is called before the data segments are
+      8           * initialized, this means that this function cannot rely on the
+      9           * values of global or static variables.
+     10           *
+     11           *
+     12           * Copyright 2006- bizistyle(bgyoon@hanafos.com) All rights reserved.
+     13           *
+     14           * $Revision: 0.1 $
+     15           * $Revision date: 2006.08.__
+     16           *
+     17            ******************************************************************************/
+     18          //#include "../include/main.h"
+     19          #define DEV_ADF4153
+     20          
+     21          #include "../include/main.h"
+     22          
+     23          //#define ADF4153_debug
+     24          
+     25          //#define __IFPRE			16
+     26          //#define __RFPRE			128
+     27          
+     28          #define __RFRVAL	1
+     29          //#define __IFRVAL	65
+     30          
+     31          //#define __IFPRE			8
+     32          //#define __IFPRE			16
+     33          //#define __IFPRE			32
+     34          //#define __IFPRE			64
+     35          
+     36          void SetRxPllClk(void)
+     37          {
+     38          	ExpioBitSet(RxPLL_CLKSel);
+     39          }
+     40          
+     41          void RstRxPllClk(void)
+     42          {
+     43          	ExpioBitRst(RxPLL_CLKSel);
+     44          }
+     45          
+     46          void SetRxPllData(void)
+     47          {
+     48          	ExpioBitSet(RxPLL_DATASel);
+     49          }
+     50          
+     51          void RstRxPllData(void)
+     52          {
+     53          	ExpioBitRst(RxPLL_DATASel);
+     54          }
+     55          
+     56          void SetRxPllEnA(void)	// RX PLL IN1
+     57          {
+     58          	//ExpioBitSet(RxBEACONFA1EnSel);
+     59          	ForDelay(ADF4153DELAY);
+     60          }
+     61          
+     62          void RstRxPllEnA(void)	// RX PLL IN1
+     63          {
+     64          //	ExpioBitRst(RxBEACONFA1EnSel);
+     65          	ForDelay(ADF4153DELAY);
+     66          }
+     67          
+     68          void SetRxPllEnB(void)	// RX PLL IN2
+     69          {
+     70          //	ExpioBitSet(RxBEACONFA2EnSel);
+     71          	ForDelay(ADF4153DELAY);
+     72          }
+     73          
+     74          
+     75          void RstRxPllEnB(void)	// RX PLL IN2
+     76          {
+     77          //	ExpioBitRst(RxBEACONFA2EnSel);
+     78          	ForDelay(ADF4153DELAY);
+     79          }
+     80          
+     81          void SetRxPllEnC(void)	// Rx PLL OUT
+     82          {
+     83          #ifdef __SUNWAVE
+     84          	ExpioBitSet(PLL_EN3Sel);
+     85          #else
+     86          	ExpioBitSet(RxCopyEnSel);
+     87          #endif
+     88          #ifdef __SUNWAVE
+     89          		ForDelay(ADF4153DELAY);
+     90          #endif
+     91          }
+     92          
+     93          void RstRxPllEnC(void)	// Rx PLL OUT
+     94          {
+     95          #ifdef __SUNWAVE
+     96          	ExpioBitRst(PLL_EN3Sel);
+     97          #else
+     98          	ExpioBitRst(RxCopyEnSel);
+     99          #endif
+    100          #ifdef __SUNWAVE
+    101          	ForDelay(ADF4153DELAY);
+    102          #endif
+    103          }
+    104          
+    105          
+    106          
+    107          void SetTxPllClk(void)
+    108          {
+    109          	//ExpioBitSet(PLL_CLKsel);
+    110          }
+    111          
+    112          void RstTxPllClk(void)
+    113          {
+    114          	//ExpioBitRst(PLL_CLKsel);
+    115          }
+    116          
+    117          void SetTxPllData(void)
+    118          {
+    119          	//ExpioBitSet(PLL_DATASel);
+    120          }
+    121          
+    122          void RstTxPllData(void)
+    123          {
+    124          	//ExpioBitRst(PLL_DATASel);
+    125          }
+    126          
+    127          
+    128          void SetTxPllEnA(void)	// TX PLL OUT1
+    129          {
+    130          	ExpioBitSet(TxBEACONFA1EnSel);
+    131          }
+    132          
+    133          void RstTxPllEnA(void)	// TX PLL OUT1
+    134          {
+    135          	ExpioBitRst(TxBEACONFA1EnSel);
+    136          }
+    137          
+    138          void SetTxPllEnB(void)	// TX PLL OUT2
+    139          {
+    140          	ExpioBitSet(TxBEACONFA2EnSel);
+    141          }
+    142          
+    143          void RstTxPllEnB(void)	// PLL IN2
+    144          {
+    145          	ExpioBitRst(TxBEACONFA2EnSel);
+    146          }
+    147          
+    148          void SetTxPllEnC(void)	// TX PLL IN
+    149          {
+    150          	ExpioBitSet(TxCopyEnSel);
+    151          }
+    152          
+    153          void RstTxPllEnC(void)	// TX PLL IN
+    154          {
+    155          	ExpioBitRst(TxCopyEnSel);
+    156          }
+    157          
+    158          
+    159          ////////////////////////////////////////////////////////////////////////////////
+    160          void ADF4153Create(_pADF4252Str ptr, 
+    161          						void (*SetClk)(), void (*RstClk)(), 
+    162          							void (*SetData)(), void (*RstData)(),
+    163          							  void (*SetEn)(), void (*RstEn)() )
+    164          {
+    165          	ptr->SetClk = SetClk;
+    166          	ptr->RstClk = RstClk;
+    167          	ptr->SetData = SetData;
+    168          	ptr->RstData = RstData;
+    169          	ptr->SetEn = SetEn;
+    170          	ptr->RstEn = RstEn;
+    171          
+    172          	ptr->RstData();
+    173          	ptr->RstClk();
+    174          	//ptr->SetEn();
+    175          	ptr->RstEn();
+    176          }
+    177          
+    178          
+    179          void ADF4153Init(INT32U rfrq, INT32U rsol, _pADF4252Str ptr)
+    180          {
+    181          	ptr->rfrq = rfrq;
+    182          	ptr->rsol = rsol;
+    183          }
+    184          
+    185          
+    186          _ADF4153Reg ADF4153RFOutput(INT32U fvco, _pADF4252Str ptr, INT8U nfullCtrl)
+    187          {
+    188          	INT32U i = 0;
+    189          	_ADF4153Reg Reg;
+    190          
+    191          	{
+    192          		_RFNDividerReg	RFNDivider;
+    193          		_RFRDividerReg	RFRDivider;
+    194          		_RFControlReg RFControl;
+    195          		_RFNoiseReg RFNoise;
+    196          
+    197          		RFNDivider.Data = __RFNDividerRegSel;
+    198          		RFRDivider.Data = __RFRDividerRegSel;
+    199          		RFControl.Data = __RFControlRegSel;
+    200          		RFNoise.Data = __RFNoiseSpurRegSet;
+    201          
+    202          		{
+    203          			INT32U R = __RFRVAL;	// RF reference division factor
+    204          			INT32U D = __DISABLE;	// Doubler disable
+    205          			INT32U Fpfd = (ptr->rfrq/R)*((1+D));
+    206          			INT32U MOD = Fpfd/ptr->rsol;
+    207          
+    208          			// N Divider Set
+    209          			RFNDivider.Bit.INTVAL = fvco/Fpfd;
+    210          			//RFNDivider.Bit.FRACVAL = (((((INT64U)fvco*100L)/Fpfd)%100L)*MOD)/100L;
+    211          			{
+    212          				double tmp;
+    213          				tmp = (double)fvco/(double)Fpfd - (double)RFNDivider.Bit.INTVAL;
+    214          				tmp = tmp*MOD*10L;
+    215          				RFNDivider.Bit.FRACVAL = ((INT32U)tmp + 1)/10L;
+    216          			}
+    217          			RFNDivider.Bit.FL = __NOR;
+    218          
+    219          			// R Divider Set
+    220          			RFRDivider.Bit.MODVAL = MOD;
+    221          			RFRDivider.Bit.R = R;
+    222          			if(fvco > 2000000000L) 	RFRDivider.Bit.RFPRESCALER = __RF_PR8;
+    223          			else					RFRDivider.Bit.RFPRESCALER = __RF_PR4;
+    224          
+    225          			RFRDivider.Bit.MUXOUT = __DIGLock;
+    226          			RFRDivider.Bit.LOADCTRL = __NOR;
+    227          
+    228          
+    229          			RFControl.Bit.RFCOUNTERRst = __DISABLE;
+    230          			RFControl.Bit.RFCPThreeSts = __DISABLE;
+    231          			RFControl.Bit.RFPWRDN = __DISABLE;
+    232          			RFControl.Bit.LDP = __24PFD;
+    233          			RFControl.Bit.RFPDPOL = __POS;
+    234          			RFControl.Bit.RFCPCURSet = __ICP5_1K_1_25mA;//__ICP5_1K_1_25mA;
+    235          			RFControl.Bit.RFDOUBLER = __DISABLE;
+    236          			RFControl.Bit.RFRYNC = 0;
+    237          
+    238          			RFNoise.Bit.NOISEMODE = __LowestNoise;
+    239          //#define	ADF4153_debug
+    240          
+    241          			#ifdef ADF4153_debug
+    242          			{
+    243          				SerPtr->printf("VCO: %d [MHz]\n", fvco/1000000L);
+    244          				SerPtr->printf("RF ref: %d, Fpfd: %d, MOD: %06x \n",  ptr->rfrq,  Fpfd, MOD & 0xffffff);
+    245          				SerPtr->printf("INTVAL: %d, FRACVAL: %d \n",  RFNDivider.Bit.INTVAL,  RFNDivider.Bit.FRACVAL);
+    246          				SerPtr->printf("RF N Divider: %06x \n", RFNDivider.Grp.tot & 0xffffff);
+    247          				SerPtr->printf("RF R Counter: %05x \n", RFRDivider.Grp.tot & 0xffffff);
+    248          				SerPtr->printf("RF CONTROL  : %04x \n", RFControl.Grp.tot & 0xffffff);
+    249          				SerPtr->printf("RF NOISE    : %03x \n", RFNoise.Grp.tot & 0xffffff);
+    250          				
+    251          				OSTimeDly(100);
+    252          			}
+    253          			#endif
+    254          
+    255          			Reg.RFNDividerReg = RFNDivider.Data;
+    256          			Reg.RFRDividerReg = RFRDivider.Data;
+    257          			Reg.RFControlReg = RFControl.Data;
+    258          			Reg.RFNoiseSpurReg = RFNoise.Data;
+    259          
+    260          			if(!nfullCtrl) return Reg;
+    261          		}
+    262          
+    263          /////////////
+    264          // 3
+    265          /////////////
+    266          			for(i = 0; i < 24; i++)				// Noise & Spur
+    267          			{
+    268          				if((RFNoise.Data & 0x800000) == 0x800000)	ptr->SetData();
+    269          				else										ptr->RstData();
+    270          
+    271          
+    272          				RFNoise.Data <<= 1;
+    273          				ptr->SetClk();
+    274          				ptr->RstClk();
+    275          			}
+    276          			ptr->RstData();
+    277          			ptr->SetEn();
+    278          			ptr->RstEn();
+    279          /////////////
+    280          // 2
+    281          /////////////
+    282          			for(i = 0; i < 24; i++) 			// control
+    283          			{
+    284          				if((RFControl.Data & 0x800000) == 0x800000)	ptr->SetData();
+    285          				else										ptr->RstData();
+    286          
+    287          				ptr->SetClk();
+    288          				RFControl.Data <<= 1;
+    289          				ptr->RstClk();
+    290          			}
+    291          			
+    292          			ptr->RstData();
+    293          			ptr->SetEn();
+    294          			ptr->RstEn();
+    295          /////////////
+    296          // 1
+    297          /////////////
+    298          		//RFRDivider.Grp.tot = 0x044065;
+    299          
+    300          		//tMsb = 1 << 23;
+    301          		for(i = 0; i < 24; i++)				// R Divider
+    302          		{
+    303          			if((RFRDivider.Data & 0x800000) == 0x800000)	ptr->SetData();
+    304          			else											ptr->RstData();
+    305          
+    306          			ptr->SetClk();
+    307          			RFRDivider.Data <<= 1;
+    308          			ptr->RstClk();
+    309          		}
+    310          		
+    311          		ptr->RstData();
+    312          		ptr->SetEn();
+    313          		ptr->RstEn();
+    314          /////////////
+    315          // 0
+    316          /////////////
+    317          
+    318          		//tMsb = 1 << 23;
+    319          
+    320          		//RFNDivider.Grp.tot = 0x33401C;
+    321          
+    322          		for(i = 0; i < 24; i++)				// N Divider
+    323          		{
+    324          			if((RFNDivider.Data & 0x800000) == 0x800000)	ptr->SetData();
+    325          			else											ptr->RstData();
+    326          			ptr->SetClk();
+    327          			RFNDivider.Data <<= 1;
+    328          			ptr->RstClk();
+    329          		}
+    330          		ptr->RstData();
+    331          		ptr->SetEn();
+    332          		ptr->RstEn();
+    333          /////////////// 	
+    334          	}
+    335          
+    336          	////////////////////////////////////////////////////////////
+    337          	return Reg;
+    338          }
+    339          
+    340          ////////////////////////////////////////////////////////////////////////////////
+    341          // End of Source File
+    342          /////////////////////
+    343          
+
+Errors: 12
+Warnings: none

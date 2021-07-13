@@ -1,0 +1,378 @@
+###############################################################################
+#                                                                             #
+# IAR ANSI C/C++ Compiler V5.50.0.51878/W32 for ARM     11/Aug/2012  17:25:05 #
+# Copyright (C) 1999-2010 IAR Systems AB.                                     #
+#                                                                             #
+#    Cpu mode     =  thumb                                                    #
+#    Endian       =  little                                                   #
+#    Source file  =  C:\user\project\FR-SSR\fw\appl_ssr_20120717\lib\Vfd\clcd #
+#                    lib_v1006.c                                              #
+#    Command line =  C:\user\project\FR-SSR\fw\appl_ssr_20120717\lib\Vfd\clcd #
+#                    lib_v1006.c -D NDEBUG -lcN C:\user\project\FR-SSR\fw\app #
+#                    l_ssr_20120717\sout\ -o C:\user\project\FR-SSR\fw\appl_s #
+#                    sr_20120717\sout\ --endian=little --cpu=Cortex-M3 -e     #
+#                    --warnings_are_errors --fpu=None --dlib_config           #
+#                    "C:\compiler\ewarm 5.5\arm\INC\DLib_Config_Normal.h" -I  #
+#                    C:\user\project\FR-SSR\fw\appl_ssr_20120717\include\ -I  #
+#                    C:\user\project\FR-SSR\fw\appl_ssr_20120717\lib_stm32\in #
+#                    c\ -I C:\user\project\FR-SSR\fw\appl_ssr_20120717\lib_st #
+#                    m32\src\ -I C:\user\project\FR-SSR\fw\appl_ssr_20120717\ #
+#                    uC-CPU\ -I C:\user\project\FR-SSR\fw\appl_ssr_20120717\u #
+#                    C-LIB\ -I C:\user\project\FR-SSR\fw\appl_ssr_20120717\uC #
+#                    OS-II\Ports\ -I C:\user\project\FR-SSR\fw\appl_ssr_20120 #
+#                    717\uCOS-II\Source\ -I C:\user\project\FR-SSR\fw\appl_ss #
+#                    r_20120717\uC-Probe\ -I "C:\compiler\ewarm               #
+#                    5.5\arm\INC\" -Oh                                        #
+#    List file    =  C:\user\project\FR-SSR\fw\appl_ssr_20120717\sout\clcdlib #
+#                    _v1006.lst                                               #
+#    Object file  =  C:\user\project\FR-SSR\fw\appl_ssr_20120717\sout\clcdlib #
+#                    _v1006.o                                                 #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+C:\user\project\FR-SSR\fw\appl_ssr_20120717\lib\Vfd\clcdlib_v1006.c
+      1          /*******************************************************************************
+      2           *
+      3           * This module contains the function HMS39C7092 original header file, a function
+      4           * whole things  initializations - global, include function and so on
+      5           *
+      6           *
+      7           * Note that this function is called before the data segments are
+      8           * initialized, this means that this function cannot rely on the
+      9           * values of global or static variables.
+     10           *
+     11           *
+     12           * Copyright 2006- bizistyle(bgyoon@hanafos.com) All rights reserved.
+     13           *
+     14           * $Revision: 0.1 $
+     15           * $Revision date: 2006.03.__
+     16           * $Revision: 0.2 $
+     17           * $Revision date: 2007.04.__
+     18           *               : to support to variable clcd like application 4*24 etc
+     19           *                 void LcdInit(INT32U bAddr, INT16U _A0, INT16U _Sel,
+     20           *                              INT8U LineSize, INT8U LineMax, INT8U swtime, char *init);
+     21           ******************************************************************************/
+     22          
+     23          #include "stm32f10x_conf.h"
+     24          #include "../include/cLcdlibExt.h"
+     25          #include "cLcdlib_v1006.h"
+     26          
+     27          void LcdInit(INT32U bAddr, INT16U _A0, INT16U _Sel, INT8U LineSize, INT8U LineMax, INT8U swtime, char *init)
+     28          {
+     29          	cLval.LcdOnOff = FALSE;
+     30          	cLval.BlankCnt = 0;
+     31          	cLval.LcdBlinkTimer = 0;
+     32          	cLval.LcdCharCount = 0;
+     33          	cLval.cs = bAddr;
+     34          
+     35          	cLval.LcdSel = _Sel;
+     36          	cLval.LcdA0 = _A0;
+     37          
+     38          ////////////////////////////////////////////////////////////////////////////
+     39          	OSTimeDly(100);
+     40              //ForDelay(2);
+     41              LcdCommandWrite(0x30);  		ForDelay(2);
+     42              LcdCommandWrite(0x30);  		ForDelay(2);
+     43              LcdCommandWrite(0x30);  		ForDelay(2);
+     44          	LcdCommandWrite(FUNC_SET | (LineMax >> 2));  	ForDelay(2); //data length : 8bit, 2 line, 5*7 dot
+     45              LcdCommandWrite(FUNC_SET | (LineMax >> 2));  	ForDelay(2); //data length : 8bit, 2 line, 5*7 dot */
+     46              LcdCommandWrite(FUNC_SET | (LineMax >> 2));  	ForDelay(2);
+     47              LcdCommandWrite(CURSOR_OFF);  	ForDelay(2);
+     48              LcdCommandWrite(CURSOR_HOME);	ForDelay(2);
+     49              LcdCommandWrite(INC_MODE);  	ForDelay(2); //cursor forward
+     50              LcdCommandWrite(CLEAR_DISP);	ForDelay(2);
+     51              LcdCommandWrite(CURSOR_OFF);
+     52          
+     53          	cLval.Sem = OSSemCreate(1);
+     54          
+     55          	cLval.Line1stAddr = 0x00 | 0x80;
+     56          
+     57          	if(LineMax == 2)
+     58          	{
+     59          		cLval.Line2ndAddr = 0x40 | 0x80;
+     60          	}
+     61          	else
+     62          	{
+     63          		cLval.Line2ndAddr = 0x20 | 0x80;
+     64          	}
+     65          	if(!swtime)	cLval.swtime = 20;
+     66          	else		cLval.swtime = swtime;
+     67          	if(LineSize <= cLCDlineSIZE )	cLval.LineSize = LineSize;
+     68          	else							cLval.LineSize = cLCDlineSIZE;
+     69          
+     70          	if(LineMax <=  cLCDlineMAX)		cLval.LineMax = LineMax;
+     71          	else							cLval.LineMax = cLCDlineMAX;
+     72          
+     73          	cLval.LcdUserPtrF = &cLval.lcd_buffersF[0];
+     74          	cLval.LcdUserPtrB = &cLval.lcd_buffersB[0];
+     75          	cLval.LcdIntPtr = cLval.LcdUserPtrF;
+     76          	cLval.LcdCharCount = 0;
+     77          
+     78          	Lcdprintf((char *)init, BlinkON);
+     79          
+     80          }
+     81          
+     82          void LcdCommandWrite ( INT8U Comm )
+     83          {
+     84          
+     85          	ExpioBitRst(cLval.LcdA0);
+     86          	ExpioWriteData(cLval.cs, Comm);
+     87          	ExpioBitSet(cLval.LcdSel);
+     88          	ForDelay(1);
+     89          	ExpioBitRst(cLval.LcdSel);
+     90          }
+     91          
+     92          void Lcdprintf ( char *Ptr, INT8U Blink )
+     93          {
+     94          	INT32U	i;
+     95          
+     96          	INT8U err;
+     97          
+     98          	OSSemPend(cLval.Sem, 0, &err);
+     99          
+    100          	if( Blink == BlinkON )
+    101          	{
+    102          		for( i = 0; i < (cLCDlineSIZE*cLCDlineMAX) && i < (cLval.LineSize * cLval.LineMax); i++ )
+    103          		{
+    104          			cLval.lcd_buffersF[i] = *(Ptr + i);
+    105          			cLval.lcd_buffersB[i] = *(Ptr +(cLval.LineSize*cLval.LineMax) + i);
+    106          		}
+    107          	}
+    108          	else
+    109          	{
+    110          		for( i = 0; i < (cLCDlineSIZE*cLCDlineMAX) && i < (cLval.LineSize * cLval.LineMax); i++ )
+    111          		{
+    112          			cLval.lcd_buffersF[i] = *(Ptr + i);
+    113          			cLval.lcd_buffersB[i] = *(Ptr + i);
+    114          		}
+    115          	}
+    116           	OSSemPost(cLval.Sem);
+    117          
+    118          }
+    119          
+    120          void LcdClear(void)
+    121          {
+    122          	INT32U	i;
+    123          
+    124          	INT8U err;
+    125          
+    126          	OSSemPend(cLval.Sem, 0, &err);
+    127          
+    128          	for( i = 0; i < (cLCDlineSIZE*cLCDlineMAX) && i < cLval.LineSize * cLval.LineMax; i++ )
+    129          	{
+    130          			cLval.lcd_buffersF[i] = ' ';
+    131          			cLval.lcd_buffersB[i] = ' ';
+    132          	}
+    133          
+    134           	OSSemPost(cLval.Sem);
+    135          
+    136          }
+    137          int Lcdsprintf(INT32U Addr, const char *format, ... )
+    138          {
+    139          	char buf[100];
+    140          	va_list argptr;
+    141          
+    142          	va_start(argptr, format);
+    143          	/*cnt = */vsprintf(buf, format, argptr);
+    144          	va_end( argptr );
+    145          
+    146          	ReplaceStr((char *)buf, Addr, strlen(buf));
+    147          
+    148          	return (strlen(buf));
+    149          }
+    150          
+    151          #define StrLimit {\
+    152          \
+    153          	if(Addr + Cnt > (cLval.LineSize * cLval.LineMax)) \
+    154          	{ \
+    155          		if(Addr >= (cLval.LineSize * cLval.LineMax)) return; \
+    156          		else	Cnt = (cLval.LineSize * cLval.LineMax) - Addr; \
+    157          	} \
+    158          	if(strlen(Ptr) < Cnt) Cnt = strlen(Ptr);\
+    159          }
+    160          
+    161          void ReplaceStr(char *Ptr, INT32U Addr, INT32U Cnt)
+    162          {
+    163          	INT32U	i;
+    164          	INT8U err;
+    165          
+    166          
+    167          	OSSemPend(cLval.Sem, 0, &err);
+    168          
+    169          	StrLimit;
+    170          
+    171          	for( i = 0; i < Cnt; i++ )
+    172          	{	*((char *)cLval.lcd_buffersF+Addr + i) = *(Ptr + i);
+    173          		*((char *)cLval.lcd_buffersB+Addr + i) = *(Ptr + i);
+    174          	}
+    175          
+    176          	OSSemPost(cLval.Sem);
+    177          }
+    178          
+    179          void ReplaceOneStr (char *Ptr, INT32U Addr, INT32U Cnt, INT32U FwdOrNot)
+    180          {
+    181          	INT32U	i;
+    182          	char *WrPtr;
+    183          	INT8U err;
+    184          
+    185          	OSSemPend(cLval.Sem, 0, &err);
+    186          
+    187          	StrLimit;
+    188          
+    189          	if(FwdOrNot == FwdWrite)WrPtr = (char *)cLval.lcd_buffersF;
+    190          	else					WrPtr = (char *)cLval.lcd_buffersB;
+    191          
+    192          	for( i = 0; i < Cnt; i++ ) *((char *)WrPtr+Addr + i) = *(Ptr + i);
+    193          
+    194           	OSSemPost(cLval.Sem);
+    195          }
+    196          
+    197          void LcdWriting(void)
+    198          {
+    199          	if ( cLval.LcdBlinkTimer != 0 )
+    200          		cLval.LcdBlinkTimer--;
+    201          	LcdPutChar();
+    202          }
+    203          
+    204          void DispLine1Adrs ( INT8U Addr )
+    205           {
+    206          	LcdCommandWrite( DDRAML1addr + Addr );
+    207           }
+    208          
+    209          void DispLine2Adrs ( INT8U Addr )
+    210           {
+    211          	LcdCommandWrite( DDRAML2addr + Addr );
+    212           }
+    213          
+    214          void DispLine3Adrs ( INT8U Addr )
+    215           {
+    216          	LcdCommandWrite( DDRAML1addr + 0x40 + Addr );
+    217           }
+    218          
+    219          void DispLine4Adrs ( INT8U Addr )
+    220           {
+    221          	LcdCommandWrite( DDRAML2addr + 0x40 + Addr );
+    222           }
+    223          
+    224          void LcdPutChar(void)
+    225          {
+    226          	if(	cLval.LcdOnOff == TRUE )
+    227          	{
+    228          		if(cLval.LineMax == 2)
+    229          		{
+    230          			if( cLval.LcdCharCount == cLval.LineSize )
+    231          			{
+    232          			  	DispLine2Adrs(0);
+    233          			}
+    234          			else if( cLval.LcdCharCount == cLval.LineSize*2)
+    235          			{
+    236          				DispLine1Adrs(0);
+    237          				cLval.LcdCharCount = 0;
+    238          				StringSwitch();
+    239          			}
+    240          		}
+    241          		else	// 4 Line
+    242          		{
+    243          			if( cLval.LcdCharCount == cLval.LineSize )
+    244          			{
+    245          			  	DispLine2Adrs(0);
+    246          			}
+    247          			else if( cLval.LcdCharCount == cLval.LineSize*2)
+    248          			{
+    249          			  	DispLine3Adrs(0);
+    250          			}
+    251          			else if( cLval.LcdCharCount == cLval.LineSize*3)
+    252          			{
+    253          			  	DispLine4Adrs(0);
+    254          			}
+    255          			else if( cLval.LcdCharCount == cLval.LineSize*4)
+    256          			{
+    257          				DispLine1Adrs(0);
+    258          				cLval.LcdCharCount = 0;
+    259          				StringSwitch();
+    260          			}
+    261          		}
+    262          	   	cLval.LcdOnOff = FALSE;
+    263          	}
+    264          	else
+    265          	{
+    266          		// VFD_FuncSet = 0x40;
+    267          		while(cLval.LcdOnOff == FALSE)
+    268          		{
+    269          			ExpioBitSet(cLval.LcdA0);
+    270          			ExpioWriteData(cLval.cs, *((INT8U*)(cLval.LcdIntPtr + cLval.LcdCharCount)));
+    271          			ExpioBitSet(cLval.LcdSel);
+    272          			ForDelay(1);
+    273          			ExpioBitRst(cLval.LcdSel);
+    274          			cLval.LcdCharCount++;
+    275          
+    276          			if((cLval.LcdCharCount%cLval.LineSize) == 0 )cLval.LcdOnOff = TRUE;
+    277          		}
+    278          	}
+    279          }
+    280          
+    281          void StringSwitch ( void )
+    282          {
+    283          	if( cLval.LcdBlinkTimer == 0 )
+    284          	{	cLval.LcdBlinkTimer = cLval.swtime%100;
+    285          		if( cLval.LcdIntPtr != cLval.LcdUserPtrB )	cLval.LcdIntPtr = cLval.LcdUserPtrB;
+    286          		else					      				cLval.LcdIntPtr = cLval.LcdUserPtrF;
+    287          	}
+    288          }
+    289          
+
+   Maximum stack usage in bytes:
+
+     Function        .cstack
+     --------        -------
+     DispLine1Adrs        8
+     DispLine2Adrs        8
+     DispLine3Adrs        8
+     DispLine4Adrs        8
+     LcdClear            16
+     LcdCommandWrite     16
+     LcdInit             32
+     LcdPutChar          16
+     LcdWriting           8
+     Lcdprintf           24
+     Lcdsprintf         120
+     ReplaceOneStr       32
+     ReplaceStr          24
+     StringSwitch         4
+
+
+   Section sizes:
+
+     Function/Label  Bytes
+     --------------  -----
+     cLval            228
+     cLcdB             28
+     cLcd               4
+     LcdInit          288
+     LcdCommandWrite   50
+     Lcdprintf        118
+     LcdClear          62
+     Lcdsprintf        46
+     ReplaceStr        96
+     ReplaceOneStr    106
+     LcdWriting        16
+     DispLine1Adrs     10
+     ?Subroutine0       8
+     DispLine2Adrs     10
+     DispLine3Adrs      8
+     DispLine4Adrs      6
+     LcdPutChar       184
+     StringSwitch      50
+     ??DataTable11      4
+
+ 
+   228 bytes in section .bss
+    32 bytes in section .data
+ 1 062 bytes in section .text
+ 
+ 1 062 bytes of CODE memory
+   260 bytes of DATA memory
+
+Errors: none
+Warnings: none

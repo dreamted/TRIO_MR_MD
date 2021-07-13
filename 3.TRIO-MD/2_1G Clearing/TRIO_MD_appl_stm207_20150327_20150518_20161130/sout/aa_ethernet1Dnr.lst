@@ -1,0 +1,351 @@
+###############################################################################
+#                                                                             #
+# IAR ANSI C/C++ Compiler V5.30.2.51295/W32 for ARM     09/Jun/2011  18:42:05 #
+# Copyright 1999-2009 IAR Systems AB.                                         #
+#                                                                             #
+#    Cpu mode     =  thumb                                                    #
+#    Endian       =  little                                                   #
+#    Source file  =  C:\user\project\HFR OTM-L12\fw\appl_otmL12_20110505_v1.0 #
+#                    \code\aa_ethernet1Dnr.c                                  #
+#    Command line =  "C:\user\project\HFR OTM-L12\fw\appl_otmL12_20110505_v1. #
+#                    0\code\aa_ethernet1Dnr.c" -lcN "C:\user\project\HFR      #
+#                    OTM-L12\fw\appl_otmL12_20110505_v1.0\sout\" -lB          #
+#                    "C:\user\project\HFR OTM-L12\fw\appl_otmL12_20110505_v1. #
+#                    0\sout\" -o "C:\user\project\HFR                         #
+#                    OTM-L12\fw\appl_otmL12_20110505_v1.0\sout\"              #
+#                    --endian=little --cpu=Cortex-M3 -e --require_prototypes  #
+#                    --fpu=None --dlib_config "C:\compiler\ewarm              #
+#                    5.3\arm\INC\DLib_Config_Normal.h" -I                     #
+#                    "C:\user\project\HFR OTM-L12\fw\appl_otmL12_20110505_v1. #
+#                    0\include\" -I "C:\user\project\HFR                      #
+#                    OTM-L12\fw\appl_otmL12_20110505_v1.0\lib_stm32\inc\" -I  #
+#                    "C:\user\project\HFR OTM-L12\fw\appl_otmL12_20110505_v1. #
+#                    0\lib_stm32\src\" -I "C:\user\project\HFR                #
+#                    OTM-L12\fw\appl_otmL12_20110505_v1.0\uC-CPU\" -I         #
+#                    "C:\user\project\HFR OTM-L12\fw\appl_otmL12_20110505_v1. #
+#                    0\uC-LIB\" -I "C:\user\project\HFR                       #
+#                    OTM-L12\fw\appl_otmL12_20110505_v1.0\uCOS-II\Ports\" -I  #
+#                    "C:\user\project\HFR OTM-L12\fw\appl_otmL12_20110505_v1. #
+#                    0\uCOS-II\Source\" -I "C:\user\project\HFR               #
+#                    OTM-L12\fw\appl_otmL12_20110505_v1.0\uC-Probe\" -I       #
+#                    "C:\compiler\ewarm 5.3\arm\INC\" -Oh                     #
+#    List file    =  C:\user\project\HFR OTM-L12\fw\appl_otmL12_20110505_v1.0 #
+#                    \sout\aa_ethernet1Dnr.lst                                #
+#    Object file  =  C:\user\project\HFR OTM-L12\fw\appl_otmL12_20110505_v1.0 #
+#                    \sout\aa_ethernet1Dnr.o                                  #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+C:\user\project\HFR OTM-L12\fw\appl_otmL12_20110505_v1.0\code\aa_ethernet1Dnr.c
+      1          
+      2          /******************** (C) COPYRIGHT 2008 PILOG, NSINFO *************************
+      3          * File Name          : exlib.c
+      4          * Author             : Yoon Byong-Gyu(bgyoon@naver.com)
+      5          * Date First Issued  : 02/01/2008
+      6          * Description        : This file provides all the port/input/update firmware functions.
+      7          * $Revision: 0.1 $
+      8          * $Revision date: 2008.01.__
+      9          ********************************************************************************/
+     10          
+     11          #define ETH1_C
+     12          
+     13          #include "../dev/W3150A_v1.0.6/types.h"
+     14          #include "../dev/W3150A_v1.0.6/socket.h"
+     15          #include "../dev/W3150A_v1.0.6/w3150a.h"
+     16          
+     17          #include "../include/main.h"
+     18          #include "aa_ethernet1Rmt.c"
+     19          
+     20          void Ethenet1Init(void)
+     21          {
+     22          	////////////////////////////////////////////////////////////////////////////////
+     23          	//
+     24          	Wrcs1->CheckByte = ret1CheckByte;
+     25          	Wrcs1->RxGetByte = ret1GetByte;
+     26          	Wrcs1->PutStr = udp1PutStr;
+     27          	Wrcs1->TxCheckByte = NULL;
+     28          
+     29          	Wrcs1->TimerRx = Timerudp1Rx;
+     30          	Wrcs1->WRCSRecv = &Rwrcs1;
+     31          	Wrcs1->WRCSSend = &Swrcs1;
+     32          	Wrcs1->nUSE = ETH1_CHANNEL;
+     33          	Wrcs1->OSSem = OSSemCreate(1);
+     34          
+     35          	udpSem[ETH1_CHANNEL] = OSSemCreate(1);
+     36          
+     37          	if(SystemTypeInfo < 2)	OSTaskCreate(Ethernet1DnrTask, (void *)NULL, (OS_STK *)&Eth1TaskStk[ETH1_START_STK_SIZE - 1], ETH1_START_PRIO);
+     38          	else					OSTaskCreate(Ethernet1RmtTask, (void *)NULL, (OS_STK *)&Eth1TaskStk[ETH1_START_STK_SIZE - 1], ETH1_START_PRIO);
+     39          
+     40          }
+     41          // UDP CASE !!(SERVER)
+     42          void Ethernet1DnrTask(void *p_arg)
+     43          {
+     44          	INT8U s = 0;
+     45          	INT8U nUSE = Wrcs1->nUSE;
+     46          	INT8U tmpID = 0;
+     47          
+     48          	__ProtocolPtr *nPtr = Wrcs1;
+     49          
+     50          	OSTimeDly(100L*ETH1_START_PRIO);
+     51          	EthernetInitSet(nUSE, Sn_MR_UDP, FALSE);
+     52          
+     53          	udp1SetAddr(Wrcs1_RtnIP.IPAddr, Wrcs1_RtnIP.nPort);
+     54          
+     55          	//SerPtr->printf("set: ip:%d.%d.%d.%d, port: %d\n", Wrcs1_RtnIP.IPAddr[0], Wrcs1_RtnIP.IPAddr[1] ,
+     56          	//						 						  Wrcs1_RtnIP.IPAddr[2], Wrcs1_RtnIP.IPAddr[3] ,
+     57          	//											      (Wrcs1_RtnIP.nPort));
+     58          	while(1)
+     59          	{
+     60          		if(eLink_Check(nUSE) && !tTestFlag)
+     61          		{
+     62          			while(eLink_Check(nUSE) && !tTestFlag)
+     63          			{
+     64          				RmtLinkFailCheck();
+     65          				OSTimeDly(300L);
+     66          			}
+     67          			EthernetInitSet(nUSE, Sn_MR_UDP, TRUE);
+     68          			OSTimeDly(1000L);
+     69          		}
+     70          		while(!eLink_Check(nUSE) && !tTestFlag)
+     71          		{
+     72          //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+     73          			if(retSelect(nUSE, s, returnip[nUSE], &returnport[nUSE]))
+     74          			{
+     75          				INT16U Recv;
+     76          
+     77          				//rPtr->printf("recv ip:%d.%d.%d.%d, port: %d\n", returnip[nUSE][0], returnip[nUSE][1] ,
+     78          				//										  returnip[nUSE][2], returnip[nUSE][3] ,
+     79          				//										  returnport[nUSE]);
+     80          				
+     81          			    while(nPtr->CheckByte(1, &Recv))
+     82          				{
+     83          					if(WRCS_ProtocolCheck(nPtr))
+     84          					{
+     85          #if TWO_BODY >= 2
+     86          						while(nPtr->WRCSRecv->cBody  <=  nPtr->WRCSRecv->BodyNo)
+     87          						{
+     88          #endif
+     89          							udp1SetAddr(Wrcs1_RtnIP.IPAddr, Wrcs1_RtnIP.nPort);
+     90          							RmtLinkFailRst();
+     91          							ProtocolComCheck(nPtr);
+     92          #if TWO_BODY >= 2
+     93          							nPtr->WRCSRecv->cBody++;
+     94          						}
+     95          #endif
+     96          					}
+     97          				}
+     98          			}
+     99          			else {
+    100          				tmpID = RmtCheckInstalltoSend(nPtr, tmpID);
+    101          			}
+    102          			
+    103          			//if(!WRCS_DownLoadGiveupTimerSet(NULL))
+    104          			//{
+    105          				//SerPtr->printf("SendCnt = %d, RecvCnt = %d \n", RmtSendCnt, RmtRecvCnt);
+    106          			//}
+    107          			OSTimeDly(200L);
+    108          		}
+    109          		OSTimeDly(200L);
+    110          	}
+    111          }
+    112          
+    113          
+    114          INT8U RmtCheckInstalltoSend(__ProtocolPtr *nPtr, INT8U tmpID)
+    115          {
+    116          	INT8U *sData = nPtr->WRCSRecv->BodyFrame[0].SubData;
+    117          	INT8U tmpDnr, tmpRmt;
+    118          	INT16U rlen = 0;
+    119          	INT8U id0, id1, id2;
+    120          	INT8U rcom;
+    121          	
+    122          	if(WRCS_DownLoadGiveupTimerSet(NULL)) return tmpID;
+    123          
+    124          	////////////////////////////////////////////////////////////////////////////
+    125          	if(tmpID == 0)
+    126          	{
+    127          		// 자기 상태 내려준다..
+    128          		tmpDnr = MyDnrID;
+    129          		tmpRmt = 0x00;
+    130          	}
+    131          	else if(tmpID == 1)
+    132          	{
+    133          		// 다른 Donor 내려준다.
+    134          		tmpDnr = MyDnrID ^ 1;
+    135          		tmpRmt = 0x00;
+    136          	}
+    137          	else if(tmpID == 2)
+    138          	{
+    139          		// 다른 Remote 내려준다....
+    140          		tmpDnr = MyDnrID ^ 1;
+    141          		tmpRmt = 0x01;
+    142          	}
+    143          
+    144          ////////////////////////////////////////////////////////////////////////////////
+    145          	// DATA MAKE
+    146          	// SUB ID 3 Bytes!!
+    147          	IsItRtnMyVALtoSysID(&id0, &id1, &id2, tmpDnr, tmpRmt);
+    148          	sData[0] = id0;
+    149          	sData[1] = id1;
+    150          	sData[2] = id2;
+    151          
+    152          	rlen = GenDnrRstSts(&sData[3], &DnrSts[tmpDnr][tmpRmt], tmpDnr, tmpRmt, &rcom, Wrcs1) + 3;
+    153          ////////////////////////////////////////////////////////////////////////////////
+    154          	IsItRtnMyVALtoSysID(&id0, &id1, &id2, MyDnrID, 0x01);
+    155          	pBodyFrameTx(id0, id1, id2, sData, rlen, StatusRQST, Wrcs1, NULL);
+    156          
+    157          	//DnrInsertCheck();
+    158          	tmpID++;
+    159          	
+    160          	//if(DnrInsertCheck())tmpID++;
+    161          	//else 				tmpID = 0;
+    162          	
+    163          	OSTimeDly(500L);
+    164          	return (tmpID%3);
+    165          }
+    166          
+    167          void RmtLinkFailCheck(void)
+    168          {
+    169          	if(SystemTypeInfo < 2)
+    170          	{
+    171          		if((++RmtLinkFailCnt > 20))
+    172          		{
+    173          			RmtLinkFailCnt = 30;
+    174          			BitSet(DnrSts[MyDnrID][1].RTInfo, mLinkFail);
+    175          			BitSet(DnrSts[MyDnrID][1].COTInfo, mLinkFail);
+    176          			DnrSts[MyDnrID][1].DnrAlm.LinkFail = SET;
+    177          	   	}
+    178          	}
+    179          	else
+    180          	{
+    181          		if(TimeOverCheck(TimerRmtLink))
+    182          		{
+    183          			TimerRegist(TimerRmtLink, Time1Sec*5L);
+    184          
+    185          			if(BitRead(DnrSts[MyDnrID ^ 1][0].COTInfo, mInstall))
+    186          			{
+    187          				BitSet(DnrSts[MyDnrID ^ 1][0].COTInfo, mLinkFail);
+    188          				BitSet(DnrSts[MyDnrID ^ 1][0].RTInfo, mLinkFail);
+    189          
+    190          				BitSet(DnrSts[MyDnrID ^ 1][1].COTInfo, mLinkFail);
+    191          				BitSet(DnrSts[MyDnrID ^ 1][1].RTInfo, mLinkFail);
+    192          
+    193          				DnrSts[MyDnrID ^ 1][0].DnrAlm.LinkFail = SET;
+    194          			}
+    195          
+    196          			BitSet(DnrSts[MyDnrID][0].COTInfo, mLinkFail);
+    197          			BitSet(DnrSts[MyDnrID][0].RTInfo, mLinkFail);
+    198          			DnrSts[MyDnrID][0].DnrAlm.LinkFail = SET;
+    199          		}
+    200          	}
+    201          }
+    202          
+    203          void RmtLinkFailRst(void)
+    204          {
+    205          	if(SystemTypeInfo < 2)
+    206          	{
+    207          		RmtLinkFailCnt = 0;
+    208          		//BitRst(DnrSts[MyDnrID][1].RTInfo, mLinkFail);
+    209          		//BitRst(DnrSts[MyDnrID][1].COTInfo, mLinkFail);
+    210          		//DnrSts[MyDnrID][1].DnrAlm.LinkFail = RESET;
+    211          	}
+    212          	else
+    213          	{
+    214          		TimerRegist(TimerRmtLink, Time1Sec*5L);
+    215          		//BitRst(DnrSts[MyDnrID][0].COTInfo, mLinkFail);
+    216          		//BitRst(DnrSts[MyDnrID][0].RTInfo, mLinkFail);
+    217          		//DnrSts[MyDnrID][0].DnrAlm.LinkFail = RESET;
+    218          	}
+    219          }
+    220          
+    221          
+    222          
+    223          /////////////////////////////////////////////////////////////////////////////////////////////////////
+    224          unsigned char ret1CheckByte(unsigned short int ByteCnt, unsigned short int *Recv)
+    225          {
+    226          	return(retCheckByte(Wrcs1->nUSE, ByteCnt, Recv));
+    227          }
+    228          
+    229          signed short int ret1GetByte(void)
+    230          {
+    231          	return (retGetByte(Wrcs1->nUSE));
+    232          }
+    233          
+    234          
+    235          void udp1SetAddr(INT8U *destaddr, INT16U destport)
+    236          {	
+    237          	udpSetAddr(Wrcs1->nUSE, 0, destaddr, destport);
+    238          }
+    239          
+    240          void udp1PutStr(unsigned char *Str, unsigned short int Length, int iEn)
+    241          {
+    242          	udpPutStr(Wrcs1->nUSE, Str, Length, iEn, Wrcs1->destaddr, Wrcs1->destport);
+    243          	//SerPtr->printf("ip:%d.%d.%d.%d, port: %d\n", Wrcs1->destaddr[0], Wrcs1->destaddr[1] ,
+    244          	//											 Wrcs1->destaddr[2], Wrcs1->destaddr[3] ,
+    245          	//											Wrcs1->destport);
+    246          }
+    247          
+    248          
+    249          //////////////////////////////////////////////////////
+    250          // End of Source File
+    251          ////////////////////////
+    252          
+
+   Maximum stack usage in bytes:
+
+     Function              .cstack
+     --------              -------
+     Ethenet1Init               8
+     Ethernet1DnrTask          40
+     Ethernet1RmtTask          32
+     RmtCheckInstalltoSend     48
+     RmtLinkFailCheck          16
+     RmtLinkFailRst             8
+     ret1CheckByte              8
+     ret1GetByte                8
+     udp1PutStr                24
+     udp1SetAddr                8
+
+
+   Section sizes:
+
+     Function/Label        Bytes
+     --------------        -----
+     Wrcs1B                  48
+     RmtLinkFailCnt           1
+     RmtSendCnt               1
+     RmtRecvCnt               1
+     Wrcs1_RtnIP           3144
+     Wrcs1
+     Eth1TaskStk
+     Swrcs1
+     Rwrcs1
+     Ethernet1RmtTask       210
+     Ethenet1Init           128
+     Ethernet1DnrTask       210
+     RmtCheckInstalltoSend  246
+     RmtLinkFailCheck       222
+     RmtLinkFailRst          26
+     ret1CheckByte           16
+     ret1GetByte             12
+     udp1SetAddr             18
+     udp1PutStr              36
+     ??DataTable7             4
+     ??DataTable8             4
+     ??DataTable9             4
+     ??DataTable20            4
+     ??DataTable21            4
+     ??DataTable22            4
+     ??DataTable23            4
+     ??DataTable27            4
+
+ 
+    51 bytes in section .bss
+ 3 144 bytes in section .data
+ 1 156 bytes in section .text
+ 
+ 1 156 bytes of CODE memory
+ 3 195 bytes of DATA memory
+
+Errors: none
+Warnings: none

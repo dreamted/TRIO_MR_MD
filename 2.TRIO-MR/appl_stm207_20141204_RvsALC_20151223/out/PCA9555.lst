@@ -1,0 +1,1158 @@
+###############################################################################
+#                                                                             #
+# IAR ANSI C/C++ Compiler V6.30.1.53127/W32 for ARM     08/Feb/2018  09:39:24 #
+# Copyright 1999-2011 IAR Systems AB.                                         #
+#                                                                             #
+#    Cpu mode     =  thumb                                                    #
+#    Endian       =  little                                                   #
+#    Source file  =  D:\Project\TRIO\2.TRIO-MR\appl_stm207_20141204_RvsALC_20 #
+#                    151223\dev\iobus\PCA9555.c                               #
+#    Command line =  D:\Project\TRIO\2.TRIO-MR\appl_stm207_20141204_RvsALC_20 #
+#                    151223\dev\iobus\PCA9555.c -lC                           #
+#                    D:\Project\TRIO\2.TRIO-MR\appl_stm207_20141204_RvsALC_20 #
+#                    151223\out\ -o D:\Project\TRIO\2.TRIO-MR\appl_stm207_201 #
+#                    41204_RvsALC_20151223\out\ --endian=little               #
+#                    --cpu=Cortex-M3 -e --fpu=None --dlib_config "D:\Program  #
+#                    Files (x86)\IAR Systems\Embedded Workbench               #
+#                    6.0\arm\INC\c\DLib_Config_Normal.h" -I                   #
+#                    D:\Project\TRIO\2.TRIO-MR\appl_stm207_20141204_RvsALC_20 #
+#                    151223\include\ -I D:\Project\TRIO\2.TRIO-MR\appl_stm207 #
+#                    _20141204_RvsALC_20151223\STM32F2xx_StdPeriph_Driver_v12 #
+#                    12\ -I D:\Project\TRIO\2.TRIO-MR\appl_stm207_20141204_Rv #
+#                    sALC_20151223\STM32F2xx_StdPeriph_Driver_v1212\inc\ -I   #
+#                    D:\Project\TRIO\2.TRIO-MR\appl_stm207_20141204_RvsALC_20 #
+#                    151223\uC-CPU\ -I D:\Project\TRIO\2.TRIO-MR\appl_stm207_ #
+#                    20141204_RvsALC_20151223\uC-LIB\ -I                      #
+#                    D:\Project\TRIO\2.TRIO-MR\appl_stm207_20141204_RvsALC_20 #
+#                    151223\uCOS-II\Ports\ -I D:\Project\TRIO\2.TRIO-MR\appl_ #
+#                    stm207_20141204_RvsALC_20151223\uCOS-II\Source\ -I       #
+#                    D:\Project\TRIO\2.TRIO-MR\appl_stm207_20141204_RvsALC_20 #
+#                    151223\uC-Probe\ -Oh --use_c++_inline                    #
+#    List file    =  D:\Project\TRIO\2.TRIO-MR\appl_stm207_20141204_RvsALC_20 #
+#                    151223\out\PCA9555.lst                                   #
+#    Object file  =  D:\Project\TRIO\2.TRIO-MR\appl_stm207_20141204_RvsALC_20 #
+#                    151223\out\PCA9555.o                                     #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\Project\TRIO\2.TRIO-MR\appl_stm207_20141204_RvsALC_20151223\dev\iobus\PCA9555.c
+      1          #define PCA9555_C
+      2          
+      3          #include "../../include/main.h"
+
+   \                                 In section .bss, align 4
+   \   __absolute _PCA9555Str pPCA9555StrB
+   \                     pPCA9555StrB:
+   \   00000000                      DS8 24
+
+   \                                 In section .data, align 4
+   \   __absolute _pPCA9555Str pPCA9555Str
+   \                     pPCA9555Str:
+   \   00000000   0x........         DC32 pPCA9555StrB
+
+   \                                 In section .bss, align 4
+   \   __absolute _PCA9555Reg pLEDCSVal0B
+   \                     pLEDCSVal0B:
+   \   00000000                      DS8 4
+
+   \                                 In section .data, align 4
+   \   __absolute _PCA9555Reg *pLEDCSVal0
+   \                     pLEDCSVal0:
+   \   00000000   0x........         DC32 pLEDCSVal0B
+
+   \                                 In section .bss, align 4
+   \   __absolute _PCA9555Reg pLEDCSVal1B
+   \                     pLEDCSVal1B:
+   \   00000000                      DS8 4
+
+   \                                 In section .data, align 4
+   \   __absolute _PCA9555Reg *pLEDCSVal1
+   \                     pLEDCSVal1:
+   \   00000000   0x........         DC32 pLEDCSVal1B
+
+   \                                 In section .bss, align 4
+   \   __absolute _PCA9555Reg pAttnVal0B
+   \                     pAttnVal0B:
+   \   00000000                      DS8 4
+
+   \                                 In section .data, align 4
+   \   __absolute _PCA9555Reg *pAttnVal0
+   \                     pAttnVal0:
+   \   00000000   0x........         DC32 pAttnVal0B
+
+   \                                 In section .bss, align 4
+   \   __absolute _PCA9555Reg pAttnVal1B
+   \                     pAttnVal1B:
+   \   00000000                      DS8 4
+
+   \                                 In section .data, align 4
+   \   __absolute _PCA9555Reg *pAttnVal1
+   \                     pAttnVal1:
+   \   00000000   0x........         DC32 pAttnVal1B
+
+   \                                 In section .bss, align 4
+   \   __absolute _PCA9555Reg pAttnVal2B
+   \                     pAttnVal2B:
+   \   00000000                      DS8 4
+
+   \                                 In section .data, align 4
+   \   __absolute _PCA9555Reg *pAttnVal2
+   \                     pAttnVal2:
+   \   00000000   0x........         DC32 pAttnVal2B
+      4          
+      5          
+      6          //#define pPCA9555_debug
+      7          #define CLKDELAY	ForDelay(5)
+      8          
+      9          
+
+   \                                 In section .text, align 2, keep-with-next
+     10          void PCA9555_Init(_pPCA9555Str ptr, 
+     11          						void (*SetClk)(), void (*RstClk)(), 
+     12          							void (*SetData)(), void (*RstData)())
+     13          {
+   \                     PCA9555_Init:
+   \   00000000   0xE92D 0x43F8      PUSH     {R3-R9,LR}
+   \   00000004   0x4604             MOV      R4,R0
+   \   00000006   0x460D             MOV      R5,R1
+   \   00000008   0x4616             MOV      R6,R2
+   \   0000000A   0x4698             MOV      R8,R3
+   \   0000000C   0x9F08             LDR      R7,[SP, #+32]
+     14          	// Port Initialization
+     15          //	GPIOB->CNF.B6= __PB6_OU_PP; 	//__I2C1_SCL;	
+     16          //	GPIOB->CNF.B7 = __PB7_IN_FL; 	//__I2C1_SDA;
+     17          	__PB7_PP_PP();			//__I2C1_SCL;	PB7
+   \   0000000E   0x.... 0x....      LDR.W    R9,??DataTable6  ;; 0x40020400
+   \   00000012   0x2307             MOVS     R3,#+7
+   \   00000014   0x464A             MOV      R2,R9
+   \   00000016   0x2100             MOVS     R1,#+0
+   \   00000018   0x2021             MOVS     R0,#+33
+   \   0000001A   0x.... 0x....      BL       GPIOPortInit
+     18          	__PB4_IN_FL();			//__I2C1_SDA;   PB4
+   \   0000001E   0x2304             MOVS     R3,#+4
+   \   00000020   0x464A             MOV      R2,R9
+   \   00000022   0x2100             MOVS     R1,#+0
+   \   00000024   0x2000             MOVS     R0,#+0
+   \   00000026   0x.... 0x....      BL       GPIOPortInit
+     19          
+     20          
+     21              ptr->SetClk = SetClk;
+   \   0000002A   0x60A5             STR      R5,[R4, #+8]
+     22              ptr->RstClk = RstClk;
+   \   0000002C   0x60E6             STR      R6,[R4, #+12]
+     23              ptr->SetData = SetData;
+   \   0000002E   0xF8C4 0x8010      STR      R8,[R4, #+16]
+     24              ptr->RstData = RstData;
+   \   00000032   0x6167             STR      R7,[R4, #+20]
+     25          	
+     26          	RstpPCA9555SCL();
+   \   00000034   0xE8BD 0x43F1      POP      {R0,R4-R9,LR}
+   \   00000038   0x....             B.N      RstpPCA9555SCL
+     27          }
+     28           
+
+   \                                 In section .text, align 2, keep-with-next
+     29          void pPCA9555BitSet(INT32U Bitaddr, _PCA9555Reg *pVal, _pPCA9555Str ptr)
+   \                     pPCA9555BitSet:
+   \   00000000   0x....             B.N      ?Subroutine0
+
+   \                                 In section .text, align 2, keep-with-next
+     30          {
+   \                     ?Subroutine0:
+   \   00000000   0xB478             PUSH     {R3-R6}
+     31          	INT16U	dAddr = Bitaddr%8;
+     32          	INT16U	pSel = (Bitaddr/8)/8;
+   \   00000002   0x0983             LSRS     R3,R0,#+6
+   \   00000004   0xB29B             UXTH     R3,R3
+     33          	INT16U	BitNumber = (Bitaddr/8)%8;
+     34          
+     35          	BitSet(pVal->pData[pSel].Data, BitNumber);
+   \   00000006   0x5C5C             LDRB     R4,[R3, R1]
+   \   00000008   0x2501             MOVS     R5,#+1
+   \   0000000A   0xF3C0 0x06C2      UBFX     R6,R0,#+3,#+3
+   \   0000000E   0x40B5             LSLS     R5,R5,R6
+   \   00000010   0x432C             ORRS     R4,R5,R4
+   \   00000012                      REQUIRE ??Subroutine7_0
+   \   00000012                      ;; // Fall through to label ??Subroutine7_0
+
+   \                                 In section .text, align 2, keep-with-next
+   \                     ??Subroutine7_0:
+   \   00000000   0x545C             STRB     R4,[R3, R1]
+     36          	pPCASetPortData(dAddr, pVal->Data,ptr);
+   \   00000002   0x4613             MOV      R3,R2
+   \   00000004   0x880A             LDRH     R2,[R1, #+0]
+   \   00000006   0x2102             MOVS     R1,#+2
+   \   00000008   0xF000 0x0007      AND      R0,R0,#0x7
+   \   0000000C   0x0040             LSLS     R0,R0,#+1
+   \   0000000E   0xF040 0x0040      ORR      R0,R0,#0x40
+   \   00000012   0xB001             ADD      SP,SP,#+4
+   \   00000014   0xBC70             POP      {R4-R6}
+   \   00000016   0x....             B.N      Write_pPCA9555_8Addr_16Data
+     37          }
+     38          
+
+   \                                 In section .text, align 2, keep-with-next
+     39          void pPCA9555BitRst(INT32U Bitaddr, _PCA9555Reg *pVal, _pPCA9555Str ptr)
+     40          {
+   \                     pPCA9555BitRst:
+   \   00000000   0xB478             PUSH     {R3-R6}
+     41          	INT16U	dAddr = Bitaddr%8;
+     42          	INT16U	pSel = (Bitaddr/8)/8;
+   \   00000002   0x0983             LSRS     R3,R0,#+6
+   \   00000004   0xB29B             UXTH     R3,R3
+     43          	INT16U	BitNumber = (Bitaddr/8)%8;
+     44          
+     45          	BitRst(pVal->pData[pSel].Data, BitNumber);
+   \   00000006   0x5C5C             LDRB     R4,[R3, R1]
+   \   00000008   0x2501             MOVS     R5,#+1
+   \   0000000A   0xF3C0 0x06C2      UBFX     R6,R0,#+3,#+3
+   \   0000000E   0x40B5             LSLS     R5,R5,R6
+   \   00000010   0x43AC             BICS     R4,R4,R5
+   \   00000012   0x....             B.N      ??Subroutine7_0
+     46          	pPCASetPortData(dAddr, pVal->Data,ptr);
+     47          }
+     48          
+
+   \                                 In section .text, align 2, keep-with-next
+     49          void _pPCA9555BitSet(INT32U Bitaddr, _PCA9555Reg *pVal, _pPCA9555Str ptr)
+   \                     _pPCA9555BitSet:
+   \   00000000   0xBF00             Nop      
+   \   00000002                      REQUIRE ?Subroutine0
+   \   00000002                      ;; // Fall through to label ?Subroutine0
+     50          {
+     51          	INT16U	dAddr = Bitaddr%8;
+     52          	INT16U	pSel = (Bitaddr/8)/8;
+     53          	INT16U	BitNumber = (Bitaddr/8)%8;
+     54          
+     55          	BitSet(pVal->pData[pSel].Data, BitNumber);
+     56          	pPCASetPortData(dAddr, pVal->Data,ptr);
+     57          }
+     58          
+     59          
+
+   \                                 In section .text, align 2, keep-with-next
+     60          void pPCA9555SetData(INT32U pSel, INT8U Data, _PCA9555Reg *pVal, _pPCA9555Str ptr)
+     61          {
+   \                     pPCA9555SetData:
+   \   00000000   0xB418             PUSH     {R3,R4}
+     62          	INT16U	dAddr = pSel%8;
+     63          
+     64          	pSel = (pSel/8)/8;
+     65          	pVal->pData[pSel].Data = Data;	
+   \   00000002   0x0984             LSRS     R4,R0,#+6
+   \   00000004   0x54A1             STRB     R1,[R4, R2]
+     66          	pPCASetPortData(dAddr, pVal->Data,ptr);
+   \   00000006   0x8812             LDRH     R2,[R2, #+0]
+   \   00000008   0x2102             MOVS     R1,#+2
+   \   0000000A   0xF000 0x0007      AND      R0,R0,#0x7
+   \   0000000E   0x0040             LSLS     R0,R0,#+1
+   \   00000010   0xF040 0x0040      ORR      R0,R0,#0x40
+   \   00000014   0xB001             ADD      SP,SP,#+4
+   \   00000016   0xBC10             POP      {R4}
+   \   00000018   0x....             B.N      Write_pPCA9555_8Addr_16Data
+     67          }
+     68          
+
+   \                                 In section .text, align 2, keep-with-next
+     69          INT8U pPCA9555BitRead(INT32U Bitaddr, _PCA9555Reg *pVal, _pPCA9555Str ptr)
+     70          {
+   \                     pPCA9555BitRead:
+   \   00000000   0xB538             PUSH     {R3-R5,LR}
+   \   00000002   0x4604             MOV      R4,R0
+   \   00000004   0x460D             MOV      R5,R1
+     71          	INT16U	dAddr = Bitaddr%8;
+     72          	INT16U	pSel = (Bitaddr/8)/8;
+     73          	INT16U	BitNumber = (Bitaddr/8)%8;
+     74          
+     75          	pVal->Data = pPCAReadPortData(dAddr,ptr);
+   \   00000006   0x2100             MOVS     R1,#+0
+   \   00000008   0xF004 0x0007      AND      R0,R4,#0x7
+   \   0000000C   0x0040             LSLS     R0,R0,#+1
+   \   0000000E   0xF040 0x0040      ORR      R0,R0,#0x40
+   \   00000012   0x.... 0x....      BL       Read_pPCA9555_8Addr_16Data
+   \   00000016   0x8028             STRH     R0,[R5, #+0]
+     76          	return (BitRead(pVal->pData[pSel].Data, BitNumber));
+   \   00000018   0x09A0             LSRS     R0,R4,#+6
+   \   0000001A   0xB280             UXTH     R0,R0
+   \   0000001C   0x5D40             LDRB     R0,[R0, R5]
+   \   0000001E   0xF3C4 0x01C2      UBFX     R1,R4,#+3,#+3
+   \   00000022   0x40C8             LSRS     R0,R0,R1
+   \   00000024   0xF000 0x0001      AND      R0,R0,#0x1
+   \   00000028   0xBD32             POP      {R1,R4,R5,PC}    ;; return
+     77          }
+     78          
+
+   \                                 In section .text, align 2, keep-with-next
+     79          INT8U pPCA9555ReadData(INT32U pSel, _PCA9555Reg *pVal, _pPCA9555Str ptr)
+     80          {
+   \                     pPCA9555ReadData:
+   \   00000000   0xB538             PUSH     {R3-R5,LR}
+   \   00000002   0x4604             MOV      R4,R0
+   \   00000004   0x460D             MOV      R5,R1
+     81          	INT16U	dAddr = pSel%8;
+     82          
+     83          	pSel = (pSel/8)/8;
+     84          	pVal->Data = pPCAReadPortData(dAddr,ptr);
+   \   00000006   0x2100             MOVS     R1,#+0
+   \   00000008   0xF004 0x0007      AND      R0,R4,#0x7
+   \   0000000C   0x0040             LSLS     R0,R0,#+1
+   \   0000000E   0xF040 0x0040      ORR      R0,R0,#0x40
+   \   00000012   0x.... 0x....      BL       Read_pPCA9555_8Addr_16Data
+   \   00000016   0x8028             STRH     R0,[R5, #+0]
+     85          	return pVal->pData[pSel].Data;
+   \   00000018   0x09A0             LSRS     R0,R4,#+6
+   \   0000001A   0x5D40             LDRB     R0,[R0, R5]
+   \   0000001C   0xBD32             POP      {R1,R4,R5,PC}    ;; return
+     86          }
+     87          
+     88          
+
+   \                                 In section .text, align 2, keep-with-next
+     89          void pPCA9555BitSet1(INT32U Bitaddr, INT8U Command, _PCA9555Reg *pVal, _pPCA9555Str ptr)
+     90          {
+   \                     pPCA9555BitSet1:
+   \   00000000   0xB4F0             PUSH     {R4-R7}
+     91          	INT16U	dAddr = Bitaddr%8;
+     92          	INT16U	pSel = (Bitaddr/8)/8;
+   \   00000002   0x0984             LSRS     R4,R0,#+6
+   \   00000004   0xB2A4             UXTH     R4,R4
+     93          	INT16U	BitNumber = (Bitaddr/8)%8;
+     94          
+     95          	BitSet(pVal->pData[pSel].Data, BitNumber);
+   \   00000006   0x5CA5             LDRB     R5,[R4, R2]
+   \   00000008   0x2601             MOVS     R6,#+1
+   \   0000000A   0xF3C0 0x07C2      UBFX     R7,R0,#+3,#+3
+   \   0000000E   0x40BE             LSLS     R6,R6,R7
+   \   00000010   0x4335             ORRS     R5,R6,R5
+   \   00000012   0x....             B.N      ?Subroutine1
+     96          	pPCASetPortData1(dAddr,Command, pVal->Data,ptr);
+     97          }
+
+   \                                 In section .text, align 2, keep-with-next
+   \                     ?Subroutine1:
+   \   00000000   0x54A5             STRB     R5,[R4, R2]
+   \   00000002   0x8812             LDRH     R2,[R2, #+0]
+   \   00000004   0xF000 0x0007      AND      R0,R0,#0x7
+   \   00000008   0x0040             LSLS     R0,R0,#+1
+   \   0000000A   0xF040 0x0040      ORR      R0,R0,#0x40
+   \   0000000E   0xBCF0             POP      {R4-R7}
+   \   00000010   0x....             B.N      Write_pPCA9555_8Addr_16Data
+     98          
+
+   \                                 In section .text, align 2, keep-with-next
+     99          void pPCA9555BitRst1(INT32U Bitaddr, INT8U Command, _PCA9555Reg *pVal, _pPCA9555Str ptr)
+    100          {
+   \                     pPCA9555BitRst1:
+   \   00000000   0xB4F0             PUSH     {R4-R7}
+    101          	INT16U	dAddr = Bitaddr%8;
+    102          	INT16U	pSel = (Bitaddr/8)/8;
+   \   00000002   0x0984             LSRS     R4,R0,#+6
+   \   00000004   0xB2A4             UXTH     R4,R4
+    103          	INT16U	BitNumber = (Bitaddr/8)%8;
+    104          
+    105          	BitRst(pVal->pData[pSel].Data, BitNumber);
+   \   00000006   0x5CA5             LDRB     R5,[R4, R2]
+   \   00000008   0x2601             MOVS     R6,#+1
+   \   0000000A   0xF3C0 0x07C2      UBFX     R7,R0,#+3,#+3
+   \   0000000E   0x40BE             LSLS     R6,R6,R7
+   \   00000010   0x43B5             BICS     R5,R5,R6
+   \   00000012                      REQUIRE ?Subroutine1
+   \   00000012                      ;; // Fall through to label ?Subroutine1
+    106          	pPCASetPortData1(dAddr,Command, pVal->Data,ptr);
+    107          }
+    108          
+    109          
+    110          
+    111          ////////////////////////////////////////////////////////////////////////////////////////
+
+   \                                 In section .text, align 2, keep-with-next
+    112          void pPCASetConfiguration(INT8U DevAddr, _PCA9555Reg Reg, _pPCA9555Str ptr)
+    113          {
+   \                     pPCASetConfiguration:
+   \   00000000   0xB081             SUB      SP,SP,#+4
+   \   00000002   0xB402             PUSH     {R1}
+    114          	Write_pPCA9555_8Addr_16Data(PCA9555Addr | (DevAddr << 1), _ConfigPort0, Reg.Data, ptr);
+   \   00000004   0x4613             MOV      R3,R2
+   \   00000006   0xF8BD 0x2000      LDRH     R2,[SP, #+0]
+   \   0000000A   0x2106             MOVS     R1,#+6
+   \   0000000C   0x....             B.N      ?Subroutine2
+    115          }
+
+   \                                 In section .text, align 2, keep-with-next
+   \                     ?Subroutine2:
+   \   00000000   0x0040             LSLS     R0,R0,#+1
+   \   00000002   0xF040 0x0040      ORR      R0,R0,#0x40
+   \   00000006   0xB2C0             UXTB     R0,R0
+   \   00000008   0xB002             ADD      SP,SP,#+8
+   \   0000000A   0x....             B.N      Write_pPCA9555_8Addr_16Data
+    116          
+
+   \                                 In section .text, align 2, keep-with-next
+    117          void pPCASetConfiguration1(INT8U DevAddr, INT8U Command, _PCA9555Reg Reg, _pPCA9555Str ptr)
+    118          {
+   \                     pPCASetConfiguration1:
+   \   00000000   0xB081             SUB      SP,SP,#+4
+   \   00000002   0xB404             PUSH     {R2}
+    119          	Write_pPCA9555_8Addr_16Data(PCA9555Addr | (DevAddr << 1), Command, Reg.Data, ptr);
+   \   00000004   0xF8BD 0x2000      LDRH     R2,[SP, #+0]
+   \   00000008                      REQUIRE ?Subroutine2
+   \   00000008                      ;; // Fall through to label ?Subroutine2
+    120          }
+    121          
+
+   \                                 In section .text, align 2, keep-with-next
+    122          void pPCASetPortData1(INT8U DevAddr, INT8U Command, INT16U Data,_pPCA9555Str ptr)
+    123          {
+    124          	Write_pPCA9555_8Addr_16Data(PCA9555Addr | (DevAddr << 1), Command, Data, ptr);
+   \                     pPCASetPortData1:
+   \   00000000   0x....             B.N      ?Subroutine3
+    125          }
+
+   \                                 In section .text, align 2, keep-with-next
+   \                     ?Subroutine3:
+   \   00000000   0x0040             LSLS     R0,R0,#+1
+   \   00000002   0xF040 0x0040      ORR      R0,R0,#0x40
+   \   00000006   0xB2C0             UXTB     R0,R0
+   \   00000008   0x....             B.N      Write_pPCA9555_8Addr_16Data
+    126          
+
+   \                                 In section .text, align 2, keep-with-next
+    127          INT16U pPCAReadPortData1(INT16U DevAddr, INT8U Command,_pPCA9555Str ptr)
+    128          {
+    129          	return Read_pPCA9555_8Addr_16Data(PCA9555Addr | (DevAddr << 1), Command, ptr);
+   \                     pPCAReadPortData1:
+   \   00000000   0x....             B.N      ?Subroutine4
+    130          }
+
+   \                                 In section .text, align 2, keep-with-next
+   \                     ?Subroutine4:
+   \   00000000   0x0040             LSLS     R0,R0,#+1
+   \   00000002   0xF040 0x0040      ORR      R0,R0,#0x40
+   \   00000006   0xB2C0             UXTB     R0,R0
+   \   00000008   0x....             B.N      Read_pPCA9555_8Addr_16Data
+    131          
+    132          
+
+   \                                 In section .text, align 2, keep-with-next
+    133          void pPCASetPortData(INT8U DevAddr, INT16U Data,_pPCA9555Str ptr)
+    134          {
+    135          	Write_pPCA9555_8Addr_16Data(PCA9555Addr | (DevAddr << 1), _OutputPort0, Data, ptr);
+   \                     pPCASetPortData:
+   \   00000000   0x4613             MOV      R3,R2
+   \   00000002   0x460A             MOV      R2,R1
+   \   00000004   0x2102             MOVS     R1,#+2
+   \   00000006                      REQUIRE ?Subroutine3
+   \   00000006                      ;; // Fall through to label ?Subroutine3
+    136          }
+    137          
+
+   \                                 In section .text, align 2, keep-with-next
+    138          INT16U pPCAReadPortData(INT16U DevAddr,_pPCA9555Str ptr)
+    139          {
+    140          	return Read_pPCA9555_8Addr_16Data(PCA9555Addr | (DevAddr << 1), _InputPort0, ptr);
+   \                     pPCAReadPortData:
+   \   00000000   0x460A             MOV      R2,R1
+   \   00000002   0x2100             MOVS     R1,#+0
+   \   00000004                      REQUIRE ?Subroutine4
+   \   00000004                      ;; // Fall through to label ?Subroutine4
+    141          }
+    142          
+    143          
+
+   \                                 In section .text, align 2, keep-with-next
+    144          INT16U Write_pPCA9555_8Addr_16Data(INT8U DevAddr, INT8U Command, INT16U Data, _pPCA9555Str ptr)
+    145          {
+   \                     Write_pPCA9555_8Addr_16Data:
+   \   00000000   0xE92D 0x43F8      PUSH     {R3-R9,LR}
+   \   00000004   0x460C             MOV      R4,R1
+   \   00000006   0x4615             MOV      R5,R2
+   \   00000008   0x4698             MOV      R8,R3
+    146          	INT8U cnt = pPCAWrTry;
+   \   0000000A   0x2703             MOVS     R7,#+3
+   \   0000000C   0x0A2E             LSRS     R6,R5,#+8
+   \   0000000E   0xF000 0x09FE      AND      R9,R0,#0xFE
+   \                     ??Write_pPCA9555_8Addr_16Data_0:
+   \   00000012   0x1E7F             SUBS     R7,R7,#+1
+    147          	// Start Condition
+    148          	// Write Protection Disable, Allows normal write operation
+    149          	// 
+    150          	// output 1(SDATA)
+    151          	// START Conditon making
+    152          
+    153          	while(cnt--)
+    154          	{
+    155          
+    156          //////////Start
+    157          		StartpPCA9555(ptr);
+   \   00000014   0x4640             MOV      R0,R8
+   \   00000016   0x.... 0x....      BL       StartpPCA9555
+    158          		
+    159          		WritepPCA9555Data(DevAddr & (~0x01),ptr);
+   \   0000001A   0x4641             MOV      R1,R8
+   \   0000001C   0x4648             MOV      R0,R9
+   \   0000001E   0x.... 0x....      BL       WritepPCA9555Data
+    160          		#ifndef pPCA9555_debug
+    161          			if(ACKpPCA9555(ptr)) continue;
+   \   00000022   0x4640             MOV      R0,R8
+   \   00000024   0x.... 0x....      BL       ACKpPCA9555
+   \   00000028   0xB9B8             CBNZ.N   R0,??Write_pPCA9555_8Addr_16Data_1
+    162          		#else
+    163          		{
+    164          			INT8U _Ack = ACKpPCA9555(ptr);
+    165          			SerPtr->printf("ACK: %d \n", _Ack);
+    166          		}
+    167          		#endif
+    168          		WritepPCA9555Data((INT8U)(Command     ),ptr);
+   \   0000002A   0x4641             MOV      R1,R8
+   \   0000002C   0x4620             MOV      R0,R4
+   \   0000002E   0x.... 0x....      BL       WritepPCA9555Data
+    169          		#ifndef pPCA9555_debug
+    170          			if(ACKpPCA9555(ptr)) continue;
+   \   00000032   0x4640             MOV      R0,R8
+   \   00000034   0x.... 0x....      BL       ACKpPCA9555
+   \   00000038   0xB978             CBNZ.N   R0,??Write_pPCA9555_8Addr_16Data_1
+    171          		#else
+    172          		{
+    173          			INT8U _Ack = ACKpPCA9555(ptr);
+    174          			SerPtr->printf("ACK: %d \n", _Ack);
+    175          		}
+    176          		#endif
+    177          		WritepPCA9555Data((INT8U)(Data >> 8),ptr);
+   \   0000003A   0x4641             MOV      R1,R8
+   \   0000003C   0x4630             MOV      R0,R6
+   \   0000003E   0x.... 0x....      BL       WritepPCA9555Data
+    178          		#ifndef pPCA9555_debug
+    179          			if(ACKpPCA9555(ptr)) continue;
+   \   00000042   0x4640             MOV      R0,R8
+   \   00000044   0x.... 0x....      BL       ACKpPCA9555
+   \   00000048   0xB938             CBNZ.N   R0,??Write_pPCA9555_8Addr_16Data_1
+    180          		#else
+    181          		{
+    182          			INT8U _Ack = ACKpPCA9555(ptr);
+    183          			SerPtr->printf("ACK: %d \n", _Ack);
+    184          		}
+    185          		#endif
+    186          
+    187          		WritepPCA9555Data((INT8U)(Data >> 0),ptr);
+   \   0000004A   0x4641             MOV      R1,R8
+   \   0000004C   0xB2E8             UXTB     R0,R5
+   \   0000004E   0x.... 0x....      BL       WritepPCA9555Data
+    188          		#ifndef pPCA9555_debug
+    189          			if(ACKpPCA9555(ptr)) continue;
+   \   00000052   0x4640             MOV      R0,R8
+   \   00000054   0x.... 0x....      BL       ACKpPCA9555
+   \   00000058   0xB128             CBZ.N    R0,??Write_pPCA9555_8Addr_16Data_2
+   \                     ??Write_pPCA9555_8Addr_16Data_1:
+   \   0000005A   0xB2FF             UXTB     R7,R7
+   \   0000005C   0x2F00             CMP      R7,#+0
+   \   0000005E   0xD1D8             BNE.N    ??Write_pPCA9555_8Addr_16Data_0
+    190          		#else
+    191          		{
+    192          			INT8U _Ack = ACKpPCA9555(ptr);
+    193          			SerPtr->printf("ACK: %d \n", _Ack);
+    194          		}
+    195          		#endif
+    196          
+    197          		//////////Stop
+    198          
+    199          		StoppPCA9555(ptr);
+    200          //		SerPtr->printf("1: Write_pPCA9555_8Addr_16Data \n");
+    201          
+    202          		return TRUE;
+    203          	}
+    204          	return FALSE;
+   \   00000060   0x2000             MOVS     R0,#+0
+   \                     ??Write_pPCA9555_8Addr_16Data_3:
+   \   00000062   0xE8BD 0x83F2      POP      {R1,R4-R9,PC}    ;; return
+   \                     ??Write_pPCA9555_8Addr_16Data_2:
+   \   00000066   0x4640             MOV      R0,R8
+   \   00000068   0x.... 0x....      BL       StoppPCA9555
+   \   0000006C   0x2001             MOVS     R0,#+1
+   \   0000006E   0xE7F8             B.N      ??Write_pPCA9555_8Addr_16Data_3
+    205          }
+    206          
+    207          
+
+   \                                 In section .text, align 2, keep-with-next
+    208          INT16U Read_pPCA9555_8Addr_16Data(INT8U DevAddr, INT16U Command, _pPCA9555Str ptr)
+    209          {
+   \                     Read_pPCA9555_8Addr_16Data:
+   \   00000000   0xB570             PUSH     {R4-R6,LR}
+   \   00000002   0x4604             MOV      R4,R0
+   \   00000004   0x460D             MOV      R5,R1
+   \   00000006   0x4616             MOV      R6,R2
+    210          	INT16U rVal = 0;
+    211          	
+    212          	// Device Address Writing
+    213          	StartpPCA9555(ptr);
+   \   00000008   0x4630             MOV      R0,R6
+   \   0000000A   0x.... 0x....      BL       StartpPCA9555
+    214          	WritepPCA9555Data(DevAddr & (~0x01),ptr);
+   \   0000000E   0x4631             MOV      R1,R6
+   \   00000010   0xF004 0x00FE      AND      R0,R4,#0xFE
+   \   00000014   0x.... 0x....      BL       WritepPCA9555Data
+    215          	#ifndef pPCA9555_debug
+    216          		ACKpPCA9555(ptr);
+   \   00000018   0x4630             MOV      R0,R6
+   \   0000001A   0x.... 0x....      BL       ACKpPCA9555
+    217          	#else
+    218          	{
+    219          		INT8U _Ack = ACKpPCA9555(ptr);
+    220          		SerPtr->printf("ACK: %d \n", _Ack);
+    221          	}
+    222          	#endif
+    223          
+    224          	WritepPCA9555Data((INT8U)(Command),ptr);
+   \   0000001E   0x4631             MOV      R1,R6
+   \   00000020   0xB2E8             UXTB     R0,R5
+   \   00000022   0x.... 0x....      BL       WritepPCA9555Data
+    225          	#ifndef pPCA9555_debug
+    226          		ACKpPCA9555(ptr);
+   \   00000026   0x4630             MOV      R0,R6
+   \   00000028   0x.... 0x....      BL       ACKpPCA9555
+    227          	#else
+    228          	{
+    229          		INT8U _Ack = ACKpPCA9555(ptr);
+    230          		SerPtr->printf("ACK: %d \n", _Ack);
+    231          	}
+    232          	#endif
+    233          	
+    234          	StartpPCA9555((ptr));
+   \   0000002C   0x4630             MOV      R0,R6
+   \   0000002E   0x.... 0x....      BL       StartpPCA9555
+    235          	WritepPCA9555Data(DevAddr | 0x01,ptr);
+   \   00000032   0x4631             MOV      R1,R6
+   \   00000034   0xF044 0x0001      ORR      R0,R4,#0x1
+   \   00000038   0x.... 0x....      BL       WritepPCA9555Data
+    236          	#ifndef pPCA9555_debug
+    237          		ACKpPCA9555(ptr);
+   \   0000003C   0x4630             MOV      R0,R6
+   \   0000003E   0x.... 0x....      BL       ACKpPCA9555
+    238          	#else
+    239          	{
+    240          		INT8U _Ack = ACKpPCA9555(ptr);
+    241          		SerPtr->printf("ACK: %d \n", _Ack);
+    242          	}
+    243          	#endif	
+    244          	rVal = (rVal << 8) | ReadpPCA9555Data(ptr);
+   \   00000042   0x4630             MOV      R0,R6
+   \   00000044   0x.... 0x....      BL       ReadpPCA9555Data
+   \   00000048   0x4604             MOV      R4,R0
+    245          	rVal = (rVal << 8) | ReadpPCA9555Data(ptr);
+   \   0000004A   0x4630             MOV      R0,R6
+   \   0000004C   0x.... 0x....      BL       ReadpPCA9555Data
+   \   00000050   0x4605             MOV      R5,R0
+    246          
+    247          	#ifndef pPCA9555_debug
+    248          		ACKpPCA9555(ptr);
+   \   00000052   0x4630             MOV      R0,R6
+   \   00000054   0x.... 0x....      BL       ACKpPCA9555
+    249          	#else
+    250          	{
+    251          		INT8U _Ack = ACKpPCA9555(ptr);
+    252          		SerPtr->printf("ACK: %d \n", _Ack);
+    253          	}
+    254          	#endif	
+    255          
+    256          	NACKpPCA9555(ptr);
+   \   00000058   0x4630             MOV      R0,R6
+   \   0000005A   0x.... 0x....      BL       NACKpPCA9555
+    257           	StoppPCA9555(ptr);
+   \   0000005E   0x4630             MOV      R0,R6
+   \   00000060   0x.... 0x....      BL       StoppPCA9555
+    258          
+    259          	return rVal;
+   \   00000064   0xEA45 0x2004      ORR      R0,R5,R4, LSL #+8
+   \   00000068   0xBD70             POP      {R4-R6,PC}       ;; return
+    260          }
+    261          
+
+   \                                 In section .text, align 2, keep-with-next
+    262          void WritepPCA9555Data(INT8U Data, _pPCA9555Str ptr)
+    263          {
+   \                     WritepPCA9555Data:
+   \   00000000   0xB570             PUSH     {R4-R6,LR}
+   \   00000002   0x4604             MOV      R4,R0
+   \   00000004   0x460D             MOV      R5,R1
+    264          	INT8U i = 0;
+    265          
+    266           	SetpPCA9555SDAOutMode();
+   \   00000006   0x.... 0x....      BL       SetpPCA9555SDAOutMode
+    267          	ForDelay(100L);			///20120407 Adder
+   \   0000000A   0x2064             MOVS     R0,#+100
+   \   0000000C   0x.... 0x....      BL       ForDelay
+    268          
+    269          	ptr->RstClk();
+   \   00000010   0x68E8             LDR      R0,[R5, #+12]
+   \   00000012   0x4780             BLX      R0
+    270          	
+    271          	for(i = 0; i < 8; i++)
+   \   00000014   0x2608             MOVS     R6,#+8
+    272          	{
+    273          		if((Data & 0x80)) 	ptr->SetData();
+   \                     ??WritepPCA9555Data_0:
+   \   00000016   0x0620             LSLS     R0,R4,#+24
+   \   00000018   0xD502             BPL.N    ??WritepPCA9555Data_1
+   \   0000001A   0x6928             LDR      R0,[R5, #+16]
+   \   0000001C   0x4780             BLX      R0
+   \   0000001E   0xE001             B.N      ??WritepPCA9555Data_2
+    274          		else				ptr->RstData();
+   \                     ??WritepPCA9555Data_1:
+   \   00000020   0x6968             LDR      R0,[R5, #+20]
+   \   00000022   0x4780             BLX      R0
+    275          
+    276          		ptr->SetClk();
+   \                     ??WritepPCA9555Data_2:
+   \   00000024   0x68A8             LDR      R0,[R5, #+8]
+   \   00000026   0x4780             BLX      R0
+    277          		ptr->RstClk();
+   \   00000028   0x68E8             LDR      R0,[R5, #+12]
+   \   0000002A   0x4780             BLX      R0
+    278          		Data <<= 1;
+   \   0000002C   0x0064             LSLS     R4,R4,#+1
+    279          	}
+   \   0000002E   0x1E76             SUBS     R6,R6,#+1
+   \   00000030   0xD1F1             BNE.N    ??WritepPCA9555Data_0
+    280          }
+   \   00000032   0xBD70             POP      {R4-R6,PC}       ;; return
+    281          
+
+   \                                 In section .text, align 2, keep-with-next
+    282          INT8U ReadpPCA9555Data(_pPCA9555Str ptr)
+    283          {
+   \                     ReadpPCA9555Data:
+   \   00000000   0xB570             PUSH     {R4-R6,LR}
+   \   00000002   0x4604             MOV      R4,R0
+    284          	INT8U Data = 0, i = 0;
+   \   00000004   0x2500             MOVS     R5,#+0
+    285          
+    286          	SetpPCA9555SDAInMode();
+   \   00000006   0x.... 0x....      BL       SetpPCA9555SDAInMode
+    287          	ForDelay(100L);			///20120407 Adder
+   \   0000000A   0x2064             MOVS     R0,#+100
+   \   0000000C   0x.... 0x....      BL       ForDelay
+    288          
+    289          	for(i = 0; i < 8; i++)
+   \   00000010   0x2608             MOVS     R6,#+8
+    290          	{
+    291                  Data = (Data << 1);
+   \                     ??ReadpPCA9555Data_0:
+   \   00000012   0x066D             LSLS     R5,R5,#+25
+   \   00000014   0x0E2D             LSRS     R5,R5,#+24
+    292          		ptr->SetClk();
+   \   00000016   0x68A0             LDR      R0,[R4, #+8]
+   \   00000018   0x4780             BLX      R0
+    293          
+    294                  if(ReadpPCA9555SDA())	Data |= 0x01;
+   \   0000001A   0x.... 0x....      BL       ReadpPCA9555SDA
+   \   0000001E   0xB108             CBZ.N    R0,??ReadpPCA9555Data_1
+   \   00000020   0xF045 0x0501      ORR      R5,R5,#0x1
+    295          
+    296          		ptr->RstClk();
+   \                     ??ReadpPCA9555Data_1:
+   \   00000024   0x68E0             LDR      R0,[R4, #+12]
+   \   00000026   0x4780             BLX      R0
+    297          	}	
+   \   00000028   0x1E76             SUBS     R6,R6,#+1
+   \   0000002A   0xD1F2             BNE.N    ??ReadpPCA9555Data_0
+    298          	return Data;
+   \   0000002C   0x4628             MOV      R0,R5
+   \   0000002E   0xBD70             POP      {R4-R6,PC}       ;; return
+    299          }
+    300          
+
+   \                                 In section .text, align 2, keep-with-next
+    301          void StartpPCA9555(_pPCA9555Str ptr)
+    302          {
+   \                     StartpPCA9555:
+   \   00000000   0xB510             PUSH     {R4,LR}
+   \   00000002   0x4604             MOV      R4,R0
+    303          	// START Conditon making
+    304           	SetpPCA9555SDAOutMode();
+   \   00000004   0x.... 0x....      BL       SetpPCA9555SDAOutMode
+    305          
+    306          	ptr->SetData();
+   \   00000008   0x6920             LDR      R0,[R4, #+16]
+   \   0000000A   0x4780             BLX      R0
+    307          	ptr->SetClk();
+   \   0000000C   0x68A0             LDR      R0,[R4, #+8]
+   \   0000000E   0x4780             BLX      R0
+    308          	ptr->RstData();
+   \   00000010   0x6960             LDR      R0,[R4, #+20]
+   \   00000012   0x4780             BLX      R0
+    309          	ptr->RstClk();
+   \   00000014   0x....             B.N      ?Subroutine5
+    310          
+    311          }
+
+   \                                 In section .text, align 2, keep-with-next
+   \                     ?Subroutine5:
+   \   00000000   0x68E0             LDR      R0,[R4, #+12]
+   \   00000002   0xE8BD 0x4010      POP      {R4,LR}
+   \   00000006   0x4700             BX       R0
+    312          
+
+   \                                 In section .text, align 2, keep-with-next
+    313          void StoppPCA9555(_pPCA9555Str ptr)
+    314          {
+   \                     StoppPCA9555:
+   \   00000000   0xB510             PUSH     {R4,LR}
+   \   00000002   0x4604             MOV      R4,R0
+    315          	// STOP
+    316           	SetpPCA9555SDAOutMode();
+   \   00000004   0x.... 0x....      BL       SetpPCA9555SDAOutMode
+    317          	
+    318          	ptr->RstData();
+   \   00000008   0x6960             LDR      R0,[R4, #+20]
+   \   0000000A   0x4780             BLX      R0
+    319          	ptr->SetClk();
+   \   0000000C   0x68A0             LDR      R0,[R4, #+8]
+   \   0000000E   0x4780             BLX      R0
+    320          	ptr->SetData();
+   \   00000010   0x6920             LDR      R0,[R4, #+16]
+   \   00000012   0xE8BD 0x4010      POP      {R4,LR}
+   \   00000016   0x4700             BX       R0
+    321          }
+    322          
+
+   \                                 In section .text, align 2, keep-with-next
+    323          INT8U ACKpPCA9555(_pPCA9555Str ptr)
+    324          {
+   \                     ACKpPCA9555:
+   \   00000000   0xB538             PUSH     {R3-R5,LR}
+   \   00000002   0x4604             MOV      R4,R0
+    325          	INT8U Data;
+    326          
+    327           	SetpPCA9555SDAInMode();
+   \   00000004   0x.... 0x....      BL       SetpPCA9555SDAInMode
+    328          	// ACK Check
+    329          	ptr->SetClk();
+   \   00000008   0x68A0             LDR      R0,[R4, #+8]
+   \   0000000A   0x4780             BLX      R0
+    330          	Data = ReadpPCA9555SDA();
+   \   0000000C   0x.... 0x....      BL       ReadpPCA9555SDA
+   \   00000010   0x4605             MOV      R5,R0
+    331          	ptr->RstClk();
+   \   00000012   0x68E0             LDR      R0,[R4, #+12]
+   \   00000014   0x4780             BLX      R0
+    332          	return Data;
+   \   00000016   0x4628             MOV      R0,R5
+   \   00000018   0xBD32             POP      {R1,R4,R5,PC}    ;; return
+    333          }
+    334          
+
+   \                                 In section .text, align 2, keep-with-next
+    335          void NACKpPCA9555(_pPCA9555Str ptr)
+    336          {
+   \                     NACKpPCA9555:
+   \   00000000   0xB510             PUSH     {R4,LR}
+   \   00000002   0x4604             MOV      R4,R0
+    337          	// NACK
+    338           	SetpPCA9555SDAOutMode();
+   \   00000004   0x.... 0x....      BL       SetpPCA9555SDAOutMode
+    339          	
+    340          	ptr->SetData();
+   \   00000008   0x6920             LDR      R0,[R4, #+16]
+   \   0000000A   0x4780             BLX      R0
+    341          	ptr->SetClk();
+   \   0000000C   0x68A0             LDR      R0,[R4, #+8]
+   \   0000000E   0x4780             BLX      R0
+    342          	ptr->RstClk();	
+   \   00000010                      REQUIRE ?Subroutine5
+   \   00000010                      ;; // Fall through to label ?Subroutine5
+    343          }
+    344          
+    345          ////////////////////////////////////////////////////////////////////////////////
+    346          // Default Read/Write, Access F31xx Series
+    347          //////////////////////////////////////////
+    348          
+
+   \                                 In section .text, align 2, keep-with-next
+    349          void SetpPCA9555SDAInMode(void)
+    350          {
+    351          	__PB4_IU_PD();
+   \                     SetpPCA9555SDAInMode:
+   \   00000000   0x2304             MOVS     R3,#+4
+   \   00000002   0x....             LDR.N    R2,??DataTable6  ;; 0x40020400
+   \   00000004   0x2100             MOVS     R1,#+0
+   \   00000006   0x2066             MOVS     R0,#+102
+   \   00000008   0x.... 0x....      B.W      GPIOPortInit
+    352          
+    353          //	GPIOB->CNF.B7 = __PB7_IN_PU; 
+    354          }
+    355          
+
+   \                                 In section .text, align 2, keep-with-next
+    356          void SetpPCA9555SDAOutMode(void)
+    357          {
+    358          //	GPIOB->CNF.B7 = __PB7_OU_PP; 
+    359          //	__PB4_PP_PU();
+    360          	__PB4_PP_PP();
+   \                     SetpPCA9555SDAOutMode:
+   \   00000000   0x2304             MOVS     R3,#+4
+   \   00000002   0x....             LDR.N    R2,??DataTable6  ;; 0x40020400
+   \   00000004   0x2100             MOVS     R1,#+0
+   \   00000006   0x2021             MOVS     R0,#+33
+   \   00000008   0x.... 0x....      B.W      GPIOPortInit
+    361          
+    362          }
+    363          
+
+   \                                 In section .text, align 2, keep-with-next
+    364          void SetpPCA9555SDA(void)
+    365          {
+    366          //	_PCA9555_DATA= 1;
+    367          
+    368          	GPIOB->__B.ODR.B4 = SET;
+   \                     SetpPCA9555SDA:
+   \   00000000   0x....             LDR.N    R0,??DataTable6_1  ;; 0x40020414
+   \   00000002   0x6801             LDR      R1,[R0, #+0]
+   \   00000004   0xF041 0x0110      ORR      R1,R1,#0x10
+   \   00000008   0x....             B.N      ?Subroutine6
+    369          	CLKDELAY;
+    370          }
+
+   \                                 In section .text, align 2, keep-with-next
+   \                     ?Subroutine6:
+   \   00000000   0x6001             STR      R1,[R0, #+0]
+   \   00000002   0x2005             MOVS     R0,#+5
+   \   00000004   0x.... 0x....      B.W      ForDelay
+    371          
+
+   \                                 In section .text, align 2, keep-with-next
+    372          void RstpPCA9555SDA(void)
+    373          {
+    374          //	_PCA9555_DATA= 0;
+    375          	GPIOB->__B.ODR.B4 = RESET;
+   \                     RstpPCA9555SDA:
+   \   00000000   0x....             LDR.N    R0,??DataTable6_1  ;; 0x40020414
+   \   00000002   0x6801             LDR      R1,[R0, #+0]
+   \   00000004   0xF021 0x0110      BIC      R1,R1,#0x10
+   \   00000008                      REQUIRE ?Subroutine6
+   \   00000008                      ;; // Fall through to label ?Subroutine6
+    376          	CLKDELAY;
+    377          }
+    378          
+    379          
+
+   \                                 In section .text, align 2, keep-with-next
+    380          void SetpPCA9555SCL(void)
+    381          {
+    382          //	_PCA9555_CLK = 1;
+    383          	GPIOB->__B.ODR.B7 = SET;
+   \                     SetpPCA9555SCL:
+   \   00000000   0x....             LDR.N    R0,??DataTable6_1  ;; 0x40020414
+   \   00000002   0x6801             LDR      R1,[R0, #+0]
+   \   00000004   0xF041 0x0180      ORR      R1,R1,#0x80
+   \   00000008   0x....             B.N      ?Subroutine6
+    384          	CLKDELAY;
+    385          }
+    386          
+
+   \                                 In section .text, align 2, keep-with-next
+    387          void RstpPCA9555SCL(void)
+    388          {
+    389          //	_PCA9555_CLK = 0;
+    390          	GPIOB->__B.ODR.B7 = RESET;
+   \                     RstpPCA9555SCL:
+   \   00000000   0x....             LDR.N    R0,??DataTable6_1  ;; 0x40020414
+   \   00000002   0x6801             LDR      R1,[R0, #+0]
+   \   00000004   0xF021 0x0180      BIC      R1,R1,#0x80
+   \   00000008   0x....             B.N      ?Subroutine6
+    391          	CLKDELAY;
+    392          }
+    393          
+
+   \                                 In section .text, align 2, keep-with-next
+    394          INT8U ReadpPCA9555SDA(void)
+    395          {
+   \                     ReadpPCA9555SDA:
+   \   00000000   0xB580             PUSH     {R7,LR}
+    396          	INT8U	RetVal;
+    397          
+    398          	CLKDELAY;	
+   \   00000002   0x2005             MOVS     R0,#+5
+   \   00000004   0x.... 0x....      BL       ForDelay
+    399          	RetVal = GPIOB->__B.IDR.B4;
+   \   00000008   0x....             LDR.N    R0,??DataTable6_2  ;; 0x40020410
+   \   0000000A   0x6800             LDR      R0,[R0, #+0]
+   \   0000000C   0xF3C0 0x1000      UBFX     R0,R0,#+4,#+1
+    400          	return	RetVal;
+   \   00000010   0xBD02             POP      {R1,PC}          ;; return
+    401          }
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable6:
+   \   00000000   0x40020400         DC32     0x40020400
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable6_1:
+   \   00000000   0x40020414         DC32     0x40020414
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable6_2:
+   \   00000000   0x40020410         DC32     0x40020410
+    402          
+    403          
+    404          ////////////////////////////////////////////////////////////////////////////////
+    405          // End of Source File
+    406          /////////////////////
+    407          
+
+   Maximum stack usage in bytes:
+
+   .cstack Function
+   ------- --------
+       16  ACKpPCA9555
+             16 -- Indirect call
+             16 -> ReadpPCA9555SDA
+             16 -> SetpPCA9555SDAInMode
+        8  NACKpPCA9555
+              0 -- Indirect call
+              8 -- Indirect call
+              8 -> SetpPCA9555SDAOutMode
+       32  PCA9555_Init
+             32 -> GPIOPortInit
+              0 -> RstpPCA9555SCL
+       16  Read_pPCA9555_8Addr_16Data
+             16 -> ACKpPCA9555
+             16 -> NACKpPCA9555
+             16 -> ReadpPCA9555Data
+             16 -> StartpPCA9555
+             16 -> StoppPCA9555
+             16 -> WritepPCA9555Data
+       16  ReadpPCA9555Data
+             16 -- Indirect call
+             16 -> ForDelay
+             16 -> ReadpPCA9555SDA
+             16 -> SetpPCA9555SDAInMode
+        8  ReadpPCA9555SDA
+              8 -> ForDelay
+        0  RstpPCA9555SCL
+              0 -> ForDelay
+        0  RstpPCA9555SDA
+              0 -> ForDelay
+        0  SetpPCA9555SCL
+              0 -> ForDelay
+        0  SetpPCA9555SDA
+              0 -> ForDelay
+        0  SetpPCA9555SDAInMode
+              0 -> GPIOPortInit
+        0  SetpPCA9555SDAOutMode
+              0 -> GPIOPortInit
+        8  StartpPCA9555
+              0 -- Indirect call
+              8 -- Indirect call
+              8 -> SetpPCA9555SDAOutMode
+        8  StoppPCA9555
+              0 -- Indirect call
+              8 -- Indirect call
+              8 -> SetpPCA9555SDAOutMode
+       32  Write_pPCA9555_8Addr_16Data
+             32 -> ACKpPCA9555
+             32 -> StartpPCA9555
+             32 -> StoppPCA9555
+             32 -> WritepPCA9555Data
+       16  WritepPCA9555Data
+             16 -- Indirect call
+             16 -> ForDelay
+             16 -> SetpPCA9555SDAOutMode
+        0  _pPCA9555BitSet
+              0 -> Write_pPCA9555_8Addr_16Data
+       16  pPCA9555BitRead
+             16 -> Read_pPCA9555_8Addr_16Data
+       16  pPCA9555BitRst
+              0 -> Write_pPCA9555_8Addr_16Data
+       16  pPCA9555BitRst1
+              0 -> Write_pPCA9555_8Addr_16Data
+        0  pPCA9555BitSet
+              0 -> Write_pPCA9555_8Addr_16Data
+       16  pPCA9555BitSet1
+              0 -> Write_pPCA9555_8Addr_16Data
+       16  pPCA9555ReadData
+             16 -> Read_pPCA9555_8Addr_16Data
+        8  pPCA9555SetData
+              0 -> Write_pPCA9555_8Addr_16Data
+        0  pPCAReadPortData
+              0 -> Read_pPCA9555_8Addr_16Data
+        0  pPCAReadPortData1
+              0 -> Read_pPCA9555_8Addr_16Data
+        8  pPCASetConfiguration
+              0 -> Write_pPCA9555_8Addr_16Data
+        8  pPCASetConfiguration1
+              0 -> Write_pPCA9555_8Addr_16Data
+        0  pPCASetPortData
+              0 -> Write_pPCA9555_8Addr_16Data
+        0  pPCASetPortData1
+              0 -> Write_pPCA9555_8Addr_16Data
+
+
+   Section sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+       4  ??DataTable6
+       4  ??DataTable6_1
+       4  ??DataTable6_2
+      24  ??Subroutine7_0
+      18  ?Subroutine0
+      18  ?Subroutine1
+      12  ?Subroutine2
+      10  ?Subroutine3
+      10  ?Subroutine4
+       8  ?Subroutine5
+       8  ?Subroutine6
+      26  ACKpPCA9555
+      16  NACKpPCA9555
+      58  PCA9555_Init
+     106  Read_pPCA9555_8Addr_16Data
+      48  ReadpPCA9555Data
+      18  ReadpPCA9555SDA
+      10  RstpPCA9555SCL
+       8  RstpPCA9555SDA
+      10  SetpPCA9555SCL
+      10  SetpPCA9555SDA
+      12  SetpPCA9555SDAInMode
+      12  SetpPCA9555SDAOutMode
+      22  StartpPCA9555
+      24  StoppPCA9555
+     112  Write_pPCA9555_8Addr_16Data
+      52  WritepPCA9555Data
+       2  _pPCA9555BitSet
+       4  pAttnVal0
+       4  pAttnVal0B
+       4  pAttnVal1
+       4  pAttnVal1B
+       4  pAttnVal2
+       4  pAttnVal2B
+       4  pLEDCSVal0
+       4  pLEDCSVal0B
+       4  pLEDCSVal1
+       4  pLEDCSVal1B
+      42  pPCA9555BitRead
+      20  pPCA9555BitRst
+      18  pPCA9555BitRst1
+       2  pPCA9555BitSet
+      20  pPCA9555BitSet1
+      30  pPCA9555ReadData
+      26  pPCA9555SetData
+       4  pPCA9555Str
+      24  pPCA9555StrB
+       4  pPCAReadPortData
+       2  pPCAReadPortData1
+      14  pPCASetConfiguration
+       8  pPCASetConfiguration1
+       6  pPCASetPortData
+       2  pPCASetPortData1
+
+ 
+  44 bytes in section .bss
+  24 bytes in section .data
+ 860 bytes in section .text
+ 
+ 860 bytes of CODE memory
+  68 bytes of DATA memory
+
+Errors: none
+Warnings: none

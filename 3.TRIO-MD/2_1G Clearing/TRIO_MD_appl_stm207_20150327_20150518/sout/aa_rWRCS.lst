@@ -1,0 +1,1596 @@
+###############################################################################
+#                                                                             #
+# IAR ANSI C/C++ Compiler V5.30.2.51295/W32 for ARM     09/Jun/2011  18:42:11 #
+# Copyright 1999-2009 IAR Systems AB.                                         #
+#                                                                             #
+#    Cpu mode     =  thumb                                                    #
+#    Endian       =  little                                                   #
+#    Source file  =  C:\user\project\HFR OTM-L12\fw\appl_otmL12_20110505_v1.0 #
+#                    \code\aa_rWRCS.c                                         #
+#    Command line =  "C:\user\project\HFR OTM-L12\fw\appl_otmL12_20110505_v1. #
+#                    0\code\aa_rWRCS.c" -lcN "C:\user\project\HFR             #
+#                    OTM-L12\fw\appl_otmL12_20110505_v1.0\sout\" -lB          #
+#                    "C:\user\project\HFR OTM-L12\fw\appl_otmL12_20110505_v1. #
+#                    0\sout\" -o "C:\user\project\HFR                         #
+#                    OTM-L12\fw\appl_otmL12_20110505_v1.0\sout\"              #
+#                    --endian=little --cpu=Cortex-M3 -e --require_prototypes  #
+#                    --fpu=None --dlib_config "C:\compiler\ewarm              #
+#                    5.3\arm\INC\DLib_Config_Normal.h" -I                     #
+#                    "C:\user\project\HFR OTM-L12\fw\appl_otmL12_20110505_v1. #
+#                    0\include\" -I "C:\user\project\HFR                      #
+#                    OTM-L12\fw\appl_otmL12_20110505_v1.0\lib_stm32\inc\" -I  #
+#                    "C:\user\project\HFR OTM-L12\fw\appl_otmL12_20110505_v1. #
+#                    0\lib_stm32\src\" -I "C:\user\project\HFR                #
+#                    OTM-L12\fw\appl_otmL12_20110505_v1.0\uC-CPU\" -I         #
+#                    "C:\user\project\HFR OTM-L12\fw\appl_otmL12_20110505_v1. #
+#                    0\uC-LIB\" -I "C:\user\project\HFR                       #
+#                    OTM-L12\fw\appl_otmL12_20110505_v1.0\uCOS-II\Ports\" -I  #
+#                    "C:\user\project\HFR OTM-L12\fw\appl_otmL12_20110505_v1. #
+#                    0\uCOS-II\Source\" -I "C:\user\project\HFR               #
+#                    OTM-L12\fw\appl_otmL12_20110505_v1.0\uC-Probe\" -I       #
+#                    "C:\compiler\ewarm 5.3\arm\INC\" -Oh                     #
+#    List file    =  C:\user\project\HFR OTM-L12\fw\appl_otmL12_20110505_v1.0 #
+#                    \sout\aa_rWRCS.lst                                       #
+#    Object file  =  C:\user\project\HFR OTM-L12\fw\appl_otmL12_20110505_v1.0 #
+#                    \sout\aa_rWRCS.o                                         #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+C:\user\project\HFR OTM-L12\fw\appl_otmL12_20110505_v1.0\code\aa_rWRCS.c
+      1          
+      2          /******************** (C) COPYRIGHT 2008 PILOG, NSINFO *************************
+      3          * File Name          : usart1_vx.x.c
+      4          * Author             : Yoon Byong-Gyu(bgyoon@naver.com)
+      5          * Date First Issued  : 01/17/2008
+      6          * Description        : This file provides all the USART0 firmware functions.
+      7          * $Revision: 0.1 $
+      8          * $Revision date: 2008.01.__
+      9          ********************************************************************************/
+     10          
+     11          #define SER0INT_C
+     12          
+     13          #include "../include/main.h"
+     14          #include "download.c"
+     15          
+     16          void WRCS_SerInit(void)
+     17          {
+     18           	PcSer->CheckByte = pUSART1.CheckByte;
+     19          	PcSer->RxGetByte = pUSART1.RxGetByte;
+     20          	PcSer->PutStr = pUSART1.PutStr;
+     21          	PcSer->TxCheckByte = pUSART1.TxCheckByte;
+     22          
+     23          	PcSer->TimerRx = TimerSioRx;
+     24          	PcSer->WRCSRecv = &RPcsksio;
+     25          	PcSer->WRCSSend = &SPcsksio;
+     26          	PcSer->OSSem = OSSemCreate(1);
+     27          
+     28          	Initialize();
+     29          
+     30          	OSTaskCreate(WRCSTask, (void *)PcSer, (OS_STK *)&Ser1TaskStk[SER1_STK_SIZE - 1], SER0TASK_PRIO);
+     31          
+     32           }
+     33          
+     34          void WRCSTask(void *pdata)
+     35          {
+     36          	__ProtocolPtr *nPtr = (__ProtocolPtr *)pdata;
+     37          
+     38              nPtr = nPtr;
+     39          	pdata = pdata;
+     40          	OSTimeDly(100*SER0TASK_PRIO);
+     41          
+     42          	while(1)
+     43          	{
+     44          		nPtr->WRCSRecv->cBody = 0;
+     45          		StsCheckConnectionRst(nPtr);
+     46          	
+     47          		if(!tTestFlag)
+     48          		{
+     49          			if(WRCS_ProtocolCheck(nPtr))
+     50          			{
+     51          			#if TWO_BODY >= 2
+     52          				while(nPtr->WRCSRecv->cBody  <=  nPtr->WRCSRecv->BodyNo)
+     53          				{
+     54          			#endif
+     55          					ProtocolComCheck(nPtr);
+     56          			#if TWO_BODY >= 2
+     57          					nPtr->WRCSRecv->cBody++;
+     58          				}
+     59          			#endif
+     60          			}			
+     61          		}
+     62          		WRCS_DownLoadGiveupTimerChk(nPtr);
+     63          		OSTimeDly(200L);
+     64          	}
+     65          }
+     66          
+     67          void StsCheckConnectionSet(__ProtocolPtr *nPtr)
+     68          {
+     69          	if(nPtr == PcSer)
+     70          	{
+     71          		SerialPadOnFlag = 1;
+     72          		TimerRegist(TimerSerCheck, 60*Time1Sec);
+     73          	}
+     74          	else if(nPtr == Wrcs0)
+     75          	{
+     76          		UdpPadOnFlag = 1;
+     77          		TimerRegist(TimerUdp0Check, 60*Time1Sec);
+     78          		MySts->ServerPadFlag = 1;
+     79          		TimerRegist(TimerServerPadFlag, ServerPadTime);
+     80          	}
+     81          }
+     82          void StsCheckConnectionRst(__ProtocolPtr *nPtr)
+     83          {
+     84          	if(nPtr == PcSer && TimeOverCheck(TimerSerCheck)) 		SerialPadOnFlag = 0;
+     85          	if(nPtr == Wrcs0 && TimeOverCheck(TimerUdp0Check))  	UdpPadOnFlag = 0;
+     86          	if(nPtr == Wrcs0 && TimeOverCheck(TimerServerPadFlag))  MySts->ServerPadFlag = 0;
+     87          
+     88          }
+     89          
+     90          INT32U WRCS_ProtocolCheck(__ProtocolPtr *nPtr)
+     91          {
+     92          	INT16U nInitCnt, nCnt;
+     93          	INT16U i = 0;
+     94          	INT16U Data;
+     95          
+     96          	__WRCSSIO *Recv = nPtr->WRCSRecv;
+     97          
+     98          	TimerRegist(nPtr->TimerRx, Time1Sec*2L);
+     99          
+    100          	while(1)
+    101          	{
+    102          		if(TimeOverCheck(nPtr->TimerRx)) return FALSE;	
+    103          
+    104          		if(nPtr->CheckByte(1, &nCnt))
+    105          		{
+    106          			Data = nPtr->RxGetByte();
+    107          			
+    108          			if(STX == Data/*nPtr->RxGetByte()*/)
+    109          			{
+    110          				if(nPtr->CheckByte(1, &nCnt))
+    111          				{
+    112              				if(STX == nPtr->RxGetByte())
+    113          					{
+    114          						if(nPtr->CheckByte(1, &nCnt))
+    115          						{
+    116          							if(STX == nPtr->RxGetByte())
+    117          							{
+    118          								if(nPtr->CheckByte(1, &nCnt))
+    119          								{
+    120          									if(STX == nPtr->RxGetByte())
+    121          									{
+    122          											Recv->Sync[0] = STX;
+    123          											Recv->Sync[1] = STX;
+    124          											Recv->Sync[2] = STX;
+    125          											Recv->Sync[3] = STX;
+    126          											Recv->BodyNo = 0; // Default: 1EA
+    127          											
+    128          											break;
+    129          									}
+    130          								}
+    131          								else OSTimeDly(100L);
+    132          							}
+    133          						}
+    134          						else OSTimeDly(100L);
+    135          					}
+    136          				} 
+    137          				else OSTimeDly(100L);
+    138          			}
+    139          			////////////////////////////////////////////////////////////////////
+    140          			{
+    141          				if((nPtr == PcSer)&&(downloadFlag == 0))
+    142          				{
+    143          					if((Data == 'x')||(Data == 'X'))
+    144          					{
+    145          						iDebugCnt++;
+    146          						
+    147          						if(iDebugCnt > 20)
+    148          						{
+    149          							iUser_Value2 = __ChangeDebug;
+    150          							iDebugCnt = 0; 
+    151          							TimerRegist(Timer_DebugCnt, Time1Min*30L);
+    152          						}
+    153          					}
+    154          				}
+    155          			}
+    156           		} else OSTimeDly(100L);
+    157          	}	
+    158          
+    159          	TimerRegist(nPtr->TimerRx, Time1Sec);
+    160          	nPtr->CheckByte(1, &nInitCnt);
+    161          	while(!nPtr->CheckByte(4, &nCnt))
+    162          	{
+    163          		if(TimeOverCheck(nPtr->TimerRx))
+    164          		{
+    165          			if(nCnt > nInitCnt)
+    166          			{
+    167          				nInitCnt = nCnt;
+    168          				TimerRegist(nPtr->TimerRx, Time100mSec);
+    169          			}
+    170          			else return FALSE;
+    171          		}
+    172          		OSTimeDly(100L);
+    173          	}
+    174          	
+    175          	Recv->TryNo 		= nPtr->RxGetByte();
+    176          	Recv->BodyLen[0]	= nPtr->RxGetByte();
+    177          	Recv->BodyLen[1]	= nPtr->RxGetByte();
+    178          	Recv->CheckSum		= nPtr->RxGetByte();
+    179          
+    180          	Recv->BodyLength = (Recv->BodyLen[0] << 8) + (Recv->BodyLen[1]);
+    181          
+    182          	if(Recv->CheckSum != (INT8U)(Recv->TryNo + Recv->BodyLen[0] + Recv->BodyLen[1])
+    183          		|| (Recv->BodyLength >= (TWO_BODY*BODYSIZEMAX))
+    184          	)
+    185          	{
+    186          			return FALSE;
+    187          	}
+    188              
+    189          #if TWO_BODY >= 2
+    190          BODYRE:
+    191          #endif
+    192          	TimerRegist(nPtr->TimerRx, Time1Sec*2);
+    193          	nPtr->CheckByte(1, &nInitCnt);
+    194          	while(1)
+    195          	{
+    196          		if(TimeOverCheck(nPtr->TimerRx)) ///1byte 500us
+    197          		{
+    198          			if(nCnt > nInitCnt)
+    199          			{
+    200          				nInitCnt = nCnt;
+    201          				TimerRegist(nPtr->TimerRx, Time100mSec);
+    202          			}
+    203          			else
+    204          			{
+    205          				return FALSE;
+    206          			}
+    207          		}
+    208          		if(nPtr->CheckByte(7, &nCnt))
+    209          		{
+    210          			break;// include 0x03
+    211          		}
+    212          		OSTimeDly(100L);
+    213          	}
+    214          	
+    215          	for(i = 0; i < 7 ; i++)
+    216          	{
+    217          		*((INT8U *)Recv->BodyFrame[Recv->BodyNo].SubID + i) = nPtr->RxGetByte();
+    218          	}
+    219          	
+    220          
+    221          
+    222          	Recv->BodyFrame[Recv->BodyNo].SubLength
+    223          		=	 ((Recv->BodyFrame[Recv->BodyNo].SubLen[0] << 8)& 0xff00)
+    224          		  +  ((Recv->BodyFrame[Recv->BodyNo].SubLen[1] << 0)& 0x00ff);
+    225          
+    226          	if(Recv->BodyFrame[Recv->BodyNo].SubLength >= BODYSIZEMAX)
+    227          	{
+    228          		//SerPtr->printf("SubLength error = %d", Recv->BodyFrame[Recv->BodyNo].SubLength); 
+    229          		return FALSE;
+    230          	}
+    231          
+    232          
+    233          	TimerRegist(nPtr->TimerRx, Time1Sec*2);
+    234          
+    235          	nPtr->CheckByte(1, &nInitCnt);
+    236          	while(1)
+    237          	{
+    238          		if(TimeOverCheck(nPtr->TimerRx)) ///1byte 500us
+    239          		{
+    240          			if(nCnt > nInitCnt)
+    241          			{
+    242          				nInitCnt = nCnt;
+    243          				TimerRegist(nPtr->TimerRx, Time100mSec);
+    244          			}
+    245          			else
+    246          			{
+    247          				return FALSE;
+    248          			}
+    249          		}
+    250          		if(nPtr->CheckByte((INT16U)(Recv->BodyFrame[Recv->BodyNo].SubLength + 2), &nCnt))
+    251          		{
+    252          			break;// include 0x03
+    253          		}
+    254          		OSTimeDly(100L);
+    255          	}
+    256          	for(i = 0; i < Recv->BodyFrame[Recv->BodyNo].SubLength + 2; i++)
+    257          	{
+    258          	    *((INT8U *)Recv->BodyFrame[Recv->BodyNo].SubData + i) = nPtr->RxGetByte();
+    259          	}
+    260          
+    261          	Recv->BodyFrame[Recv->BodyNo].Crc= Crc16Calc ( &(Recv->BodyFrame[Recv->BodyNo].SubID[0])
+    262          						                            , Recv->BodyFrame[Recv->BodyNo].SubLength + 5 + 2, NULL);
+    263          	Recv->BodyFrame[Recv->BodyNo].CrcOK = TRUE;
+    264          
+    265          	Data = Recv->BodyFrame[Recv->BodyNo].SubLength;
+    266          
+    267          	if (   ( (INT8U)(Recv->BodyFrame[Recv->BodyNo].Crc >> 8)!= Recv->BodyFrame[Recv->BodyNo].SubData[Data  ] )
+    268          		|| ( (INT8U)(Recv->BodyFrame[Recv->BodyNo].Crc     )!= Recv->BodyFrame[Recv->BodyNo].SubData[Data+1] )  )
+    269          	{
+    270          		//CRC ERROR!!
+    271          		{
+    272          			//if(nPtr != IORUSer[0] && nPtr != IORUSer[1])
+    273          			//{
+    274          				Recv->BodyFrame[Recv->BodyNo].CrcOK = FALSE;
+    275          				SerPtr->printf("CRC Error\n");
+    276          				return TRUE;
+    277          			//}
+    278          		}
+    279          	}
+    280          
+    281          #if TWO_BODY >= 2
+    282          	if(!Recv->BodyNo)
+    283          	{
+    284          		if(Recv->BodyLength != (Recv->BodyFrame[Recv->BodyNo].SubLength
+    285          															  + 5 + 2 + 2))
+    286          		{
+    287          			Recv->BodyNo++;
+    288          			goto BODYRE;
+    289          		}
+    290          	}
+    291          #endif	
+    292          ////////////////////////////////////////////////////////////////////////////////
+    293          
+    294          	TimerRegist(nPtr->TimerRx, Time1Sec);
+    295          	nPtr->CheckByte(1, &nInitCnt);
+    296          	while(!nPtr->CheckByte(1, &nCnt))
+    297          	{
+    298          		if(TimeOverCheck(nPtr->TimerRx))
+    299          		{
+    300          			if(nCnt > nInitCnt)
+    301          			{
+    302          				nInitCnt = nCnt;
+    303          				TimerRegist(nPtr->TimerRx, Time100mSec);
+    304          			}
+    305          			else
+    306          			{
+    307          				return FALSE;
+    308          			}
+    309          		}
+    310          		OSTimeDly(100L);
+    311          	}
+    312          	Data = nPtr->RxGetByte();
+    313          	//if(nPtr != PcSer)
+    314          	//SerPtr->PutToBuffer(Data);
+    315          
+    316          	if(Data != ETX)
+    317          	{
+    318          		SerPtr->printf("ETX error = %d", Data); 
+    319          		return FALSE;
+    320          	}
+    321          	return TRUE;
+    322          }
+    323          
+    324          
+    325          INT16U WRCS_WhatRxComm(__ProtocolPtr *nPtr)
+    326          {
+    327          	INT16U RetVal = 0;
+    328          	INT8U cBody = nPtr->WRCSRecv->cBody;
+    329          	
+    330          	if(nPtr->WRCSRecv->BodyFrame[cBody].CrcOK)
+    331          	{
+    332          		RetVal = nPtr->WRCSRecv->BodyFrame[cBody].Command;
+    333          	}
+    334          	else //NO ERROR
+    335          	{
+    336          		//ERROR CASE
+    337          		RetVal = 0xff;
+    338          	}
+    339              return (RetVal);
+    340          }
+    341          
+    342          void ProtocolComCheck (__ProtocolPtr *nPtr)
+    343          {
+    344          	INT16U tcnt = 0;
+    345          	INT8U Comm = WRCS_WhatRxComm(nPtr);
+    346          	
+    347          	__WRCSSIO *Recv = nPtr->WRCSRecv;
+    348          	__WRCSSIO *Send = nPtr->WRCSSend;
+    349              __BODYFRAME *rBody = &Recv->BodyFrame[0];
+    350              __BODYFRAME *sBody = &Send->BodyFrame[0];
+    351          
+    352          	INT8U id0 = rBody->SubID[0];
+    353          	INT8U id1 = rBody->SubID[1];
+    354          	INT8U id2 = rBody->SubID[2];
+    355          	INT8U tmpDnr = 0;
+    356          	INT8U tmpRmt = 0;
+    357          	
+    358          	INT8U IsItMyID = IsItRtnMySysIDtoVAL(id0, id1, id2, &tmpDnr, &tmpRmt);
+    359          	INT32U sptr = 0;
+    360          
+    361          	//SerPtr->printf("r: id1 = %02x, id2 = %02x, tmpDnr = %02x, tmpRmt = %02x \n", id1, id2, tmpDnr, tmpRmt);
+    362          	// DEBUG
+    363          	#ifdef WRCS_DBG
+    364          	if(nPtr == Wrcs0)
+    365          	{
+    366          		pBodyFrameTx(id0, id1, id2, rBody->SubData, rBody->SubLength, Comm, PcSer, NULL);
+    367          	}
+    368          	#endif
+    369          	
+    370          	if(Comm != AlarmSCODE) StsCheckConnectionSet(nPtr);
+    371          	if(nPtr == SelfSer) return;
+    372          
+    373          	switch(Comm)
+    374          	{
+    375          		case SystemRCUTypeSetQue:
+    376          		case SystemRCUTypeStsQue:
+    377          		case LocalMacAddrSetQue:
+    378          		case LocalMacAddrStsQue:
+    379          		case LocalIPAddrSetQue:
+    380          		case LocalIPAddrStsQue:
+    381          			MyProtocolComCheck(nPtr);
+    382          		break;
+    383          		
+    384          		case AlarmSCODE:
+    385          		{
+    386            			if(nPtr == PcSer || nPtr == Wrcs0)
+    387            			{
+    388          				if(ServRstAlmFlag[tmpDnr][tmpRmt])	MyRstCase.SERVERRstCase[tmpDnr][tmpRmt] = 0x00;
+    389          				ServAlmSndCnt[tmpDnr][tmpRmt] = 0;
+    390          				ServRstAlmFlag[tmpDnr][tmpRmt]= 0;
+    391          			}
+    392          		}
+    393          		break;
+    394          
+    395          		case ModuleInformStsQue:
+    396          			if(nPtr == PcSer || nPtr == Wrcs0)
+    397          			{
+    398          				tcnt = GenModuleAutoInformSts(sBody->SubData, tmpDnr, tmpRmt);
+    399          				pBodyFrameTx(id0, id1, id2, sBody->SubData, tcnt, Comm, nPtr, NULL);
+    400          			}
+    401          			else if(nPtr == IORUSer)
+    402          			{
+    403          				if(IsItMyID)
+    404          				{
+    405          					IsItGetIOURInform = TRUE;
+    406          					DnrSts[tmpDnr][tmpRmt].IOURInform.IsitLink = TRUE;
+    407          					DnrSts[tmpDnr][tmpRmt].IOURInform.minform =  *(__ModuleInform *)rBody->SubData;
+    408          				}
+    409          			}
+    410          		break;
+    411          
+    412          		case AutoModuleInformQue:
+    413          			
+    414          		break;
+    415          
+    416          		case IsItLocalCtrlSetRQST:
+    417          			if(IsItMyID) MyProtocolComCheck(nPtr);
+    418          			else
+    419          			{
+    420          				if(SystemTypeInfo < 2) {
+    421          					if(nPtr == DnrSer1 &&    (tmpDnr == MyDnrID)) 	
+    422          						pBodyFrameTx(id0, id1, id2, (INT8U *)rBody->SubData, rBody->SubLength, Comm, Wrcs1, nPtr);
+    423          					else if(nPtr == Wrcs1 && (tmpDnr != MyDnrID))
+    424          						pBodyFrameTx(id0, id1, id2, (INT8U *)rBody->SubData, rBody->SubLength, Comm, DnrSer0, nPtr);
+    425          				}
+    426          				else
+    427          				{
+    428          					if(nPtr == Wrcs1){
+    429          
+    430          					}
+    431          				}
+    432          			}
+    433          		break;
+    434          
+    435          		case IsItLocalCtrlSetRSPS:
+    436          			{
+    437          				__ProtocolPtr *dptr = (__ProtocolPtr *)nPtr->ctrlsrc;
+    438          				if(dptr == NULL) break;
+    439          				if(dptr == PcSer || dptr == Wrcs0) break;
+    440          				if(dptr == SelfSer) {
+    441          					IsItLocalCtrlRSPS = TRUE;
+    442          				}
+    443          				else
+    444          				{
+    445          					pBodyFrameTx(id0, id1, id2, (INT8U *)rBody->SubData, rBody->SubLength, Comm, dptr, NULL);
+    446          				}
+    447          			}
+    448          		break;
+    449          		
+    450          
+    451          		case ControlQue:
+    452          		case AlarmMaskSetQue:
+    453          		case ModuleInformSetQue:
+    454          
+    455          			if(WRCS_DownLoadGiveupTimerSet(NULL))
+    456          			{
+    457          				if( WRCS_DownLoadGiveupTimerSet(NULL) != (INT32U)nPtr ) return;
+    458          			}
+    459          
+    460          			if(nPtr != IORUSer)
+    461          			{
+    462          				if(SystemTypeInfo < 2) {
+    463          
+    464          					if(nPtr == PcSer || nPtr == Wrcs0)
+    465          					{
+    466          						if(IsItMyID) MyProtocolComCheck(nPtr);
+    467          						else 
+    468          						{
+    469          							if(nPtr == PcSer && MySts->IsItLocalCtrl && Comm == ControlQue) {
+    470          								tcnt = GenDnrAidSts((INT8U *)rBody->SubData, &DnrSts[MyDnrID][MyRmtID], nPtr);
+    471          								pBodyFrameTx(id0, id1, id2, (INT8U *)rBody->SubData, tcnt, Comm, nPtr, NULL);	// Response
+    472          								return;
+    473          							}
+    474          							else if(nPtr == PcSer && MySts->IsItLocalCtrl && Comm == AlarmMaskSetQue)
+    475          							{
+    476          								pBodyFrameTx(id0, id1, id2, (INT8U *)DnrSts[tmpDnr][tmpRmt].AlarmMask, 1, Comm, nPtr, NULL);	// Response
+    477          								return;
+    478          							}
+    479          						
+    480          							if(tmpDnr == MyDnrID && tmpRmt)	
+    481          							{
+    482          								//		to WRCS1
+    483          								//		SEND MY_Donor Remote !!
+    484          								//		SerPtr->printf("SEND Remote \n");
+    485          								pBodyFrameTx(id0, id1, id2, (INT8U *)rBody->SubData, rBody->SubLength, Comm, Wrcs1, nPtr);
+    486          							}
+    487          							else // to Another DONOR Send
+    488          							{
+    489          								pBodyFrameTx(id0, id1, id2, (INT8U *)rBody->SubData, rBody->SubLength, Comm, DnrSer0, nPtr);
+    490          							}
+    491          						}
+    492          					}
+    493          					else if(nPtr == DnrSer1)
+    494          					{
+    495          						//SerPtr->printf("DATA Recevied %02x\n", IsItMyID);
+    496          						if(IsItMyID){
+    497          							MyProtocolComCheck(nPtr);		//WRCS_DownloadFunc(nPtr);
+    498          						}
+    499          						else
+    500          						{
+    501          							//		from Another Donor to Remote
+    502          							//		SEND MY_Donor Remote !!
+    503          							//		SerPtr->printf("SEND Remote \n");
+    504          							pBodyFrameTx(id0, id1, id2, (INT8U *)rBody->SubData, rBody->SubLength, Comm, Wrcs1, nPtr);
+    505          							
+    506          						}
+    507          					}
+    508          					else //if(nPtr == DnrSer0 || nPtr == WRCS1)
+    509          					{	// response
+    510          						goto CTRLRSPS;
+    511          					}
+    512          				}
+    513          				else
+    514          				{						// REMOTE CASE !!
+    515          					if(IsItMyID) MyProtocolComCheck(nPtr);
+    516          					else
+    517          					{
+    518          						if(nPtr == PcSer && MySts->IsItLocalCtrl && Comm == ControlQue){
+    519          							tcnt = GenDnrAidSts((INT8U *)rBody->SubData, &DnrSts[MyDnrID][MyRmtID], nPtr);
+    520          							pBodyFrameTx(id0, id1, id2, (INT8U *)rBody->SubData, tcnt, Comm, nPtr, NULL);	// Response
+    521          							return;
+    522          						}
+    523          						else if(nPtr == PcSer && MySts->IsItLocalCtrl && Comm == AlarmMaskSetQue)
+    524          						{
+    525          							pBodyFrameTx(id0, id1, id2, (INT8U *)DnrSts[tmpDnr][tmpRmt].AlarmMask, 1, Comm, nPtr, NULL);	// Response
+    526          							return;
+    527          						}
+    528          						if(nPtr == Wrcs0 || nPtr == PcSer)
+    529          						{
+    530          							goto RVSCTRLRQST;
+    531          						}
+    532          					}
+    533          				}
+    534          			}
+    535          			else
+    536          			{
+    537          CTRLRSPS:			
+    538          				{
+    539          					__ProtocolPtr *dptr = (__ProtocolPtr *)nPtr->ctrlsrc;
+    540          					if(dptr == SelfSer) break;
+    541          					if(dptr == NULL) break;
+    542          					
+    543          					if((__SKProtocolPtr *)dptr == RcsSer)
+    544          					{
+    545          						switch(Comm)
+    546          						{
+    547          							case ControlQue:
+    548          							case RvsControlRSPS:
+    549          								
+    550          								Comm = RCSControlRSPS;
+    551          
+    552          								AnalyzeAidData(nPtr, FALSE, tmpDnr, tmpRmt);
+    553          								tcnt = RCSGenAidSts(sBody->SubData, &DnrSts[tmpDnr][tmpRmt]);
+    554          								RCSDataAckTx(id0, id1, (INT8U *)sBody->SubData, tcnt, MyPortID, Comm);
+    555          							break;
+    556          
+    557          						}
+    558          
+    559          					}
+    560          					else
+    561          					{
+    562          						switch(Comm)
+    563          						{
+    564          							case ModuleInformSetQue:
+    565          								if(pCtrlComm == RvsModuleInformSetRQST){
+    566          									Comm = RvsModuleInformSetRSPS;
+    567          									pCtrlComm = NULL;
+    568          								}
+    569          
+    570          								IsItGetIOURInform = NULL;
+    571          								pBodyFrameTx(id0, id1, id2, (INT8U *)rBody->SubData, rBody->SubLength, Comm, dptr, NULL);
+    572          							break;
+    573          							
+    574          							case AlarmMaskSetQue:
+    575          								pBodyFrameTx(id0, id1, id2, (INT8U *)rBody->SubData, rBody->SubLength, Comm, dptr, NULL);
+    576          							break;
+    577          
+    578          							default:
+    579          								if(pCtrlComm == RvsControlRQST) {
+    580          									Comm = RvsControlRSPS;
+    581          									pCtrlComm = NULL;
+    582          								}
+    583          
+    584          								AnalyzeAidData(nPtr, FALSE, tmpDnr, tmpRmt);
+    585          								tcnt = GenDnrAidSts((INT8U *)sBody->SubData, &DnrSts[tmpDnr][tmpRmt], dptr);
+    586          								pBodyFrameTx(id0, id1, id2, (INT8U *)sBody->SubData, tcnt, Comm, dptr, NULL);
+    587          							break;
+    588          						}
+    589          					}
+    590          				}
+    591          			}
+    592          		break;
+    593          		
+    594          		case StatusRQST:
+    595          		case AlarmRQST:
+    596          			////////////////////////////////////////////////////////////////////////////////
+    597          			if(IsItMyID){
+    598          				MyProtocolComCheck(nPtr);
+    599          			}
+    600          			else
+    601          			{
+    602          
+    603          
+    604          			}
+    605          		break;
+    606          
+    607          		case AlarmRSPS:
+    608          			RmtAlarmSndCnt[tmpDnr][tmpRmt] = 0;
+    609          			MyRstCase.VERTICALRstCase[tmpDnr][tmpRmt] = 0;
+    610          		break;
+    611          		
+    612          		case StatusRSPS:
+    613          			if(nPtr == Wrcs1)
+    614          			{
+    615          				AnalyzeAidData(nPtr, FALSE, tmpDnr, tmpRmt);	// response
+    616          			}
+    617          		break;
+    618          		
+    619          		case StatusQue:
+    620          		{
+    621          			if(nPtr == PcSer || nPtr == Wrcs0 || nPtr == DnrSer1)
+    622          			{
+    623          				if(nPtr == DnrSer1)
+    624          				{
+    625          					tmpDnr = MyDnrID;
+    626          					tcnt = GenDnrRstSts((INT8U *)sBody->SubData, &DnrSts[tmpDnr][tmpRmt], tmpDnr, tmpRmt, &Comm, nPtr);
+    627          				}
+    628          				else{
+    629          					tcnt = GenDnrAidSts((INT8U *)sBody->SubData, &DnrSts[tmpDnr][tmpRmt], nPtr);
+    630          				}
+    631          				pBodyFrameTx(id0, id1, id2, (INT8U *)sBody->SubData, tcnt, Comm, nPtr, NULL);
+    632          			}
+    633          			else if(nPtr == Wrcs1)
+    634          			{
+    635          
+    636          
+    637          			}
+    638          			else if(nPtr == IORUSer || nPtr == DnrSer0)	// OTRUSer
+    639          			{
+    640          				if(nPtr == DnrSer0) tmpDnr = MyDnrID ^ 1;
+    641          
+    642          				AnalyzeAidData(nPtr, FALSE, tmpDnr, tmpRmt);	// response				
+    643          			}
+    644          		}
+    645          		break;
+    646          
+    647          		case DownloadCMD:
+    648          		case DownloadCMDConfirm:
+    649          		case DownLoadData:
+    650          		case DownLoadDataConfirm:  
+    651          			{
+    652                          sptr = WRCS_DownLoadGiveupTimerSet(NULL);
+    653          
+    654          				if(id0 == 0xff && id1 == 0xff && id2 == 0xff) {	WRCS_DownloadFunc(nPtr); break;}
+    655          				
+    656          				if(nPtr != IORUSer)
+    657          				{
+    658          					if(SystemTypeInfo < 2) {	// DONOR CASE !!
+    659          						if(sptr && (nPtr == PcSer || nPtr == Wrcs0 || nPtr == DnrSer1)) if(sptr != (INT32U)nPtr) return;
+    660          
+    661          						if(nPtr == PcSer || nPtr == Wrcs0)				//Requset!!
+    662          						{
+    663          							if(IsItMyID) MyProtocolComCheck(nPtr);		//WRCS_DownloadFunc(nPtr);
+    664          							else {
+    665          								
+    666          								WRCS_DownLoadGiveupTimerSet((INT32U)nPtr);
+    667          
+    668          								if(tmpDnr == MyDnrID && tmpRmt)
+    669          								{
+    670          									//		to WRCS1
+    671          									//		SEND MY_Donor Remote !!
+    672          									//		SerPtr->printf("SEND Remote \n");
+    673          									pBodyFrameTx(id0, id1, id2, (INT8U *)rBody->SubData, rBody->SubLength, Comm, Wrcs1, nPtr);
+    674          								}
+    675          								else // to Another DONOR Send
+    676          								{
+    677          									pBodyFrameTx(id0, id1, id2, (INT8U *)rBody->SubData, rBody->SubLength, Comm, DnrSer0, nPtr);
+    678          								}
+    679          								
+    680          							}
+    681          						}
+    682          						else if(nPtr == DnrSer1)	// DownLoad Reqeuset
+    683          						{
+    684          
+    685          							if(IsItMyID) MyProtocolComCheck(nPtr);		//WRCS_DownloadFunc(nPtr);
+    686          							else if(tmpDnr == MyDnrID && tmpRmt)
+    687          							{
+    688          								//		to WRCS1
+    689          								//		SEND MY_Donor Remote !!
+    690          								//		SerPtr->printf("SEND Remote \n");
+    691          								//		DO not Sent Another Donor!!
+    692          								WRCS_DownLoadGiveupTimerSet((INT32U)nPtr);
+    693          								pBodyFrameTx(id0, id1, id2, (INT8U *)rBody->SubData, rBody->SubLength, Comm, Wrcs1, nPtr);
+    694          
+    695          							}
+    696          						}
+    697          						else //if(nPtr == DnrSer0 || nPtr == WRCS1)
+    698          						{
+    699          							goto DOWNRSPS;
+    700          						}
+    701          					}
+    702          					else {						// REMOTE CASE !!
+    703          						if(sptr && (nPtr == PcSer || nPtr == Wrcs0 || nPtr == Wrcs1)) if(sptr != (INT32U)nPtr) return;
+    704          
+    705          						if(IsItMyID) MyProtocolComCheck(nPtr);
+    706          						else if(nPtr == PcSer || nPtr == Wrcs0)
+    707          						{
+    708          								WRCS_DownLoadGiveupTimerSet((INT32U)nPtr);
+    709          RVSCTRLRQST:								
+    710          								
+    711          								// to SEND Remote
+    712          									 if(Comm == DownloadCMD)			Comm = RvsDownloadCMDRQST;
+    713          								else if(Comm == DownloadCMDConfirm) 	Comm = RvsDownloadCMDConfirmRQST;
+    714          								else if(Comm == DownLoadData)			Comm = RvsDownLoadDataRQST;
+    715          								else if(Comm == DownLoadDataConfirm)	Comm = RvsDownLoadDataConfirmRQST;
+    716          								else if(Comm == ControlQue)				Comm = RvsControlRQST;
+    717          								else if(Comm == AlarmMaskSetQue)		Comm = RvsAlarmMaskSetRQST;
+    718          								else if(Comm == ModuleInformSetQue)		Comm = RvsModuleInformSetRQST;
+    719          								
+    720          								pBodyFrameTx(id0, id1, id2, (INT8U *)rBody->SubData, rBody->SubLength, Comm, Wrcs1, nPtr);
+    721          						}
+    722          					}
+    723          				}
+    724          				else
+    725          				{
+    726          DOWNRSPS:
+    727          	                 {
+    728          						__ProtocolPtr *dptr = (__ProtocolPtr *)nPtr->ctrlsrc;
+    729          						if(dptr == NULL) break;
+    730          						if(dptr == SelfSer) break;
+    731          						
+    732          
+    733          						if((__SKProtocolPtr *)dptr == RcsSer)
+    734          						{
+    735          							INT16U i = 0;
+    736          							
+    737          							switch(Comm)
+    738          							{
+    739          								case DownloadCMD:				Comm = RCSDownloadCMD;			break;
+    740          								case DownloadCMDConfirm:		Comm = RCSDownloadCMDConfirm;	break;
+    741          								case DownLoadData:				Comm = RCSDownLoadData; 		break;
+    742          								case DownLoadDataConfirm:		Comm = RCSDownLoadDataConfirm;	break;
+    743          							}
+    744          							RcsSer->Send->BODYFRAME.SubData[0] = Comm;
+    745          
+    746          							for(i = 0; i < rBody->SubLength; i++)
+    747          							{
+    748          								RcsSer->Send->BODYFRAME.SubData[1+i] = rBody->SubData[i];
+    749          							}
+    750          							RCSDataAckTx(id0, id1, (INT8U *)RcsSer->Send->BODYFRAME.SubData, rBody->SubLength + 1, MyPortID, RcsDownloadRSPS);
+    751          						}
+    752          						else
+    753          						{
+    754          							     if(pCtrlComm == RvsDownloadCMDRQST){			Comm = RvsDownloadCMDRSPS;			pCtrlComm = NULL; }
+    755          							else if(pCtrlComm == RvsDownloadCMDConfirmRQST){	Comm = RvsDownloadCMDConfirmRSPS;	pCtrlComm = NULL; }
+    756          							else if(pCtrlComm == RvsDownLoadDataRQST){			Comm = RvsDownLoadDataRSPS;			pCtrlComm = NULL; }
+    757          							else if(pCtrlComm == RvsDownLoadDataConfirmRQST){	Comm = RvsDownLoadDataConfirmRSPS;	pCtrlComm = NULL; }
+    758          							pBodyFrameTx(id0, id1, id2, (INT8U *)rBody->SubData, rBody->SubLength, Comm, dptr, NULL);
+    759          						}
+    760          					}
+    761          				}
+    762          			}
+    763          		default:
+    764          			ProtocolRvsComCheck(nPtr);
+    765          
+    766          			if(nPtr == IORUSer)
+    767          			{
+    768          				SerPtr->printf(" id0 = %02x \n", rBody->SubID[0]);
+    769          				SerPtr->printf(" id1 = %02x \n", rBody->SubID[1]);
+    770          				SerPtr->printf(" id2 = %02x \n", rBody->SubID[2]);
+    771          				SerPtr->printf(" Comm = %02x \n", Comm);
+    772          			}
+    773          		break;
+    774          	}
+    775          	
+    776          }
+    777          
+    778          
+    779          
+    780          void MyProtocolComCheck(__ProtocolPtr *nPtr)
+    781          {
+    782          	INT16U tcnt = 0;
+    783          	INT8U Comm = WRCS_WhatRxComm(nPtr);
+    784          	
+    785          	__WRCSSIO *Recv = nPtr->WRCSRecv;
+    786          	__WRCSSIO *Send = nPtr->WRCSSend;
+    787              __BODYFRAME *rBody = &Recv->BodyFrame[0];
+    788              __BODYFRAME *sBody = &Send->BodyFrame[0];
+    789          
+    790          	INT8U id0 = rBody->SubID[0];
+    791          	INT8U id1 = rBody->SubID[1];
+    792          	INT8U id2 = rBody->SubID[2];
+    793          	INT8U tmpDnr = MyDnrID;
+    794          	INT8U tmpRmt = MyRmtID;
+    795          
+    796          	switch(Comm)
+    797          	{
+    798          		case SystemRCUTypeSetQue:
+    799          		case SystemRCUTypeStsQue:
+    800          			
+    801          			if(nPtr == PcSer)
+    802          			{
+    803          				if(Comm == SystemRCUTypeSetQue)
+    804          				{
+    805          					INT32U cpu_sr;
+    806          					EE_BACK1 *tptr;
+    807          			
+    808          					OS_ENTER_CRITICAL();
+    809          					
+    810          					tptr = (EE_BACK1 *)RoadBackuptobuffer(vEE_BACK1Addr);	// Load 1st Area	
+    811          					
+    812          					SystemTypeInfo = rBody->SubData[0]%4;
+    813          					tptr->BackUp.SystemTypeSet = rBody->SubData[0]%4;
+    814          			
+    815          					WriteBuffertoBackup(vEE_BACK1Addr, sizeof(EE_BACK1));
+    816          					OS_EXIT_CRITICAL();
+    817          			
+    818          					ResetStart();
+    819          				}
+    820          				pBodyFrameTx(id0, id1, id2, (INT8U *)&SystemTypeInfo, 1, Comm, nPtr, NULL);
+    821          			}
+    822          		break;
+    823          
+    824          		case LocalMacAddrSetQue:
+    825          		case LocalMacAddrStsQue:
+    826          			if(nPtr == PcSer)
+    827          			{
+    828          				if(Comm == LocalMacAddrSetQue)
+    829          				{
+    830          					LocalMacCtrlData(rBody->SubData);
+    831          					ResetStart();
+    832          				}
+    833          				pBodyFrameTx(id0, id1, id2, (INT8U *)MacAddrInfo.MacAddr[ETH0_CHANNEL], 6, Comm, nPtr, NULL);
+    834          			}
+    835          		break;
+    836          		
+    837          		case LocalIPAddrSetQue:
+    838          		case LocalIPAddrStsQue:
+    839          			if(nPtr == PcSer)
+    840          			{
+    841          				if(Comm == LocalIPAddrSetQue)
+    842          				{
+    843          					LocalIPCtrlData((__IPAddrStr *)rBody->SubData);
+    844          					ResetStart();
+    845          				}
+    846          				pBodyFrameTx(id0, id1, id2, (INT8U *)&IPAddrInfo, sizeof(__IPAddrStr)/2, Comm, nPtr, NULL);
+    847          			}
+    848          		break;
+    849          
+    850              	case AlarmRQST:
+    851          		case StatusRQST:
+    852          			if(nPtr == Wrcs1)
+    853          			{
+    854          				IsItRtnMySysIDtoVAL(rBody->SubData[0], rBody->SubData[1], rBody->SubData[2], &tmpDnr, &tmpRmt);
+    855          				AnalyzeAidDataptr(&rBody->SubData[3], rBody->SubLength - 3, FALSE, tmpDnr, tmpRmt);	// response
+    856          				/////////////////////////////////
+    857          				// Generation BodyFrame
+    858          				tcnt = GenDnrRstSts((INT8U *)sBody->SubData, &DnrSts[MyDnrID][MyRmtID], MyDnrID, MyRmtID, &Comm, nPtr);
+    859          				IsItRtnMyVALtoSysID(&id0, &id1, &id2, MyDnrID, MyRmtID);
+    860          
+    861          					 if(Comm == AlarmRQST) 	Comm = AlarmRSPS;
+    862          				else if(Comm == StatusRQST)	Comm = StatusRSPS;
+    863          				
+    864          				pBodyFrameTx(id0, id1, id2, (INT8U *)sBody->SubData, tcnt, StatusRSPS, Wrcs1, NULL);
+    865          			}
+    866          		break;
+    867          
+    868                  case IsItLocalCtrlSetRQST:
+    869          			ServerCtrlStart(rBody->SubData[0]);
+    870          			pBodyFrameTx(id0, id1, id2, (INT8U *)&MySts->IsitServerCtrl, 1, IsItLocalCtrlSetRSPS, nPtr, NULL);
+    871          		break;
+    872          		
+    873          		case ControlQue:
+    874          		case RvsControlRQST:
+    875          			{
+    876          				INT8U rval = FALSE;
+    877          				
+    878          				pCtrlComm = Comm;
+    879          				
+    880          				if(Comm == ControlQue)
+    881          				{
+    882          					if(nPtr == DnrSer1 || nPtr == PcSer || nPtr == Wrcs0 || (nPtr == Wrcs1 && SystemTypeInfo >= 2)) rval = TRUE;	// Remote CASE
+    883          				}
+    884          				else if(Comm == RvsControlRQST)
+    885          				{
+    886          					if(nPtr == DnrSer1 || nPtr == Wrcs1 ) rval = TRUE;	// Remote CASE
+    887          				}
+    888          				if(rval)
+    889          				{
+    890          					AnalyzeAidData(nPtr, TRUE, tmpDnr, tmpRmt);
+    891          
+    892          					if(nPtr == PcSer && MySts->IsItLocalCtrl){
+    893          						tcnt = GenDnrAidSts((INT8U *)rBody->SubData, &DnrSts[MyDnrID][MyRmtID], nPtr);
+    894          						pBodyFrameTx(id0, id1, id2, (INT8U *)rBody->SubData, tcnt, Comm, nPtr, NULL);	// Response
+    895          						break;
+    896          					}
+    897          					
+    898          					if(SystemTypeInfo < 2){
+    899          						if(Comm == RvsControlRQST) Comm = RvsControlRSPS;
+    900          
+    901          						if(!ALLResetFlag)
+    902          						{
+    903          							tcnt = GenDnrAidSts((INT8U *)rBody->SubData, &DnrSts[MyDnrID][MyRmtID], nPtr);
+    904          							pBodyFrameTx(id0, id1, id2, (INT8U *)rBody->SubData, tcnt, Comm, nPtr, NULL);	// Response
+    905          						}
+    906          						else {
+    907          							pBodyFrameTx(id0, id1, id2, (INT8U *)rBody->SubData, rBody->SubLength, ControlQue, IORUSer, nPtr); // Send to Request
+    908          						}
+    909          					}
+    910          					else
+    911          					{
+    912          						pBodyFrameTx(id0, id1, id2, (INT8U *)rBody->SubData, rBody->SubLength, ControlQue, IORUSer, nPtr); // Send to Request
+    913          						//SerPtr->printf("Recv and send to IORU = %02x, %02x, %02x", id0, id1, id2);
+    914          					}
+    915          				}
+    916          			}
+    917          		break;
+    918          
+    919          		case AlarmMaskSetQue:
+    920          		case RvsAlarmMaskSetRQST:
+    921          		{
+    922          			INT8U rval = FALSE;
+    923          			
+    924          			if(Comm == AlarmMaskSetQue)
+    925          			{
+    926          				if(nPtr == DnrSer1 || nPtr == PcSer || nPtr == Wrcs0 || (nPtr == Wrcs1 && SystemTypeInfo >= 2)) rval = TRUE;	// Remote CASE
+    927          			}
+    928          			else if(Comm == RvsAlarmMaskSetRQST)
+    929          			{
+    930          				if(nPtr == DnrSer1 || nPtr == Wrcs1 ) rval = TRUE;	// Remote CASE
+    931          			}
+    932          			
+    933          			if(rval)
+    934          			{
+    935          				if( !(nPtr == PcSer && MySts->IsItLocalCtrl) )
+    936          				{
+    937          					INT32U cpu_sr;
+    938          					EE_BACK1 *tptr;
+    939          
+    940          					OS_ENTER_CRITICAL();
+    941          					
+    942          					tptr = (EE_BACK1 *)RoadBackuptobuffer(vEE_BACK1Addr);	// Load 1st Area	
+    943          					
+    944          					DnrSts[tmpDnr][tmpRmt].AlarmMask = rBody->SubData[0] & 0x01;
+    945          					tptr->BackUp.AlarmMask = rBody->SubData[0] & 0x01;
+    946          
+    947          					WriteBuffertoBackup(vEE_BACK1Addr, sizeof(EE_BACK1));
+    948          
+    949          					OS_EXIT_CRITICAL();
+    950          				}
+    951          
+    952          				if(Comm == RvsAlarmMaskSetRQST) Comm = RvsAlarmMaskSetRSPS;
+    953          				pBodyFrameTx(id0, id1, id2, (INT8U *)&DnrSts[tmpDnr][tmpRmt].AlarmMask, 1, Comm, nPtr, NULL);	// Response 
+    954          
+    955          			}
+    956          		}
+    957          		break;
+    958          
+    959          		case ModuleInformSetQue:
+    960          		case RvsModuleInformSetRQST:
+    961          			{
+    962          				INT8U rval = FALSE;
+    963          				
+    964          				pCtrlComm = Comm;
+    965          				
+    966          				if(Comm == ModuleInformSetQue)
+    967          				{
+    968          					if(nPtr == DnrSer1 || nPtr == PcSer || nPtr == Wrcs0 || (nPtr == Wrcs1 && SystemTypeInfo >= 2)) rval = TRUE;	// Remote CASE
+    969          				}
+    970          				else if(Comm == RvsModuleInformSetRQST)
+    971          				{
+    972          					if(nPtr == DnrSer1 || nPtr == Wrcs1 ) rval = TRUE;	// Remote CASE
+    973          				}
+    974          
+    975          				if(rval)
+    976          				{
+    977          					if(id0 == RCUID)
+    978          					{
+    979          						if(rBody->SubLength == 36)
+    980          						{
+    981          							Inform_CtrlDataCopy(&(DnrSts[tmpDnr][tmpRmt].RCUInform.minform), (__ModuleInformCtrl *)&rBody->SubData[2]);
+    982          						}
+    983          						else
+    984          						{
+    985          							Inform_CtrlDataCopy(&(DnrSts[tmpDnr][tmpRmt].RCUInform.minform), (__ModuleInformCtrl *)&rBody->SubData[0]);
+    986          						}
+    987          
+    988          						if(Comm == RvsModuleInformSetRQST) Comm = RvsModuleInformSetRSPS;
+    989          						tcnt = GenModuleInformSts(sBody->SubData, &(DnrSts[tmpDnr][tmpRmt].RCUInform.minform));
+    990          						
+    991          						pBodyFrameTx(id0, id1, id2, (INT8U *)sBody->SubData, tcnt, Comm, nPtr, NULL);	// Response 
+    992          					}
+    993          					else
+    994          					{
+    995          						pBodyFrameTx(id0, id1, id2, (INT8U *)rBody->SubData, rBody->SubLength, ModuleInformSetQue, IORUSer, nPtr);
+    996          					}
+    997          				}
+    998          			}
+    999          		break;
+   1000          		
+   1001          		case DownloadCMD:
+   1002          		case DownloadCMDConfirm:
+   1003          		case DownLoadData:
+   1004          		case DownLoadDataConfirm: 
+   1005          
+   1006          			pCtrlComm = Comm;
+   1007          
+   1008          			if(nPtr == PcSer || nPtr == Wrcs0 || (nPtr == Wrcs1 && SystemTypeInfo >= 2) || nPtr == DnrSer1)	// Remote CASE
+   1009          			{
+   1010          
+   1011          				WRCS_DownLoadGiveupTimerSet((INT32U)nPtr);
+   1012          
+   1013          				if(id0 == RCUID) WRCS_DownloadFunc(nPtr);		//WRCS_DownloadFunc(nPtr);
+   1014          				else
+   1015          				{
+   1016          					pBodyFrameTx(id0, id1, id2, (INT8U *)rBody->SubData, rBody->SubLength, Comm, IORUSer, nPtr);
+   1017          				}
+   1018          			}
+   1019          		break;
+   1020          
+   1021          		case RvsDownloadCMDRQST:
+   1022          		case RvsDownloadCMDConfirmRQST:
+   1023                  case RvsDownLoadDataRQST:
+   1024                 	case RvsDownLoadDataConfirmRQST:
+   1025          
+   1026          			pCtrlComm = Comm;
+   1027          
+   1028          			if(nPtr == DnrSer1 || nPtr == Wrcs1)
+   1029          			{
+   1030          				WRCS_DownLoadGiveupTimerSet((INT32U)nPtr);
+   1031          				if(id0 == RCUID) WRCS_DownloadFunc(nPtr);
+   1032          				else
+   1033          				{
+   1034          						 if(Comm == RvsDownloadCMDRQST) 			Comm = DownloadCMD;
+   1035          					else if(Comm == RvsDownloadCMDConfirmRQST)		Comm = DownloadCMDConfirm;
+   1036          					else if(Comm == RvsDownLoadDataConfirmRQST) 	Comm = DownLoadDataConfirm;
+   1037          					else if(Comm == RvsDownLoadDataRQST) 			Comm = DownLoadData;
+   1038          					pBodyFrameTx(id0, id1, id2, (INT8U *)rBody->SubData, rBody->SubLength, Comm, IORUSer, nPtr);
+   1039          				}
+   1040          			}
+   1041          		break;
+   1042          	}
+   1043          }
+   1044          
+   1045          
+   1046          
+   1047          
+   1048          
+   1049          INT8U ProtocolRvsComCheck(__ProtocolPtr *nPtr)
+   1050          {
+   1051          	INT16U tcnt = 0;
+   1052          	INT16U Comm = WRCS_WhatRxComm(nPtr);
+   1053          	INT16U RSPSComm;
+   1054          	
+   1055          	__WRCSSIO *Recv = nPtr->WRCSRecv;
+   1056          	__WRCSSIO *Send = nPtr->WRCSSend;
+   1057              __BODYFRAME *rBody = &Recv->BodyFrame[0];
+   1058              __BODYFRAME *sBody = &Send->BodyFrame[0];
+   1059          
+   1060          	INT8U id0 = rBody->SubID[0];
+   1061          	INT8U id1 = rBody->SubID[1];
+   1062          	INT8U id2 = rBody->SubID[2];
+   1063          	INT8U tmpDnr = 0;
+   1064          	INT8U tmpRmt = 0;
+   1065          	INT8U IsItMyID = IsItRtnMySysIDtoVAL(id0, id1, id2, &tmpDnr, &tmpRmt);
+   1066          
+   1067          
+   1068          	switch(Comm)
+   1069          	{
+   1070          		case RvsDownloadCMDRQST:
+   1071          		case RvsDownloadCMDConfirmRQST:
+   1072                  case RvsDownLoadDataRQST:
+   1073                 	case RvsDownLoadDataConfirmRQST:
+   1074          		case RvsControlRQST:
+   1075          		case RvsAlarmMaskSetRQST:	
+   1076          		case RvsModuleInformSetRQST:
+   1077          
+   1078          			{
+   1079          				INT32U sptr = WRCS_DownLoadGiveupTimerSet(NULL);
+   1080          
+   1081          				if(SystemTypeInfo < 2)
+   1082          				{	// DONOR CASE
+   1083          					if(sptr && (nPtr == Wrcs1 || nPtr == DnrSer1)) if(sptr != (INT32U)nPtr) return TRUE;
+   1084          
+   1085          					if(IsItMyID) MyProtocolComCheck(nPtr);
+   1086          					else 
+   1087          					{
+   1088          						switch(Comm)
+   1089          						{
+   1090          							case RvsControlRQST:
+   1091          							case RvsAlarmMaskSetRQST:
+   1092          							case RvsModuleInformSetRQST:
+   1093          								
+   1094          							break;
+   1095          							
+   1096          							default:
+   1097          								WRCS_DownLoadGiveupTimerSet((INT32U)nPtr);
+   1098          							break;
+   1099          						}
+   1100          						if(nPtr == Wrcs1 && (tmpDnr != MyDnrID)) // to Another DONOR Send
+   1101          						{
+   1102          							pBodyFrameTx(id0, id1, id2, (INT8U *)rBody->SubData, rBody->SubLength, Comm, DnrSer0, nPtr);
+   1103          						}
+   1104          						else if(nPtr == DnrSer1 && (tmpDnr == MyDnrID && tmpRmt)) // to Remote Send
+   1105          						{
+   1106          							pBodyFrameTx(id0, id1, id2, (INT8U *)rBody->SubData, rBody->SubLength, Comm, Wrcs1, nPtr);
+   1107          						}
+   1108          					}
+   1109          				}
+   1110          				else {
+   1111          					if(IsItMyID) MyProtocolComCheck(nPtr);
+   1112          					else {
+   1113          						//WRCS_DownloadFunc(nPtr);
+   1114          					}
+   1115          				}
+   1116                 		}
+   1117          		break;
+   1118          
+   1119          		case RvsDownloadCMDRSPS:
+   1120          		case RvsDownloadCMDConfirmRSPS:
+   1121                  case RvsDownLoadDataRSPS:
+   1122                 	case RvsDownLoadDataConfirmRSPS:
+   1123          		case RvsControlRSPS:
+   1124          		case RvsAlarmMaskSetRSPS:
+   1125          		case RvsModuleInformSetRSPS:
+   1126          			{
+   1127          				__ProtocolPtr *dptr = (__ProtocolPtr *)nPtr->ctrlsrc;
+   1128          				if(dptr == NULL) break;
+   1129          				if(dptr == SelfSer) break;
+   1130          
+   1131          				if((__SKProtocolPtr *)dptr == RcsSer)
+   1132          				{
+   1133          					INT16U i = 0;
+   1134          					
+   1135          					switch(Comm)
+   1136          					{
+   1137          						case RvsDownloadCMDRSPS:			RSPSComm = RCSDownloadCMD;			break;
+   1138          						case RvsDownloadCMDConfirmRSPS:		RSPSComm = RCSDownloadCMDConfirm;	break;
+   1139          						case RvsDownLoadDataRSPS:			RSPSComm = RCSDownLoadData; 		break;
+   1140          						case RvsDownLoadDataConfirmRSPS:	RSPSComm = RCSDownLoadDataConfirm;	break;
+   1141          						case RvsControlRSPS:				RSPSComm = RCSControlRSPS;			break;
+   1142          						case RvsAlarmMaskSetRSPS:			RSPSComm = RCSAlarmMaskSetRSPS;		break;
+   1143          					}
+   1144          
+   1145          					switch(Comm)
+   1146          					{
+   1147          						case RvsDownloadCMDRSPS:	
+   1148          						case RvsDownloadCMDConfirmRSPS:
+   1149          						case RvsDownLoadDataRSPS:	
+   1150          						case RvsDownLoadDataConfirmRSPS:
+   1151          							RcsSer->Send->BODYFRAME.SubData[0] = RSPSComm;
+   1152          
+   1153          							for(i = 0; i < rBody->SubLength; i++)
+   1154          							{
+   1155          								RcsSer->Send->BODYFRAME.SubData[1+i] = rBody->SubData[i];
+   1156          							}
+   1157          							RCSDataAckTx(id0, id1, (INT8U *)RcsSer->Send->BODYFRAME.SubData, rBody->SubLength + 1, MyPortID, RcsDownloadRSPS);
+   1158          						break;
+   1159          
+   1160          						case RvsControlRSPS:
+   1161          
+   1162          							AnalyzeAidData(nPtr, FALSE, tmpDnr, tmpRmt);
+   1163          							tcnt = RCSGenAidSts(sBody->SubData, &DnrSts[tmpDnr][tmpRmt]);
+   1164          							RCSDataAckTx(id0, id1, (INT8U *)sBody->SubData, tcnt, MyPortID, RSPSComm);
+   1165          						break;
+   1166          
+   1167          						default:
+   1168          							RCSDataAckTx(id0, id1, (INT8U *)rBody->SubData, rBody->SubLength, MyPortID, RSPSComm);
+   1169          						break;
+   1170          					}
+   1171          				}
+   1172          				else
+   1173          				{
+   1174          					if(dptr == PcSer || dptr == Wrcs0)
+   1175          					{
+   1176          						switch(Comm)
+   1177          						{
+   1178          							case RvsDownloadCMDRSPS:			Comm = DownloadCMD;				break;
+   1179          							case RvsDownloadCMDConfirmRSPS: 	Comm = DownloadCMDConfirm;		break;
+   1180          							case RvsDownLoadDataRSPS:			Comm = DownLoadData;	 		break;
+   1181          							case RvsDownLoadDataConfirmRSPS:	Comm = DownLoadDataConfirm;		break;
+   1182          							case RvsControlRSPS:
+   1183          								Comm = ControlQue;				
+   1184          								AnalyzeAidData(nPtr, FALSE, tmpDnr, tmpRmt);
+   1185          							break;
+   1186          							case RvsAlarmMaskSetRSPS:
+   1187          								Comm = AlarmMaskSetQue;
+   1188          								DnrSts[tmpDnr][tmpRmt].AlarmMask = rBody->SubData[0];
+   1189          							break;
+   1190          
+   1191          							case RvsModuleInformSetRSPS:
+   1192          								Comm = ModuleInformSetQue;
+   1193          							break;
+   1194          						}
+   1195          					}
+   1196          					else
+   1197          					{
+   1198          						switch(Comm)
+   1199          						{
+   1200          							case RvsControlRSPS:
+   1201          								AnalyzeAidData(nPtr, FALSE, tmpDnr, tmpRmt);
+   1202          							break;
+   1203          							case RvsAlarmMaskSetRSPS:
+   1204          								DnrSts[tmpDnr][tmpRmt].AlarmMask = rBody->SubData[0];
+   1205          							break;
+   1206          							
+   1207          							case RvsModuleInformSetRSPS:								
+   1208          							break;
+   1209          						}
+   1210          					}
+   1211          					pBodyFrameTx(id0, id1, id2, rBody->SubData, rBody->SubLength, Comm, dptr, NULL);
+   1212          				}
+   1213          			}
+   1214          		default:
+   1215          		break;
+   1216          	}
+   1217              return TRUE;
+   1218          }
+   1219          
+   1220          void pBodyFrameTx(INT8U id0, INT8U id1, INT8U id2, INT8U *Data, INT16U nCnt, INT8U Comm,
+   1221          											__ProtocolPtr *toPtr,  __ProtocolPtr *fromPtr)
+   1222          {
+   1223          	//sPtr: from source ptr,
+   1224          	//nPtr: where to!!
+   1225          	INT8U err = 0;
+   1226          		
+   1227          	OSSemPend(toPtr->OSSem, 0, &err);
+   1228          	
+   1229          	if(fromPtr) toPtr->ctrlsrc = (INT32U)fromPtr;
+   1230          
+   1231          	GenBodyFrameTx(id0, id1, id2, Data, nCnt, MyRCode, Comm, toPtr);
+   1232          
+   1233          	OSSemPost(toPtr->OSSem);
+   1234          
+   1235          	if     (toPtr == Wrcs1 && (SystemTypeInfo < 2)) 	RmtLinkFailCheck();
+   1236          	else if(toPtr == IORUSer){
+   1237          		IORULinkFailCheck();
+   1238          		IORUTxLED(SET);
+   1239          	}
+   1240          	else if(toPtr == DnrSer0)	DnrLinkFailCheck();
+   1241          		
+   1242          }
+   1243          
+   1244          void GenBodyFrameTx(INT8U id0, INT8U id1, INT8U id2, INT8U *Data, INT16U nCnt, INT8U RCode,
+   1245          					INT8U Comm, __ProtocolPtr *nPtr)
+   1246          {
+   1247          
+   1248          	GenBodyFrame(id0, id1, id2, Data, nCnt, RCode, Comm, nPtr, 0);
+   1249          	WRCS_ProDataAckTx(nPtr);
+   1250          }
+   1251          
+   1252          void GenBodyFrame(INT8U id0, INT8U id1, INT8U id2, INT8U *Data, INT16U nCnt, INT8U RCode,
+   1253          					INT8U Comm, __ProtocolPtr *nPtr, INT8U BodyNo)
+   1254          {
+   1255          	int i = 0;
+   1256          	int DataCnt = 0;
+   1257          	
+   1258          	__WRCSSIO *Send = nPtr->WRCSSend;
+   1259          	
+   1260          #if TWO_BODY >= 2
+   1261          	__BODYFRAME *BodyFrame = &(Send->BodyFrame[BodyNo]);
+   1262          #else
+   1263          	__BODYFRAME *BodyFrame = &(Send->BodyFrame[0]);
+   1264          	BodyNo = 0;
+   1265          #endif
+   1266          
+   1267          	Send->BodyNo = BodyNo;
+   1268          
+   1269          	BodyFrame->SubID[0] = id0;
+   1270          	BodyFrame->SubID[1] = id1;
+   1271          	BodyFrame->SubID[2] = id2;
+   1272          
+   1273          	BodyFrame->Command = Comm;
+   1274          	BodyFrame->RCode = RCode;
+   1275          
+   1276          	BodyFrame->SubLength = nCnt;
+   1277          	BodyFrame->SubLen[0] = (INT8U)((nCnt) >> 8);
+   1278          	BodyFrame->SubLen[1] = (INT8U)((nCnt) >> 0);
+   1279          
+   1280          	for(i = 0 ; i < nCnt && i < BODYSIZEMAX; i++)
+   1281          	{
+   1282          		BodyFrame->SubData[DataCnt++] = Data[i];
+   1283          	}
+   1284          
+   1285          	///////////// CRC //
+   1286          	{
+   1287          		BodyFrame->Crc = Crc16Calc ((INT8U *)BodyFrame->SubID, 7 + i, NULL);
+   1288          		BodyFrame->SubData[DataCnt++] = (INT8U)(BodyFrame->Crc >> 8);
+   1289          		BodyFrame->SubData[DataCnt++] = (INT8U)(BodyFrame->Crc		);
+   1290          	}
+   1291          	BodyFrame->SubData[DataCnt++] = ETX;
+   1292          }
+   1293          
+   1294          
+   1295          void WRCS_ProDataAckTx(__ProtocolPtr *nPtr)
+   1296          {
+   1297          	INT16U i, Len = 0;
+   1298          
+   1299          	__WRCSSIO *Send = nPtr->WRCSSend;
+   1300          #if TWO_BODY >= 2
+   1301          	INT8U BodyNo = Send->BodyNo;
+   1302          #else
+   1303          	INT8U BodyNo = 0;
+   1304          #endif
+   1305          	Send->Sync[0] = STX;
+   1306          	Send->Sync[1] = STX;
+   1307          	Send->Sync[2] = STX;
+   1308          	Send->Sync[3] = STX;
+   1309          
+   1310          	Send->TryNo= '0';
+   1311          
+   1312          	Send->BodyLength = 0;
+   1313          
+   1314          
+   1315          	for(i = 0; i <= BodyNo; i++)
+   1316          	{
+   1317          		Len = ((Send->BodyFrame[i].SubLen[0] << 8) | Send->BodyFrame[i].SubLen[1]) + 5 + 2 + 2;
+   1318          		Send->BodyLength += Len;
+   1319          	}
+   1320          	Send->BodyLen[0] = (INT8U)(Send->BodyLength >> 8);
+   1321          	Send->BodyLen[1] = (INT8U)(Send->BodyLength >> 0);
+   1322          
+   1323          	Send->CheckSum = Send->TryNo + Send->BodyLen[0] + Send->BodyLen[1];
+   1324          
+   1325          
+   1326          	if(nPtr == Wrcs0 || nPtr == Wrcs1)
+   1327          	{
+   1328          		nPtr->PutStr((INT8U *)Send, (4 + 1 + 2 + 1) + Send->BodyFrame[0].SubLength + 7 + 2 + 1, FALSE);
+   1329          
+   1330          		// DEBUG
+   1331          		#ifdef WRCS_DBG
+   1332          		if(nPtr == Wrcs0)
+   1333          		{
+   1334          			PcSer->PutStr((INT8U *)Send, (4 + 1 + 2 + 1) + Send->BodyFrame[0].SubLength + 7 + 2 + 1, TRUE);
+   1335          		}
+   1336          		#endif
+   1337          	}
+   1338          	else
+   1339          	{
+   1340          	
+   1341          		nPtr->PutStr((INT8U *)Send, 4 + 1 + 2 + 1, FALSE);
+   1342          
+   1343          		for(i = 0; i <= BodyNo; i++)
+   1344          		{
+   1345          			nPtr->PutStr((INT8U *)&Send->BodyFrame[i], Send->BodyFrame[i].SubLength + 7 + 2, FALSE);
+   1346          		}		
+   1347          
+   1348          		BodyNo = ETX;
+   1349          		nPtr->PutStr((INT8U *)&BodyNo, 1, TRUE);		
+   1350          	}
+   1351          }
+   1352          
+   1353          INT16U GenAidData(INT16U Aid, INT8U *dptr, INT8U *sptr, INT16U len)
+   1354          {
+   1355          	INT8U i = 0;
+   1356          	INT8U rval = 0;
+   1357          
+   1358          	dptr[rval++] = (INT8U)((Aid >> 8) & 0xFF);
+   1359          	dptr[rval++] = (INT8U)((Aid >> 0) & 0xFF);
+   1360          	dptr[rval++] = len;
+   1361          	for(i = 0; i < len; i++) dptr[rval++] = sptr[i];
+   1362          
+   1363          	return rval;
+   1364          }
+   1365          
+   1366          INT8U IsItRtnMySysIDtoVAL(INT8U id0, INT8U id1, INT8U id2, INT8U *tmpDnr, INT8U *tmpRmt)
+   1367          {
+   1368          
+   1369          
+   1370          	// COT 1
+   1371          	     if(/*id0 == 0x00 && */id1 == 0x0f && id2 == 0xff){*tmpDnr = 0x00; *tmpRmt = 0x00;}
+   1372          	else if(/*id0 == 0x00 && */id1 == 0x00 && id2 == 0xff){*tmpDnr = 0x00; *tmpRmt = 0x01;}
+   1373          	else if(/*id0 == 0x00 && */id1 == 0x1f && id2 == 0xff){*tmpDnr = 0x01; *tmpRmt = 0x00;}
+   1374          	else// if(id0 == 0x00 && id1 == 0x10 && id2 == 0xff)
+   1375          		{*tmpDnr = 0x01; *tmpRmt = 0x01;}
+   1376          	
+   1377          	if( *tmpDnr == MyDnrID && *tmpRmt == MyRmtID) return TRUE;
+   1378          		
+   1379          	return FALSE;
+   1380          }
+   1381          
+   1382          INT8U IsItRtnMyVALtoSysID(INT8U *id0, INT8U *id1, INT8U *id2, INT8U tmpDnr, INT8U tmpRmt)
+   1383          {
+   1384          	     if(tmpDnr == 0x00 && tmpRmt == 0x00) {*id0 = 0x00; *id1 = 0x0f; *id2 = 0xff;}
+   1385          	else if(tmpDnr == 0x00 && tmpRmt == 0x01) {*id0 = 0x00; *id1 = 0x00; *id2 = 0xff;}
+   1386          	else if(tmpDnr == 0x01 && tmpRmt == 0x00) {*id0 = 0x00; *id1 = 0x1f; *id2 = 0xff;}
+   1387          	else// if(tmpDnr == 0x01 && tmpRmt == 0x01)
+   1388          		{*id0 = 0x00; *id1 = 0x10; *id2 = 0xff;}
+   1389          
+   1390          	if( tmpDnr == MyDnrID && tmpRmt == MyRmtID) return TRUE;
+   1391          
+   1392          	return FALSE;
+   1393          }
+   1394          
+   1395          
+   1396          
+   1397          INT8U IsItMySysValtoID(INT8U tmpDnr, INT8U tmpRmt)
+   1398          {
+   1399          	if((tmpRmt*2 + tmpDnr) == SystemTypeInfo) return TRUE;  
+   1400          	
+   1401          	return FALSE;
+   1402          }
+   1403          
+   1404          INT8U ReturnDnrRmtID(INT8U SysID, INT8U *tmpDnr, INT8U *tmpRmt)
+   1405          {
+   1406          	*tmpDnr = SysID%2;
+   1407          	*tmpRmt = (SysID/2) & 0x01;
+   1408            
+   1409              return 0;
+   1410          }
+   1411          
+   1412          INT8U ReturnPollingID(INT8U SysID, INT8U *tmpDnr, INT8U *tmpRmt)
+   1413          {
+   1414          	*tmpDnr = SysID%2;
+   1415          	*tmpRmt = (SysID/2) & 0x01;
+   1416          
+   1417          	if(!(*tmpRmt))  *tmpRmt = 0xFF;
+   1418          	else		    *tmpRmt = 0x00;
+   1419            
+   1420              return 0;
+   1421          }
+   1422          
+   1423          
+   1424          ////////////////////////////////////////////////////////////////////////////////
+   1425          // End of Source File
+   1426          /////////////////////
+   1427          
+
+   Maximum stack usage in bytes:
+
+     Function                    .cstack
+     --------                    -------
+     GenAidData                       8
+     GenBodyFrame                    24
+     GenBodyFrameTx                  48
+     IsItMySysValtoID                 0
+     IsItRtnMySysIDtoVAL              0
+     IsItRtnMyVALtoSysID              8
+     IsitRmtSelfDn                    0
+     MyProtocolComCheck              56
+     ProtocolComCheck                56
+     ProtocolRvsComCheck             64
+     ReturnDnrRmtID                   0
+     ReturnPollingID                  0
+     RmtDnConFirmSend                 0
+     RmtDnDataSend                   24
+     RmtDnEndSend                     0
+     RmtDnFrameStart                  0
+     RmtDownStart                    16
+     RmtRecvDownLoadFunc              8
+     RmtSelfDnErrClr                  0
+     RmtSendDownLoadFunc              8
+     StsCheckConnectionRst           16
+     StsCheckConnectionSet            8
+     WRCSTask                        16
+     WRCS_DownLoadGiveupTimerChk      8
+     WRCS_DownLoadGiveupTimerRst      0
+     WRCS_DownLoadGiveupTimerSet      8
+     WRCS_DownloadFunc               64
+     WRCS_ProDataAckTx               24
+     WRCS_ProtocolCheck              32
+     WRCS_ReceiveData                24
+     WRCS_SerInit                     8
+     WRCS_WhatRxComm                  0
+     pBodyFrameTx                    64
+
+
+   Section sizes:
+
+     Function/Label               Bytes
+     --------------               -----
+     PcSerB                         48
+     Digital_StsData               100
+     DnLoad_Data                   200
+     DnLoad_Cnt                      1
+     DownloadID                      1
+     iResetCase                      1
+     WRCS_DownLoadGiveupTimerSet    24
+     WRCS_DownLoadGiveupTimerRst    10
+     WRCS_DownLoadGiveupTimerChk    34
+     WRCS_DownloadFunc             420
+     SerialPadOnFlag              3156
+     ALLResetFlag
+     pCtrlComm
+     iDebugCnt
+     iUser_Value2
+     RmtSelfErrCnt
+     RmtSelfStep
+     RmtSelfId2
+     FrameCnt
+     TotFrame
+     Swcrc16
+     PcSer
+     SelfSer
+     downloadFlag
+     DataCount
+     RmtSelfSrc
+     Ser1TaskStk
+     SPcsksio
+     RPcsksio
+     FrameCounterOld                 2
+     FrameCounter                    2
+     IsitRmtSelfDn                   8
+     RmtSelfDnErrClr                10
+     RmtDownStart                   64
+     RmtSendDownLoadFunc            48
+     RmtRecvDownLoadFunc           158
+     RmtDnFrameStart                 2
+     RmtDnConFirmSend                2
+     RmtDnDataSend                 108
+     RmtDnEndSend                    2
+     WRCS_ReceiveData              116
+     WRCS_SerInit                   84
+     WRCSTask                       64
+     StsCheckConnectionSet          70
+     StsCheckConnectionRst          74
+     WRCS_ProtocolCheck            904
+     ?Subroutine1                    6
+     WRCS_WhatRxComm                30
+     ProtocolComCheck             2048
+     MyProtocolComCheck           1456
+     ProtocolRvsComCheck           692
+     pBodyFrameTx                  168
+     GenBodyFrameTx                 46
+     GenBodyFrame                  118
+     WRCS_ProDataAckTx             212
+     GenAidData                     40
+     IsItRtnMySysIDtoVAL            84
+     IsItRtnMyVALtoSysID            96
+     IsItMySysValtoID               24
+     ReturnDnrRmtID                 12
+     ?Subroutine0                    6
+     ReturnPollingID                20
+     ??DataTable17                   4
+     ??DataTable26                   4
+     ??DataTable27                   4
+     ??DataTable28                   4
+     ??DataTable29                   4
+     ??DataTable31                   4
+     ??DataTable32                   4
+     ?<Constant {0}>                28
+     ?<Constant "CRC Error\n">      28
+     ?<Constant " id0 = %02x \n">   64
+
+ 
+   351 bytes in section .bss
+ 3 160 bytes in section .data
+   120 bytes in section .rodata
+ 7 288 bytes in section .text
+ 
+ 7 288 bytes of CODE  memory
+   120 bytes of CONST memory
+ 3 511 bytes of DATA  memory
+
+Errors: none
+Warnings: none

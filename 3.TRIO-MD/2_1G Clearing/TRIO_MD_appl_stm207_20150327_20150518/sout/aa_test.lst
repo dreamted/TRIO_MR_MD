@@ -1,0 +1,970 @@
+###############################################################################
+#                                                                             #
+# IAR ANSI C/C++ Compiler V6.21.1.52794/W32 for ARM     30/Aug/2012  21:29:27 #
+# Copyright 1999-2011 IAR Systems AB.                                         #
+#                                                                             #
+#    Cpu mode     =  thumb                                                    #
+#    Endian       =  little                                                   #
+#    Source file  =  D:\Work\Project\2012\NL_INBUILD\FW\MU\code\aa_test.c     #
+#    Command line =  D:\Work\Project\2012\NL_INBUILD\FW\MU\code\aa_test.c -D  #
+#                    OS_INCLUDED -D APPL_SRC -lcN                             #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\sout\ -lB          #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\sout\ -o           #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\sout\              #
+#                    --endian=little --cpu=Cortex-M3 -e --fpu=None            #
+#                    --dlib_config "C:\Programming\IAR Systems\Embedded       #
+#                    Workbench 6.0\arm\INC\c\DLib_Config_Normal.h" -I         #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\include\ -I        #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\..\..\STM32F2xx_St #
+#                    dPeriph_Driver\ -I D:\Work\Project\2012\NL_INBUILD\FW\MU #
+#                    \..\..\STM32F2xx_StdPeriph_Driver\inc\ -I                #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\uC-CPU\ -I         #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\uC-LIB\ -I         #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\uCOS-II\Ports\ -I  #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\uCOS-II\Source\    #
+#                    -I D:\Work\Project\2012\NL_INBUILD\FW\MU\uC-Probe\ -Oh   #
+#                    --use_c++_inline --require_prototypes                    #
+#    List file    =  D:\Work\Project\2012\NL_INBUILD\FW\MU\sout\aa_test.lst   #
+#    Object file  =  D:\Work\Project\2012\NL_INBUILD\FW\MU\sout\aa_test.o     #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\Work\Project\2012\NL_INBUILD\FW\MU\code\aa_test.c
+      1          
+      2          /******************** (C) COPYRIGHT 2008 PILOG, NSINFO *************************
+      3          * File Name          : exlib.c
+      4          * Author             : Yoon Byong-Gyu(bgyoon@naver.com)
+      5          * Date First Issued  : 02/01/2008
+      6          * Description        : This file provides all the port/input/update firmware functions.
+      7          * $Revision: 0.1 $
+      8          * $Revision date: 2008.01.__
+      9          ********************************************************************************/
+     10          
+     11          #define TEST_C
+     12          
+     13          #include "../include/main.h"
+     14          
+     15          void TestInit(void)
+     16          {
+     17          	
+     18          	OSTaskCreate(TestTask, (void *)NULL, (OS_STK *)&TestTaskStk[TEST_START_STK_SIZE - 1], TEST_START_PRIO);
+     19          }
+     20          
+     21          void TestTask(void *p_arg)
+     22          {
+     23          	INT16U nCnt = 0;
+     24          	nCnt = nCnt;
+     25          	p_arg = p_arg;
+     26          
+     27          
+     28          	tTestFlag = FALSE;
+     29          	
+     30          	OSTimeDly(TEST_START_PRIO*100L);
+     31          	
+     32          	while(1)
+     33          	{
+     34          		if(iUser_Value2 == __ChangeDebug)
+     35          		{
+     36          			PrintLogo();
+     37          			PromptOut();
+     38          			tTestFlag = TRUE;
+     39          	
+     40          			while(iUser_Value2 == __ChangeDebug)
+     41          			//while(1)
+     42          			{
+     43          				if(SerPtr->CheckByte(1, &nCnt))
+     44          				{
+     45          					KeyProc(SerPtr->RxGetByte(), OnCommand);
+     46          				}
+     47          
+     48          				OSTimeDly(10L);
+     49          				
+     50          				if(TimeOverCheck(Timer_DebugCnt))
+     51          				{
+     52          					//DownLoadBootingJump();
+     53          				}
+     54          			}
+     55          		}
+     56          	}
+     57          }
+     58          
+     59          void KeyProc( char sbuf, void (*func)(void))
+     60          {
+     61          	INT16U nSize = sizeof(tRevData);
+     62          
+     63          	tRevData[tIndex%nSize] = sbuf;
+     64          	if( tRevData[tIndex%nSize] == 0x0D )			// Enter 입력
+     65          	{
+     66          		SerPtr->PutToBuffer('\r');
+     67          		SerPtr->PutToBuffer('\n');
+     68          		tRevData[tIndex%nSize] = '\0';
+     69          
+     70          		if(tIndex != 0)
+     71          		{
+     72          			strcpy((char *)PrevData[PrevWRCnt++], (const char *)tRevData);
+     73          			PrevWRCnt %= 5;
+     74          		}
+     75          		PrevRDCnt = PrevWRCnt;
+     76          		func();
+     77          		tIndex = 0;
+     78          
+     79          		return;
+     80          	}
+     81          	else if( tRevData[tIndex%nSize] == 0x08 )		// Back Space
+     82          	{
+     83          		if (tIndex == 0)
+     84          			return;
+     85          
+     86          		SerPtr->PutToBuffer(0x08);
+     87          		SerPtr->PutToBuffer(' ');
+     88          		SerPtr->PutToBuffer(0x08);
+     89          		tIndex--;
+     90          
+     91          		return;
+     92          	}
+     93          	else if( tRevData[tIndex%nSize] == 0x09 )		// tab
+     94          	{
+     95          		while(tIndex)
+     96          		{
+     97          			SerPtr->PutToBuffer(0x08);
+     98          			SerPtr->PutToBuffer(' ');
+     99          			SerPtr->PutToBuffer(0x08);
+    100          			tIndex--;
+    101          		}
+    102          
+    103          		PrevRDCnt--;
+    104          		if(PrevRDCnt < 0) PrevRDCnt = 4;
+    105          		strcpy((char *)tRevData, (const char *)PrevData[PrevRDCnt]);
+    106          
+    107          		SerPtr->printf("%s", PrevData[PrevRDCnt]);
+    108          		tIndex = strlen((const char *)PrevData[PrevRDCnt]);
+    109          
+    110          		return;
+    111          	}
+    112          	
+    113          	SerPtr->PutToBuffer(tRevData[tIndex%nSize]);			// 입력 키 출력
+    114          
+    115          	if(++tIndex >= nSize) tIndex = 0;
+    116          }
+    117          
+    118          INT8U htob(INT8U hex)
+    119          {
+    120          	INT8U i;
+    121          	
+    122          	if (hex >= '0' && hex <= '9') i=hex-'0';
+    123          	else if ( hex >= 'A' && hex <= 'F' )i=hex-'A'+10;
+    124          	else i=hex-'a'+10;
+    125          	
+    126          	return i;
+    127          }
+    128          
+    129          INT8U dGetHex (INT8U Data_H, INT8U Data_L)
+    130          {
+    131          	INT8U i;
+    132          	
+    133          	i=htob( Data_H );
+    134          	i=htob( Data_L )+(i<<4);
+    135          	return i;
+    136          }
+    137          
+    138          void OnCommand ( void )
+    139          {
+    140          	INT8U	tdata = TRUE;
+    141          	INT8U	DebugAdd;
+    142          	INT8S	DebugData;
+    143          	
+    144             	switch(tRevData[0])
+    145             	{
+    146             		case 'P':
+    147          		case 'p':
+    148          			if(tRevData[1] == '1')
+    149          			{
+    150          				SerPtr->printf("\n 2.1G PATH..........\n");
+    151          				SysPath = 0;
+    152          			}
+    153          			else if(tRevData[1] == '2')
+    154          			{
+    155          				SerPtr->printf("\n 900M PATH..........\n");
+    156          				SysPath = 1;
+    157          			}
+    158          			else if(tRevData[1] == '3')
+    159          			{
+    160          				SerPtr->printf("\n 2.5G PATH..........\n");
+    161          				SysPath = 2;
+    162          			}
+    163          			break;
+    164          			
+    165          		case 'S':
+    166          		case 's':
+    167          			if((tRevData[1] == 'O')||(tRevData[1] == 'o'))
+    168          			{
+    169          				if(SysPath==0)
+    170          				{
+    171          					SerPtr->printf("\n 2.1G SISO AMP ON(High)...\n");
+    172          					ExpioBitSet(Amp_OnOff_S_21G_Sel);
+    173          				}
+    174          				else if(SysPath==1)
+    175          				{
+    176          					SerPtr->printf("\n 900M SISO AMP ON(High)...\n");
+    177          					ExpioBitSet(Amp_OnOff_S_900M_Sel);
+    178          				}
+    179          				else
+    180          				{
+    181          					SerPtr->printf("\n 2.5G SISO AMP ON(High)...\n");
+    182          					ExpioBitSet(Amp_OnOff_S_25G_Sel);
+    183          				}
+    184          			}
+    185          			else if((tRevData[1] == 'F')||(tRevData[1] == 'f'))
+    186          			{
+    187          				if(SysPath==0)
+    188          				{
+    189          					SerPtr->printf("\n 2.1G SISO AMP OFF(Low)...\n");
+    190          					ExpioBitRst(Amp_OnOff_S_21G_Sel);
+    191          				}
+    192          				else if(SysPath==1)
+    193          				{
+    194          					SerPtr->printf("\n 900M SISO AMP OFF(Low)...\n");
+    195          					ExpioBitRst(Amp_OnOff_S_900M_Sel);
+    196          				}
+    197          				else
+    198          				{
+    199          					SerPtr->printf("\n 2.1G SISO AMP OFF(Low)...\n");
+    200          					ExpioBitRst(Amp_OnOff_S_25G_Sel);
+    201          				}
+    202          			}
+    203          		break;
+    204          
+    205          		case 'M':
+    206          		case 'm':
+    207          			if((tRevData[1] == 'O')||(tRevData[1] == 'o'))
+    208          			{
+    209          				if(SysPath==0)
+    210          				{
+    211          					SerPtr->printf("\n 2.1G MIMO AMP ON(High)...\n");
+    212          					ExpioBitSet(Amp_OnOff_M_21G_Sel);
+    213          				}
+    214          				else if(SysPath==1)
+    215          				{
+    216          					SerPtr->printf("\n 900M MIMO AMP ON(High)...\n");
+    217          					ExpioBitSet(Amp_OnOff_M_900M_Sel);
+    218          				}
+    219          				else
+    220          				{
+    221          					SerPtr->printf("\n 2.5G MIMO AMP ON(High)...\n");
+    222          					ExpioBitSet(Amp_OnOff_M_25G_Sel);
+    223          				}
+    224          			}
+    225          			else if((tRevData[1] == 'F')||(tRevData[1] == 'f'))
+    226          			{
+    227          				if(SysPath==0)
+    228          				{
+    229          					SerPtr->printf("\n 2.1G MIMO AMP OFF(Low)...\n");
+    230          					ExpioBitRst(Amp_OnOff_M_21G_Sel);
+    231          				}
+    232          				else if(SysPath==1)
+    233          				{
+    234          					SerPtr->printf("\n 900M MIMO AMP OFF(Low)...\n");
+    235          					ExpioBitRst(Amp_OnOff_M_900M_Sel);
+    236          				}
+    237          				else
+    238          				{
+    239          					SerPtr->printf("\n 2.1G MIMO AMP OFF(Low)...\n");
+    240          					ExpioBitRst(Amp_OnOff_M_25G_Sel);
+    241          				}
+    242          			}
+    243          		break;
+    244          
+    245          		case 'A':
+    246          		case 'a':
+    247          			DebugData =	((tRevData[3]-0x30)*10)+(tRevData[4]-0x30);
+    248          			if(DebugData < 0)	DebugData = 0;
+    249          			if(DebugData > 63)	DebugData = 63;
+    250          			
+    251          			if((tRevData[1] == 'T')||(tRevData[1] == 't'))
+    252          			{
+    253          				if((tRevData[2] == 'S')||(tRevData[2] == 's'))
+    254          				{
+    255          					if(SysPath==0)
+    256          					{
+    257          						SerPtr->printf("\n 2.1G SISO TX Attn = %d\n", DebugData);
+    258          						HMC624AttnOut(DebugData, DL_S_21G_PATH);
+    259          					}
+    260          					else if(SysPath==1)
+    261          					{
+    262          						SerPtr->printf("\n 900M SISO TX Attn = %d\n", DebugData);
+    263          						HMC624AttnOut(DebugData, DL_S_900M_PATH);
+    264          					}
+    265          					else
+    266          					{
+    267          						SerPtr->printf("\n 2.5G SISO TX Attn = %d\n", DebugData);
+    268          						HMC624AttnOut(DebugData, DL_S_25G_PATH);
+    269          					}
+    270          				}
+    271          				else if((tRevData[2] == 'M')||(tRevData[2] == 'm'))
+    272          				{
+    273          					if(SysPath==0)
+    274          					{
+    275          						SerPtr->printf("\n 2.1G MIMO TX Attn = %d\n", DebugData);
+    276          						HMC624AttnOut(DebugData, DL_M_21G_PATH);
+    277          					}
+    278          					else if(SysPath==1)
+    279          					{
+    280          						SerPtr->printf("\n 900M MIMO TX Attn = %d\n", DebugData);
+    281          						HMC624AttnOut(DebugData, DL_M_900M_PATH);
+    282          					}
+    283          					else
+    284          					{
+    285          						SerPtr->printf("\n 2.5G MIMO TX Attn = %d\n", DebugData);
+    286          						HMC624AttnOut(DebugData, DL_M_25G_PATH);
+    287          					}
+    288          				}
+    289          			}
+    290          			else if((tRevData[1] == 'R')||(tRevData[1] == 'r'))
+    291          			{
+    292          				if((tRevData[2] == 'S')||(tRevData[2] == 's'))
+    293          				{
+    294          					if(SysPath==0)
+    295          					{
+    296          						SerPtr->printf("\n 2.1G SISO RX Attn = %d\n", DebugData);
+    297          						HMC624AttnOut(DebugData, UL_S_21G_PATH);
+    298          					}
+    299          					else if(SysPath==1)
+    300          					{
+    301          						SerPtr->printf("\n 900M SISO RX Attn = %d\n", DebugData);
+    302          						HMC624AttnOut(DebugData, UL_S_900M_PATH);
+    303          					}
+    304          					else
+    305          					{
+    306          						SerPtr->printf("\n 2.5G SISO RX Attn = %d\n", DebugData);
+    307          						HMC624AttnOut(DebugData, UL_S_25G_PATH);
+    308          					}
+    309          				}
+    310          				else if((tRevData[2] == 'M')||(tRevData[2] == 'm'))
+    311          				{
+    312          					if(SysPath==0)
+    313          					{
+    314          						SerPtr->printf("\n 2.1G MIMO RX Attn = %d\n", DebugData);
+    315          						HMC624AttnOut(DebugData, UL_M_21G_PATH);
+    316          					}
+    317          					else if(SysPath==1)
+    318          					{
+    319          						SerPtr->printf("\n 900M MIMO RX Attn = %d\n", DebugData);
+    320          						HMC624AttnOut(DebugData, UL_M_900M_PATH);
+    321          					}
+    322          					else
+    323          					{
+    324          						SerPtr->printf("\n 2.5G MIMO RX Attn = %d\n", DebugData);
+    325          						HMC624AttnOut(DebugData, UL_M_25G_PATH);
+    326          					}
+    327          				}
+    328          			}
+    329          		break;
+    330          
+    331          		case 'r':
+    332          		case 'R':
+    333          			
+    334          			DebugAdd	=	dGetHex(tRevData[3],tRevData[4]);
+    335          			
+    336          			if(tRevData[1] == '1')
+    337          			{
+    338          				SerPtr->printf("\n Eeprom 1 Read Address[%x] : [%x]\n", DebugAdd, ReadEEprom(DebugAdd));
+    339          			}
+    340          		break;
+    341          
+    342          		case 'w':
+    343          		case 'W':
+    344          			
+    345          			DebugAdd	=	dGetHex(tRevData[3],tRevData[4]);
+    346          			DebugData	=	dGetHex(tRevData[6],tRevData[7]);
+    347          			
+    348          			if(tRevData[1] == '1')
+    349          			{
+    350          				SerPtr->printf("\n Eeprom 1 Write Address[%x] -> [%x]\n", DebugAdd, DebugData);
+    351          				WriteEEprom(DebugAdd, DebugData);
+    352          				SerPtr->printf(" Eeprom 1 Read Address[%x] : [%x]\n", DebugAdd, ReadEEprom(DebugAdd));
+    353          			}
+    354          		break;
+    355          		
+    356          		case 'G':
+    357          		case 'g':
+    358          			DownloadFlagClr();
+    359          			ForDelay(20L);
+    360          			DownLoadBootingJump();
+    361          		break;
+    362          
+    363          		case '?':
+    364          			PrintLogo();
+    365          		break;
+    366          
+    367                  default:
+    368          		break;
+    369          
+    370          	}
+    371          	PromptOut();
+    372          
+    373          }
+    374          
+    375          /*
+    376          void OnCommand ( void )
+    377          {
+    378          	INT8U	tdata = TRUE;
+    379          	INT8S	DebugData;
+    380          	
+    381             	switch(tRevData[0])
+    382             	{
+    383          		case 'S':
+    384          		case 's':
+    385          			if((tRevData[1] == 'O')||(tRevData[1] == 'o'))
+    386          			{
+    387          				SerPtr->printf("\n 2.1G SISO AMP ON(High)...\n");
+    388          				ExpioBitSet(Amp_OnOff_S_21G_Sel);
+    389          			}
+    390          			else if((tRevData[1] == 'F')||(tRevData[1] == 'f'))
+    391          			{
+    392          				SerPtr->printf("\n 2.1G SISO AMP OFF(Low)...\n");
+    393          				ExpioBitRst(Amp_OnOff_S_21G_Sel);
+    394          			}
+    395          		break;
+    396          
+    397          		case 'M':
+    398          		case 'm':
+    399          			if((tRevData[1] == 'O')||(tRevData[1] == 'o'))
+    400          			{
+    401          				SerPtr->printf("\n 2.1G MIMO AMP ON(High)...\n");
+    402          				ExpioBitSet(Amp_OnOff_M_21G_Sel);
+    403          			}
+    404          			else if((tRevData[1] == 'F')||(tRevData[1] == 'f'))
+    405          			{
+    406          				SerPtr->printf("\n 2.1G MIMO AMP OFF(Low)...\n");
+    407          				ExpioBitRst(Amp_OnOff_M_21G_Sel);
+    408          			}
+    409          		break;
+    410          
+    411          		case 'A':
+    412          		case 'a':
+    413          
+    414          		break;
+    415          		
+    416          		case 'G':
+    417          		case 'g':
+    418          			//DownloadFlagClr();
+    419          			ForDelay(20L);
+    420          			//DownLoadBootingJump();
+    421          		break;
+    422          
+    423          		case '?':
+    424          			PrintLogo();
+    425          		break;
+    426          
+    427                  default:
+    428          		break;
+    429          
+    430          	}
+    431          	PromptOut();
+    432          
+    433          }
+    434          */
+    435          
+    436          void AdInputStatus(void)
+    437          {
+    438          ////////////////////////////////////////////////////////////////////////////////
+    439          	PrintStar();
+    440          	{
+    441          		INT16S Data, tmpx;
+    442          /*
+    443          
+    444          		Data = AdctoVolt5opamp(ADC_AVR[adcRVSPWRdect1][0]);
+    445          		SerPtr->printf(STARMSG);
+    446          		SerPtr->printf("RVS PWR 4G : %d.%03d[V]\n", Data/1000, Data%1000);
+    447          
+    448          
+    449          		Data = AdctoVolt33V(ADC_AVR[adcEnvTemp][0]);
+    450          		tmpx = ReadEnvTempTable(ADC_AVR[adcEnvTemp][0]);
+    451          		SerPtr->printf(STARMSG);
+    452          		SerPtr->printf("TEMP       : %d.%03d[V], %d.%d['C]\n", Data/1000, Data%1000, tmpx/10, abs(Data%10));
+    453          */
+    454          
+    455          		OSTimeDly(10L);
+    456          	}
+    457          	PrintStar();
+    458          	SerPtr->printf("\n\n");
+    459          }
+    460          
+    461          void AdcPrintf(char *sptr, INT16U rawData, INT8U is_5V)
+    462          {
+    463          	INT16U Data=0;
+    464          //	if(is_5V) 	Data = AdctoVolt5opamp(rawData);
+    465          //	else		Data = AdctoVolt33V(rawData);
+    466          	
+    467          	SerPtr->printf(STARMSG);
+    468          	SerPtr->printf("%s: %d.%d[V], [raw:%04d]", sptr, Data/10, Data%10, rawData);
+    469          	SerPtr->printf(ENTMSG);
+    470          }
+    471          
+    472          
+    473          void COMTestFunc(void)
+    474          {
+    475          /*
+    476          	INT16U Recv;
+    477          
+    478          	//
+    479          	pUSART2.BuffClear();
+    480          	pUSART4.BuffClear();
+    481          	
+    482          	pUSART2.PutToBuffer('b');
+    483          	pUSART2.PutToBuffer('i');
+    484          	pUSART2.PutToBuffer('z');
+    485          	pUSART2.PutToBuffer('i');
+    486          
+    487          	OSTimeDly(10L);
+    488          	pUSART1.printf(" 통신시험 iRems2G(TX)->EXT(RX)    [SER2-SER4] 시험:");
+    489          
+    490          	if(pUSART4.CheckByte(4, &Recv))
+    491          	{
+    492          		if( pUSART4.RxGetByte() == 'b' &&
+    493          			pUSART4.RxGetByte() == 'i' &&
+    494          			pUSART4.RxGetByte() == 'z' &&
+    495          			pUSART4.RxGetByte() == 'i')
+    496          		{
+    497          			 pUSART1.printf("[SUCCESS EXT(RX)  ]: %d\n", Recv);
+    498          		}
+    499          		else pUSART1.printf("[FAIL    EXT(RX)  ]: %d\n", Recv); 
+    500          	}
+    501          	    else pUSART1.printf("[FAIL    EXT(RX)  ]: %d\n", Recv);
+    502          	//
+    503          
+    504          	pUSART3.BuffClear();
+    505          	pUSART2.BuffClear();
+    506          
+    507          	pUSART3.PutToBuffer('c');
+    508          	pUSART3.PutToBuffer('b');
+    509          	pUSART3.PutToBuffer('b');
+    510          	pUSART3.PutToBuffer('i');
+    511          
+    512          	OSTimeDly(10L);
+    513          	pUSART1.printf(" 통신시험 iRems3G(TX)->iRems4G(RX)[SER3-SER2] 시험:");
+    514          
+    515          	if(pUSART2.CheckByte(4, &Recv))
+    516          	{
+    517          		if( pUSART2.RxGetByte() == 'c' &&
+    518          			pUSART2.RxGetByte() == 'b' &&
+    519          			pUSART2.RxGetByte() == 'b' &&
+    520          			pUSART2.RxGetByte() == 'i')
+    521          		{
+    522          			 pUSART1.printf("[SUCCESS REMS_4G  ]: %d\n", Recv);
+    523          		}
+    524          		else pUSART1.printf("[FAIL    REMS_4G  ]: %d\n", Recv); 
+    525          	}
+    526          		else pUSART1.printf("[FAIL    REMS_4G  ]: %d\n", Recv);
+    527          
+    528          	//
+    529          	pUSART4.BuffClear();
+    530          	pUSART5.BuffClear();
+    531          	
+    532          	pUSART4.PutToBuffer('b');
+    533          	pUSART4.PutToBuffer('i');
+    534          	pUSART4.PutToBuffer('z');
+    535          	pUSART4.PutToBuffer('i');
+    536          
+    537          	OSTimeDly(10L);
+    538          	pUSART1.printf(" 통신시험 iRems4G(TX)-> FPGA(RX)  [SER4-SER5] 시험:");
+    539          
+    540          	if(pUSART5.CheckByte(4, &Recv))
+    541          	{
+    542          		if( pUSART5.RxGetByte() == 'b' &&
+    543          			pUSART5.RxGetByte() == 'i' &&
+    544          			pUSART5.RxGetByte() == 'z' &&
+    545          			pUSART5.RxGetByte() == 'i')
+    546          		{
+    547          			 pUSART1.printf("[SUCCESS FPGA     ]: %d\n", Recv);
+    548          		}
+    549          		else pUSART1.printf("[FAIL    FPGA     ]: %d\n", Recv); 
+    550          	}
+    551          	    else pUSART1.printf("[FAIL    FPAG     ]: %d\n", Recv);
+    552          
+    553          	//
+    554          	pUSART5.BuffClear();
+    555          	pUSART3.BuffClear();
+    556          
+    557          	pUSART5.PutToBuffer('c');
+    558          	pUSART5.PutToBuffer('b');
+    559          	pUSART5.PutToBuffer('b');
+    560          	pUSART5.PutToBuffer('i');
+    561          
+    562          	OSTimeDly(10L);
+    563          	pUSART1.printf(" 통신시험 FPGA(TX)->iRems3G(RX)   [SER5-SER3] 시험:");
+    564          
+    565          	if(pUSART3.CheckByte(4, &Recv))
+    566          	{
+    567          		if( pUSART3.RxGetByte() == 'c' &&
+    568          			pUSART3.RxGetByte() == 'b' &&
+    569          			pUSART3.RxGetByte() == 'b' &&
+    570          			pUSART3.RxGetByte() == 'i')
+    571          		{
+    572          			 pUSART1.printf("[SUCCESS REMS_3G  ]: %d\n", Recv);
+    573          		}
+    574          		else pUSART1.printf("[FAIL    REMS_3G  ]: %d\n", Recv); 
+    575          	}
+    576          		else pUSART1.printf("[FAIL    REMS_3G  ]: %d\n", Recv);
+    577          
+    578          	pUSART1.printf(ENTMSG);
+    579          */	
+    580          }
+    581          
+    582          
+    583          
+    584          void CurrentInputStatus(INT8U vcheck)
+    585          {
+    586          	INT8U tcnt = 0;
+    587          	INT8U tval = FALSE;
+    588              tcnt = tcnt;
+    589          
+    590          	if(!vcheck)PrintStar();
+    591          	{
+    592          		
+    593          	}
+    594          	
+    595          	if(!vcheck)PrintStar();
+    596          	if(vcheck)
+    597          	{
+    598          		if(tval) SerPtr->printf("\n");
+    599          	}
+    600          }
+    601          
+    602          INT32U dCycle = 0;
+    603          INT32U vstrval = 0;
+    604          INT8S vstr[64];
+    605          
+    606          
+    607          void HwTestOutFunc(INT32U *nFlag)
+    608          {
+    609          	INT32U MaxValue = 0xFFFF;
+    610          	INT8U Data = *nFlag;
+    611          
+    612              MaxValue = MaxValue;
+    613              Data = Data;
+    614          	
+    615          	switch(Data)
+    616          	{
+    617          		case 0:
+    618          //			_4G_NORLED = 1;
+    619          		break;
+    620          		
+    621          		case 1:
+    622          			MaxValue = Data;
+    623          			//BuzzShort();
+    624          		break;
+    625          	}	
+    626          	*nFlag = *nFlag + 1;
+    627          
+    628          	if(*nFlag >= MaxValue) *nFlag = 0;
+    629          
+    630          }
+    631          
+    632          INT32U DigitalInputDiplay(INT8U num, INT8U ival,
+    633          							INT8U *fmsg, INT8U *emsg,
+    634          							INT8U vcheck)
+    635          {
+    636          	INT32U temp = FALSE;
+    637          	INT8U *currentptr = (INT8U *)&tinputSts;
+    638          	INT8U *beforeptr = (INT8U *)&tinputStsOld;
+    639          
+    640          	// first
+    641          	if(!vcheck)
+    642          	{
+    643          		if(fmsg != NULL) SerPtr->printf("%s", fmsg);	// start // phase mssage
+    644          	}
+    645          
+    646          	currentptr[num] = ival;
+    647          
+    648          	{
+    649          
+    650          		if( (vcheck && (beforeptr[num] != currentptr[num]) ) )
+    651          		{
+    652          			SerPtr->printf("%02d. ", num);
+    653          			SerPtr->printf("%s", tDisplay[num]);
+    654          			{
+    655          				if(ival) SerPtr->printf(OFFMSG);
+    656          				else	 SerPtr->printf(ONMSG);
+    657          			}
+    658          			temp = TRUE;
+    659          		}
+    660          		else if(!vcheck)
+    661          		{
+    662          			SerPtr->printf("%s", tDisplay[num]);
+    663          			{
+    664          				if(ival) SerPtr->printf(OFFMSG);
+    665          				else	 SerPtr->printf(ONMSG);
+    666          			}
+    667          		}
+    668          	}
+    669          
+    670          ////////////////////////////////////////////////////////////////////////////////
+    671          	if(vcheck)
+    672          	{
+    673          		if(temp)
+    674          		{
+    675          			OSTimeDly(1L);
+    676          			SerPtr->printf(ENTMSG);
+    677          		}
+    678          	}
+    679          	else
+    680          	{
+    681          		if(emsg)
+    682          		{
+    683          			OSTimeDly(1L);
+    684          			SerPtr->printf(ENTMSG);
+    685          		}
+    686          	}
+    687          
+    688          	beforeptr[num] = currentptr[num];
+    689          	return (INT32U)temp;
+    690          }
+    691          
+    692          
+    693          INT8U returnmsgTest(char *str)
+    694          {
+    695          	SerPtr->printf("%s이 수행되어 있습니다. 계속 진행하시겠습니까?[Y]es, [C]ancel\n", str);
+    696          	return WaringMssageReturn();
+    697          }
+    698          
+    699          INT8U WaringMssageReturn(void)
+    700          {
+    701          	INT16U nCnt;
+    702          
+    703          	TimerRegist(TimerTest, Time1Sec*5L);
+    704          
+    705          	while(1)
+    706          	{
+    707          		if(TimeOverCheck(TimerTest))
+    708          		{
+    709          			TimerRegist(TimerTest, Time1Sec*5L);
+    710          			return TRUE;
+    711          		}
+    712          		if(SerPtr->CheckByte(1, &nCnt))
+    713          		{
+    714          			nCnt = SerPtr->RxGetByte();
+    715          			if(nCnt == 'C' || nCnt == 'c')
+    716          			{
+    717          				SerPtr->printf("CANCEL TEST \n");
+    718          				return FALSE;
+    719          			}
+    720          			else return TRUE;
+    721          		}
+    722          		OSTimeDly(10L);
+    723          	}
+    724          }
+    725          
+    726          /*
+    727          void PrintLogo(void)
+    728          {
+    729          
+    730          	SerPtr->printf("\n\n");
+    731          	PrintStar();
+    732          	SerPtr->printf("*\n");
+    733          	SerPtr->printf("* %s [VER:%d.%d]\n", BoardTestMode, (SystemVer >> 4 & 0x0f), (SystemVer >> 0 & 0x0f));
+    734          	SerPtr->printf("*    -COMMAND 1st-\n");
+    735          	SerPtr->printf("*  ?        : help(this message)\n");
+    736          	SerPtr->printf("*  I        : INPUT Test          [%s]\n", testResult[0x03 & SavetoTestBackup(InputTest, NULL, NULL)]);
+    737          	SerPtr->printf("*  O        : OUTPUT Test         [%s]\n", testResult[0x03 & SavetoTestBackup(OutputTest,  NULL, NULL)]);
+    738          	SerPtr->printf("*  A        : ANALOG DECT         [%s]\n", testResult[0x03 & SavetoTestBackup(ADCTest, 	NULL, NULL)]);
+    739          	SerPtr->printf("*  C        : SERIAL[UART]        [%s]\n", testResult[0x03 & SavetoTestBackup(CommTest, NULL, NULL)]);
+    740          	SerPtr->printf("*  G        : compulsory boot/#,\n");
+    741          	
+    742          	PrintStar();
+    743          }
+    744          */
+    745          
+    746          void PrintLogo(void)
+    747          {
+    748          	SerPtr->printf("\n\n");
+    749          	PrintStar();
+    750          	SerPtr->printf("*\n");
+    751          	SerPtr->printf("*  ?               : help(this message)\n");
+    752          	SerPtr->printf("*  SO              : 2.1G SISO AMP On\n");
+    753          	SerPtr->printf("*  SF              : 2.1G SISO AMP Off\n");
+    754          	SerPtr->printf("*  MO              : 2.1G MIMO AMP On\n");
+    755          	SerPtr->printf("*  MF              : 2.1G MIMO AMP Off\n");
+    756          	SerPtr->printf("*  A[T/R][S/M][00] : 2.1G Attn\n");
+    757          	SerPtr->printf("*   [T/R]          : T->TX, R->RX\n");	
+    758          	SerPtr->printf("*        [S/M]     : S->SISO, M->MIMO\n");	
+    759          	SerPtr->printf("*             [00] : Attn Value (1=0.5dB)\n");	
+    760          	SerPtr->printf("*  ex) ATS30 -> 2.1G SISO TX ATTN 15.0dB \n");
+    761          	SerPtr->printf("*  ex) ARM03 -> 2.1G MIMO RX ATTN 1.5dB \n");
+    762          	
+    763          	PrintStar();
+    764          }
+    765          
+    766          
+    767          void PrintStar(void)
+    768          {
+    769          	SerPtr->printf("*******************************************************************************\n");
+    770          }
+    771          
+    772          void PromptOut(void)
+    773          {
+    774          	SerPtr->printf("STM3>>");
+    775          }
+    776          
+    777          
+    778          
+    779          
+    780          
+    781          ///////////////////////////////////////////////////////////////////////////////
+    782          // End of Source File
+    783          ////////////////////////
+    784          
+
+   Maximum stack usage in bytes:
+
+     Function           .cstack
+     --------           -------
+     AdInputStatus           8
+     AdcPrintf              24
+     COMTestFunc             0
+     CurrentInputStatus      8
+     DigitalInputDiplay     32
+     HwTestOutFunc           0
+     KeyProc                24
+     OnCommand              24
+     PrintLogo               8
+     PrintStar               8
+     PromptOut               8
+     TestInit                8
+     TestTask               24
+     WaringMssageReturn     16
+     dGetHex                16
+     htob                    0
+     returnmsgTest           8
+
+
+   Section sizes:
+
+     Function/Label                                 Bytes
+     --------------                                 -----
+     TestTaskStk                                    1024
+     tIndex                                          156
+     PrevWRCnt
+     PrevRDCnt
+     PrevData
+     tRevData                                         32
+     tTestFlag                                         1
+     SysPath                                           1
+     testResult                                       16
+     tinputSts                                        96
+     tinputStsOld
+     tDisplay
+     TestInit                                         16
+     TestTask                                        104
+     KeyProc                                         322
+     htob                                             32
+     dGetHex                                          24
+     OnCommand                                       850
+     AdInputStatus                                    30
+     AdcPrintf                                        48
+     COMTestFunc                                       2
+     CurrentInputStatus                               16
+     dCycle                                            4
+     vstrval                                           4
+     vstr                                             64
+     HwTestOutFunc                                    28
+     DigitalInputDiplay                              188
+     returnmsgTest                                    20
+     WaringMssageReturn                               96
+     PrintLogo                                       138
+     PrintStar                                         6
+     ?Subroutine0                                      8
+     PromptOut                                         4
+     ??DataTable64                                     4
+     ??DataTable70                                     4
+     ??DataTable70_1                                   4
+     ??DataTable70_2                                   4
+     ??DataTable70_3                                   4
+     ??DataTable70_4                                   4
+     ??DataTable70_5                                   4
+     ??DataTable70_6                                   4
+     ??DataTable70_7                                   4
+     ??DataTable70_8                                   4
+     ??DataTable70_9                                   4
+     ??DataTable70_10                                  4
+     ??DataTable70_11                                  4
+     ??DataTable70_12                                  4
+     ??DataTable70_13                                  4
+     ??DataTable70_14                                  4
+     ?<Constant "NON TESTED">                         12
+     ?<Constant "    TESTED">                         12
+     ?<Constant "GPO0   :">                           12
+     ?<Constant "GPO1   :">                           12
+     ?<Constant "GPO2   :">                           12
+     ?<Constant "GPO3   :">                           12
+     ?<Constant "GPO4   :">                           12
+     ?<Constant "GPO5   :">                           12
+     ?<Constant "GPO6   :">                           12
+     ?<Constant "GPO7   :">                           12
+     ?<Constant "%s">                                  4
+     ?<Constant "\n 2.1G PATH..........\n">           24
+     ?<Constant "\n 900M PATH..........\n">           24
+     ?<Constant "\n 2.5G PATH..........\n">           24
+     ?<Constant "\n 2.1G SISO AMP ON(Hi...">          32
+     ?<Constant "\n 900M SISO AMP ON(Hi...">          32
+     ?<Constant "\n 2.5G SISO AMP ON(Hi...">          32
+     ?<Constant "\n 2.1G SISO AMP OFF(L...">          32
+     ?<Constant "\n 900M SISO AMP OFF(L...">          32
+     ?<Constant "\n 2.1G MIMO AMP ON(Hi...">          32
+     ?<Constant "\n 900M MIMO AMP ON(Hi...">          32
+     ?<Constant "\n 2.5G MIMO AMP ON(Hi...">          32
+     ?<Constant "\n 2.1G MIMO AMP OFF(L...">          32
+     ?<Constant "\n 900M MIMO AMP OFF(L...">          32
+     ?<Constant "\n 2.1G SISO TX Attn =...">          28
+     ?<Constant "\n 900M SISO TX Attn =...">          28
+     ?<Constant "\n 2.5G SISO TX Attn =...">          28
+     ?<Constant "\n 2.1G MIMO TX Attn =...">          28
+     ?<Constant "\n 900M MIMO TX Attn =...">          28
+     ?<Constant "\n 2.5G MIMO TX Attn =...">          28
+     ?<Constant "\n 2.1G SISO RX Attn =...">          28
+     ?<Constant "\n 900M SISO RX Attn =...">          28
+     ?<Constant "\n 2.5G SISO RX Attn =...">          28
+     ?<Constant "\n 2.1G MIMO RX Attn =...">          28
+     ?<Constant "\n 900M MIMO RX Attn =...">          28
+     ?<Constant "\n 2.5G MIMO RX Attn =...">          28
+     ?<Constant "\n Eeprom 1 Read Addre...">          36
+     ?<Constant "\n Eeprom 1 Write Addr...">          40
+     ?<Constant " Eeprom 1 Read Addres...">           36
+     ?<Constant "%s: %d.%d[V], [raw:%04d]">           28
+     ?<Constant "%02d. ">                              8
+     ?<Constant "[OFF]">                               8
+     ?<Constant "[ON ]">                               8
+     ?<Constant "%s\300\314 \274\366\307\340\265\30   64
+     ?<Constant "CANCEL TEST \n">                     16
+     ?<Constant "*  ?               : ...">           44
+     ?<Constant "*  SO              : ...">           40
+     ?<Constant "*  SF              : ...">           40
+     ?<Constant "*  MO              : ...">           40
+     ?<Constant "*  MF              : ...">           40
+     ?<Constant "*  A[T/R][S/M][00] : ...">           32
+     ?<Constant "*   [T/R]          : ...">           36
+     ?<Constant "*        [S/M]     : ...">           40
+     ?<Constant "*             [00] : ...">           44
+     ?<Constant "*  ex) ATS30 -> 2.1G ...">           44
+     ?<Constant "*  ex) ARM03 -> 2.1G ...">           44
+     ?<Constant "*********************...">           84
+     ?<Constant "STM3>>">                              8
+     ?<Constant "\n\n">                                4
+     ?<Constant "* ">                                  4
+     ?<Constant "\n">                                  2
+     ?<Constant "*\n">                                 4
+
+ 
+   262 bytes in section .bss
+   112 bytes in section .data
+   138 bytes in section .rodata
+ 3 504 bytes in section .text
+ 1 024 bytes in section iram
+ 
+ 3 504 bytes of CODE  memory
+   138 bytes of CONST memory
+ 1 398 bytes of DATA  memory
+
+Errors: none
+Warnings: 3

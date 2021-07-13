@@ -1,0 +1,60 @@
+###############################################################################
+#                                                                             #
+# IAR ANSI C/C++ Compiler V6.21.1.52794/W32 for ARM     19/Oct/2013  14:07:18 #
+# Copyright 1999-2011 IAR Systems AB.                                         #
+#                                                                             #
+#    Cpu mode     =  thumb                                                    #
+#    Endian       =  little                                                   #
+#    Source file  =  C:\Project\TRIO\2차버전\3.F_W\appl_stm207_20131019\code\ #
+#                    de_protocol.c                                            #
+#    Command line =  C:\Project\TRIO\2차버전\3.F_W\appl_stm207_20131019\code\ #
+#                    de_protocol.c -lC C:\Project\TRIO\2차버전\3.F_W\appl_stm #
+#                    207_20131019\out\ -o C:\Project\TRIO\2차버전\3.F_W\appl_ #
+#                    stm207_20131019\out\ --endian=little --cpu=Cortex-M3 -e  #
+#                    --fpu=None --dlib_config "C:\Program Files (x86)\IAR     #
+#                    Systems\Embedded Workbench 6.0\arm\INC\c\DLib_Config_Nor #
+#                    mal.h" -I C:\Project\TRIO\2차버전\3.F_W\appl_stm207_2013 #
+#                    1019\include\ -I C:\Project\TRIO\2차버전\3.F_W\appl_stm2 #
+#                    07_20131019\STM32F2xx_StdPeriph_Driver_v1212\ -I         #
+#                    C:\Project\TRIO\2차버전\3.F_W\appl_stm207_20131019\STM32 #
+#                    F2xx_StdPeriph_Driver_v1212\inc\ -I                      #
+#                    C:\Project\TRIO\2차버전\3.F_W\appl_stm207_20131019\uC-CP #
+#                    U\ -I C:\Project\TRIO\2차버전\3.F_W\appl_stm207_20131019 #
+#                    \uC-LIB\ -I C:\Project\TRIO\2차버전\3.F_W\appl_stm207_20 #
+#                    131019\uCOS-II\Ports\ -I C:\Project\TRIO\2차버전\3.F_W\a #
+#                    ppl_stm207_20131019\uCOS-II\Source\ -I                   #
+#                    C:\Project\TRIO\2차버전\3.F_W\appl_stm207_20131019\uC-Pr #
+#                    obe\ -Oh --use_c++_inline                                #
+#    List file    =  C:\Project\TRIO\2차버전\3.F_W\appl_stm207_20131019\out\d #
+#                    e_protocol.lst                                           #
+#    Object file  =  C:\Project\TRIO\2차버전\3.F_W\appl_stm207_20131019\out\d #
+#                    e_protocol.o                                             #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+C:\Project\TRIO\2차버전\3.F_W\appl_stm207_20131019\code\de_protocol.c
+      1          /*********************************************
+      2          * File Name          : DE_Protocol.c
+      3          * Author             :
+      4          * Date First Issued  : 10/20/2010
+      5          * Description        : This file provides all the port/input/update firmware functions.
+      6          * $Revision: 0.1 $
+      7          * $Revision date: 2010.10.__
+      8          ********************************************************************************/
+      9          #define DE_Protocol_C
+     10          
+     11          #include "../include/main.h"
+     12          
+     13          ////////////////////////////////////////////////////////////////////////////////
+     14          // End of Source File
+     15          ////////////////////////
+     16          
+
+
+ 
+ 
+ 0 bytes of memory
+
+Errors: none
+Warnings: none

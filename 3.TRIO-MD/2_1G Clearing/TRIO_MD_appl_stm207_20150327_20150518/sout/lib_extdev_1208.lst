@@ -1,0 +1,330 @@
+###############################################################################
+#                                                                             #
+# IAR ANSI C/C++ Compiler V6.21.1.52794/W32 for ARM     30/Aug/2012  21:29:24 #
+# Copyright 1999-2011 IAR Systems AB.                                         #
+#                                                                             #
+#    Cpu mode     =  thumb                                                    #
+#    Endian       =  little                                                   #
+#    Source file  =  D:\Work\Project\2012\NL_INBUILD\FW\MU\lib\ext\lib_extdev #
+#                    _1208.c                                                  #
+#    Command line =  D:\Work\Project\2012\NL_INBUILD\FW\MU\lib\ext\lib_extdev #
+#                    _1208.c -D OS_INCLUDED -D APPL_SRC -lcN                  #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\sout\ -o           #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\sout\              #
+#                    --endian=little --cpu=Cortex-M3 -e                       #
+#                    --warnings_are_errors --fpu=None --dlib_config           #
+#                    "C:\Programming\IAR Systems\Embedded Workbench           #
+#                    6.0\arm\INC\c\DLib_Config_Normal.h" -I                   #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\include\ -I        #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\..\..\STM32F2xx_St #
+#                    dPeriph_Driver\ -I D:\Work\Project\2012\NL_INBUILD\FW\MU #
+#                    \..\..\STM32F2xx_StdPeriph_Driver\inc\ -I                #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\uC-CPU\ -I         #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\uC-LIB\ -I         #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\uCOS-II\Ports\ -I  #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\uCOS-II\Source\    #
+#                    -I D:\Work\Project\2012\NL_INBUILD\FW\MU\uC-Probe\ -Oh   #
+#                    --use_c++_inline                                         #
+#    List file    =  D:\Work\Project\2012\NL_INBUILD\FW\MU\sout\lib_extdev_12 #
+#                    08.lst                                                   #
+#    Object file  =  D:\Work\Project\2012\NL_INBUILD\FW\MU\sout\lib_extdev_12 #
+#                    08.o                                                     #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\Work\Project\2012\NL_INBUILD\FW\MU\lib\ext\lib_extdev_1208.c
+      1          /******************** (C) COPYRIGHT 2008 PILOG, NSINFO *************************
+      2          * File Name          : usart1_vx.x.c
+      3          * Author             : Yoon Byong-Gyu(bgyoon@naver.com)
+      4          * Date First Issued  : 01/17/2008
+      5          * Description        : This file provides all the USART0 firmware functions.
+      6          * $Revision: 0.1 $
+      7          * $Revision date: 2008.01.__
+      8          ********************************************************************************/
+      9          
+     10          
+     11          #define	EXTDEV_C
+     12          
+     13          #include "lib_extdev_1208.h"
+     14          #include "../include/lib_extdevext.h"
+     15          
+     16          extern __SerStrPtr pUSART1;
+     17          
+     18          void DownFlagSet(INT16U mode)
+     19          {
+     20          /*
+     21          	INT32U cpu_sr;
+     22          	OS_ENTER_CRITICAL();
+     23          	{
+     24          		SYS_BACK *ptr = (SYS_BACK *)RoadBackuptobuffer(__pSYSTAddr);
+     25          
+     26          		ptr->Data[DownLoadFlag1] = (mode >> 8) & 0xff;
+     27          		ptr->Data[DownLoadFlag2] = (mode >> 0) & 0xff;
+     28          
+     29          		WriteBuffertoBackup(__pSYSTAddr, sizeof(SYS_BACK));
+     30          	}
+     31          	OS_EXIT_CRITICAL();
+     32          	*/
+     33          }
+     34          
+     35          void DownloadFlagClr(void)
+     36          {
+     37          	DownFlagSet(NOMODE);
+     38          }
+     39          
+     40          ////////////////////////////////////////////////////////////////////////////////
+     41          
+     42          unsigned short int Crc16Calc(unsigned char *buf_ptr, unsigned long int len, unsigned short int ninit)
+     43          {
+     44          	INT16U dt;
+     45          	INT16U crc16;
+     46          
+     47          	len *= 8;
+     48          	for(crc16 = ninit; len >= 8; len -= 8, buf_ptr++)
+     49          	{
+     50          		crc16 = Crc_tbl[(crc16>>8) ^ *buf_ptr] ^ (crc16<<8);
+     51          	}
+     52          	if(len != 0)
+     53          	{
+     54          		dt = ((INT16U)(*buf_ptr)) << 8;
+     55          		while(len-- != 0)
+     56          		{
+     57          			if(((crc16^dt) & ((INT16U)1 << 15)) != 0)
+     58          			{crc16 <<= 1;crc16 ^= POLYNOMIAL;}
+     59          			else crc16 <<= 1;
+     60          			dt <<= 1;
+     61          		}
+     62          	}
+     63          	return(crc16);
+     64          }
+     65          
+     66          INT32U FLASHpAPBK_Check_Erase(void)
+     67          {
+     68          	FLASH_If_Init();
+     69          
+     70          	if(!FLASH_If_GetWPStatus(__pAPBKAddr))
+     71          	{
+     72          		if(FLASH_WPDisable(__pAPBKAddr) != 1)
+     73          		{
+     74                      //pUSART1.printf("data: 1\n");
+     75          			return FALSE;
+     76          		}
+     77          	}
+     78          	if(!FLASH_If_Erase(__pAPBKAddr))
+     79          	{
+     80          		//pUSART1.printf("data: 2\n");
+     81          		return FALSE;
+     82          	}
+     83          	return TRUE;
+     84          }
+     85          
+     86          // -1: error
+     87          //__pAPBKAddr
+     88          
+     89          
+     90          signed long int UpLoadData(unsigned int bAddr, unsigned char *ptr, unsigned short int len, unsigned long int pcnt)
+     91          {
+     92          	INT32U i = 0;
+     93          	INT32U rdata = 0;
+     94          	volatile INT8U *upLdAddr = (INT8U * )(bAddr + pcnt);
+     95          
+     96          	for(i = 0; i < len; i = i+4 )
+     97          	{	// copy to download area.
+     98          		rdata = 0;
+     99          		rdata |= (*ptr++) << 0;
+    100          		rdata |= (*ptr++) << 8;
+    101          		rdata |= (*ptr++) << 16;
+    102          		rdata |= (*ptr++) << 24;	
+    103          		WatchdogClear();
+    104          
+    105          		if(FLASH_ProgramWord(((INT32U)&upLdAddr[i]), rdata) != FLASH_COMPLETE )
+    106                  {
+    107                      pUSART1.printf("data: %08x, len: %d, i: %d, pcnt: %d \n", rdata, len, i, pcnt);
+    108                      return -1;
+    109                  }
+    110          
+    111          		if( !(i%128) ) OSTimeDly(1);
+    112          		
+    113          	}
+    114          	return (pcnt + len);
+    115          }
+    116          
+    117          signed long int UpLoadExtSRAM(unsigned char *ptr, unsigned short int len, unsigned long int pcnt)
+    118          {
+    119            /**
+    120          	INT32U i = 0;
+    121          	INT32U rdata = 0;
+    122          	volatile INT8U *upLdAddr = (INT8U * )(__pAPBK_SRAMAddr + pcnt);
+    123          
+    124          	if((pcnt + len) > (APPLSIZE*2L)) return -1;
+    125          
+    126          	for(i = 0; i < len; i = i+4 )
+    127          	{	// copy to download area.
+    128          		rdata = 0;
+    129          		rdata |= (*ptr++) << 0;
+    130          		rdata |= (*ptr++) << 8;
+    131          		rdata |= (*ptr++) << 16;
+    132          		rdata |= (*ptr++) << 24;	
+    133          
+    134          		*(volatile INT32U *)((INT8U *)upLdAddr + i) = rdata;
+    135          		if( !(i%128) ) OSTimeDly(1);
+    136          	}
+    137          	return (pcnt + len);
+    138            **/
+    139            return 0;
+    140          }
+    141          
+    142          INT8U SetBootBaudRate(INT32U nBps)
+    143          {
+    144          	INT8U rval = FALSE;
+    145          	INT32U rBAUD = 0;
+    146          
+    147          	rBAUD = ((ReadEEprom(BackupMark1H) << 8) | (ReadEEprom(BackupMark1L))) * 100L;
+    148          
+    149          	if(rBAUD != nBps)
+    150          	{
+    151          		nBps = nBps/100L;
+    152          		WriteEEprom(BackupMark1L,	(nBps >> 0) & 0xff);
+    153          		WriteEEprom(BackupMark1H,	(nBps >> 8) & 0xff);
+    154          
+    155          		rval = TRUE;
+    156          	}
+    157          	return rval;
+    158          }
+    159          
+    160          
+    161          
+    162          void DownloadFlagSet(unsigned long int nsize)
+    163          {
+    164          	WriteEEprom(DownLoadFlag1, 	(INT8U)(APDNMODE >> 8));
+    165          	WriteEEprom(DownLoadFlag2, 	(INT8U)(APDNMODE     ));
+    166          
+    167          	WriteEEprom(FWDataSize3_MSB,	(INT8U)((nsize >> 24) & 0xFF));
+    168          	WriteEEprom(FWDataSize2, 		(INT8U)((nsize >> 16) & 0xFF));
+    169          	WriteEEprom(FWDataSize1, 		(INT8U)((nsize >> 8 ) & 0xFF));
+    170          	WriteEEprom(FWDataSize0_LSB,	(INT8U)((nsize		) & 0xFF));
+    171          
+    172          }
+    173          
+    174          void DownloadFlagSetExtSRAM(unsigned long int nsize)
+    175          {
+    176          	WriteEEprom(DownLoadFlag1,	(INT8U)(APDNSRAM >> 8));
+    177          	WriteEEprom(DownLoadFlag2,	(INT8U)(APDNSRAM     ));
+    178          
+    179          	WriteEEprom(FWDataSize3_MSB,	(INT8U)((nsize >> 24) & 0xFF));
+    180          	WriteEEprom(FWDataSize2,	   	(INT8U)((nsize >> 16) & 0xFF));
+    181          	WriteEEprom(FWDataSize1,		(INT8U)((nsize >> 8 ) & 0xFF));
+    182          	WriteEEprom(FWDataSize0_LSB,	(INT8U)((nsize		) & 0xFF));
+    183          }
+    184          
+    185          
+    186          void DownLoadBootingJump(void)
+    187          {
+    188          	INT32U cpu_sr;
+    189          	OS_ENTER_CRITICAL();
+    190          	cpu_sr = cpu_sr;
+    191          	//while(1);
+    192          	SYSTEMRESET;
+    193          	//OS_EXIT_CRITICAL();
+    194          }
+    195          
+    196          INT32U DATEtoInt(char *DATE)
+    197          {
+    198                // retval: yyyy mm dd
+    199              char *MChar[] =
+    200              {
+    201                  "Jan",
+    202                  "Feb",
+    203                  "Mar",
+    204                  "Apr",
+    205                  "May",
+    206                  "Jun",
+    207                  "Jul",
+    208                  "Aug",
+    209                  "Sep",
+    210                  "Oct",
+    211                  "Nov",
+    212                  "Dec"
+    213              };
+    214              
+    215          	INT32U i = 0;
+    216          	INT32U rval = 0;
+    217          	for(i = 0; i < 12; i++)
+    218          	{
+    219          		if(!strncmp(MChar[i], DATE, 3)) break;
+    220          	}
+    221          	rval  = (i+1) << 8;
+    222          	rval |= (atoi((char *)&DATE[4]) & 0xff);
+    223          	rval |= (atoi((char *)&DATE[7]) & 0xffff) << 16;
+    224          
+    225          	return rval;
+    226          }
+    227          
+    228          ////////////////////////////////////////////////////////////////////////////////
+    229          // End of Source File
+    230          /////////////////////
+    231          
+
+   Maximum stack usage in bytes:
+
+     Function               .cstack
+     --------               -------
+     Crc16Calc                   4
+     DATEtoInt                  64
+     DownFlagSet                 0
+     DownLoadBootingJump         8
+     DownloadFlagClr             0
+     DownloadFlagSet             8
+     DownloadFlagSetExtSRAM      8
+     FLASHpAPBK_Check_Erase      8
+     SetBootBaudRate            24
+     UpLoadData                 40
+     UpLoadExtSRAM               0
+
+
+   Section sizes:
+
+     Function/Label                                 Bytes
+     --------------                                 -----
+     Crc_tbl                                         512
+     DownFlagSet                                       2
+     DownloadFlagClr                                   2
+     Crc16Calc                                        74
+     FLASHpAPBK_Check_Erase                           46
+     UpLoadData                                      112
+     UpLoadExtSRAM                                     4
+     SetBootBaudRate                                  60
+     DownloadFlagSet                                  16
+     ?Subroutine0                                     46
+     DownloadFlagSetExtSRAM                           14
+     DownLoadBootingJump                              14
+     DATEtoInt                                        78
+     ??DataTable17                                     4
+     ??DataTable17_1                                   4
+     ??DataTable17_2                                   4
+     ??DataTable17_3                                   4
+     ?<Constant "Jan">                                 4
+     ?<Constant "Feb">                                 4
+     ?<Constant "Mar">                                 4
+     ?<Constant "Apr">                                 4
+     ?<Constant "May">                                 4
+     ?<Constant "Jun">                                 4
+     ?<Constant "Jul">                                 4
+     ?<Constant "Aug">                                 4
+     ?<Constant "Sep">                                 4
+     ?<Constant "Oct">                                 4
+     ?<Constant "Nov">                                 4
+     ?<Constant "Dec">                                 4
+     ?<Constant "data: %08x, len: %d, ...">           40
+     ?<Constant {&"Jan", &"Feb", &"Mar", &"Apr", &"   48
+
+ 
+    48 bytes in section .rodata
+ 1 084 bytes in section .text
+ 
+ 1 084 bytes of CODE  memory
+    48 bytes of CONST memory
+
+Errors: none
+Warnings: none

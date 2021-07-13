@@ -1,0 +1,770 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<project>
+  <fileVersion>2</fileVersion>
+  <fileChecksum>3739169306</fileChecksum>
+  <configuration>
+    <name>Debug</name>
+    <outputs>
+      <file>$PROJ_DIR$\Debug\Obj\serial6.pbi</file>
+      <file>$PROJ_DIR$\lib\ext\extdevlib.c</file>
+      <file>$PROJ_DIR$\lib\Vfd\clcdlib_v0.1.c</file>
+      <file>$PROJ_DIR$\Debug\Obj\timer_v0.1.pbi</file>
+      <file>$PROJ_DIR$\lib\Vfd\cLcdlib_v0.1.h</file>
+      <file>$PROJ_DIR$\lib\timer\timer_v0.1.h</file>
+      <file>$PROJ_DIR$\lib\include\timerext.h</file>
+      <file>$PROJ_DIR$\Debug\Exe\stm32FxC_lib_prj_v511.out</file>
+      <file>$PROJ_DIR$\Debug\Obj\stm32FxC_lib_prj_v511.pbd</file>
+      <file>$PROJ_DIR$\lib\include\cLcdlibExt.h</file>
+      <file>$PROJ_DIR$\lib\at24c64\eep_24c64_v0.1.c</file>
+      <file>$PROJ_DIR$\lib\keybuzz\Keybuz5key_v0901.c</file>
+      <file>$PROJ_DIR$\lib\16c550\serial6.c</file>
+      <file>$PROJ_DIR$\lib\timer\timer_v0.1.c</file>
+      <file>$PROJ_DIR$\lib\uart1\usart1_v0.1.c</file>
+      <file>$PROJ_DIR$\lib\uart2\usart2_v0903.c</file>
+      <file>$PROJ_DIR$\lib\uart3\usart3_v0.1.c</file>
+      <file>$PROJ_DIR$\lib\uart4\usart4_v0.1.c</file>
+      <file>$PROJ_DIR$\lib\uart5\usart5_v0.1.c</file>
+      <file>$PROJ_DIR$\lib\include\USART5ext.h</file>
+      <file>$PROJ_DIR$\lib\uart3\usart3_v0.1.h</file>
+      <file>$TOOLKIT_DIR$\inc\DLib_Threads.h</file>
+      <file>$PROJ_DIR$\lib\uart2\usart2_v0.1.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\usart4_v0.1.pbi</file>
+      <file>$PROJ_DIR$\lib\uart5\usart5_v0.1.h</file>
+      <file>$TOOLKIT_DIR$\inc\DLib_Config_Normal.h</file>
+      <file>$PROJ_DIR$\lib\16c550\Serial6.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\usart5_v0.1.pbi</file>
+      <file>$PROJ_DIR$\lib\keybuzz\KeyBuz5Key_v0901.h</file>
+      <file>$PROJ_DIR$\lib\include\usart2ext.h</file>
+      <file>$TOOLKIT_DIR$\inc\stdarg.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\usart3_v0.1.pbi</file>
+      <file>$TOOLKIT_DIR$\inc\string.h</file>
+      <file>$PROJ_DIR$\lib\include\extdevlibext.h</file>
+      <file>$TOOLKIT_DIR$\inc\ycheck.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\eep_24c64_v0.1.pbi</file>
+      <file>$TOOLKIT_DIR$\inc\stdio.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\Keybuz5key_v0901.pbi</file>
+      <file>$PROJ_DIR$\lib\include\usart1ext.h</file>
+      <file>$PROJ_DIR$\lib\include\USART4ext.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\extdevlib.pbi</file>
+      <file>$PROJ_DIR$\lib\include\eepext.h</file>
+      <file>$PROJ_DIR$\lib\include\KeyBuzExt.h</file>
+      <file>$TOOLKIT_DIR$\inc\stdlib.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\usart1_v0.1.pbi</file>
+      <file>$TOOLKIT_DIR$\inc\DLib_Product_string.h</file>
+      <file>$TOOLKIT_DIR$\inc\yvals.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\clcdlib_v0.1.pbi</file>
+      <file>$PROJ_DIR$\lib\ext\extdevlib.h</file>
+      <file>$PROJ_DIR$\lib\uart4\usart4_v0.1.h</file>
+      <file>$PROJ_DIR$\lib\include\usart3ext.h</file>
+      <file>$TOOLKIT_DIR$\inc\xencoding_limits.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\usart2_v0903.pbi</file>
+      <file>$PROJ_DIR$\lib\at24c64\eep_24c64_v0.1.h</file>
+      <file>$TOOLKIT_DIR$\inc\DLib_Defaults.h</file>
+      <file>$PROJ_DIR$\lib\include\uart16550ext.h</file>
+      <file>$TOOLKIT_DIR$\inc\ysizet.h</file>
+      <file>$TOOLKIT_DIR$\inc\DLib_Product.h</file>
+      <file>$PROJ_DIR$\lib\uart1\usart1_v0.1.h</file>
+    </outputs>
+    <file>
+      <name>[ROOT_NODE]</name>
+      <outputs>
+        <tool>
+          <name>ILINK</name>
+          <file> 7</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\lib\ext\extdevlib.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 40</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 30 34 46 54 25 57 51 21 43 56 36 32 45</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 30 34 46 54 57 51 21 43 56 36 32 45 33 48</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\lib\Vfd\clcdlib_v0.1.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 47</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 9 4</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\Debug\Obj\stm32FxC_lib_prj_v511.pbd</name>
+      <inputs>
+        <tool>
+          <name>BILINK</name>
+          <file> 37 47 35 40 0 3 44 52 31 23 27</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\lib\at24c64\eep_24c64_v0.1.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 35</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 41 53</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\lib\keybuzz\Keybuz5key_v0901.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 37</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 30 34 46 54 25 57 51 21 43 56 36</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 30 34 46 54 57 51 21 43 56 36 42 28</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\lib\16c550\serial6.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 0</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 30 34 46 54 25 57 51 21 43 56 36 32 45</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 30 34 46 54 57 51 21 43 56 36 32 45 55 26</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\lib\timer\timer_v0.1.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 3</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 6 5</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\lib\uart1\usart1_v0.1.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 44</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 38 58</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\lib\uart2\usart2_v0903.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 52</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 29 22</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\lib\uart3\usart3_v0.1.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 31</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 30 34 46 54 25 57 51 21 43 56 36</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 30 34 46 54 57 51 21 43 56 36 50 20</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\lib\uart4\usart4_v0.1.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 23</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 39 49</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\lib\uart5\usart5_v0.1.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 27</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 19 24</file>
+        </tool>
+      </inputs>
+    </file>
+    <forcedrebuild>
+      <name>[MULTI_TOOL]</name>
+      <tool>ILINK</tool>
+    </forcedrebuild>
+  </configuration>
+  <configuration>
+    <name>Release</name>
+    <outputs>
+      <file>$PROJ_DIR$\sout\usart3_v0.1.lst</file>
+      <file>$PROJ_DIR$\sout\usart3_v0.1.pbi</file>
+      <file>$PROJ_DIR$\lib_stm32\inc\stm32f10x_tim1_v0901.h</file>
+      <file>$PROJ_DIR$\lib_stm32\inc\stm32f10x_rcc_v0901.h</file>
+      <file>$PROJ_DIR$\lib_stm32\inc\stm32f10x_iwdg.h</file>
+      <file>$PROJ_DIR$\sout\eep_24c64_v0.1.lst</file>
+      <file>$PROJ_DIR$\sout\timer_v0.1.lst</file>
+      <file>$PROJ_DIR$\sout\clcdlib_v0.1.pbi</file>
+      <file>$PROJ_DIR$\lib_stm32\inc\stm32f10x_bkp.h</file>
+      <file>$PROJ_DIR$\sout\Keybuz5key_v0901.o</file>
+      <file>$PROJ_DIR$\sout\usart1_v0.1.lst</file>
+      <file>$PROJ_DIR$\sout\usart5_v0.1.lst</file>
+      <file>$PROJ_DIR$\sout\usart2_v0903.pbi</file>
+      <file>$PROJ_DIR$\sout\clcdlib_v0.1.lst</file>
+      <file>$PROJ_DIR$\lib\include\bellext_v0112.h</file>
+      <file>$PROJ_DIR$\sout\stm32FxC_lib_prj_v511.pbd</file>
+      <file>$PROJ_DIR$\lib_stm32\inc\stm32f10x_pwr.h</file>
+      <file>$PROJ_DIR$\sout\timer_v0.1.pbi</file>
+      <file>$PROJ_DIR$\lib_stm32\inc\stm32f10x_i2c.h</file>
+      <file>$PROJ_DIR$\sout\eep_24c64_v0.1.pbi</file>
+      <file>$PROJ_DIR$\lib\bellwave860\bell860s.c</file>
+      <file>$PROJ_DIR$\sout\usart4_v0.1.o</file>
+      <file>$PROJ_DIR$\stm32FxC_lib_gsi_201001.a</file>
+      <file>$PROJ_DIR$\sout\bell860s_v0112.pbi</file>
+      <file>$PROJ_DIR$\include\stm32f10x_conf.h</file>
+      <file>$PROJ_DIR$\lib_stm32\inc\stm32f10x_map_v0902.h</file>
+      <file>$PROJ_DIR$\lib_stm32\inc\stm32f10x_adc_0902.h</file>
+      <file>$PROJ_DIR$\dev\mem\fsmc_sram.h</file>
+      <file>$PROJ_DIR$\lib_stm32\inc\stm32f10x_gpio_v0903.h</file>
+      <file>$PROJ_DIR$\lib\uart2\usart2_v0.1.c</file>
+      <file>$PROJ_DIR$\sout\Keybuz5key_v0901.pbi</file>
+      <file>$PROJ_DIR$\sout\serial6.pbi</file>
+      <file>$PROJ_DIR$\lib_stm32\inc\stm32f10x_exti_v0903.h</file>
+      <file>$PROJ_DIR$\lib_stm32\inc\stm32f10x_fsmc.h</file>
+      <file>$PROJ_DIR$\sout\serial6.o</file>
+      <file>$PROJ_DIR$\lib_stm32\inc\stm32f10x_can.h</file>
+      <file>$PROJ_DIR$\sout\Keybuz5key_v0901.lst</file>
+      <file>$PROJ_DIR$\sout\usart4_v0.1.pbi</file>
+      <file>$PROJ_DIR$\sout\bell860s.lst</file>
+      <file>$PROJ_DIR$\sout\usart5_v0.1.o</file>
+      <file>$PROJ_DIR$\lib_stm32\inc\stm32f10x_tim.h</file>
+      <file>$PROJ_DIR$\sout\clcdlib_v0.1.o</file>
+      <file>$PROJ_DIR$\sout\usart1_v0.1.pbi</file>
+      <file>$PROJ_DIR$\sout\usart4_v0.1.lst</file>
+      <file>$PROJ_DIR$\sout\extdevlib.o</file>
+      <file>$PROJ_DIR$\sout\timer_v0.1.o</file>
+      <file>$PROJ_DIR$\sout\usart2_v0.1.o</file>
+      <file>$PROJ_DIR$\sout\extdevlib.pbi</file>
+      <file>$PROJ_DIR$\sout\usart1_v0.1.o</file>
+      <file>$PROJ_DIR$\stm32FxC_lib_gsi_20100114.a</file>
+      <file>$PROJ_DIR$\include\os_cfg.h</file>
+      <file>$PROJ_DIR$\lib_stm32\inc\stm32f10x_wwdg.h</file>
+      <file>$PROJ_DIR$\lib_stm32\inc\cortexm3_macro.h</file>
+      <file>$PROJ_DIR$\sout\eep_24c64_v0.1.o</file>
+      <file>$PROJ_DIR$\sout\bell860s_v0112.lst</file>
+      <file>$PROJ_DIR$\lib_stm32\inc\stm32f10x_dac.h</file>
+      <file>$PROJ_DIR$\sout\bell860s.pbi</file>
+      <file>$PROJ_DIR$\lib\include\bellext.h</file>
+      <file>$PROJ_DIR$\lib_stm32\inc\stm32f10x_systick.h</file>
+      <file>$PROJ_DIR$\sout\usart2_v0903.o</file>
+      <file>$PROJ_DIR$\stm32FxC_lib_20090301.a</file>
+      <file>$PROJ_DIR$\uC-CPU\cpu.h</file>
+      <file>$PROJ_DIR$\sout\usart2_v0903.lst</file>
+      <file>$PROJ_DIR$\sout\usart2_v0.1.lst</file>
+      <file>$PROJ_DIR$\uCOS-II\Source\ucos_ii.h</file>
+      <file>$PROJ_DIR$\sout\bell860s_v0112.o</file>
+      <file>$PROJ_DIR$\lib_stm32\inc\stm32f10x_gpio_v0901.h</file>
+      <file>$PROJ_DIR$\lib_stm32\inc\stm32f10x_usart.h</file>
+      <file>$PROJ_DIR$\lib_stm32\inc\stm32f10x_nvic_0902.h</file>
+      <file>$PROJ_DIR$\sout\usart3_v0.1.o</file>
+      <file>$PROJ_DIR$\lib\bellwave860\bell860s_v0112.c</file>
+      <file>$PROJ_DIR$\uCOS-II\Ports\os_cpu.h</file>
+      <file>$PROJ_DIR$\lib_stm32\inc\stm32f10x_type.h</file>
+      <file>$PROJ_DIR$\lib\ext\extdevlib.c</file>
+      <file>$PROJ_DIR$\lib\Vfd\clcdlib_v0.1.c</file>
+      <file>$PROJ_DIR$\lib\Vfd\cLcdlib_v0.1.h</file>
+      <file>$PROJ_DIR$\lib\timer\timer_v0.1.h</file>
+      <file>$PROJ_DIR$\lib\include\timerext.h</file>
+      <file>$PROJ_DIR$\lib\include\cLcdlibExt.h</file>
+      <file>$PROJ_DIR$\lib\at24c64\eep_24c64_v0.1.c</file>
+      <file>$PROJ_DIR$\lib\keybuzz\Keybuz5key_v0901.c</file>
+      <file>$PROJ_DIR$\lib\16c550\serial6.c</file>
+      <file>$PROJ_DIR$\lib\timer\timer_v0.1.c</file>
+      <file>$PROJ_DIR$\lib\uart1\usart1_v0.1.c</file>
+      <file>$PROJ_DIR$\lib\uart2\usart2_v0903.c</file>
+      <file>$PROJ_DIR$\lib\uart3\usart3_v0.1.c</file>
+      <file>$PROJ_DIR$\lib\uart4\usart4_v0.1.c</file>
+      <file>$PROJ_DIR$\lib\uart5\usart5_v0.1.c</file>
+      <file>$PROJ_DIR$\lib\include\USART5ext.h</file>
+      <file>$PROJ_DIR$\lib\uart3\usart3_v0.1.h</file>
+      <file>$TOOLKIT_DIR$\inc\DLib_Threads.h</file>
+      <file>$PROJ_DIR$\lib\uart2\usart2_v0.1.h</file>
+      <file>$PROJ_DIR$\lib\uart5\usart5_v0.1.h</file>
+      <file>$TOOLKIT_DIR$\inc\DLib_Config_Normal.h</file>
+      <file>$PROJ_DIR$\lib\16c550\Serial6.h</file>
+      <file>$PROJ_DIR$\lib\keybuzz\KeyBuz5Key_v0901.h</file>
+      <file>$PROJ_DIR$\lib\include\usart2ext.h</file>
+      <file>$TOOLKIT_DIR$\inc\stdarg.h</file>
+      <file>$TOOLKIT_DIR$\inc\string.h</file>
+      <file>$PROJ_DIR$\lib\include\extdevlibext.h</file>
+      <file>$TOOLKIT_DIR$\inc\ycheck.h</file>
+      <file>$TOOLKIT_DIR$\inc\stdio.h</file>
+      <file>$PROJ_DIR$\lib\include\usart1ext.h</file>
+      <file>$PROJ_DIR$\lib\include\USART4ext.h</file>
+      <file>$PROJ_DIR$\lib\include\eepext.h</file>
+      <file>$PROJ_DIR$\lib\include\KeyBuzExt.h</file>
+      <file>$TOOLKIT_DIR$\inc\stdlib.h</file>
+      <file>$TOOLKIT_DIR$\inc\DLib_Product_string.h</file>
+      <file>$TOOLKIT_DIR$\inc\yvals.h</file>
+      <file>$PROJ_DIR$\lib\ext\extdevlib.h</file>
+      <file>$PROJ_DIR$\lib\uart4\usart4_v0.1.h</file>
+      <file>$PROJ_DIR$\lib\include\usart3ext.h</file>
+      <file>$TOOLKIT_DIR$\inc\xencoding_limits.h</file>
+      <file>$PROJ_DIR$\lib\at24c64\eep_24c64_v0.1.h</file>
+      <file>$TOOLKIT_DIR$\inc\DLib_Defaults.h</file>
+      <file>$PROJ_DIR$\lib\include\uart16550ext.h</file>
+      <file>$TOOLKIT_DIR$\inc\ysizet.h</file>
+      <file>$TOOLKIT_DIR$\inc\DLib_Product.h</file>
+      <file>$PROJ_DIR$\lib\uart1\usart1_v0.1.h</file>
+      <file>$PROJ_DIR$\stm32FxC_lib_20090210.a</file>
+      <file>$PROJ_DIR$\sout\extdevlib.lst</file>
+      <file>$PROJ_DIR$\lib_stm32\inc\stm32f10x_dma.h</file>
+      <file>$PROJ_DIR$\sout\bell860s.o</file>
+      <file>$PROJ_DIR$\lib_stm32\inc\stm32f10x_rtc.h</file>
+      <file>$PROJ_DIR$\lib_stm32\inc\stm32f10x_spi.h</file>
+      <file>$PROJ_DIR$\lib\bellwave860\bell860s.h</file>
+      <file>$PROJ_DIR$\sout\usart5_v0.1.pbi</file>
+      <file>$PROJ_DIR$\sout\serial6.lst</file>
+      <file>$PROJ_DIR$\lib_stm32\inc\stm32f10x_exti.h</file>
+      <file>$PROJ_DIR$\lib_stm32\inc\stm32f10x_flash.h</file>
+      <file>$PROJ_DIR$\lib\bellwave860\bell860s_v0112.h</file>
+    </outputs>
+    <file>
+      <name>[ROOT_NODE]</name>
+      <outputs>
+        <tool>
+          <name>IARCHIVE</name>
+          <file> 49</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\sout\stm32FxC_lib_prj_v511.pbd</name>
+      <inputs>
+        <tool>
+          <name>BILINK</name>
+          <file> 30 7 19 47 31 17 42 12 1 37 126</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\lib\bellwave860\bell860s.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 38 122</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 56</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 97 100 108 114 93 117 112 90 106 116 101 98 107 24 64 50 71 61 72 25 52 26 8 35 121 32 129 28 18 4 68 16 3 123 124 58 40 2 67 51 33 55 57 77 102 125</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 97 100 108 114 117 112 90 106 116 101 98 107 24 64 50 71 61 72 25 52 26 8 35 121 32 129 28 18 4 68 16 3 123 124 58 40 2 67 51 33 55 77 102 125</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\stm32FxC_lib_gsi_201001.a</name>
+      <inputs>
+        <tool>
+          <name>IARCHIVE</name>
+          <file> 9 41 53 44 34 45 48 59 69 21 39</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\lib\uart2\usart2_v0.1.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 46 63</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 24 97 100 108 114 93 117 112 90 106 116 101 98 107 64 50 71 61 72 25 52 26 8 35 121 128 129 66 18 4 68 16 3 123 124 58 40 2 67 51 33 55 96 91</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\stm32FxC_lib_20090301.a</name>
+      <inputs>
+        <tool>
+          <name>IARCHIVE</name>
+          <file> 9 41 53 44 34 45 48 59 69 21 39</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\lib\bellwave860\bell860s_v0112.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 54 65</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 23</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 97 100 108 114 93 117 112 90 106 116 101 98 107 24 64 50 71 61 72 25 52 26 8 35 121 32 129 28 18 4 68 16 3 123 124 58 40 2 67 51 33 55 14 77 102 130</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\lib\ext\extdevlib.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 120 44</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 47</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 97 100 108 114 93 117 112 90 106 116 101 98 107 64 50 71 61 72 24 25 52 26 8 35 121 32 129 28 18 4 68 16 3 123 124 58 40 2 67 51 33 55 99 109 27</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 97 100 108 114 117 112 90 106 116 101 98 107 64 50 71 61 72 24 25 52 26 8 35 121 32 129 28 18 4 68 16 3 123 124 58 40 2 67 51 33 55 99 109 27</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\lib\Vfd\clcdlib_v0.1.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 13 41</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 7</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 24 97 100 108 114 93 117 112 90 106 116 101 98 107 64 50 71 61 72 25 52 26 8 35 121 32 129 28 18 4 68 16 3 123 124 58 40 2 67 51 33 55 78 75</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 24 97 100 108 114 117 112 90 106 116 101 98 107 64 50 71 61 72 25 52 26 8 35 121 32 129 28 18 4 68 16 3 123 124 58 40 2 67 51 33 55 78 75</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\lib\at24c64\eep_24c64_v0.1.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 5 53</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 19</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 24 97 100 108 114 93 117 112 90 106 116 101 98 107 64 50 71 61 72 25 52 26 8 35 121 32 129 28 18 4 68 16 3 123 124 58 40 2 67 51 33 55 104 113</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 24 97 100 108 114 117 112 90 106 116 101 98 107 64 50 71 61 72 25 52 26 8 35 121 32 129 28 18 4 68 16 3 123 124 58 40 2 67 51 33 55 104 113</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\lib\keybuzz\Keybuz5key_v0901.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 36 9</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 30</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 97 100 108 114 93 117 112 90 106 116 101 24 98 107 64 50 71 61 72 25 52 26 8 35 121 32 129 28 18 4 68 16 3 123 124 58 40 2 67 51 33 55 105 95</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 97 100 108 114 117 112 90 106 116 101 24 98 107 64 50 71 61 72 25 52 26 8 35 121 32 129 28 18 4 68 16 3 123 124 58 40 2 67 51 33 55 105 95</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\lib\16c550\serial6.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 127 34</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 31</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 97 100 108 114 93 117 112 90 106 116 101 98 107 64 50 71 61 72 115 94</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 97 100 108 114 117 112 90 106 116 101 98 107 64 50 71 61 72 115 94</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\lib\timer\timer_v0.1.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 6 45</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 17</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 24 97 100 108 114 93 117 112 90 106 116 101 98 107 64 50 71 61 72 25 52 26 8 35 121 32 129 28 18 4 68 16 3 123 124 58 40 2 67 51 33 55 77 76</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 24 97 100 108 114 117 112 90 106 116 101 98 107 64 50 71 61 72 25 52 26 8 35 121 32 129 28 18 4 68 16 3 123 124 58 40 2 67 51 33 55 77 76</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\lib\uart1\usart1_v0.1.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 10 48</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 42</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 24 97 100 108 114 93 117 112 90 106 116 101 98 107 64 50 71 61 72 25 52 26 8 35 121 32 129 28 18 4 68 16 3 123 124 58 40 2 67 51 33 55 102 118</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 24 97 100 108 114 117 112 90 106 116 101 98 107 64 50 71 61 72 25 52 26 8 35 121 32 129 28 18 4 68 16 3 123 124 58 40 2 67 51 33 55 102 118</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\lib\uart2\usart2_v0903.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 62 59</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 12</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 24 97 100 108 114 93 117 112 90 106 116 101 98 107 64 50 71 61 72 25 52 26 8 35 121 32 129 28 18 4 68 16 3 123 124 58 40 2 67 51 33 55 96 91</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 24 97 100 108 114 117 112 90 106 116 101 98 107 64 50 71 61 72 25 52 26 8 35 121 32 129 28 18 4 68 16 3 123 124 58 40 2 67 51 33 55 96 91</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\lib\uart3\usart3_v0.1.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 0 69</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 1</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 97 100 108 114 93 117 112 90 106 116 101 24 98 107 64 50 71 61 72 25 52 26 8 35 121 32 129 28 18 4 68 16 3 123 124 58 40 2 67 51 33 55 111 89</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 97 100 108 114 117 112 90 106 116 101 24 98 107 64 50 71 61 72 25 52 26 8 35 121 32 129 28 18 4 68 16 3 123 124 58 40 2 67 51 33 55 111 89</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\lib\uart4\usart4_v0.1.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 43 21</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 37</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 24 97 100 108 114 93 117 112 90 106 116 101 98 107 64 50 71 61 72 25 52 26 8 35 121 32 129 28 18 4 68 16 3 123 124 58 40 2 67 51 33 55 103 110</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 24 97 100 108 114 117 112 90 106 116 101 98 107 64 50 71 61 72 25 52 26 8 35 121 32 129 28 18 4 68 16 3 123 124 58 40 2 67 51 33 55 103 110</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\lib\uart5\usart5_v0.1.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 11 39</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 126</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 24 97 100 108 114 93 117 112 90 106 116 101 98 107 64 50 71 61 72 25 52 26 8 35 121 32 129 28 18 4 68 16 3 123 124 58 40 2 67 51 33 55 88 92</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 24 97 100 108 114 117 112 90 106 116 101 98 107 64 50 71 61 72 25 52 26 8 35 121 32 129 28 18 4 68 16 3 123 124 58 40 2 67 51 33 55 88 92</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\stm32FxC_lib_20090210.a</name>
+      <inputs>
+        <tool>
+          <name>IARCHIVE</name>
+          <file> 9 41 53 34 45 48 59 69 21 39</file>
+        </tool>
+      </inputs>
+    </file>
+    <forcedrebuild>
+      <name>[MULTI_TOOL]</name>
+      <tool>ILINK</tool>
+    </forcedrebuild>
+  </configuration>
+</project>
+
+

@@ -1,0 +1,5 @@
+---- FilterRxCheck Matches (4 in 3 files) ----
+Apl_dtu.c (d:\test\project_2016\trio_md\3.f_w\trio_md_appl_stm207_20150327_20150518\code):void FilterRxCheck(INT8U* Data,INT16U nCnt)
+Apl_dtu.h (d:\test\project_2016\trio_md\3.f_w\trio_md_appl_stm207_20150327_20150518\include):void FilterRxCheck(INT8U* Data,INT16U nCnt);
+Download.c (d:\test\project_2016\trio_md\3.f_w\trio_md_appl_stm207_20150327_20150518\code):					FilterRxCheck(tptr,DataCount);
+Download.c (d:\test\project_2016\trio_md\3.f_w\trio_md_appl_stm207_20150327_20150518\code):				FilterRxCheck(tptr,DataCount);

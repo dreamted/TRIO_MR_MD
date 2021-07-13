@@ -1,0 +1,1106 @@
+###############################################################################
+#                                                                             #
+# IAR ANSI C/C++ Compiler V5.30.2.51295/W32 for ARM     09/Jun/2011  18:42:04 #
+# Copyright 1999-2009 IAR Systems AB.                                         #
+#                                                                             #
+#    Cpu mode     =  thumb                                                    #
+#    Endian       =  little                                                   #
+#    Source file  =  C:\user\project\HFR OTM-L12\fw\appl_otmL12_20110505_v1.0 #
+#                    \code\aa_ethernet0.c                                     #
+#    Command line =  "C:\user\project\HFR OTM-L12\fw\appl_otmL12_20110505_v1. #
+#                    0\code\aa_ethernet0.c" -lcN "C:\user\project\HFR         #
+#                    OTM-L12\fw\appl_otmL12_20110505_v1.0\sout\" -lB          #
+#                    "C:\user\project\HFR OTM-L12\fw\appl_otmL12_20110505_v1. #
+#                    0\sout\" -o "C:\user\project\HFR                         #
+#                    OTM-L12\fw\appl_otmL12_20110505_v1.0\sout\"              #
+#                    --endian=little --cpu=Cortex-M3 -e --require_prototypes  #
+#                    --fpu=None --dlib_config "C:\compiler\ewarm              #
+#                    5.3\arm\INC\DLib_Config_Normal.h" -I                     #
+#                    "C:\user\project\HFR OTM-L12\fw\appl_otmL12_20110505_v1. #
+#                    0\include\" -I "C:\user\project\HFR                      #
+#                    OTM-L12\fw\appl_otmL12_20110505_v1.0\lib_stm32\inc\" -I  #
+#                    "C:\user\project\HFR OTM-L12\fw\appl_otmL12_20110505_v1. #
+#                    0\lib_stm32\src\" -I "C:\user\project\HFR                #
+#                    OTM-L12\fw\appl_otmL12_20110505_v1.0\uC-CPU\" -I         #
+#                    "C:\user\project\HFR OTM-L12\fw\appl_otmL12_20110505_v1. #
+#                    0\uC-LIB\" -I "C:\user\project\HFR                       #
+#                    OTM-L12\fw\appl_otmL12_20110505_v1.0\uCOS-II\Ports\" -I  #
+#                    "C:\user\project\HFR OTM-L12\fw\appl_otmL12_20110505_v1. #
+#                    0\uCOS-II\Source\" -I "C:\user\project\HFR               #
+#                    OTM-L12\fw\appl_otmL12_20110505_v1.0\uC-Probe\" -I       #
+#                    "C:\compiler\ewarm 5.3\arm\INC\" -Oh                     #
+#    List file    =  C:\user\project\HFR OTM-L12\fw\appl_otmL12_20110505_v1.0 #
+#                    \sout\aa_ethernet0.lst                                   #
+#    Object file  =  C:\user\project\HFR OTM-L12\fw\appl_otmL12_20110505_v1.0 #
+#                    \sout\aa_ethernet0.o                                     #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+C:\user\project\HFR OTM-L12\fw\appl_otmL12_20110505_v1.0\code\aa_ethernet0.c
+      1          
+      2          /******************** (C) COPYRIGHT 2008 PILOG, NSINFO *************************
+      3          * File Name          : exlib.c
+      4          * Author             : Yoon Byong-Gyu(bgyoon@naver.com)
+      5          * Date First Issued  : 02/01/2008
+      6          * Description        : This file provides all the port/input/update firmware functions.
+      7          * $Revision: 0.1 $
+      8          * $Revision date: 2008.01.__
+      9          ********************************************************************************/
+     10          
+     11          #define ETH0_C
+     12          
+     13          #include "../dev/W3150A_v1.0.6/types.h"
+     14          #include "../dev/W3150A_v1.0.6/socket.h"
+     15          #include "../dev/W3150A_v1.0.6/w3150a.h"
+     16          
+     17          #include "../include/main.h"
+     18          
+     19          //#define udp_debug
+     20          
+     21          void Ethenet0Init(void)
+     22          {
+     23          
+     24          	Wrcs0->CheckByte = ret0CheckByte;
+     25          	Wrcs0->RxGetByte = ret0GetByte;
+     26          	Wrcs0->PutStr = udp0PutStr;
+     27          	Wrcs0->TxCheckByte = NULL;
+     28          
+     29          	Wrcs0->TimerRx = Timerudp0Rx;
+     30          	Wrcs0->WRCSRecv = &Rwrcs0;
+     31          	Wrcs0->WRCSSend = &Swrcs0;
+     32          	Wrcs0->nUSE = ETH0_CHANNEL;
+     33          	Wrcs0->OSSem = OSSemCreate(1);
+     34          
+     35          ////////////////////////////////////////////////////////////////////////////////
+     36          	udpSem[ETH0_CHANNEL] = OSSemCreate(1);
+     37          	EthernetPortReset();
+     38          	OSTaskCreate(Ethernet0Task, (void *)NULL, (OS_STK *)&Eth0TaskStk[ETH0_START_STK_SIZE - 1], ETH0_START_PRIO);
+     39          	AlarmRptFuncInit();
+     40          }
+     41          
+     42          
+     43          
+     44          // UDP CASE !!(SERVER)
+     45          void Ethernet0Task(void *p_arg)
+     46          {
+     47          	INT8U s = 0;
+     48          	INT8U nUSE = Wrcs0->nUSE;
+     49          	INT8U len;
+     50          	
+     51          	__ProtocolPtr *nPtr = Wrcs0;
+     52          	
+     53          	OSTimeDly(100L*ETH0_START_PRIO);
+     54          
+     55          	EthernetInitSet(nUSE, Sn_MR_UDP, TRUE);
+     56          	TimerRegist(TimerAlm0, Time1Sec*10L);
+     57          	TimerRegist(TimerInform, Time1Sec*20L);
+     58          	
+     59          	udp0SetAddr(returnip[nUSE], returnport[nUSE]);
+     60          
+     61          	while(1)
+     62          	{
+     63          
+     64          		if(eLink_Check(nUSE) && !tTestFlag)
+     65          		{
+     66          			while(eLink_Check(nUSE) && !tTestFlag)
+     67          			{
+     68          				StsCheckConnectionRst(nPtr);
+     69          				
+     70          				if(!WRCS_DownLoadGiveupTimerSet(NULL))
+     71          				{
+     72          					if(TimeOverCheck(TimerAlm0))
+     73          					{	
+     74          						TimerRegist(TimerAlm0, Time1Sec);
+     75          						AlarmRptFunc();
+     76          					}
+     77          					if(TimeOverCheck(TimerInform))
+     78          					{	
+     79          						AutoInformRptFunc();
+     80          					}
+     81          				}
+     82          				OSTimeDly(300L);
+     83          			}
+     84          			EthernetInitSet(nUSE, Sn_MR_UDP, FALSE);
+     85          			OSTimeDly(1000L);
+     86          		}
+     87          		while(!eLink_Check(nUSE) && !tTestFlag)
+     88          		{
+     89          			StsCheckConnectionRst(nPtr);
+     90          
+     91          			if(!WRCS_DownLoadGiveupTimerSet(NULL))
+     92          			{
+     93          				if(TimeOverCheck(TimerAlm0))
+     94          				{	
+     95          					TimerRegist(TimerAlm0, Time1Sec);
+     96          					AlarmRptFunc();
+     97          				}
+     98          				if(TimeOverCheck(TimerInform))
+     99          				{	
+    100          					AutoInformRptFunc();
+    101          				}
+    102          			}
+    103          			
+    104          			if( (len = retSelect(nUSE, s, returnip[nUSE], &returnport[nUSE])))
+    105          			{
+    106          				INT16U Recv;
+    107                          
+    108                          len = len;
+    109          
+    110          			    while(nPtr->CheckByte(1, &Recv))
+    111          				{
+    112          					if(WRCS_ProtocolCheck(nPtr))
+    113          					{
+    114          #if TWO_BODY >= 2
+    115          						while(nPtr->WRCSRecv->cBody  <=  nPtr->WRCSRecv->BodyNo)
+    116          						{
+    117          #endif
+    118          							udp0SetAddr(returnip[nUSE], returnport[nUSE]);
+    119          							ProtocolComCheck(nPtr);
+    120          #if TWO_BODY >= 2
+    121          							nPtr->WRCSRecv->cBody++;
+    122          						}
+    123          #endif
+    124          					}
+    125          				}
+    126          			
+    127          			}
+    128          			OSTimeDly(200L);
+    129          		}
+    130          		OSTimeDly(200L);
+    131          	}
+    132          }
+    133          
+    134          void AlarmRptFuncInit(void)
+    135          {
+    136          	INT8U i = 0, j = 0;
+    137          
+    138          	for(i = 0; i < DnrMaxID; i++)
+    139          	{	
+    140          		for(j = 0; j < DnrMaxID; j++)
+    141          		{
+    142          			memset((void*)&pDnrAlarm[i][j], 0, sizeof(__pDnrAlmStr));
+    143          			memset((void*)&pDnrAlarmPre[i][j], 0, sizeof(__pDnrAlmStr));
+    144          			memset((void*)&pDnrAlarmChange[i][j], 0, sizeof(__pDnrAlmStr));
+    145          			memset((void*)&pDnrAlarmTimer[i][j], 0, sizeof(__pDnrAlmStr));		
+    146          		}
+    147          	}
+    148          }
+    149          
+    150          void AutoInformRptFunc(void)	// Module Inventory Auto
+    151          {
+    152          	INT8U i = 0, j = 0;
+    153          	INT16U tcnt = 0;
+    154          	INT8U *dptr = Wrcs0->WRCSRecv->BodyFrame[0].SubData;
+    155          
+    156          	INT8U id0, id1, id2;
+    157          	
+    158          	for(i = 0; i < DnrMaxID; i++)
+    159          	{
+    160          		for(j = 0; j < DnrMaxID; j++)
+    161          		{
+    162          			tcnt = GenModuleAutoInformSts(dptr, i, j);
+    163          			IsItRtnMyVALtoSysID(&id0, &id1, &id2, i, j);
+    164          
+    165          			pBodyFrameTx(id0, id1, id2, dptr, tcnt, AutoModuleInformQue, PcSer, NULL);
+    166          			pBodyFrameTx(id0, id1, id2, dptr, tcnt, AutoModuleInformQue, Wrcs0, NULL);
+    167          		}
+    168          	}
+    169          
+    170          	for(i = 0; i < DnrMaxID; i++)
+    171          	{
+    172          		for(j = 0; j < DnrMaxID; j++)
+    173          		{
+    174          			
+    175          			dptr[0] = 0x30;
+    176          			tcnt = GenModuleAutoInformSts(&dptr[1], i, j) + 1;
+    177          			IsItRtnMyVALtoSysID(&id0, &id1, &id2, i, j);
+    178          			RCSDataAckTx(id0, id1, dptr, tcnt, MyPortID, AutoModuleInformQue);
+    179          		}
+    180          	}
+    181          }
+    182          
+    183          
+    184          void AlarmRptFunc(void)
+    185          {
+    186          	INT8U i = 0, j = 0;
+    187          ///////////////////////////////////////////////////////////////////////////////////////////////////////
+    188          
+    189          	for(i = 0; i < DnrMaxID; i++)
+    190          	{
+    191          		for(j = 0; j < DnrMaxID; j++)
+    192          		{
+    193          			if(ServAlmSndCnt[i][j] >= 3){
+    194          				ServAlmSndCnt[i][j] = 0;
+    195          				
+    196          				MyRstCase.SERVERRstCase[i][j] = 0x00;
+    197          			}
+    198          			else
+    199                      {		
+    200          				if(ServAlmSndCnt[i][j])	DnrAlarmRptFunc(i, j);
+    201          				else {
+    202                              if(DnrAlarmCheckUpdate(i, j)) DnrAlarmRptFunc(i, j);
+    203          				}
+    204          			}
+    205          		}
+    206          	}
+    207          }
+    208          
+    209          INT32U DnrAlarmCheckUpdate(INT8U tmpDnr, INT8U tmpRmt)
+    210          {
+    211          
+    212          	INT8U  i = 0;
+    213          	INT8U *CurSts = (INT8U *)&pDnrAlarm[tmpDnr][tmpRmt];
+    214          	INT8U *PreSts = (INT8U *)&pDnrAlarmPre[tmpDnr][tmpRmt];
+    215          	INT8U *ChangeFlag = (INT8U *)&pDnrAlarmChange[tmpDnr][tmpRmt];
+    216          	INT8U *AlarmTimer = (INT8U *)&pDnrAlarmTimer[tmpDnr][tmpRmt];
+    217          	INT8U tCnt = 0;
+    218          
+    219          	pDnrAlarm[tmpDnr][tmpRmt].TempUpperLmt   		= DnrSts[tmpDnr][tmpRmt].tmpAlm.TempUpperLmt 		& DnrSts[tmpDnr][tmpRmt].Flag.TempUpperLmt;
+    220          	pDnrAlarm[tmpDnr][tmpRmt].StsConFail       		= DnrSts[tmpDnr][tmpRmt].tmpAlm.StsConFail 			& DnrSts[tmpDnr][tmpRmt].Flag.StsConFail;
+    221          	pDnrAlarm[tmpDnr][tmpRmt].WestPathLossFail 		= DnrSts[tmpDnr][tmpRmt].tmpAlm.WestPathLossFail 	& DnrSts[tmpDnr][tmpRmt].Flag.WestPathLossFail;
+    222          	pDnrAlarm[tmpDnr][tmpRmt].LinkFail           	= DnrSts[tmpDnr][tmpRmt].tmpAlm.LinkFail 			& DnrSts[tmpDnr][tmpRmt].Flag.LinkFail;
+    223          
+    224          	pDnrAlarm[tmpDnr][tmpRmt].EastPathLossFail    	= DnrSts[tmpDnr][tmpRmt].tmpAlm.EastPathLossFail 	& DnrSts[tmpDnr][tmpRmt].Flag.EastPathLossFail;
+    225          	pDnrAlarm[tmpDnr][tmpRmt].WestSubPassLossFail 	= DnrSts[tmpDnr][tmpRmt].tmpAlm.WestSubPassLossFail & DnrSts[tmpDnr][tmpRmt].Flag.WestSubPassLossFail;
+    226          	pDnrAlarm[tmpDnr][tmpRmt].EastSubPassLossFail	= DnrSts[tmpDnr][tmpRmt].tmpAlm.EastSubPassLossFail	& DnrSts[tmpDnr][tmpRmt].Flag.EastSubPassLossFail;
+    227          	pDnrAlarm[tmpDnr][tmpRmt].SFP7LDFail 			= DnrSts[tmpDnr][tmpRmt].tmpAlm.SFP7LDFail 			& DnrSts[tmpDnr][tmpRmt].Flag.SFP7LDFail;
+    228          
+    229          	pDnrAlarm[tmpDnr][tmpRmt].SFP6LDFail 			= DnrSts[tmpDnr][tmpRmt].tmpAlm.SFP6LDFail 			& DnrSts[tmpDnr][tmpRmt].Flag.SFP6LDFail;
+    230          	pDnrAlarm[tmpDnr][tmpRmt].SFP5LDFail 			= DnrSts[tmpDnr][tmpRmt].tmpAlm.SFP5LDFail 			& DnrSts[tmpDnr][tmpRmt].Flag.SFP5LDFail;
+    231          	pDnrAlarm[tmpDnr][tmpRmt].SFP4LDFail 			= DnrSts[tmpDnr][tmpRmt].tmpAlm.SFP4LDFail 			& DnrSts[tmpDnr][tmpRmt].Flag.SFP4LDFail;
+    232          	pDnrAlarm[tmpDnr][tmpRmt].SFP3LDFail 			= DnrSts[tmpDnr][tmpRmt].tmpAlm.SFP3LDFail 			& DnrSts[tmpDnr][tmpRmt].Flag.SFP3LDFail;
+    233          
+    234          	pDnrAlarm[tmpDnr][tmpRmt].SFP2LDFail 			= DnrSts[tmpDnr][tmpRmt].tmpAlm.SFP2LDFail 			& DnrSts[tmpDnr][tmpRmt].Flag.SFP2LDFail;
+    235          	pDnrAlarm[tmpDnr][tmpRmt].SFP1LDFail 			= DnrSts[tmpDnr][tmpRmt].tmpAlm.SFP1LDFail 			& DnrSts[tmpDnr][tmpRmt].Flag.SFP1LDFail;
+    236          	pDnrAlarm[tmpDnr][tmpRmt].SFP0LDFail 			= DnrSts[tmpDnr][tmpRmt].tmpAlm.SFP0LDFail 			& DnrSts[tmpDnr][tmpRmt].Flag.SFP0LDFail;
+    237          	pDnrAlarm[tmpDnr][tmpRmt].SFP11LDFail			= DnrSts[tmpDnr][tmpRmt].tmpAlm.SFP11LDFail 		& DnrSts[tmpDnr][tmpRmt].Flag.SFP11LDFail;
+    238          
+    239          	pDnrAlarm[tmpDnr][tmpRmt].SFP10LDFail			= DnrSts[tmpDnr][tmpRmt].tmpAlm.SFP10LDFail 		& DnrSts[tmpDnr][tmpRmt].Flag.SFP10LDFail;
+    240          	pDnrAlarm[tmpDnr][tmpRmt].SFP9LDFail 			= DnrSts[tmpDnr][tmpRmt].tmpAlm.SFP9LDFail 			& DnrSts[tmpDnr][tmpRmt].Flag.SFP9LDFail;
+    241          	pDnrAlarm[tmpDnr][tmpRmt].SFP8LDFail 			= DnrSts[tmpDnr][tmpRmt].tmpAlm.SFP8LDFail 			& DnrSts[tmpDnr][tmpRmt].Flag.SFP8LDFail;
+    242          	pDnrAlarm[tmpDnr][tmpRmt].SFP7PDFail 			= DnrSts[tmpDnr][tmpRmt].tmpAlm.SFP7PDFail 			& DnrSts[tmpDnr][tmpRmt].Flag.SFP7PDFail;
+    243          
+    244          	pDnrAlarm[tmpDnr][tmpRmt].SFP6PDFail 			= DnrSts[tmpDnr][tmpRmt].tmpAlm.SFP6PDFail 			& DnrSts[tmpDnr][tmpRmt].Flag.SFP6PDFail;
+    245          	pDnrAlarm[tmpDnr][tmpRmt].SFP5PDFail 			= DnrSts[tmpDnr][tmpRmt].tmpAlm.SFP5PDFail 			& DnrSts[tmpDnr][tmpRmt].Flag.SFP5PDFail;
+    246          	pDnrAlarm[tmpDnr][tmpRmt].SFP4PDFail 			= DnrSts[tmpDnr][tmpRmt].tmpAlm.SFP4PDFail 			& DnrSts[tmpDnr][tmpRmt].Flag.SFP4PDFail;
+    247          	pDnrAlarm[tmpDnr][tmpRmt].SFP3PDFail 			= DnrSts[tmpDnr][tmpRmt].tmpAlm.SFP3PDFail 			& DnrSts[tmpDnr][tmpRmt].Flag.SFP3PDFail;
+    248          	
+    249          	pDnrAlarm[tmpDnr][tmpRmt].SFP2PDFail 			= DnrSts[tmpDnr][tmpRmt].tmpAlm.SFP2PDFail 			& DnrSts[tmpDnr][tmpRmt].Flag.SFP2PDFail;
+    250          	pDnrAlarm[tmpDnr][tmpRmt].SFP1PDFail 			= DnrSts[tmpDnr][tmpRmt].tmpAlm.SFP1PDFail 			& DnrSts[tmpDnr][tmpRmt].Flag.SFP1PDFail;
+    251          	pDnrAlarm[tmpDnr][tmpRmt].SFP0PDFail 			= DnrSts[tmpDnr][tmpRmt].tmpAlm.SFP0PDFail 			& DnrSts[tmpDnr][tmpRmt].Flag.SFP0PDFail;
+    252          	pDnrAlarm[tmpDnr][tmpRmt].SFP11PDFail			= DnrSts[tmpDnr][tmpRmt].tmpAlm.SFP11PDFail 		& DnrSts[tmpDnr][tmpRmt].Flag.SFP11PDFail;
+    253          
+    254          	pDnrAlarm[tmpDnr][tmpRmt].SFP10PDFail 			= DnrSts[tmpDnr][tmpRmt].tmpAlm.SFP10PDFail 		& DnrSts[tmpDnr][tmpRmt].Flag.SFP10PDFail;
+    255          	pDnrAlarm[tmpDnr][tmpRmt].SFP9PDFail 			= DnrSts[tmpDnr][tmpRmt].tmpAlm.SFP9PDFail 			& DnrSts[tmpDnr][tmpRmt].Flag.SFP9PDFail;
+    256          	pDnrAlarm[tmpDnr][tmpRmt].SFP8PDFail 			= DnrSts[tmpDnr][tmpRmt].tmpAlm.SFP8PDFail 			& DnrSts[tmpDnr][tmpRmt].Flag.SFP8PDFail;
+    257          	pDnrAlarm[tmpDnr][tmpRmt].SFP7LOSFail 			= DnrSts[tmpDnr][tmpRmt].tmpAlm.SFP7LOSFail 		& DnrSts[tmpDnr][tmpRmt].Flag.SFP7LOSFail;
+    258          
+    259          	pDnrAlarm[tmpDnr][tmpRmt].SFP6LOSFail 			= DnrSts[tmpDnr][tmpRmt].tmpAlm.SFP6LOSFail 		& DnrSts[tmpDnr][tmpRmt].Flag.SFP6LOSFail;
+    260          	pDnrAlarm[tmpDnr][tmpRmt].SFP5LOSFail 			= DnrSts[tmpDnr][tmpRmt].tmpAlm.SFP5LOSFail 		& DnrSts[tmpDnr][tmpRmt].Flag.SFP5LOSFail;
+    261          	pDnrAlarm[tmpDnr][tmpRmt].SFP4LOSFail 			= DnrSts[tmpDnr][tmpRmt].tmpAlm.SFP4LOSFail 		& DnrSts[tmpDnr][tmpRmt].Flag.SFP4LOSFail;
+    262          	pDnrAlarm[tmpDnr][tmpRmt].SFP3LOSFail 			= DnrSts[tmpDnr][tmpRmt].tmpAlm.SFP3LOSFail 		& DnrSts[tmpDnr][tmpRmt].Flag.SFP3LOSFail;
+    263          
+    264          	pDnrAlarm[tmpDnr][tmpRmt].SFP2LOSFail 			= DnrSts[tmpDnr][tmpRmt].tmpAlm.SFP2LOSFail 		& DnrSts[tmpDnr][tmpRmt].Flag.SFP2LOSFail;
+    265          	pDnrAlarm[tmpDnr][tmpRmt].SFP1LOSFail 			= DnrSts[tmpDnr][tmpRmt].tmpAlm.SFP1LOSFail 		& DnrSts[tmpDnr][tmpRmt].Flag.SFP1LOSFail;
+    266          	pDnrAlarm[tmpDnr][tmpRmt].SFP0LOSFail 			= DnrSts[tmpDnr][tmpRmt].tmpAlm.SFP0LOSFail 		& DnrSts[tmpDnr][tmpRmt].Flag.SFP0LOSFail;
+    267          	pDnrAlarm[tmpDnr][tmpRmt].SFP11LOSFail 			= DnrSts[tmpDnr][tmpRmt].tmpAlm.SFP11LOSFail 		& DnrSts[tmpDnr][tmpRmt].Flag.SFP11LOSFail;
+    268          
+    269          	pDnrAlarm[tmpDnr][tmpRmt].SFP10LOSFail 			= DnrSts[tmpDnr][tmpRmt].tmpAlm.SFP10LOSFail 		& DnrSts[tmpDnr][tmpRmt].Flag.SFP10LOSFail;
+    270          	pDnrAlarm[tmpDnr][tmpRmt].SFP9LOSFail 			= DnrSts[tmpDnr][tmpRmt].tmpAlm.SFP9LOSFail 		& DnrSts[tmpDnr][tmpRmt].Flag.SFP9LOSFail;
+    271          	pDnrAlarm[tmpDnr][tmpRmt].SFP8LOSFail 			= DnrSts[tmpDnr][tmpRmt].tmpAlm.SFP8LOSFail 		& DnrSts[tmpDnr][tmpRmt].Flag.SFP8LOSFail;
+    272          
+    273          
+    274          
+    275          ////////////////////////////////////////////////////////////////////////////////
+    276          	for(i = 0; i < sizeof(__pDnrAlmStr); i++)
+    277          	{
+    278          		tCnt += UPdateAlarm(CurSts + i, PreSts + i, ChangeFlag + i, AlarmTimer + i, 10L);
+    279          	}
+    280          	tCnt += MyRstCase.SERVERRstCase[tmpDnr][tmpRmt];
+    281          
+    282          	if(tCnt != 0) return TRUE;
+    283          
+    284          	return FALSE;
+    285          }
+    286          
+    287          
+    288          void DnrAlarmRptFunc(INT8U tmpDnr, INT8U tmpRmt)
+    289          {
+    290          
+    291          	INT8U *dptr = Wrcs0->WRCSRecv->BodyFrame[0].SubData;
+    292          	INT16U rlen = 0;
+    293          
+    294          	__pDnrAlmStr *cAlm = &pDnrAlarmChange[tmpDnr][tmpRmt];
+    295          	__pDnrAlmStr *pAlm = &pDnrAlarmPre[tmpDnr][tmpRmt];	
+    296          
+    297          	if(cAlm->TempUpperLmt)	{
+    298          		dptr[rlen++] = hibyte(Aid_TempUpperLmt);
+    299          		dptr[rlen++] = lobyte(Aid_TempUpperLmt);
+    300          		dptr[rlen++] = pAlm->TempUpperLmt;
+    301          		dptr[rlen++] = 0;
+    302          	}
+    303          	
+    304          	if(cAlm->StsConFail)	{
+    305          		dptr[rlen++] = hibyte(Aid_StsCheckCon);
+    306          		dptr[rlen++] = lobyte(Aid_StsCheckCon);
+    307          		dptr[rlen++] = pAlm->StsConFail;
+    308          		dptr[rlen++] = 0;
+    309          	}
+    310          
+    311          	if(cAlm->WestPathLossFail)	{
+    312          		dptr[rlen++] = hibyte(Aid_WestPathLossFail);
+    313          		dptr[rlen++] = lobyte(Aid_WestPathLossFail);
+    314          		dptr[rlen++] = pAlm->WestPathLossFail;
+    315          		dptr[rlen++] = 0;
+    316          	}
+    317          
+    318          	if(cAlm->LinkFail)	{
+    319          		
+    320          		dptr[rlen++] = hibyte(Aid_OWTMLinkFail);
+    321          		dptr[rlen++] = lobyte(Aid_OWTMLinkFail);
+    322          		dptr[rlen++] = pAlm->LinkFail;
+    323          		if(pAlm->LinkFail)
+    324          		{
+    325          			dptr[rlen++] = 0x01;
+    326          			dptr[rlen++] = 0x03;
+    327          		}
+    328          		else
+    329          		{
+    330          			dptr[rlen++] = 0x00;
+    331          		}
+    332          	}
+    333          	
+    334          	if(cAlm->EastPathLossFail){
+    335          		dptr[rlen++] = hibyte(Aid_EastPathLossFail);
+    336          		dptr[rlen++] = lobyte(Aid_EastPathLossFail);
+    337          		dptr[rlen++] = pAlm->EastPathLossFail;
+    338          		dptr[rlen++] = 0;
+    339          	}
+    340          
+    341          	if(cAlm->WestSubPassLossFail){
+    342          		dptr[rlen++] = hibyte(Aid_WestSubPassLossFail);
+    343          		dptr[rlen++] = lobyte(Aid_WestSubPassLossFail);
+    344          		dptr[rlen++] = pAlm->WestSubPassLossFail;
+    345          		dptr[rlen++] = 0;
+    346          	}
+    347          
+    348          	if(cAlm->EastSubPassLossFail){
+    349          		dptr[rlen++] = hibyte(Aid_EastSubPassLossFail);
+    350          		dptr[rlen++] = lobyte(Aid_EastSubPassLossFail);
+    351          		dptr[rlen++] = pAlm->WestSubPassLossFail;
+    352          		dptr[rlen++] = 0;
+    353          	}
+    354          
+    355          	if(cAlm->SFP0LDFail){
+    356          		dptr[rlen++] = hibyte(Aid_SFP0LDFail);
+    357          		dptr[rlen++] = lobyte(Aid_SFP0LDFail);
+    358          		dptr[rlen++] = pAlm->SFP0LDFail;
+    359          		dptr[rlen++] = 0;
+    360          	}
+    361          
+    362          	if(cAlm->SFP1LDFail){
+    363          		dptr[rlen++] = hibyte(Aid_SFP1LDFail);
+    364          		dptr[rlen++] = lobyte(Aid_SFP1LDFail);
+    365          		dptr[rlen++] = pAlm->SFP1LDFail;
+    366          		dptr[rlen++] = 0;
+    367          	}
+    368          	
+    369          	if(cAlm->SFP2LDFail){
+    370          		dptr[rlen++] = hibyte(Aid_SFP2LDFail);
+    371          		dptr[rlen++] = lobyte(Aid_SFP2LDFail);
+    372          		dptr[rlen++] = pAlm->SFP2LDFail;
+    373          		dptr[rlen++] = 0;
+    374          	}
+    375          	
+    376          	if(cAlm->SFP3LDFail){
+    377          		dptr[rlen++] = hibyte(Aid_SFP3LDFail);
+    378          		dptr[rlen++] = lobyte(Aid_SFP3LDFail);
+    379          		dptr[rlen++] = pAlm->SFP3LDFail;
+    380          		dptr[rlen++] = 0;
+    381          	}
+    382          
+    383          	if(cAlm->SFP4LDFail){
+    384          		dptr[rlen++] = hibyte(Aid_SFP4LDFail);
+    385          		dptr[rlen++] = lobyte(Aid_SFP4LDFail);
+    386          		dptr[rlen++] = pAlm->SFP4LDFail;
+    387          		dptr[rlen++] = 0;
+    388          	}
+    389          
+    390          	if(cAlm->SFP5LDFail){
+    391          		dptr[rlen++] = hibyte(Aid_SFP5LDFail);
+    392          		dptr[rlen++] = lobyte(Aid_SFP5LDFail);
+    393          		dptr[rlen++] = pAlm->SFP5LDFail;
+    394          		dptr[rlen++] = 0;
+    395          	}
+    396          
+    397          	if(cAlm->SFP6LDFail){
+    398          		dptr[rlen++] = hibyte(Aid_SFP6LDFail);
+    399          		dptr[rlen++] = lobyte(Aid_SFP6LDFail);
+    400          		dptr[rlen++] = pAlm->SFP6LDFail;
+    401          		dptr[rlen++] = 0;
+    402          	}
+    403          
+    404          	if(cAlm->SFP7LDFail){
+    405          		dptr[rlen++] = hibyte(Aid_SFP7LDFail);
+    406          		dptr[rlen++] = lobyte(Aid_SFP7LDFail);
+    407          		dptr[rlen++] = pAlm->SFP7LDFail;
+    408          		dptr[rlen++] = 0;
+    409          	}
+    410          	
+    411          	if(cAlm->SFP8LDFail){
+    412          		dptr[rlen++] = hibyte(Aid_SFP8LDFail);
+    413          		dptr[rlen++] = lobyte(Aid_SFP8LDFail);
+    414          		dptr[rlen++] = pAlm->SFP8LDFail;
+    415          		dptr[rlen++] = 0;
+    416          	}
+    417          	
+    418          	if(cAlm->SFP9LDFail){
+    419          		dptr[rlen++] = hibyte(Aid_SFP9LDFail);
+    420          		dptr[rlen++] = lobyte(Aid_SFP9LDFail);
+    421          		dptr[rlen++] = pAlm->SFP9LDFail;
+    422          		dptr[rlen++] = 0;
+    423          	}
+    424          	
+    425          	if(cAlm->SFP10LDFail){
+    426          		dptr[rlen++] = hibyte(Aid_SFP10LDFail);
+    427          		dptr[rlen++] = lobyte(Aid_SFP10LDFail);
+    428          		dptr[rlen++] = pAlm->SFP10LDFail;
+    429          		dptr[rlen++] = 0;
+    430          	}
+    431          
+    432          	
+    433          	if(cAlm->SFP0PDFail){
+    434          		dptr[rlen++] = hibyte(Aid_SFP0PDFail);
+    435          		dptr[rlen++] = lobyte(Aid_SFP0PDFail);
+    436          		dptr[rlen++] = pAlm->SFP0PDFail;
+    437          		dptr[rlen++] = 0;
+    438          	}
+    439          		
+    440          	if(cAlm->SFP1PDFail){
+    441          		dptr[rlen++] = hibyte(Aid_SFP1PDFail);
+    442          		dptr[rlen++] = lobyte(Aid_SFP1PDFail);
+    443          		dptr[rlen++] = pAlm->SFP1PDFail;
+    444          		dptr[rlen++] = 0;
+    445          	}
+    446          
+    447          	if(cAlm->SFP2PDFail){
+    448          		dptr[rlen++] = hibyte(Aid_SFP2PDFail);
+    449          		dptr[rlen++] = lobyte(Aid_SFP2PDFail);
+    450          		dptr[rlen++] = pAlm->SFP2PDFail;
+    451          		dptr[rlen++] = 0;
+    452          	}
+    453          
+    454          	if(cAlm->SFP3PDFail){
+    455          		dptr[rlen++] = hibyte(Aid_SFP3PDFail);
+    456          		dptr[rlen++] = lobyte(Aid_SFP3PDFail);
+    457          		dptr[rlen++] = pAlm->SFP3PDFail;
+    458          		dptr[rlen++] = 0;
+    459          	}
+    460          	
+    461          	if(cAlm->SFP11LDFail){
+    462          		dptr[rlen++] = hibyte(Aid_SFP11LDFail);
+    463          		dptr[rlen++] = lobyte(Aid_SFP11LDFail);
+    464          		dptr[rlen++] = pAlm->SFP11LDFail;
+    465          		dptr[rlen++] = 0;
+    466          	}
+    467          
+    468          	
+    469          	if(cAlm->SFP4PDFail){
+    470          		dptr[rlen++] = hibyte(Aid_SFP4PDFail);
+    471          		dptr[rlen++] = lobyte(Aid_SFP4PDFail);
+    472          		dptr[rlen++] = pAlm->SFP4PDFail;
+    473          		dptr[rlen++] = 0;
+    474          	}
+    475          	
+    476          	if(cAlm->SFP5PDFail){
+    477          		dptr[rlen++] = hibyte(Aid_SFP5PDFail);
+    478          		dptr[rlen++] = lobyte(Aid_SFP5PDFail);
+    479          		dptr[rlen++] = pAlm->SFP5PDFail;
+    480          		dptr[rlen++] = 0;
+    481          	}
+    482          
+    483          	if(cAlm->SFP6PDFail){
+    484          		dptr[rlen++] = hibyte(Aid_SFP6PDFail);
+    485          		dptr[rlen++] = lobyte(Aid_SFP6PDFail);
+    486          		dptr[rlen++] = pAlm->SFP6PDFail;
+    487          		dptr[rlen++] = 0;
+    488          	}
+    489          
+    490          	if(cAlm->SFP7PDFail){
+    491          		dptr[rlen++] = hibyte(Aid_SFP7PDFail);
+    492          		dptr[rlen++] = lobyte(Aid_SFP7PDFail);
+    493          		dptr[rlen++] = pAlm->SFP7PDFail;
+    494          		dptr[rlen++] = 0;
+    495          	}
+    496          
+    497          	if(cAlm->SFP8PDFail){
+    498          		dptr[rlen++] = hibyte(Aid_SFP8PDFail);
+    499          		dptr[rlen++] = lobyte(Aid_SFP8PDFail);
+    500          		dptr[rlen++] = pAlm->SFP8PDFail;
+    501          		dptr[rlen++] = 0;
+    502          	}
+    503          	
+    504          	if(cAlm->SFP9PDFail){
+    505          		dptr[rlen++] = hibyte(Aid_SFP9PDFail);
+    506          		dptr[rlen++] = lobyte(Aid_SFP9PDFail);
+    507          		dptr[rlen++] = pAlm->SFP9PDFail;
+    508          		dptr[rlen++] = 0;
+    509          	}
+    510          	
+    511          	if(cAlm->SFP10PDFail){
+    512          		dptr[rlen++] = hibyte(Aid_SFP10PDFail);
+    513          		dptr[rlen++] = lobyte(Aid_SFP10PDFail);
+    514          		dptr[rlen++] = pAlm->SFP10PDFail;
+    515          		dptr[rlen++] = 0;
+    516          	}
+    517          
+    518          	if(cAlm->SFP11PDFail){
+    519          		dptr[rlen++] = hibyte(Aid_SFP11PDFail);
+    520          		dptr[rlen++] = lobyte(Aid_SFP11PDFail);
+    521          		dptr[rlen++] = pAlm->SFP11PDFail;
+    522          		dptr[rlen++] = 0;
+    523          	}
+    524          	////////////////////////////////////////////////
+    525          	if(cAlm->SFP0LOSFail){
+    526          		dptr[rlen++] = hibyte(Aid_SFP0LOSFail);
+    527          		dptr[rlen++] = lobyte(Aid_SFP0LOSFail);
+    528          		dptr[rlen++] = pAlm->SFP0LOSFail;
+    529          		dptr[rlen++] = 0;
+    530          	}
+    531          	if(cAlm->SFP1LOSFail){
+    532          		dptr[rlen++] = hibyte(Aid_SFP1LOSFail);
+    533          		dptr[rlen++] = lobyte(Aid_SFP1LOSFail);
+    534          		dptr[rlen++] = pAlm->SFP1LOSFail;
+    535          		dptr[rlen++] = 0;
+    536          	}
+    537          	if(cAlm->SFP2LOSFail){
+    538          		dptr[rlen++] = hibyte(Aid_SFP2LOSFail);
+    539          		dptr[rlen++] = lobyte(Aid_SFP2LOSFail);
+    540          		dptr[rlen++] = pAlm->SFP2LOSFail;
+    541          		dptr[rlen++] = 0;
+    542          	}
+    543          	if(cAlm->SFP3LOSFail){
+    544          		dptr[rlen++] = hibyte(Aid_SFP3LOSFail);
+    545          		dptr[rlen++] = lobyte(Aid_SFP3LOSFail);
+    546          		dptr[rlen++] = pAlm->SFP3LOSFail;
+    547          		dptr[rlen++] = 0;
+    548          	}
+    549          
+    550          	if(cAlm->SFP4LOSFail){
+    551          		dptr[rlen++] = hibyte(Aid_SFP4LOSFail);
+    552          		dptr[rlen++] = lobyte(Aid_SFP4LOSFail);
+    553          		dptr[rlen++] = pAlm->SFP4LOSFail;
+    554          		dptr[rlen++] = 0;
+    555          	}
+    556          
+    557          	if(cAlm->SFP5LOSFail){
+    558          		dptr[rlen++] = hibyte(Aid_SFP5LOSFail);
+    559          		dptr[rlen++] = lobyte(Aid_SFP5LOSFail);
+    560          		dptr[rlen++] = pAlm->SFP5LOSFail;
+    561          		dptr[rlen++] = 0;
+    562          	}
+    563          	if(cAlm->SFP6LOSFail){
+    564          		dptr[rlen++] = hibyte(Aid_SFP6LOSFail);
+    565          		dptr[rlen++] = lobyte(Aid_SFP6LOSFail);
+    566          		dptr[rlen++] = pAlm->SFP6LOSFail;
+    567          		dptr[rlen++] = 0;
+    568          	}
+    569          	if(cAlm->SFP7LOSFail){
+    570          		dptr[rlen++] = hibyte(Aid_SFP7LOSFail);
+    571          		dptr[rlen++] = lobyte(Aid_SFP7LOSFail);
+    572          		dptr[rlen++] = pAlm->SFP7LOSFail;
+    573          		dptr[rlen++] = 0;
+    574          	}
+    575          
+    576          	if(cAlm->SFP8LOSFail){
+    577          		dptr[rlen++] = hibyte(Aid_SFP8LOSFail);
+    578          		dptr[rlen++] = lobyte(Aid_SFP8LOSFail);
+    579          		dptr[rlen++] = pAlm->SFP8LOSFail;
+    580          		dptr[rlen++] = 0;
+    581          	}
+    582          	if(cAlm->SFP9LOSFail){
+    583          		dptr[rlen++] = hibyte(Aid_SFP9LOSFail);
+    584          		dptr[rlen++] = lobyte(Aid_SFP9LOSFail);
+    585          		dptr[rlen++] = pAlm->SFP9LOSFail;
+    586          		dptr[rlen++] = 0;
+    587          	}
+    588          	
+    589          	if(cAlm->SFP10LOSFail){
+    590          		dptr[rlen++] = hibyte(Aid_SFP10LOSFail);
+    591          		dptr[rlen++] = lobyte(Aid_SFP10LOSFail);
+    592          		dptr[rlen++] = pAlm->SFP10LOSFail;
+    593          		dptr[rlen++] = 0;
+    594          	}
+    595          	
+    596          	if(cAlm->SFP11LOSFail){
+    597          		dptr[rlen++] = hibyte(Aid_SFP11LOSFail);
+    598          		dptr[rlen++] = lobyte(Aid_SFP11LOSFail);
+    599          		dptr[rlen++] = pAlm->SFP11LOSFail;
+    600          		dptr[rlen++] = 0;
+    601          	}
+    602          		
+    603          	
+    604          	if(MyRstCase.SERVERRstCase[tmpDnr][tmpRmt])
+    605          	{
+    606          		dptr[rlen++] = hibyte(Aid_RCUReset);
+    607          		dptr[rlen++] = lobyte(Aid_RCUReset);
+    608          		dptr[rlen++] = 0x01;
+    609          		dptr[rlen++] = 0x01;
+    610                  
+    611          		dptr[rlen++] = MyRstCase.SERVERRstCase[tmpDnr][tmpRmt];
+    612          		ServRstAlmFlag[tmpDnr][tmpRmt] = SET;
+    613          	}
+    614          
+    615          
+    616          	// 필수 항목..
+    617          	dptr[rlen++] = 0xff;
+    618          	dptr[rlen++] = 0xff;
+    619          	dptr[rlen++] = 1;
+    620          	dptr[rlen++] = DnrSts[tmpDnr][tmpRmt].CurrentTemp;
+    621          
+    622          	if(DnrSts[tmpDnr][tmpRmt].AlarmMask == UnMask) {
+    623          		INT8U id0, id1, id2;
+    624          		
+    625          		IsItRtnMyVALtoSysID(&id0, &id1, &id2, tmpDnr, tmpRmt);
+    626          		pBodyFrameTx(id0, id1, id2, dptr, rlen, AlarmSCODE, Wrcs0, NULL);
+    627          		pBodyFrameTx(id0, id1, id2, dptr, rlen, AlarmSCODE, PcSer, NULL);
+    628          		RCSDataAckTx(id0, id1,      dptr, rlen, MyPortID, RCSAlarmSCODERQST);
+    629          
+    630          		ServAlmSndCnt[tmpDnr][tmpRmt]++;
+    631          		TimerRegist(TimerAlm0, Time1Sec*2L);
+    632          	}
+    633          }
+    634          
+    635          INT16U retSelect(INT32U nUSE, SOCKET s, unsigned char *addr, unsigned short int *port)
+    636          {
+    637          	INT16U len = 0;
+    638          	INT8U err;
+    639          	
+    640          	OSSemPend(udpSem[nUSE], 0, &err);
+    641          	
+    642          	if ((IINCHIP_READ(nUSE, Sn_IR(nUSE, s)) & Sn_IR_RECV )) // check interrupt register
+    643          	{
+    644          		// clear interrupt register
+    645          		IINCHIP_WRITE(nUSE, Sn_IR(nUSE, s), Sn_IR_RECV);
+    646          
+    647          		if ((len = getSn_RX_RSR(nUSE, s)) > 0)			// check Rx data
+    648          		{
+    649          			if (len > TX_RX_MAX_BUF_SIZE) len = TX_RX_MAX_BUF_SIZE; 	//if Rx data size is lager than TX_RX_MAX_BUF_SIZE
+    650          																		//the data size to read is MAX_BUF_SIZE.
+    651          			len = recvfrom(nUSE, 0, udp_rx_buf[nUSE], len,(u_char *)returnip[nUSE], &returnport[nUSE]); //read the received data
+    652          			udp_rx_len[nUSE] = len;
+    653          			udp_rx_rcnt[nUSE] = 0;
+    654          		}
+    655          	}
+    656          	#ifdef udp_debug
+    657          	//SerPtr->printf("len: %d\n", len);
+    658          	if(len)
+    659          	{
+    660          		int i;
+    661          		for(i = 0; i < len; i++) SerPtr->printf("%02x ", udp_rx_buf[nUSE][i]);
+    662          		SerPtr->printf("\n", len);
+    663          			
+    664          	}
+    665          	#endif
+    666          	OSSemPost(udpSem[nUSE]);
+    667          
+    668          	return len;
+    669          }
+    670          
+    671          unsigned char ret0CheckByte(unsigned short int ByteCnt, unsigned short int *Recv)
+    672          {
+    673          	return (retCheckByte(Wrcs0->nUSE, ByteCnt, Recv));
+    674          }
+    675          
+    676          signed short int ret0GetByte(void)
+    677          {
+    678          	return (retGetByte(Wrcs0->nUSE));
+    679          }
+    680          
+    681          void udp0SetAddr(INT8U *destaddr, INT16U destport)
+    682          {
+    683          	udpSetAddr(Wrcs0->nUSE, 0, destaddr, destport);
+    684          }
+    685          
+    686          void udp0PutStr(unsigned char *Str, unsigned short int Length, int iEn)
+    687          {
+    688          	udpPutStr(Wrcs0->nUSE, Str, Length, iEn, Wrcs0->destaddr, Wrcs0->destport);
+    689          }
+    690          
+    691          void udp0desportcmp(SOCKET s, INT8U *pddr, INT8U *addr)
+    692          {
+    693          	udpdesportcmp(Wrcs0->nUSE, s, pddr, addr);
+    694          }
+    695          
+    696          unsigned char retCheckByte(INT32U nUSE, unsigned short int ByteCnt, unsigned short int *Recv)
+    697          {
+    698          
+    699          	INT16U rval = 0;
+    700          	INT8U err;
+    701          	
+    702          	OSSemPend(udpSem[nUSE], 0, &err);
+    703          
+    704          	*Recv = 0;
+    705          	
+    706          	if(udp_rx_rcnt[nUSE] >= TX_RX_MAX_BUF_SIZE || udp_rx_rcnt[nUSE] >= udp_rx_len[nUSE]){
+    707          
+    708          		udp_rx_len[nUSE] = 0;
+    709          	}
+    710          	else
+    711          	{
+    712          		*Recv = (udp_rx_len[nUSE] - udp_rx_rcnt[nUSE]);
+    713          		if(*Recv >= ByteCnt) rval = TRUE;
+    714          	}
+    715          
+    716          #ifdef udp_debug
+    717          	SerPtr->printf("Recv: %d, rval: %d \n", *Recv, rval);
+    718          #endif
+    719          	OSSemPost(udpSem[nUSE]);
+    720          
+    721          	return rval;
+    722          }
+    723          
+    724          signed short int retGetByte(INT32U nUSE)
+    725          {
+    726          	INT8U rval = 0;
+    727          	INT8U err;
+    728          	
+    729          	OSSemPend(udpSem[nUSE], 0, &err);
+    730          
+    731          	rval = udp_rx_buf[nUSE][udp_rx_rcnt[nUSE]++];
+    732          
+    733          	OSSemPost(udpSem[nUSE]);
+    734          	
+    735          #ifdef udp_debug
+    736          	SerPtr->printf("rval: %02x \n", rval & 0xff);
+    737          #endif
+    738          
+    739          	return rval & 0xff;
+    740          }
+    741          
+    742          
+    743          void udpSetAddr(INT32U nUSE, SOCKET s, INT8U *destaddr, INT16U destport)
+    744          {
+    745          	
+    746          	INT8U err;
+    747          	OSSemPend(udpSem[nUSE], 0, &err);
+    748          
+    749          	if(nUSE == ETH0_CHANNEL)
+    750          	{
+    751              	Wrcs0->destaddr = destaddr;
+    752          		Wrcs0->destport = destport;
+    753          
+    754          		rambackup[1] = (INT8U)(destport >> 0);
+    755          		rambackup[2] = (INT8U)(destport >> 8);
+    756          		rambackup[3] = (INT8U)(destaddr[0]);
+    757          		rambackup[4] = (INT8U)(destaddr[1]);
+    758          		rambackup[5] = (INT8U)(destaddr[2]);
+    759          		rambackup[6] = (INT8U)(destaddr[3]);
+    760          	}
+    761          	else
+    762          	{
+    763              	Wrcs1->destaddr = destaddr;
+    764          		Wrcs1->destport = destport;
+    765          	}
+    766          	OSSemPost(udpSem[nUSE]);
+    767          }
+    768          
+    769          void udpdesportcmp(INT32U nUSE, SOCKET s, INT8U *pddr, INT8U *addr)
+    770          {
+    771          	INT32U i = 0;
+    772          	INT16U nPort;
+    773          	INT8U IsItSame = TRUE;
+    774          	
+    775          	for(i = 0; i < 4; i++)
+    776          	{
+    777          		if(pddr[i] != addr[i]) IsItSame = FALSE;
+    778          	}
+    779          
+    780          	if(IsItSame == FALSE)
+    781          	{		
+    782          		for(i = 0; i < 4; i++) pddr[i] = addr[i];
+    783          		if(nUSE == ETH0_CHANNEL)	nPort = (IPAddrInfo.Eth0Port[0] << 8) | (IPAddrInfo.Eth0Port[1] << 0);
+    784          		else						nPort = (IPAddrInfo.Eth1Port[0] << 8) | (IPAddrInfo.Eth1Port[1] << 0);	
+    785          		
+    786          		init_sock(nUSE, s, Sn_MR_UDP, nPort, 0, (INT8U)NULL);
+    787          	}
+    788          }
+    789          
+    790          void udpPutStr(INT32U nUSE, unsigned char *Str, unsigned short int Length, int iEn, INT8U *daddr, INT16U dport)
+    791          {
+    792          	INT8U err;
+    793          
+    794          	if(eLink_Check(nUSE)) return;
+    795          	
+    796          	OSSemPend(udpSem[nUSE], 0, &err);
+    797          
+    798          	#ifdef udp_debug
+    799          	SerPtr->printf("IPAddr: %d.%d.%d.%d\n", 
+    800          		daddr[0],
+    801          		daddr[1],
+    802          		daddr[2],
+    803          		daddr[3]);
+    804          
+    805          	{
+    806          		int i = 0;
+    807          		SerPtr->printf("[TX] ");
+    808          
+    809          		for(i = 0; i < Length; i++) SerPtr->printf("%02x ", Str[i]);
+    810          		SerPtr->printf("\n");
+    811          
+    812          
+    813          	}
+    814          	#endif
+    815          	
+    816          	udpdesportcmp(nUSE, 0, udp_preAddr[nUSE], daddr);
+    817          	
+    818          	if(sendto(nUSE, 0, Str, Length,(u_char *)daddr, dport) == 0); //send the received data
+    819          
+    820          	OSSemPost(udpSem[nUSE]);
+    821          }
+    822          
+    823          
+    824          
+    825          void EthernetServerMode(INT32U nUSE)
+    826          {
+    827          	IINCHIP_WRITE(nUSE, Sn_CR(nUSE, 0), Sn_CR_CLOSE);
+    828          	OSTimeDly(2000L);
+    829          	EthernetInitSet(nUSE, TCP_Server_Mode, FALSE);
+    830          	if (Ethernet_Debug) USART1Printf("Server로 전환\n");
+    831          }
+    832          
+    833          void EthernetClientMode(INT32U nUSE)
+    834          {
+    835          	IINCHIP_WRITE(nUSE, Sn_CR(nUSE, 0),Sn_CR_CLOSE);
+    836          	OSTimeDly(2000L);
+    837          	EthernetInitSet(nUSE, TCP_Client_Mode, FALSE);
+    838          	if (Ethernet_Debug) USART1Printf("Client로 전환\n");
+    839          }
+    840          
+    841          
+    842          void EthernetPortReset(void)
+    843          {
+    844          	W3150RST = 1;
+    845          	OSTimeDly(100L);
+    846          	W3150RST = 0;
+    847          	OSTimeDly(100L);
+    848          	W3150RST = 1;
+    849          }
+    850          
+    851          void EthernetInitSet(INT32U nUSE, INT8U Mode, INT8U TcpDebug)
+    852          {
+    853          	INT8U tmp[6];
+    854          	INT16U nPort;
+    855          	INT8U err0 = 0;
+    856          	INT8U err1 = 0;
+    857          
+    858          	
+    859          	if(udpSem[0])	OSSemPend(udpSem[0], 0, &err0);
+    860          	if(udpSem[1])	OSSemPend(udpSem[1], 0, &err1);
+    861          
+    862          	W3150RST = 1;
+    863          		
+    864          	w3150ainit(nUSE);
+    865          
+    866          	if(nUSE == ETH0_CHANNEL) 	setGAR(nUSE, IPAddrInfo.Eth0GatewayAddr);
+    867          	else					 	setGAR(nUSE, IPAddrInfo.Eth1GatewayAddr);	
+    868          
+    869          	getGWIP(nUSE, tmp);
+    870          	if (TcpDebug)
+    871          	{
+    872          		SerPtr->printf("nUSE CHANNEL: %d\n", nUSE); 
+    873          		SerPtr->printf("GatewayAddr: %d.%d.%d.%d\n", 
+    874          					tmp[0],
+    875          					tmp[1],
+    876          					tmp[2],
+    877          					tmp[3]);
+    878          	}
+    879          	
+    880          	setSHAR(nUSE, MacAddrInfo.MacAddr[nUSE]);
+    881          	getSHAR(nUSE, tmp);
+    882          	if (TcpDebug)
+    883          	{
+    884          		SerPtr->printf("MacAddr: %x[%x].%x[%x].%x[%x].%x[%x].%x[%x].%x[%x]\n", 
+    885          					tmp[0],MacAddrInfo.MacAddr[nUSE][0],
+    886          					tmp[1],MacAddrInfo.MacAddr[nUSE][1],
+    887          					tmp[2],MacAddrInfo.MacAddr[nUSE][2],
+    888          					tmp[3],MacAddrInfo.MacAddr[nUSE][3],
+    889          					tmp[4],MacAddrInfo.MacAddr[nUSE][4],
+    890          					tmp[5],MacAddrInfo.MacAddr[nUSE][5]);
+    891          	}
+    892          	if(nUSE == ETH0_CHANNEL)	setSUBR(nUSE, IPAddrInfo.Eth0SubnetAddr);
+    893          	else						setSUBR(nUSE, IPAddrInfo.Eth1SubnetAddr);
+    894          	getSUBR(nUSE, tmp);
+    895          	if (TcpDebug)
+    896          	{
+    897          		SerPtr->printf("SubnetAddr: %d.%d.%d.%d\n", 
+    898          			tmp[0],
+    899          			tmp[1],
+    900          			tmp[2],
+    901          			tmp[3]);
+    902          	}
+    903          	if(nUSE == ETH0_CHANNEL)	setSIPR(nUSE, IPAddrInfo.Eth0IpAddr);
+    904          	else						setSIPR(nUSE, IPAddrInfo.Eth1IpAddr);
+    905          	getSIPR(nUSE, tmp);
+    906          
+    907          	if (TcpDebug)
+    908          	{
+    909          		SerPtr->printf("IPAddr: %d.%d.%d.%d\n", 
+    910          			tmp[0],
+    911          			tmp[1],
+    912          			tmp[2],
+    913          			tmp[3]);
+    914          	}
+    915          	sysinit(nUSE, 0x55, 0x55);
+    916          
+    917          	if(nUSE == ETH0_CHANNEL)	nPort = (IPAddrInfo.Eth0Port[0] << 8) | (IPAddrInfo.Eth0Port[1] << 0);
+    918          	else						nPort = (IPAddrInfo.Eth1Port[0] << 8) | (IPAddrInfo.Eth1Port[1] << 0);	
+    919          
+    920          	init_sock(nUSE, 0, Sn_MR_UDP, nPort, 0, (INT8U)NULL);
+    921          
+    922          	if(udpSem[0])	OSSemPost(udpSem[0]);
+    923          	if(udpSem[1])	OSSemPost(udpSem[1]);
+    924          	
+    925          	OSTimeDly(1000L);
+    926          }
+    927          
+    928          void init_sock(INT8U nUSE, SOCKET s, uint8 protocol, uint16 port, uint8 flag, uint8 *serverip) 
+    929          {
+    930          	// sflag: 1: clent mode, 0: server mode
+    931          	socket(nUSE, s, protocol, port, flag);	/* Create a new socket */
+    932          
+    933          	if(protocol == Sn_MR_TCP)
+    934          	{
+    935          		if (serverip != NULL)
+    936          		{
+    937          		
+    938          			if (connect(nUSE, s, serverip, port) == 0) {
+    939          				socket(nUSE, s, Sn_MR_TCP, port, flag);	/* Create a new socket */
+    940          				listen(nUSE, s);           				/* Server Mode */
+    941          			}
+    942          		}
+    943          		else
+    944          		{
+    945          			listen(nUSE, s);           			/* Server Mode */
+    946          		}
+    947          	}
+    948          }
+    949          
+    950          INT32U eLink_Check(INT32U nUSE)
+    951          {
+    952          	INT32U rval = FALSE;
+    953          
+    954                   if(nUSE == ETH0_CHANNEL) 	rval = GPIOA->IDR.B1;
+    955          	else if(nUSE == ETH1_CHANNEL)	rval = GPIOA->IDR.B0;
+    956          	
+    957          	return rval;
+    958          
+    959          }
+    960          
+    961          //////////////////////////////////////////////////////
+    962          // End of Source File
+    963          ////////////////////////
+    964          
+
+   Maximum stack usage in bytes:
+
+     Function            .cstack
+     --------            -------
+     AlarmRptFunc            32
+     AlarmRptFuncInit        24
+     AutoInformRptFunc       48
+     DnrAlarmCheckUpdate     48
+     DnrAlarmRptFunc         48
+     Ethenet0Init             8
+     Ethernet0Task           40
+     EthernetClientMode       8
+     EthernetInitSet         88
+     EthernetPortReset        8
+     EthernetServerMode       8
+     eLink_Check              0
+     init_sock               40
+     ret0CheckByte            8
+     ret0GetByte              8
+     retCheckByte            32
+     retGetByte              24
+     retSelect               40
+     udp0PutStr              24
+     udp0SetAddr              8
+     udp0desportcmp           8
+     udpPutStr               40
+     udpSetAddr              32
+     udpdesportcmp           32
+
+
+   Section sizes:
+
+     Function/Label                                 Bytes
+     --------------                                 -----
+     defaultip                                        20
+     Wrcs0B                                           48
+     UdpPadOnFlag                                      1
+     udp_rx_buf                                     4096
+     ServAlmSndCnt                                  3168
+     ServRstAlmFlag
+     udp_rx_len
+     udp_rx_rcnt
+     returnport
+     udpSem
+     Wrcs0
+     Eth0TaskStk
+     Swrcs0
+     Rwrcs0
+     returnip
+     udp_preAddr
+     Ethernet_Debug                                    1
+     pDnrAlarm                                       688
+     pDnrAlarmPre
+     pDnrAlarmChange
+     pDnrAlarmTimer
+     Ethenet0Init                                    108
+     Ethernet0Task                                   336
+     AlarmRptFuncInit                                112
+     AutoInformRptFunc                               372
+     AlarmRptFunc                                     90
+     DnrAlarmCheckUpdate                             870
+     DnrAlarmRptFunc                                2332
+     retSelect                                       144
+     ret0CheckByte                                    20
+     ret0GetByte                                      16
+     udp0SetAddr                                      20
+     udp0PutStr                                       40
+     udp0desportcmp                                   20
+     retCheckByte                                     84
+     retGetByte                                       60
+     udpSetAddr                                      112
+     udpdesportcmp                                    96
+     udpPutStr                                        84
+     EthernetServerMode                               56
+     EthernetClientMode                               56
+     EthernetPortReset                                48
+     EthernetInitSet                                 452
+     init_sock                                        72
+     eLink_Check                                      40
+     ??DataTable6                                      4
+     ??DataTable8                                      4
+     ??DataTable11                                     4
+     ??DataTable12                                     4
+     ??DataTable13                                     4
+     ??DataTable14                                     4
+     ?<Constant "Server\267\316 \300\374\310\257\n"   16
+     ?<Constant "Client\267\316 \300\374\310\257\n"   16
+     ?<Constant "nUSE CHANNEL: %d\n">                152
+
+ 
+ 4 834 bytes in section .bss
+ 3 168 bytes in section .data
+   204 bytes in section .rodata
+ 5 664 bytes in section .text
+ 
+ 5 664 bytes of CODE  memory
+   204 bytes of CONST memory
+ 8 002 bytes of DATA  memory
+
+Errors: none
+Warnings: none

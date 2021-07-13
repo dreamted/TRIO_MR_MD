@@ -1,0 +1,904 @@
+###############################################################################
+#                                                                             #
+# IAR ANSI C/C++ Compiler V6.30.1.53127/W32 for ARM     19/May/2017  23:32:24 #
+# Copyright 1999-2011 IAR Systems AB.                                         #
+#                                                                             #
+#    Cpu mode     =  thumb                                                    #
+#    Endian       =  little                                                   #
+#    Source file  =  D:\Project\TRIO\3.TRIO-MD\2_1G                           #
+#                    Clearing\TRIO_MD_appl_stm207_20150327_20150518_20161130\ #
+#                    code\main.c                                              #
+#    Command line =  "D:\Project\TRIO\3.TRIO-MD\2_1G                          #
+#                    Clearing\TRIO_MD_appl_stm207_20150327_20150518_20161130\ #
+#                    code\main.c" -lC "D:\Project\TRIO\3.TRIO-MD\2_1G         #
+#                    Clearing\TRIO_MD_appl_stm207_20150327_20150518_20161130\ #
+#                    out\" -o "D:\Project\TRIO\3.TRIO-MD\2_1G                 #
+#                    Clearing\TRIO_MD_appl_stm207_20150327_20150518_20161130\ #
+#                    out\" --endian=little --cpu=Cortex-M3 -e --fpu=None      #
+#                    --dlib_config "D:\Program Files (x86)\IAR                #
+#                    Systems\Embedded Workbench 6.0\arm\INC\c\DLib_Config_Nor #
+#                    mal.h" -I "D:\Project\TRIO\3.TRIO-MD\2_1G                #
+#                    Clearing\TRIO_MD_appl_stm207_20150327_20150518_20161130\ #
+#                    include\" -I "D:\Project\TRIO\3.TRIO-MD\2_1G             #
+#                    Clearing\TRIO_MD_appl_stm207_20150327_20150518_20161130\ #
+#                    STM32F2xx_StdPeriph_Driver_v1212\" -I                    #
+#                    "D:\Project\TRIO\3.TRIO-MD\2_1G                          #
+#                    Clearing\TRIO_MD_appl_stm207_20150327_20150518_20161130\ #
+#                    STM32F2xx_StdPeriph_Driver_v1212\inc\" -I                #
+#                    "D:\Project\TRIO\3.TRIO-MD\2_1G                          #
+#                    Clearing\TRIO_MD_appl_stm207_20150327_20150518_20161130\ #
+#                    uC-CPU\" -I "D:\Project\TRIO\3.TRIO-MD\2_1G              #
+#                    Clearing\TRIO_MD_appl_stm207_20150327_20150518_20161130\ #
+#                    uC-LIB\" -I "D:\Project\TRIO\3.TRIO-MD\2_1G              #
+#                    Clearing\TRIO_MD_appl_stm207_20150327_20150518_20161130\ #
+#                    uCOS-II\Ports\" -I "D:\Project\TRIO\3.TRIO-MD\2_1G       #
+#                    Clearing\TRIO_MD_appl_stm207_20150327_20150518_20161130\ #
+#                    uCOS-II\Source\" -I "D:\Project\TRIO\3.TRIO-MD\2_1G      #
+#                    Clearing\TRIO_MD_appl_stm207_20150327_20150518_20161130\ #
+#                    uC-Probe\" -Oh --use_c++_inline                          #
+#    List file    =  D:\Project\TRIO\3.TRIO-MD\2_1G                           #
+#                    Clearing\TRIO_MD_appl_stm207_20150327_20150518_20161130\ #
+#                    out\main.lst                                             #
+#    Object file  =  D:\Project\TRIO\3.TRIO-MD\2_1G                           #
+#                    Clearing\TRIO_MD_appl_stm207_20150327_20150518_20161130\ #
+#                    out\main.o                                               #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\Project\TRIO\3.TRIO-MD\2_1G Clearing\TRIO_MD_appl_stm207_20150327_20150518_20161130\code\main.c
+      1          /*
+      2          *********************************************************************************************************
+      3          *                                              EXAMPLE CODE
+      4          *
+      5          *                          (c) Copyright 2003-2007; Micrium, Inc.; Weston, FL
+      6          *
+      7          *               All rights reserved.  Protected by international copyright laws.
+      8          *               Knowledge of the source code may NOT be used to develop a similar product.
+      9          *               Please help us continue to provide the Embedded community with the finest
+     10          *               software available.  Your honesty is greatly appreciated.
+     11          *********************************************************************************************************
+     12          */
+     13          #define MAIN_C		// m: Macro
+     14          
+     15          #include "main.h"
+
+   \                                 In section .bss, align 4
+   \   __absolute __SerStrPtr *SerPtr
+   \                     SerPtr:
+   \   00000000                      DS8 4
+   \   __absolute __SerStrPtr *Ser3Ptr
+   \                     Ser3Ptr:
+   \   00000004                      DS8 4
+   \   __absolute __SerStrPtr *Ser4Ptr
+   \                     Ser4Ptr:
+   \   00000008                      DS8 4
+
+   \                                 In section .bss, align 4
+   \   __absolute __SerStrPtr *Ser2Ptr
+   \                     Ser2Ptr:
+   \   00000000                      DS8 4
+
+   \                                 In section .rodata, align 4, keep-with-next
+   \   __absolute selfinfo const convinfo
+   \                     convinfo:
+   \   00000000   0x54 0x52          DC8 54H, 52H, 49H, 4FH, 2DH, 4DH, 52H, 4EH
+   \              0x49 0x4F    
+   \              0x2D 0x4D    
+   \              0x52 0x4E    
+   \   00000008   0x43 0x30          DC8 43H, 30H
+   \   0000000A   0x4E 0x43          DC8 "NC1"
+   \              0x31 0x00    
+   \   0000000E   0x00 0x00          DC8 0, 0, 0, 0, 0, 0
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \   00000014   0x31 0x32          DC8 "123456789"
+   \              0x33 0x34    
+   \              0x35 0x36    
+   \              0x37 0x38    
+   \              0x39 0x00    
+   \   0000001E   0x00 0x00          DC8 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+
+   \                                 In section .data, align 1
+   \   __absolute INT8U iAdcIndex
+   \                     iAdcIndex:
+   \   00000000   0x03               DC8 3
+     16          
+     17          
+     18          /*******************************************************************************
+     19          * Function Name  : InitStm32f103
+     20          * Description    : Initializes the stm32_x application.
+     21          * Input          : None
+     22          * Output         : None
+     23          * Return         : None
+     24          *******************************************************************************/
+     25          
+     26          //extern	void SRAM_Init(void);
+     27          
+
+   \                                 In section .text, align 2, keep-with-next
+     28          void InitStm32f103(void)
+     29          {
+   \                     InitStm32f103:
+   \   00000000   0xB580             PUSH     {R7,LR}
+     30          	InitAFIO();
+   \   00000002   0x.... 0x....      BL       InitAFIO
+     31          	InitGPIO();
+   \   00000006   0x.... 0x....      BL       InitGPIO
+     32          	SystemInit_ExtMemCtl();
+   \   0000000A   0x.... 0x....      BL       SystemInit_ExtMemCtl
+     33          	SystemInit_PSRAM0Ctl();
+   \   0000000E   0x.... 0x....      BL       SystemInit_PSRAM0Ctl
+     34          
+     35          	// Set the Vector Table base location at 0x08000000
+     36          	InitSysTick(1L);	// timer init!!(1: 1ms)
+   \   00000012   0x2001             MOVS     R0,#+1
+   \   00000014   0xE8BD 0x4002      POP      {R1,LR}
+   \   00000018   0x.... 0x....      B.W      InitSysTick
+     37          }
+     38          
+     39          /*******************************************************************************
+     40          * Function Name  : InitRCC
+     41          * Description    : Initializes the stm32_x afio application.
+     42          * Input          : None
+     43          * Output         : None
+     44          * Return         : None
+     45          *******************************************************************************/
+
+   \                                 In section .text, align 2, keep-with-next
+     46          void InitAFIO(void)
+     47          {
+     48          	// AHB1 BUS RELATED
+     49          	// GPIOA, GPIOB, GPIOC, GPIOD, GPIOE, GPIOF, GPIOG, GPIOH
+     50          	// TIM1, SPI1, USART1, ADC
+     51              RCC->__B.AHB1ENR.IOPAEN = ENABLE;
+   \                     InitAFIO:
+   \   00000000   0x.... 0x....      LDR.W    R0,??DataTable5  ;; 0x40023830
+   \   00000004   0x6801             LDR      R1,[R0, #+0]
+   \   00000006   0xF041 0x0101      ORR      R1,R1,#0x1
+   \   0000000A   0x6001             STR      R1,[R0, #+0]
+     52              RCC->__B.AHB1ENR.IOPBEN = ENABLE;
+   \   0000000C   0x6801             LDR      R1,[R0, #+0]
+   \   0000000E   0xF041 0x0102      ORR      R1,R1,#0x2
+   \   00000012   0x6001             STR      R1,[R0, #+0]
+     53          	RCC->__B.AHB1ENR.IOPCEN = ENABLE;
+   \   00000014   0x6801             LDR      R1,[R0, #+0]
+   \   00000016   0xF041 0x0104      ORR      R1,R1,#0x4
+   \   0000001A   0x6001             STR      R1,[R0, #+0]
+     54          	RCC->__B.AHB1ENR.IOPDEN = ENABLE;
+   \   0000001C   0x6801             LDR      R1,[R0, #+0]
+   \   0000001E   0xF041 0x0108      ORR      R1,R1,#0x8
+   \   00000022   0x6001             STR      R1,[R0, #+0]
+     55              RCC->__B.AHB1ENR.IOPEEN = ENABLE;
+   \   00000024   0x6801             LDR      R1,[R0, #+0]
+   \   00000026   0xF041 0x0110      ORR      R1,R1,#0x10
+   \   0000002A   0x6001             STR      R1,[R0, #+0]
+     56          	RCC->__B.AHB1ENR.IOPFEN = ENABLE;
+   \   0000002C   0x6801             LDR      R1,[R0, #+0]
+   \   0000002E   0xF041 0x0120      ORR      R1,R1,#0x20
+   \   00000032   0x6001             STR      R1,[R0, #+0]
+     57              RCC->__B.AHB1ENR.IOPGEN = ENABLE;
+   \   00000034   0x6801             LDR      R1,[R0, #+0]
+   \   00000036   0xF041 0x0140      ORR      R1,R1,#0x40
+   \   0000003A   0x6001             STR      R1,[R0, #+0]
+     58          
+     59          	RCC->__B.APB2ENR.ADC1EN = ENABLE;
+   \   0000003C   0x6941             LDR      R1,[R0, #+20]
+   \   0000003E   0xF44F 0x7280      MOV      R2,#+256
+   \   00000042   0x4311             ORRS     R1,R2,R1
+   \   00000044   0x6141             STR      R1,[R0, #+20]
+     60          }
+   \   00000046   0x4770             BX       LR               ;; return
+     61          
+     62          /*******************************************************************************
+     63          * Function Name  : InitGPIO
+     64          * Description    : Initializes the stm32_x gpio application.
+     65          * Input          : None
+     66          * Output         : None
+     67          * Return         : None
+     68          *******************************************************************************/
+
+   \                                 In section .text, align 2, keep-with-next
+     69          void InitGPIO(void)
+     70          {
+   \                     InitGPIO:
+   \   00000000   0xB5F8             PUSH     {R3-R7,LR}
+     71          	//--------------------------------------------------------------//
+     72          	// CPU - LEFT
+     73          	__PE2_PP_PP();				// ATT CLK
+   \   00000002   0x....             LDR.N    R4,??DataTable5_1  ;; 0x40021000
+   \   00000004   0x2302             MOVS     R3,#+2
+   \   00000006   0x4622             MOV      R2,R4
+   \   00000008   0x2100             MOVS     R1,#+0
+   \   0000000A   0x2021             MOVS     R0,#+33
+   \   0000000C   0x.... 0x....      BL       GPIOPortInit
+     74          	__PE6_PP_PP();				// ATT DATA
+   \   00000010   0x2306             MOVS     R3,#+6
+   \   00000012   0x4622             MOV      R2,R4
+   \   00000014   0x2100             MOVS     R1,#+0
+   \   00000016   0x2021             MOVS     R0,#+33
+   \   00000018   0x.... 0x....      BL       GPIOPortInit
+     75          
+     76          	__PC14_PP_PP();				// F_PROG
+   \   0000001C   0x....             LDR.N    R4,??DataTable5_2  ;; 0x40020800
+   \   0000001E   0x230E             MOVS     R3,#+14
+   \   00000020   0x4622             MOV      R2,R4
+   \   00000022   0x2100             MOVS     R1,#+0
+   \   00000024   0x2021             MOVS     R0,#+33
+   \   00000026   0x.... 0x....      BL       GPIOPortInit
+     77          	__PC15_IN_FL();				// F_DONE
+   \   0000002A   0x230F             MOVS     R3,#+15
+   \   0000002C   0x4622             MOV      R2,R4
+   \   0000002E   0x2100             MOVS     R1,#+0
+   \   00000030   0x2000             MOVS     R0,#+0
+   \   00000032   0x.... 0x....      BL       GPIOPortInit
+     78          
+     79          	
+     80          	__PF6_PP_PP();
+   \   00000036   0x....             LDR.N    R5,??DataTable5_3  ;; 0x40021400
+   \   00000038   0x2306             MOVS     R3,#+6
+   \   0000003A   0x462A             MOV      R2,R5
+   \   0000003C   0x2100             MOVS     R1,#+0
+   \   0000003E   0x2021             MOVS     R0,#+33
+   \   00000040   0x.... 0x....      BL       GPIOPortInit
+     81          	__PF7_PP_PP();
+   \   00000044   0x2307             MOVS     R3,#+7
+   \   00000046   0x462A             MOV      R2,R5
+   \   00000048   0x2100             MOVS     R1,#+0
+   \   0000004A   0x2021             MOVS     R0,#+33
+   \   0000004C   0x.... 0x....      BL       GPIOPortInit
+     82          	__PF8_PP_PP();
+   \   00000050   0x2308             MOVS     R3,#+8
+   \   00000052   0x462A             MOV      R2,R5
+   \   00000054   0x2100             MOVS     R1,#+0
+   \   00000056   0x2021             MOVS     R0,#+33
+   \   00000058   0x.... 0x....      BL       GPIOPortInit
+     83          	__PF9_PP_PP();
+   \   0000005C   0x2309             MOVS     R3,#+9
+   \   0000005E   0x462A             MOV      R2,R5
+   \   00000060   0x2100             MOVS     R1,#+0
+   \   00000062   0x2021             MOVS     R0,#+33
+   \   00000064   0x.... 0x....      BL       GPIOPortInit
+     84          	__PF10_PP_PP();
+   \   00000068   0x230A             MOVS     R3,#+10
+   \   0000006A   0x462A             MOV      R2,R5
+   \   0000006C   0x2100             MOVS     R1,#+0
+   \   0000006E   0x2021             MOVS     R0,#+33
+   \   00000070   0x.... 0x....      BL       GPIOPortInit
+     85          
+     86          	__ADC_IN0();
+   \   00000074   0x....             LDR.N    R6,??DataTable5_4  ;; 0x40020000
+   \   00000076   0x2300             MOVS     R3,#+0
+   \   00000078   0x4632             MOV      R2,R6
+   \   0000007A   0x4619             MOV      R1,R3
+   \   0000007C   0x2003             MOVS     R0,#+3
+   \   0000007E   0x.... 0x....      BL       GPIOPortInit
+     87          	__ADC_IN1();
+   \   00000082   0x2301             MOVS     R3,#+1
+   \   00000084   0x4632             MOV      R2,R6
+   \   00000086   0x2100             MOVS     R1,#+0
+   \   00000088   0x2003             MOVS     R0,#+3
+   \   0000008A   0x.... 0x....      BL       GPIOPortInit
+     88          
+     89          	__ADC_IN3();
+   \   0000008E   0x2303             MOVS     R3,#+3
+   \   00000090   0x4632             MOV      R2,R6
+   \   00000092   0x2100             MOVS     R1,#+0
+   \   00000094   0x4618             MOV      R0,R3
+   \   00000096   0x.... 0x....      BL       GPIOPortInit
+     90          
+     91          
+     92          ///////////////////////////////////////////////
+     93          	__PB2_PP_PP();				// RUN LED
+   \   0000009A   0x....             LDR.N    R7,??DataTable5_5  ;; 0x40020400
+   \   0000009C   0x2302             MOVS     R3,#+2
+   \   0000009E   0x463A             MOV      R2,R7
+   \   000000A0   0x2100             MOVS     R1,#+0
+   \   000000A2   0x2021             MOVS     R0,#+33
+   \   000000A4   0x.... 0x....      BL       GPIOPortInit
+     94          	__PF11_PP_PP();
+   \   000000A8   0x230B             MOVS     R3,#+11
+   \   000000AA   0x462A             MOV      R2,R5
+   \   000000AC   0x2100             MOVS     R1,#+0
+   \   000000AE   0x2021             MOVS     R0,#+33
+   \   000000B0   0x.... 0x....      BL       GPIOPortInit
+     95          
+     96          	__PB14_PP_PP(); 			// ADC_CS0
+   \   000000B4   0x230E             MOVS     R3,#+14
+   \   000000B6   0x463A             MOV      R2,R7
+   \   000000B8   0x2100             MOVS     R1,#+0
+   \   000000BA   0x2021             MOVS     R0,#+33
+   \   000000BC   0x.... 0x....      BL       GPIOPortInit
+     97          	__PB15_PP_PP(); 			// ADC_CS1
+   \   000000C0   0x230F             MOVS     R3,#+15
+   \   000000C2   0x463A             MOV      R2,R7
+   \   000000C4   0x2100             MOVS     R1,#+0
+   \   000000C6   0x2021             MOVS     R0,#+33
+   \   000000C8   0x.... 0x....      BL       GPIOPortInit
+     98          
+     99          	__PG6_IN_PU();				// AC FAIL
+   \   000000CC   0x....             LDR.N    R5,??DataTable5_6  ;; 0x40021800
+   \   000000CE   0x2306             MOVS     R3,#+6
+   \   000000D0   0x462A             MOV      R2,R5
+   \   000000D2   0x2100             MOVS     R1,#+0
+   \   000000D4   0x2040             MOVS     R0,#+64
+   \   000000D6   0x.... 0x....      BL       GPIOPortInit
+    100          	__PG7_PP_PP();				// SMS VCC ON/OFF
+   \   000000DA   0x2307             MOVS     R3,#+7
+   \   000000DC   0x462A             MOV      R2,R5
+   \   000000DE   0x2100             MOVS     R1,#+0
+   \   000000E0   0x2021             MOVS     R0,#+33
+   \   000000E2   0x.... 0x....      BL       GPIOPortInit
+    101          
+    102          
+    103          	__PC6_IN_PU();				// PLL LD
+   \   000000E6   0x2306             MOVS     R3,#+6
+   \   000000E8   0x4622             MOV      R2,R4
+   \   000000EA   0x2100             MOVS     R1,#+0
+   \   000000EC   0x2040             MOVS     R0,#+64
+   \   000000EE   0x.... 0x....      BL       GPIOPortInit
+    104          	__PC7_IN_PU(); 				// PLL LD
+   \   000000F2   0x2307             MOVS     R3,#+7
+   \   000000F4   0x4622             MOV      R2,R4
+   \   000000F6   0x2100             MOVS     R1,#+0
+   \   000000F8   0x2040             MOVS     R0,#+64
+   \   000000FA   0x.... 0x....      BL       GPIOPortInit
+    105          	__PC8_IN_PU();				// PLL LD
+   \   000000FE   0x2308             MOVS     R3,#+8
+   \   00000100   0x4622             MOV      R2,R4
+   \   00000102   0x2100             MOVS     R1,#+0
+   \   00000104   0x2040             MOVS     R0,#+64
+   \   00000106   0x.... 0x....      BL       GPIOPortInit
+    106          
+    107          	__PC9_PP_PP();				// I2C_DATA
+   \   0000010A   0x2309             MOVS     R3,#+9
+   \   0000010C   0x4622             MOV      R2,R4
+   \   0000010E   0x2100             MOVS     R1,#+0
+   \   00000110   0x2021             MOVS     R0,#+33
+   \   00000112   0x.... 0x....      BL       GPIOPortInit
+    108          	__PA8_PP_PP();				// I2C_CLK
+   \   00000116   0x2308             MOVS     R3,#+8
+   \   00000118   0x4632             MOV      R2,R6
+   \   0000011A   0x2100             MOVS     R1,#+0
+   \   0000011C   0x2021             MOVS     R0,#+33
+   \   0000011E   0x.... 0x....      BL       GPIOPortInit
+    109          
+    110          
+    111          	__PA9_U1_TX();				// USART1_TX
+   \   00000122   0x2309             MOVS     R3,#+9
+   \   00000124   0x4632             MOV      R2,R6
+   \   00000126   0x2107             MOVS     R1,#+7
+   \   00000128   0x2062             MOVS     R0,#+98
+   \   0000012A   0x.... 0x....      BL       GPIOPortInit
+    112          	__PA10_U1_RX(); 			// USART1_RX
+   \   0000012E   0x230A             MOVS     R3,#+10
+   \   00000130   0x4632             MOV      R2,R6
+   \   00000132   0x2107             MOVS     R1,#+7
+   \   00000134   0x2062             MOVS     R0,#+98
+   \   00000136   0x.... 0x....      BL       GPIOPortInit
+    113          
+    114          	__PA12_IN_PU(); 			// DTU Insert
+   \   0000013A   0x230C             MOVS     R3,#+12
+   \   0000013C   0x4632             MOV      R2,R6
+   \   0000013E   0x2100             MOVS     R1,#+0
+   \   00000140   0x2040             MOVS     R0,#+64
+   \   00000142   0x.... 0x....      BL       GPIOPortInit
+    115          
+    116          	__PA13_PP_PP(); 			// MBD_RST
+   \   00000146   0x230D             MOVS     R3,#+13
+   \   00000148   0x4632             MOV      R2,R6
+   \   0000014A   0x2100             MOVS     R1,#+0
+   \   0000014C   0x2021             MOVS     R0,#+33
+   \   0000014E   0x.... 0x....      BL       GPIOPortInit
+    117          
+    118          	__PA14_PP_PP(); 			// SCK
+   \   00000152   0x230E             MOVS     R3,#+14
+   \   00000154   0x4632             MOV      R2,R6
+   \   00000156   0x2100             MOVS     R1,#+0
+   \   00000158   0x2021             MOVS     R0,#+33
+   \   0000015A   0x.... 0x....      BL       GPIOPortInit
+    119          	__PA15_PP_PP(); 			// PLL CLK
+   \   0000015E   0x230F             MOVS     R3,#+15
+   \   00000160   0x4632             MOV      R2,R6
+   \   00000162   0x2100             MOVS     R1,#+0
+   \   00000164   0x2021             MOVS     R0,#+33
+   \   00000166   0x.... 0x....      BL       GPIOPortInit
+    120          
+    121          	__PA2_IN_FL();
+   \   0000016A   0x2302             MOVS     R3,#+2
+   \   0000016C   0x4632             MOV      R2,R6
+   \   0000016E   0x2100             MOVS     R1,#+0
+   \   00000170   0x4608             MOV      R0,R1
+   \   00000172   0x.... 0x....      BL       GPIOPortInit
+    122          
+    123          	__PC10_U4_TX(); 			// USART4_TX
+   \   00000176   0x230A             MOVS     R3,#+10
+   \   00000178   0x4622             MOV      R2,R4
+   \   0000017A   0x2108             MOVS     R1,#+8
+   \   0000017C   0x2062             MOVS     R0,#+98
+   \   0000017E   0x.... 0x....      BL       GPIOPortInit
+    124          	__PC11_U4_RX(); 			// USART4_RX
+   \   00000182   0x230B             MOVS     R3,#+11
+   \   00000184   0x4622             MOV      R2,R4
+   \   00000186   0x2108             MOVS     R1,#+8
+   \   00000188   0x2062             MOVS     R0,#+98
+   \   0000018A   0x.... 0x....      BL       GPIOPortInit
+    125          
+    126          
+    127          	__PG11_PP_PP();				// DTU_CS0
+   \   0000018E   0x230B             MOVS     R3,#+11
+   \   00000190   0x462A             MOV      R2,R5
+   \   00000192   0x2100             MOVS     R1,#+0
+   \   00000194   0x2021             MOVS     R0,#+33
+   \   00000196   0x.... 0x....      BL       GPIOPortInit
+    128          	__PG13_PP_PP();				// DTU_RW
+   \   0000019A   0x230D             MOVS     R3,#+13
+   \   0000019C   0x462A             MOV      R2,R5
+   \   0000019E   0x2100             MOVS     R1,#+0
+   \   000001A0   0x2021             MOVS     R0,#+33
+   \   000001A2   0x.... 0x....      BL       GPIOPortInit
+    129          	__PG14_PP_PP(); 			// DTU_ALE
+   \   000001A6   0x230E             MOVS     R3,#+14
+   \   000001A8   0x462A             MOV      R2,R5
+   \   000001AA   0x2100             MOVS     R1,#+0
+   \   000001AC   0x2021             MOVS     R0,#+33
+   \   000001AE   0x.... 0x....      BL       GPIOPortInit
+    130          
+    131          
+    132          	__PG12_IN_PU(); 			// RF Module Insert
+   \   000001B2   0x230C             MOVS     R3,#+12
+   \   000001B4   0x462A             MOV      R2,R5
+   \   000001B6   0x2100             MOVS     R1,#+0
+   \   000001B8   0x2040             MOVS     R0,#+64
+   \   000001BA   0x.... 0x....      BL       GPIOPortInit
+    133          	__PG15_IN_PU(); 			// Ext Module Insert
+   \   000001BE   0x230F             MOVS     R3,#+15
+   \   000001C0   0x462A             MOV      R2,R5
+   \   000001C2   0x2100             MOVS     R1,#+0
+   \   000001C4   0x2040             MOVS     R0,#+64
+   \   000001C6   0x.... 0x....      BL       GPIOPortInit
+    134          	
+    135          
+    136          	__PB3_PP_PP();				// PLL DATA
+   \   000001CA   0x2303             MOVS     R3,#+3
+   \   000001CC   0x463A             MOV      R2,R7
+   \   000001CE   0x2100             MOVS     R1,#+0
+   \   000001D0   0x2021             MOVS     R0,#+33
+   \   000001D2   0x.... 0x....      BL       GPIOPortInit
+    137          	__PB4_PP_PP();				// SEL0
+   \   000001D6   0x2304             MOVS     R3,#+4
+   \   000001D8   0x463A             MOV      R2,R7
+   \   000001DA   0x2100             MOVS     R1,#+0
+   \   000001DC   0x2021             MOVS     R0,#+33
+   \   000001DE   0x.... 0x....      BL       GPIOPortInit
+    138          	__PB5_PP_PP();				// SEL1
+   \   000001E2   0x2305             MOVS     R3,#+5
+   \   000001E4   0x463A             MOV      R2,R7
+   \   000001E6   0x2100             MOVS     R1,#+0
+   \   000001E8   0x2021             MOVS     R0,#+33
+   \   000001EA   0x.... 0x....      BL       GPIOPortInit
+    139          	__PB6_PP_PP(); 	
+   \   000001EE   0x2306             MOVS     R3,#+6
+   \   000001F0   0x463A             MOV      R2,R7
+   \   000001F2   0x2100             MOVS     R1,#+0
+   \   000001F4   0x2021             MOVS     R0,#+33
+   \   000001F6   0x.... 0x....      BL       GPIOPortInit
+    140          	__PB8_IN_FL();				// DTU_CS1 Insert
+   \   000001FA   0x2308             MOVS     R3,#+8
+   \   000001FC   0x463A             MOV      R2,R7
+   \   000001FE   0x2100             MOVS     R1,#+0
+   \   00000200   0x4608             MOV      R0,R1
+   \   00000202   0x.... 0x....      BL       GPIOPortInit
+    141          
+    142          
+    143          	__PC0_PP_PP();				//PD0
+   \   00000206   0x2300             MOVS     R3,#+0
+   \   00000208   0x4622             MOV      R2,R4
+   \   0000020A   0x4619             MOV      R1,R3
+   \   0000020C   0x2021             MOVS     R0,#+33
+   \   0000020E   0x.... 0x....      BL       GPIOPortInit
+    144          	__PC1_PP_PP();				//PD1
+   \   00000212   0x2301             MOVS     R3,#+1
+   \   00000214   0x4622             MOV      R2,R4
+   \   00000216   0x2100             MOVS     R1,#+0
+   \   00000218   0x2021             MOVS     R0,#+33
+   \   0000021A   0x.... 0x....      BL       GPIOPortInit
+    145          	__PC4_PP_PP();				//PD2
+   \   0000021E   0x2304             MOVS     R3,#+4
+   \   00000220   0x4622             MOV      R2,R4
+   \   00000222   0x2100             MOVS     R1,#+0
+   \   00000224   0x2021             MOVS     R0,#+33
+   \   00000226   0x.... 0x....      BL       GPIOPortInit
+    146          	__PC5_PP_PP();				//PD3
+   \   0000022A   0x2305             MOVS     R3,#+5
+   \   0000022C   0x4622             MOV      R2,R4
+   \   0000022E   0x2100             MOVS     R1,#+0
+   \   00000230   0x2021             MOVS     R0,#+33
+   \   00000232   0x.... 0x....      BL       GPIOPortInit
+    147          	__PB0_PP_PP();				//PD4
+   \   00000236   0x2300             MOVS     R3,#+0
+   \   00000238   0x463A             MOV      R2,R7
+   \   0000023A   0x4619             MOV      R1,R3
+   \   0000023C   0x2021             MOVS     R0,#+33
+   \   0000023E   0x.... 0x....      BL       GPIOPortInit
+    148          	__PB1_PP_PP();				//PD5
+   \   00000242   0x2301             MOVS     R3,#+1
+   \   00000244   0x463A             MOV      R2,R7
+   \   00000246   0x2100             MOVS     R1,#+0
+   \   00000248   0x2021             MOVS     R0,#+33
+   \   0000024A   0x.... 0x....      BL       GPIOPortInit
+    149          	__PG8_PP_PP();				//PD6
+   \   0000024E   0x2308             MOVS     R3,#+8
+   \   00000250   0x462A             MOV      R2,R5
+   \   00000252   0x2100             MOVS     R1,#+0
+   \   00000254   0x2021             MOVS     R0,#+33
+   \   00000256   0x.... 0x....      BL       GPIOPortInit
+    150          	__PA11_PP_PP();				//PD7
+   \   0000025A   0x230B             MOVS     R3,#+11
+   \   0000025C   0x4632             MOV      R2,R6
+   \   0000025E   0x2100             MOVS     R1,#+0
+   \   00000260   0x2021             MOVS     R0,#+33
+   \   00000262   0x.... 0x....      BL       GPIOPortInit
+    151          
+    152          
+    153          	__PB10_U3_TX(); 			// USART3_TX
+   \   00000266   0x230A             MOVS     R3,#+10
+   \   00000268   0x463A             MOV      R2,R7
+   \   0000026A   0x2107             MOVS     R1,#+7
+   \   0000026C   0x2062             MOVS     R0,#+98
+   \   0000026E   0x.... 0x....      BL       GPIOPortInit
+    154          	__PB11_U3_RX(); 			// USART3_RX
+   \   00000272   0x230B             MOVS     R3,#+11
+   \   00000274   0x463A             MOV      R2,R7
+   \   00000276   0x2107             MOVS     R1,#+7
+   \   00000278   0x2062             MOVS     R0,#+98
+   \   0000027A   0x.... 0x....      BL       GPIOPortInit
+    155          
+    156          ///102
+    157          //////////////////////////
+    158          
+    159          	__PA4_PP_PP();			// SPI1_NSS
+   \   0000027E   0x2304             MOVS     R3,#+4
+   \   00000280   0x4632             MOV      R2,R6
+   \   00000282   0x2100             MOVS     R1,#+0
+   \   00000284   0x2021             MOVS     R0,#+33
+   \   00000286   0x.... 0x....      BL       GPIOPortInit
+    160          	__PA5_IN_PU(); 			// SPI1_SCK
+   \   0000028A   0x2305             MOVS     R3,#+5
+   \   0000028C   0x4632             MOV      R2,R6
+   \   0000028E   0x2100             MOVS     R1,#+0
+   \   00000290   0x2040             MOVS     R0,#+64
+   \   00000292   0x.... 0x....      BL       GPIOPortInit
+    161          	__PA6_IN_PU(); 			// SPI1_MISO
+   \   00000296   0x2306             MOVS     R3,#+6
+   \   00000298   0x4632             MOV      R2,R6
+   \   0000029A   0x2100             MOVS     R1,#+0
+   \   0000029C   0x2040             MOVS     R0,#+64
+   \   0000029E   0x.... 0x....      BL       GPIOPortInit
+    162          	__PA7_IN_PU(); 			// SPI1_MOSI
+   \   000002A2   0x2307             MOVS     R3,#+7
+   \   000002A4   0x4632             MOV      R2,R6
+   \   000002A6   0x2100             MOVS     R1,#+0
+   \   000002A8   0x2040             MOVS     R0,#+64
+   \   000002AA   0x.... 0x....      BL       GPIOPortInit
+    163          	
+    164          
+    165          	__PB12_PP_PP(); 		// SPI2_NSS
+   \   000002AE   0x230C             MOVS     R3,#+12
+   \   000002B0   0x463A             MOV      R2,R7
+   \   000002B2   0x2100             MOVS     R1,#+0
+   \   000002B4   0x2021             MOVS     R0,#+33
+   \   000002B6   0x.... 0x....      BL       GPIOPortInit
+    166          	__PB13_IN_PU(); 		// SPI2_SCK
+   \   000002BA   0x230D             MOVS     R3,#+13
+   \   000002BC   0x463A             MOV      R2,R7
+   \   000002BE   0x2100             MOVS     R1,#+0
+   \   000002C0   0x2040             MOVS     R0,#+64
+   \   000002C2   0x.... 0x....      BL       GPIOPortInit
+    167          	__PC2_IN_PU(); 			// SPI2_MISO
+   \   000002C6   0x2302             MOVS     R3,#+2
+   \   000002C8   0x4622             MOV      R2,R4
+   \   000002CA   0x2100             MOVS     R1,#+0
+   \   000002CC   0x2040             MOVS     R0,#+64
+   \   000002CE   0x.... 0x....      BL       GPIOPortInit
+    168          	__PC3_IN_PU(); 			// SPI2_MOSI
+   \   000002D2   0x2303             MOVS     R3,#+3
+   \   000002D4   0x4622             MOV      R2,R4
+   \   000002D6   0x2100             MOVS     R1,#+0
+   \   000002D8   0x2040             MOVS     R0,#+64
+   \   000002DA   0xB001             ADD      SP,SP,#+4
+   \   000002DC   0xE8BD 0x40F0      POP      {R4-R7,LR}
+   \   000002E0   0x.... 0x....      B.W      GPIOPortInit
+    169          	
+    170          }
+    171          
+    172          
+
+   \                                 In section .text, align 2, keep-with-next
+    173          void PheripheralInit(void)
+    174          {
+   \                     PheripheralInit:
+   \   00000000   0xB510             PUSH     {R4,LR}
+    175          	TimerInit();
+   \   00000002   0x.... 0x....      BL       TimerInit
+    176          	WatchdogInit();
+   \   00000006   0x.... 0x....      BL       WatchdogInit
+    177          //	WatchdogClear();
+    178          	SerPtr = &pUSART1;
+   \   0000000A   0x....             LDR.N    R4,??DataTable5_7
+   \   0000000C   0x....             LDR.N    R2,??DataTable5_8
+   \   0000000E   0x6022             STR      R2,[R4, #+0]
+    179          	SerPtr->init(115200L, (_DATA8BIT | _1_STOP | _NONPARITY));
+   \   00000010   0x2100             MOVS     R1,#+0
+   \   00000012   0xF44F 0x30E1      MOV      R0,#+115200
+   \   00000016   0x6812             LDR      R2,[R2, #+0]
+   \   00000018   0x4790             BLX      R2
+    180          //	SerPtr->init(230400L, (_DATA8BIT | _1_STOP | _NONPARITY));
+    181          
+    182          	Ser3Ptr = &pUSART3; 										
+   \   0000001A   0x....             LDR.N    R2,??DataTable5_9
+   \   0000001C   0x6062             STR      R2,[R4, #+4]
+    183          	Ser3Ptr->init(115200L, (_DATA8BIT | _1_STOP | _NONPARITY));
+   \   0000001E   0x2100             MOVS     R1,#+0
+   \   00000020   0xF44F 0x30E1      MOV      R0,#+115200
+   \   00000024   0x6812             LDR      R2,[R2, #+0]
+   \   00000026   0x4790             BLX      R2
+    184          
+    185          	Ser4Ptr = &pUSART4; 										
+   \   00000028   0x....             LDR.N    R2,??DataTable5_10
+   \   0000002A   0x60A2             STR      R2,[R4, #+8]
+    186          	Ser4Ptr->init(115200L, (_DATA8BIT | _1_STOP | _NONPARITY));
+   \   0000002C   0x2100             MOVS     R1,#+0
+   \   0000002E   0xF44F 0x30E1      MOV      R0,#+115200
+   \   00000032   0x6812             LDR      R2,[R2, #+0]
+   \   00000034   0x4790             BLX      R2
+    187          	EEpromInit();
+   \   00000036   0x.... 0x....      BL       EEpromInit
+    188          
+    189          	/////////////////////////////////////////////////////////
+    190          	// Function Task recursion
+    191          	Ser1Init();
+   \   0000003A   0x.... 0x....      BL       Ser1Init
+    192          #if 1
+    193          	ExpioInit();
+   \   0000003E   0x.... 0x....      BL       ExpioInit
+    194          	AlcInit();
+   \   00000042   0x.... 0x....      BL       AlcInit
+    195          	DtuInit();
+   \   00000046   0x.... 0x....      BL       DtuInit
+    196          	iAPDInit();
+   \   0000004A   0x.... 0x....      BL       iAPDInit
+    197          
+    198          	SmsInit();	
+   \   0000004E   0x.... 0x....      BL       SmsInit
+    199          
+    200          	TestInit();
+   \   00000052   0x.... 0x....      BL       TestInit
+    201          	ADCInit(TRUE);
+   \   00000056   0x2001             MOVS     R0,#+1
+   \   00000058   0xE8BD 0x4010      POP      {R4,LR}
+   \   0000005C   0x.... 0x....      B.W      ADCInit
+    202          #endif	
+    203          	//EXTI0_Init();
+    204          	//EXTI12_Init();
+    205          }
+    206          
+
+   \                                 In section .text, align 2, keep-with-next
+    207          void LedDisplay(void)
+    208          {
+   \                     LedDisplay:
+   \   00000000   0xB580             PUSH     {R7,LR}
+    209          	if(TimeOverCheck(TimerLed))
+   \   00000002   0x2001             MOVS     R0,#+1
+   \   00000004   0x.... 0x....      BL       TimeOverCheck
+   \   00000008   0xB168             CBZ.N    R0,??LedDisplay_0
+    210          	{
+    211          		TimerRegist(TimerLed, Time100mSec*5L);
+   \   0000000A   0xF44F 0x71FA      MOV      R1,#+500
+   \   0000000E   0x2001             MOVS     R0,#+1
+   \   00000010   0x.... 0x....      BL       TimerRegist
+    212          		RUNLEDSEL ^= 1;
+   \   00000014   0x....             LDR.N    R0,??DataTable5_11  ;; 0x40020414
+   \   00000016   0x6801             LDR      R1,[R0, #+0]
+   \   00000018   0xF081 0x0104      EOR      R1,R1,#0x4
+   \   0000001C   0x6001             STR      R1,[R0, #+0]
+    213                  WatchdogClear();
+   \   0000001E   0xE8BD 0x4001      POP      {R0,LR}
+   \   00000022   0x.... 0x....      B.W      WatchdogClear
+    214          	}
+    215          }
+   \                     ??LedDisplay_0:
+   \   00000026   0xBD01             POP      {R0,PC}          ;; return
+    216          
+
+   \                                 In section .text, align 2, keep-with-next
+    217          void  mainTask (void *p_arg)
+    218          {
+   \                     mainTask:
+   \   00000000   0xB510             PUSH     {R4,LR}
+    219              (void)p_arg;
+    220          
+    221          	InitStm32f103();
+   \   00000002   0x.... 0x....      BL       InitStm32f103
+    222          	PheripheralInit();
+   \   00000006   0x.... 0x....      BL       PheripheralInit
+    223          
+    224          	TimerRegist(TimerLed, Time100mSec);
+   \   0000000A   0x2164             MOVS     R1,#+100
+   \   0000000C   0x2001             MOVS     R0,#+1
+   \   0000000E   0x.... 0x....      BL       TimerRegist
+   \   00000012   0x....             LDR.N    R4,??DataTable5_12
+    225          
+    226              while(1)
+    227          	{
+    228          		CheckSoftTimer();
+   \                     ??mainTask_0:
+   \   00000014   0x.... 0x....      BL       CheckSoftTimer
+    229          		if(!m_writing)
+   \   00000018   0x7820             LDRB     R0,[R4, #+0]
+   \   0000001A   0xB908             CBNZ.N   R0,??mainTask_1
+    230          		{
+    231          			ADC1_SWStart();
+   \   0000001C   0x.... 0x....      BL       ADC1_SWStart
+    232          		}
+    233          		OSTimeDly(2L);
+   \                     ??mainTask_1:
+   \   00000020   0x2002             MOVS     R0,#+2
+   \   00000022   0x.... 0x....      BL       OSTimeDly
+   \   00000026   0xE7F5             B.N      ??mainTask_0
+    234              }
+    235          }
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable5:
+   \   00000000   0x40023830         DC32     0x40023830
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable5_1:
+   \   00000000   0x40021000         DC32     0x40021000
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable5_2:
+   \   00000000   0x40020800         DC32     0x40020800
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable5_3:
+   \   00000000   0x40021400         DC32     0x40021400
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable5_4:
+   \   00000000   0x40020000         DC32     0x40020000
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable5_5:
+   \   00000000   0x40020400         DC32     0x40020400
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable5_6:
+   \   00000000   0x40021800         DC32     0x40021800
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable5_7:
+   \   00000000   0x........         DC32     SerPtr
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable5_8:
+   \   00000000   0x........         DC32     pUSART1
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable5_9:
+   \   00000000   0x........         DC32     pUSART3
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable5_10:
+   \   00000000   0x........         DC32     pUSART4
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable5_11:
+   \   00000000   0x40020414         DC32     0x40020414
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable5_12:
+   \   00000000   0x........         DC32     m_writing
+    236          // 8982051008140861537
+    237          
+    238          #if 0
+    239          GUI Table Auto Table Load 시 3분 50초 
+    240          
+    241          
+    242          보드 에서 동작 시 17초 
+    243          #endif
+
+   Maximum stack usage in bytes:
+
+   .cstack Function
+   ------- --------
+        0  InitAFIO
+       24  InitGPIO
+              0 -> GPIOPortInit
+             24 -> GPIOPortInit
+        8  InitStm32f103
+              8 -> InitAFIO
+              8 -> InitGPIO
+              0 -> InitSysTick
+              8 -> SystemInit_ExtMemCtl
+              8 -> SystemInit_PSRAM0Ctl
+        8  LedDisplay
+              8 -> TimeOverCheck
+              8 -> TimerRegist
+              0 -> WatchdogClear
+        8  PheripheralInit
+              8 -- Indirect call
+              0 -> ADCInit
+              8 -> AlcInit
+              8 -> DtuInit
+              8 -> EEpromInit
+              8 -> ExpioInit
+              8 -> Ser1Init
+              8 -> SmsInit
+              8 -> TestInit
+              8 -> TimerInit
+              8 -> WatchdogInit
+              8 -> iAPDInit
+        8  mainTask
+              8 -> ADC1_SWStart
+              8 -> CheckSoftTimer
+              8 -> InitStm32f103
+              8 -> OSTimeDly
+              8 -> PheripheralInit
+              8 -> TimerRegist
+
+
+   Section sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+       4  ??DataTable5
+       4  ??DataTable5_1
+       4  ??DataTable5_10
+       4  ??DataTable5_11
+       4  ??DataTable5_12
+       4  ??DataTable5_2
+       4  ??DataTable5_3
+       4  ??DataTable5_4
+       4  ??DataTable5_5
+       4  ??DataTable5_6
+       4  ??DataTable5_7
+       4  ??DataTable5_8
+       4  ??DataTable5_9
+      72  InitAFIO
+     740  InitGPIO
+      28  InitStm32f103
+      40  LedDisplay
+      96  PheripheralInit
+       4  Ser2Ptr
+      12  SerPtr
+          Ser3Ptr
+          Ser4Ptr
+      52  convinfo
+       1  iAdcIndex
+      40  mainTask
+
+ 
+    16 bytes in section .bss
+     1 byte  in section .data
+    52 bytes in section .rodata
+ 1 068 bytes in section .text
+ 
+ 1 068 bytes of CODE  memory
+    52 bytes of CONST memory
+    17 bytes of DATA  memory
+
+Errors: none
+Warnings: none

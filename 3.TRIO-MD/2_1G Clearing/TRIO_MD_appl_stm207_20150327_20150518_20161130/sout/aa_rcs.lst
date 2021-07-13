@@ -1,0 +1,968 @@
+###############################################################################
+#                                                                             #
+# IAR ANSI C/C++ Compiler V5.30.2.51295/W32 for ARM     09/Jun/2011  18:42:12 #
+# Copyright 1999-2009 IAR Systems AB.                                         #
+#                                                                             #
+#    Cpu mode     =  thumb                                                    #
+#    Endian       =  little                                                   #
+#    Source file  =  C:\user\project\HFR OTM-L12\fw\appl_otmL12_20110505_v1.0 #
+#                    \code\aa_rcs.c                                           #
+#    Command line =  "C:\user\project\HFR OTM-L12\fw\appl_otmL12_20110505_v1. #
+#                    0\code\aa_rcs.c" -lcN "C:\user\project\HFR               #
+#                    OTM-L12\fw\appl_otmL12_20110505_v1.0\sout\" -lB          #
+#                    "C:\user\project\HFR OTM-L12\fw\appl_otmL12_20110505_v1. #
+#                    0\sout\" -o "C:\user\project\HFR                         #
+#                    OTM-L12\fw\appl_otmL12_20110505_v1.0\sout\"              #
+#                    --endian=little --cpu=Cortex-M3 -e --require_prototypes  #
+#                    --fpu=None --dlib_config "C:\compiler\ewarm              #
+#                    5.3\arm\INC\DLib_Config_Normal.h" -I                     #
+#                    "C:\user\project\HFR OTM-L12\fw\appl_otmL12_20110505_v1. #
+#                    0\include\" -I "C:\user\project\HFR                      #
+#                    OTM-L12\fw\appl_otmL12_20110505_v1.0\lib_stm32\inc\" -I  #
+#                    "C:\user\project\HFR OTM-L12\fw\appl_otmL12_20110505_v1. #
+#                    0\lib_stm32\src\" -I "C:\user\project\HFR                #
+#                    OTM-L12\fw\appl_otmL12_20110505_v1.0\uC-CPU\" -I         #
+#                    "C:\user\project\HFR OTM-L12\fw\appl_otmL12_20110505_v1. #
+#                    0\uC-LIB\" -I "C:\user\project\HFR                       #
+#                    OTM-L12\fw\appl_otmL12_20110505_v1.0\uCOS-II\Ports\" -I  #
+#                    "C:\user\project\HFR OTM-L12\fw\appl_otmL12_20110505_v1. #
+#                    0\uCOS-II\Source\" -I "C:\user\project\HFR               #
+#                    OTM-L12\fw\appl_otmL12_20110505_v1.0\uC-Probe\" -I       #
+#                    "C:\compiler\ewarm 5.3\arm\INC\" -Oh                     #
+#    List file    =  C:\user\project\HFR OTM-L12\fw\appl_otmL12_20110505_v1.0 #
+#                    \sout\aa_rcs.lst                                         #
+#    Object file  =  C:\user\project\HFR OTM-L12\fw\appl_otmL12_20110505_v1.0 #
+#                    \sout\aa_rcs.o                                           #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+C:\user\project\HFR OTM-L12\fw\appl_otmL12_20110505_v1.0\code\aa_rcs.c
+      1          /*******************************************************************************
+      2           *
+      3           * This module contains the function `7092 original header file, a function
+      4           * whole things  initializations - global, include function and so on
+      5           *
+      6           *
+      7           * Note that this function is called before the data segments are
+      8           * initialized, this means that this function cannot rely on the
+      9           * values of global or static variables.
+     10           *
+     11           *
+     12           * Copyright 2006- bizistyle(bgyoon@hanafos.com) All rights reserved.
+     13           *
+     14           * $Revision: 0.1 $
+     15           * $Revision date: 2006.03.__
+     16           *
+     17           ******************************************************************************/
+     18          #define RCS_C
+     19          //#define RCS_DEBUG
+     20          
+     21          #include "../include/main.h"
+     22          
+     23          void RCSSerInit(void)
+     24          {
+     25          	RcsSer->CheckByte = pUSART4.CheckByte;
+     26          	RcsSer->RxGetByte = pUSART4.RxGetByte;
+     27          	RcsSer->PutStr = pUSART4.PutStr;
+     28          	RcsSer->TxClear = pUSART4.TxClear;
+     29          	RcsSer->TxCheckByte = pUSART4.TxCheckByte;
+     30          	RcsSer->printf = pUSART4.printf;
+     31          	RcsSer->BuffClear = pUSART4.BuffClear;
+     32          
+     33          	RcsSer->TimerRx = TimerRcsRx;
+     34          	RcsSer->TimerEndWait = TimerRcsEndWait;
+     35          	RcsSer->ctrlsrc = NULL;			//
+     36          		
+     37          	RcsSer->Recv = &Rwrcs;
+     38          	RcsSer->Send = &Swrcs;
+     39          	RcsSer->Sem = OSSemCreate(1);
+     40          	RcsSer->printf("RCS PORT INIT: 19200bpS \n");
+     41          
+     42          	OSTaskCreate(RCSTask, (void *)0, (OS_STK *)&RcsTaskStk[RCS_START_STK_SIZE - 1], RCS_START_PRIO);
+     43          
+     44          }
+     45          
+     46          
+     47          void RCSTask(void *p_arg)
+     48          {
+     49          	p_arg = p_arg;
+     50          
+     51          	__SKProtocolPtr *nPtr = (__SKProtocolPtr *)RcsSer;
+     52          
+     53          	OSTimeDly(RCS_START_PRIO*100L);
+     54          	
+     55          	while(1)
+     56          	{
+     57          		if(!tTestFlag)
+     58          		{
+     59          #ifdef 	RCS_DEBUG
+     60          			INT16U nCnt;
+     61          
+     62          			while(nPtr->CheckByte(1, &nCnt))
+     63          			{
+     64          				INT8U tmp = nPtr->RxGetByte();
+     65          				nPtr->PutStr(&tmp, 1, TRUE);
+     66          			}
+     67          #else
+     68          			RCSStsCheckConnectionRst(nPtr);
+     69          
+     70          			if(RCSProtocolCheck(nPtr))
+     71          			{			
+     72          				RCSStsCheckConnectionSet(nPtr);
+     73          				RCSComCheck(nPtr);
+     74          			}
+     75          #endif		
+     76          	    }
+     77          		OSTimeDly(200L);
+     78          	}
+     79          }
+     80          
+     81          
+     82          INT8U WhatRxRCS(__SKProtocolPtr *nPtr)
+     83          {
+     84          	INT16U RetVal = 0;
+     85          
+     86          	//SIOⅴ BODY is ONLY ONE(1)
+     87          	if(nPtr->Recv->BODYFRAME.CrcOK)	// CRC OK
+     88          	{
+     89          		RetVal = nPtr->Recv->BODYFRAME.Command;
+     90          	}
+     91          	else //NO ERROR
+     92          	{
+     93          		//ERROR CASE
+     94          		RetVal = crcERROR;
+     95          	}
+     96              return (RetVal);	
+     97          }
+     98          
+     99          
+    100          void RCSComCheck (__SKProtocolPtr *nPtr)
+    101          {
+    102          	INT8U tcnt = 0;
+    103          
+    104          	__SKProtocolSIO *Recv = nPtr->Recv;
+    105          	__SKProtocolSIO *Send = nPtr->Send;
+    106          
+    107          	__RCSBODYFRAME *rBody = &Recv->BODYFRAME;
+    108          	__RCSBODYFRAME *sBody = &Send->BODYFRAME;
+    109          
+    110          	INT8U id0 = rBody->SubID[0];
+    111          	INT8U id1 = rBody->SubID[1];
+    112          	INT8U id2 = 0xff;
+    113          
+    114          	INT8U Comm = WhatRxRCS(nPtr);
+    115          	INT8U RSPSComm;
+    116          	
+    117          	INT8U tmpDnr = 0;
+    118          	INT8U tmpRmt = 0;
+    119          
+    120          	INT8U IsItMyID = IsItRtnMySysIDtoVAL(id0, id1, id2, &tmpDnr, &tmpRmt);
+    121          	INT32U sptr = 0;
+    122          
+    123          
+    124          	if(MyPortID != rBody->PortID)
+    125          	{
+    126          		INT32U cpu_sr;
+    127          		EE_BACK1 *tptr;
+    128          		
+    129          		tmpDnr = id1%DnrMaxID;
+    130          
+    131          		OS_ENTER_CRITICAL();
+    132          		
+    133          		tptr = (EE_BACK1 *)RoadBackuptobuffer(vEE_BACK1Addr);	// Load 1st Area	
+    134          		
+    135          		tptr->BackUp.PortID = rBody->PortID;
+    136          
+    137          		WriteBuffertoBackup(vEE_BACK1Addr, sizeof(EE_BACK1));
+    138          
+    139          		OS_EXIT_CRITICAL();
+    140          
+    141          		MyPortID = rBody->PortID;
+    142          		SerPtr->printf("PORTID CHANGED %02x\n", rBody->PortID);
+    143          	}
+    144          
+    145          	#ifdef RCS_DBG
+    146          	PcSer->PutStr((INT8U *)Recv, 4 + 7 + (rBody->SubLen - 3) + 2, ENABLE);
+    147          	#endif
+    148          	
+    149          	switch(Comm)	//command 眉农
+    150          	{	
+    151          		case RCSStatusRQST:
+    152          			
+    153          			tcnt = RCSGenAidSts(sBody->SubData, &DnrSts[tmpDnr][tmpRmt]);  
+    154          			RCSDataAckTx(id0, id1, (INT8U *)sBody->SubData, tcnt, MyPortID, RCSStatusRSPS);
+    155          		break;
+    156          
+    157          		case RCSControlRQST:
+    158          		case RCSAlarmMaskSetRQST:
+    159          
+    160          			sptr = WRCS_DownLoadGiveupTimerSet(NULL);
+    161          
+    162          			if(sptr) { if(sptr != (INT32U)nPtr) return; }
+    163          			
+    164          			if(SystemTypeInfo < 2) {
+    165          				if(IsItMyID){
+    166          					switch(Comm)
+    167          					{
+    168          						case RCSControlRQST:
+    169          							
+    170          							RCSAnalyzeAidData(nPtr, TRUE, tmpDnr, tmpRmt);
+    171          							if(!ALLResetFlag)
+    172          							{
+    173          								tcnt = RCSGenAidSts(sBody->SubData, &DnrSts[tmpDnr][tmpRmt]);
+    174          								RSPSComm = RCSControlRSPS;
+    175          							}
+    176          							else
+    177          							{
+    178          								RSPSComm = ControlQue;
+    179          								pBodyFrameTx(id0, id1, 0xff, (INT8U *)rBody->SubData, (rBody->SubLen - 3), RSPSComm, IORUSer, (__ProtocolPtr *)nPtr);
+    180          								return;
+    181          							}
+    182          						break;
+    183          						case RCSAlarmMaskSetRQST:
+    184          						{
+    185          							INT32U cpu_sr;
+    186          							EE_BACK1 *tptr;
+    187          							
+    188          							OS_ENTER_CRITICAL();
+    189          							
+    190          							tptr = (EE_BACK1 *)RoadBackuptobuffer(vEE_BACK1Addr);	// Load 1st Area	
+    191          							
+    192          							DnrSts[tmpDnr][tmpRmt].AlarmMask = rBody->SubData[0] & 0x01;
+    193          							tptr->BackUp.AlarmMask = rBody->SubData[0] & 0x01;
+    194          							sBody->SubData[0] = DnrSts[tmpDnr][tmpRmt].AlarmMask;
+    195          							tcnt = 1;
+    196          							
+    197          							WriteBuffertoBackup(vEE_BACK1Addr, sizeof(EE_BACK1));
+    198          					
+    199          							OS_EXIT_CRITICAL();
+    200          							RSPSComm = RCSAlarmMaskSetRSPS;
+    201          						}
+    202          						break;
+    203          					}
+    204          					RCSDataAckTx(id0, id1, (INT8U *)sBody->SubData, tcnt, MyPortID, RSPSComm);
+    205          				}
+    206          				else 
+    207          				{
+    208          						 if(Comm == RCSControlRQST)			RSPSComm = ControlQue;
+    209          					else if(Comm == RCSAlarmMaskSetRQST)	RSPSComm = AlarmMaskSetQue;
+    210          				
+    211          					if(tmpDnr == MyDnrID && tmpRmt) 
+    212          					{
+    213          						//		to WRCS1
+    214          						//		SEND MY_Donor Remote !!
+    215          						//		SerPtr->printf("SEND Remote \n");
+    216          						pBodyFrameTx(id0, id1, 0xff, (INT8U *)rBody->SubData, (rBody->SubLen - 3), RSPSComm, Wrcs1, (__ProtocolPtr *)nPtr);
+    217          					}
+    218          					else // to Another DONOR Send
+    219          					{
+    220          						pBodyFrameTx(id0, id1, 0xff, (INT8U *)rBody->SubData, (rBody->SubLen - 3), RSPSComm, DnrSer0, (__ProtocolPtr *)nPtr);
+    221          					}
+    222          				}
+    223          			}
+    224          			else
+    225          			{						// REMOTE CASE !!
+    226          				if(IsItMyID){
+    227          					switch(Comm)
+    228          					{
+    229          						case RCSControlRQST:
+    230          							RCSAnalyzeAidData(nPtr, TRUE, tmpDnr, tmpRmt);
+    231          
+    232          							RSPSComm = ControlQue;
+    233          							pBodyFrameTx(id0, id1, 0xff, (INT8U *)rBody->SubData, (rBody->SubLen - 3), RSPSComm, IORUSer, (__ProtocolPtr *)nPtr);
+    234          						return;
+    235          
+    236          						case RCSAlarmMaskSetRQST:
+    237          						{
+    238          							INT32U cpu_sr;
+    239          							EE_BACK1 *tptr;
+    240          							
+    241          							OS_ENTER_CRITICAL();
+    242          							
+    243          							tptr = (EE_BACK1 *)RoadBackuptobuffer(vEE_BACK1Addr);	// Load 1st Area	
+    244          							
+    245          							DnrSts[tmpDnr][tmpRmt].AlarmMask = rBody->SubData[0] & 0x01;
+    246          							tptr->BackUp.AlarmMask = rBody->SubData[0] & 0x01;
+    247          							sBody->SubData[0] = DnrSts[tmpDnr][tmpRmt].AlarmMask;
+    248          							tcnt = 1;
+    249          							
+    250          							WriteBuffertoBackup(vEE_BACK1Addr, sizeof(EE_BACK1));
+    251          					
+    252          							OS_EXIT_CRITICAL();
+    253          							RSPSComm = RCSAlarmMaskSetRSPS;
+    254          						}
+    255          						break;
+    256          					}
+    257          					RCSDataAckTx(id0, id1, (INT8U *)sBody->SubData, tcnt, MyPortID, RSPSComm);
+    258          				}
+    259          				else{
+    260          				
+    261          					     if(Comm == RCSControlRQST)			RSPSComm = RvsControlRQST;
+    262          					else if(Comm == RCSAlarmMaskSetRQST)	RSPSComm = RvsAlarmMaskSetRQST;
+    263          
+    264          					pBodyFrameTx(id0, id1, 0xff, (INT8U *)rBody->SubData, (rBody->SubLen - 3), RSPSComm, Wrcs1, (__ProtocolPtr *)nPtr); // Send to Request
+    265          				}
+    266          			}
+    267          		break;
+    268          
+    269          		case RCSAlarmSCODERSPS:
+    270          			if(ServRstAlmFlag[tmpDnr][tmpRmt])	MyRstCase.SERVERRstCase[tmpDnr][tmpRmt] = 0x00;
+    271          			ServAlmSndCnt[tmpDnr][tmpRmt] = 0;
+    272          			ServRstAlmFlag[tmpDnr][tmpRmt]= 0;
+    273          		break;
+    274          
+    275          		case ModuleInformStsQue:
+    276          
+    277          			tcnt = GenModuleAutoInformSts(&sBody->SubData[1], tmpDnr, tmpRmt) + 1;
+    278          			sBody->SubData[0] = 0x30;
+    279          			RCSDataAckTx(id0, id1, (INT8U *)sBody->SubData, tcnt, MyPortID, ModuleInformStsQue);
+    280          
+    281          		break;
+    282          		
+    283          		case RCSAlarmMaskRQST:
+    284          			RCSDataAckTx(id0, id1, (INT8U *)&DnrSts[tmpDnr][tmpRmt].AlarmMask, 1, MyPortID, RCSAlarmMaskRSPS);
+    285          		break;
+    286          
+    287          
+    288          		case RcsDownloadRQST:
+    289          			sptr = WRCS_DownLoadGiveupTimerSet(NULL);
+    290          
+    291          			if(sptr) { if(sptr != (INT32U)nPtr) return; }
+    292          
+    293          			WRCS_DownLoadGiveupTimerSet((INT32U)nPtr);
+    294          
+    295          			
+    296          			if(id0 == 0xff && id1 == 0xff)
+    297          			{
+    298          				WRCS_DownLoadGiveupTimerSet((INT32U)nPtr);
+    299          				RCSDownloadFunc(nPtr);
+    300          			}
+    301          			else
+    302          			{
+    303          				if(SystemTypeInfo < 2) {	// DONOR CASE !!
+    304          					WRCS_DownLoadGiveupTimerSet((INT32U)nPtr);
+    305          
+    306          					if(IsItMyID)
+    307          					{					
+    308          						if(id0 == RCUID) RCSDownloadFunc(nPtr);
+    309          						else
+    310          							switch(rBody->SubData[0])
+    311          							{
+    312          								case RCSDownloadCMD:			Comm = DownloadCMD; 		break;
+    313          								case RCSDownloadCMDConfirm: 	Comm = DownloadCMDConfirm;	break;
+    314          								case RCSDownLoadData:			Comm = DownLoadData;		break;
+    315          								case RCSDownLoadDataConfirm:	Comm = DownLoadDataConfirm; break;
+    316          							}	
+    317          						{
+    318          							pBodyFrameTx(id0, id1, 0xff, (INT8U *)&rBody->SubData[1], (rBody->SubLen - 4), Comm, IORUSer, (__ProtocolPtr *)nPtr);
+    319          						}
+    320          					}
+    321          					else
+    322          					{						
+    323          						switch(rBody->SubData[0])
+    324          						{
+    325          							case RCSDownloadCMD:			Comm = DownloadCMD; 		break;
+    326          							case RCSDownloadCMDConfirm: 	Comm = DownloadCMDConfirm;	break;
+    327          							case RCSDownLoadData:			Comm = DownLoadData;		break;
+    328          							case RCSDownLoadDataConfirm:	Comm = DownLoadDataConfirm; break;
+    329          						}
+    330          						
+    331          						if(tmpDnr == MyDnrID && tmpRmt)
+    332          						{
+    333          							//		to WRCS1
+    334          							//		SEND MY_Donor Remote !!
+    335          							//		SerPtr->printf("SEND Remote \n");
+    336          							pBodyFrameTx(id0, id1, 0xff, (INT8U *)&rBody->SubData[1], (rBody->SubLen - 4), Comm, Wrcs1, (__ProtocolPtr *)nPtr);
+    337          						}
+    338          						else // to Another DONOR Send
+    339          						{
+    340          							pBodyFrameTx(id0, id1, 0xff, (INT8U *)&rBody->SubData[1], (rBody->SubLen - 4), Comm, DnrSer0, (__ProtocolPtr *)nPtr);
+    341          						}
+    342          					}
+    343          				}			
+    344          				else {						// REMOTE CASE !!
+    345          					WRCS_DownLoadGiveupTimerSet((INT32U)nPtr);
+    346          
+    347          					if(IsItMyID){
+    348          						if(id0 == RCUID) RCSDownloadFunc(nPtr);
+    349          						else
+    350          						{
+    351          							switch(rBody->SubData[0])
+    352          							{
+    353          								case RCSDownloadCMD:			Comm = DownloadCMD; 		break;
+    354          								case RCSDownloadCMDConfirm: 	Comm = DownloadCMDConfirm;	break;
+    355          								case RCSDownLoadData:			Comm = DownLoadData;		break;
+    356          								case RCSDownLoadDataConfirm:	Comm = DownLoadDataConfirm; break;
+    357          							}	
+    358          							pBodyFrameTx(id0, id1, 0xff, (INT8U *)&rBody->SubData[1], (rBody->SubLen - 4), Comm, IORUSer, (__ProtocolPtr *)nPtr);
+    359          						}
+    360          					}
+    361          					else{
+    362          						switch(rBody->SubData[0])
+    363          						{
+    364          							case RCSDownloadCMD:			Comm = RvsDownloadCMDRQST; 			break;
+    365          							case RCSDownloadCMDConfirm: 	Comm = RvsDownloadCMDConfirmRQST;	break;
+    366          							case RCSDownLoadData:			Comm = RvsDownLoadDataRQST;			break;
+    367          							case RCSDownLoadDataConfirm:	Comm = RvsDownLoadDataConfirmRQST; 	break;
+    368          						}	
+    369          						pBodyFrameTx(id0, id1, 0xff, (INT8U *)&rBody->SubData[1], (rBody->SubLen - 4), Comm, Wrcs1, (__ProtocolPtr *)nPtr);
+    370          					}
+    371          				}
+    372          			}
+    373          	break;
+    374          
+    375          	default:
+    376          		SerPtr->printf("id0 = %02x, id1 = %02x Comm = %02x\n", id0, id1, Comm);
+    377          	break;
+    378          	}
+    379          	
+    380          }
+    381          
+    382          INT8U RCSDownloadFunc (__SKProtocolPtr *nPtr)
+    383          {
+    384          
+    385          	__SKProtocolSIO *Recv = nPtr->Recv;
+    386          	__RCSBODYFRAME *rBody = &Recv->BODYFRAME;
+    387          
+    388          	INT8U tmpData[10] = {0,};
+    389          	INT8U tmpLen = 0;
+    390          
+    391          	INT8U id0 = rBody->SubID[0];
+    392          	INT8U id1 = rBody->SubID[1];
+    393          
+    394          	tmpData[tmpLen++] = rBody->SubData[0];
+    395          	
+    396          	switch(rBody->SubData[0])
+    397          	{
+    398          		case RCSDownloadCMD:
+    399          			tmpData[tmpLen++] = RCSACK;
+    400          			tmpData[tmpLen++] = rBody->SubData[1];	// version
+    401          			tmpData[tmpLen++] = rBody->SubData[2];	// 1st frame high
+    402          			tmpData[tmpLen++] = rBody->SubData[3];	// 2nd fram low
+    403          			TotFrame = ((rBody->SubData[2] << 8) | rBody->SubData[3]);
+    404          		break;
+    405          		
+    406          		case RCSDownloadCMDConfirm:
+    407          			{
+    408          				INT32U cpu_sr;
+    409          				OS_ENTER_CRITICAL();
+    410          				#ifdef __EXT_RAM_USED
+    411          					tmpData[tmpLen++] = RCSACK;
+    412          				#else
+    413          					if(!FLASHpAPBK_Check_Erase())
+    414          					{
+    415          						tmpData[tmpLen++] = RCSNACK;
+    416          					}
+    417          					else
+    418          						tmpData[tmpLen++] = RCSACK;
+    419          				#endif
+    420          
+    421          				OS_EXIT_CRITICAL();
+    422          			}
+    423          		break;
+    424          		
+    425          		case RCSDownLoadData:
+    426          			if(RCSReceiveData(nPtr))
+    427          			{
+    428          				tmpData[tmpLen++] = RCSACK;
+    429          			}
+    430          			else
+    431          			{
+    432          				tmpData[tmpLen++] = RCSNACK;
+    433          			}
+    434          			tmpData[tmpLen++] = (INT8U)((FrameCnt >> 8) & 0xff);
+    435          			tmpData[tmpLen++] = (INT8U)((FrameCnt     ) & 0xff);
+    436          
+    437          		break;
+    438          		
+    439          		case RCSDownLoadDataConfirm:
+    440          			{
+    441          				INT16U tmpCRC;
+    442          				tmpCRC = (INT16U)((rBody->SubData[3] << 8) | rBody->SubData[4]);
+    443          				if((Swcrc16 == tmpCRC) && (TotFrame == FrameCnt + 1))	tmpData[tmpLen++] = RCSACK;
+    444          				else													tmpData[tmpLen++] = RCSNACK;
+    445          			}
+    446          			tmpData[tmpLen++] = (INT8U)(TotFrame >> 8);
+    447          			tmpData[tmpLen++] = (INT8U)(TotFrame     );
+    448          			tmpData[tmpLen++] = (INT8U)(Swcrc16 >> 8 );
+    449          			tmpData[tmpLen++] = (INT8U)(Swcrc16      );
+    450          		break;
+    451          	}
+    452          
+    453          	RCSDataAckTx(id0, id1, (INT8U *)tmpData, tmpLen, rBody->PortID, RcsDownloadRSPS);
+    454          
+    455          	// Jump the boot.
+    456          	////////////////////////////////////////////////////////////////////////////
+    457          	// Download OpeSocketInforating
+    458          	///////////////////////////////
+    459          	// Down Load Ending
+    460          	switch(rBody->SubData[0])
+    461          	{
+    462          		case RCSDownLoadDataConfirm:
+    463          			if(tmpData[1] == RCSACK)
+    464          			{
+    465          				INT32U t = *((INT32U *)(__pAPBKAddr + 40));	// jump base addr + selfaddinfo address
+    466          				INT32U s = *((INT32U *)(__pAPBKAddr + 36));	// jump base addr!!
+    467          
+    468          				selfinfo *p = (selfinfo *)(__pAPBKAddr + (t-s));
+    469          
+    470          				if(!memcmp(p->infor[0], convinfo.infor[0], strlen(convinfo.infor[0])))
+    471          				{
+    472          				
+    473          #ifdef __PWR_BACKUP_USED
+    474          					BKP_WriteBackupRegister(BKP_DR1, 0x02);
+    475          					PWR_BackupAccessCmd(ENABLE);
+    476          					SerPtr->printf("BKP_DR1 = %d\n", BKP_ReadBackupRegister(BKP_DR1));
+    477          #endif
+    478          					ResetCaseBackup(0x02);
+    479          					SerPtr->printf("rambackup = %d\n", rambackup[0]);
+    480          
+    481          					//WriteEEprom(ResetCaseBp, );
+    482          					OSTimeDly(10L);
+    483          					#ifdef __EXT_RAM_USED
+    484          						DownloadFlagSetExtSRAM(DataCount);
+    485          					#else
+    486          						DownloadFlagSet(DataCount);
+    487          					#endif
+    488          					DownLoadBootingJump();
+    489          				}
+    490          			}
+    491          		break;
+    492          	}
+    493            
+    494          	return TRUE;
+    495          
+    496          }
+    497          
+    498          BOOL RCSReceiveData(__SKProtocolPtr *nPtr)
+    499          {
+    500          	__SKProtocolSIO *Recv = nPtr->Recv;
+    501          	__RCSBODYFRAME *rBody = &Recv->BODYFRAME;
+    502          		
+    503          	INT16U	tmpFrameCnt = 0;
+    504          	INT32U	tmpLength = 0;
+    505          	INT32S	err = 0;
+    506          
+    507          	// get the download Frame number
+    508          
+    509          
+    510          	tmpFrameCnt = rBody->SubData[1];
+    511          	tmpFrameCnt = (tmpFrameCnt << 8) | rBody->SubData[2];		// Frame Number
+    512          
+    513          	if ( tmpFrameCnt == 0 )
+    514          	{
+    515          		// counter initialize when tmpFramecnt == 0.
+    516          		DataCount = 0;
+    517          		Swcrc16 = 0;
+    518          	}
+    519          	else
+    520          	{	// frame Number Check old != current
+    521          		if((tmpFrameCnt != (FrameCnt + 1))) return FALSE;
+    522          		else
+    523          		{
+    524          			if(tmpFrameCnt == FrameCnt) return TRUE;
+    525          		}
+    526          	}
+    527          
+    528          	// Download Data Length : length - 2(frame number 2byte)
+    529          	tmpLength = rBody->SubLen - 6;
+    530          	#ifdef __EXT_RAM_USED
+    531          		err = DataCount = UpLoadExtSRAM((INT8U *)&rBody->SubData[3], tmpLength, DataCount);
+    532          	#else
+    533          		err = DataCount = UpLoadData((INT8U *)&rBody->SubData[3], tmpLength, DataCount);
+    534          	#endif
+    535          	Swcrc16 = Crc16Calc((INT8U*)&rBody->SubData[3], tmpLength, Swcrc16);
+    536          	FrameCnt = tmpFrameCnt;
+    537          
+    538          	if(err == -1) return FALSE;
+    539          	return TRUE;
+    540          }
+    541          
+    542          
+    543          INT8U RCSAnalyzeAidData(__SKProtocolPtr *nPtr, INT8U Ctrl, INT8U tmpDnr, INT8U tmpRmt)
+    544          {
+    545          	INT8U i = 0;
+    546          	INT8U A_ID[2];
+    547          	INT8U rAID_Value[50];
+    548          	INT8U Length;
+    549          
+    550          	INT16U Cnt = 0;
+    551          	INT16U AID_Command;
+    552          	INT32S cpu_sr;
+    553          	
+    554          	__SKProtocolSIO *Recv = nPtr->Recv;
+    555          	__RCSBODYFRAME *BodyFrame = &Recv->BODYFRAME;
+    556          	
+    557          	EE_BACK1 *tptr;
+    558          	
+    559          	INT8U rval = FALSE;
+    560          
+    561          	if(BodyFrame->SubLen < 3) return FALSE;
+    562          /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    563          	if(Ctrl) {
+    564          		OS_ENTER_CRITICAL();
+    565          		tptr = (EE_BACK1 *)RoadBackuptobuffer(vEE_BACK1Addr); // Load 1st Area	
+    566          	}
+    567              else
+    568              {
+    569                  DnrSts[tmpDnr][tmpRmt].DnrExtraRecvCnt = 0;
+    570              }
+    571              
+    572          	while(BodyFrame->SubLen - 3 > Cnt)
+    573          	{
+    574          		A_ID[0] = (INT8U)(BodyFrame->SubData[Cnt++]);
+    575          		A_ID[1] = (INT8U)(BodyFrame->SubData[Cnt++]);
+    576          
+    577          		AID_Command = ((INT16U)(A_ID[0] << 8)& 0xff00) | ((INT16U)(A_ID[1] & 0x00ff));
+    578          		Length = BodyFrame->SubData[Cnt++];
+    579          		if( Length >= sizeof(rAID_Value)) break;
+    580          		for (i = 0; i < Length; i++) rAID_Value[i] = (INT8U)(BodyFrame->SubData[Cnt++]);
+    581          
+    582          
+    583          		rval += SetDnrCtrlData(AID_Command, rAID_Value, Length, Ctrl, tmpDnr, tmpRmt, tptr);
+    584          		if(Cnt >= (BodyFrame->SubLen - 3)) break;
+    585          	}
+    586          
+    587          	if(rval)
+    588          	{
+    589          		WriteBuffertoBackup(vEE_BACK1Addr, sizeof(EE_BACK1));
+    590          	}
+    591          	if(Ctrl) OS_EXIT_CRITICAL();
+    592          	
+    593          	return rval;
+    594          }
+    595          
+    596          
+    597          INT16U 	RCSGenAidSts(INT8U *dptr, __DnrStsStr *Sts)
+    598          {
+    599          	INT8U i = 0;
+    600          	INT8U rlen = 0;
+    601          
+    602          	for(i = 0; i < sizeof(__DnrAlmStr); i++)
+    603          	{
+    604          		dptr[rlen++] = *((INT8U *)(&Sts->tmpAlm) + i);
+    605          	}
+    606          
+    607          	dptr[rlen++] = Sts->Manufacture;
+    608          	dptr[rlen++] = Sts->Supplier;
+    609          	dptr[rlen++] = Sts->RepeaterType[0];
+    610          	dptr[rlen++] = Sts->RepeaterType[1];
+    611          	dptr[rlen++] = Sts->SWVer;
+    612          
+    613          	if(Sts == &DnrSts[0][0] || Sts == &DnrSts[1][0])
+    614          	{
+    615          		dptr[rlen++] = Sts->MCUManufacture;
+    616          		dptr[rlen++] = Sts->MCUSupplier;
+    617          		dptr[rlen++] = Sts->MCUSwVer;
+    618          	}
+    619          	dptr[rlen++] = Sts->CurrentTemp;
+    620          	dptr[rlen++] = Sts->TempUpperLmt;
+    621          	dptr[rlen++] = Sts->NMSType;
+    622          	
+    623          
+    624          	//dptr[rlen++] = Sts->RingType;
+    625          	dptr[rlen++] = MySts->RingType;
+    626          
+    627          	dptr[rlen++] = Sts->SFPService.Data[0];
+    628          	dptr[rlen++] = Sts->SFPService.Data[1];
+    629          
+    630          	dptr[rlen++] = Sts->SFPInstall.Data[0];
+    631          	dptr[rlen++] = Sts->SFPInstall.Data[1];
+    632          
+    633          	if(Sts == &DnrSts[0][1] || Sts == &DnrSts[1][1])
+    634          	{
+    635          		dptr[rlen++] = Sts->EastPathLossPwr[0];
+    636          		dptr[rlen++] = Sts->EastPathLossPwr[1];
+    637          
+    638          		dptr[rlen++] = Sts->WestPathLossPwr[0];
+    639          		dptr[rlen++] = Sts->WestPathLossPwr[1];
+    640          	}
+    641          
+    642          	for(i = 0; i < 12; i++)
+    643          	{
+    644          		dptr[rlen++] = (Sts->SFPPDPwr[i]);
+    645          	}
+    646          
+    647          	if(Sts == &DnrSts[0][1] || Sts == &DnrSts[1][1])
+    648          	{
+    649          		dptr[rlen++] = Sts->SwMode;
+    650          	}
+    651          	dptr[rlen++] = Sts->SwDiretion;
+    652          
+    653          	for(i = 0; i < 12; i++)
+    654          	{
+    655          		dptr[rlen++] = (Sts->SFPPDPwrLowerLmt[i]);
+    656          	}
+    657          	
+    658          	if(Sts == &DnrSts[0][1] || Sts == &DnrSts[1][1])
+    659          	{
+    660          		dptr[rlen++] = Sts->DCPMaindBLvl;
+    661          	}
+    662          
+    663          	for(i = 0; i < 12; i++)
+    664          	{
+    665          		dptr[rlen++] = (Sts->SFPLDPwr[i]);
+    666          	}
+    667          
+    668          
+    669          	for(i = 0; i < 24; i++)
+    670          	{
+    671          		dptr[rlen++] = (Sts->SFPLDInfo[i]);
+    672          	}
+    673          	
+    674          	if(Sts == &DnrSts[0][1] || Sts == &DnrSts[1][1])
+    675          	{
+    676          		dptr[rlen++] = Sts->DCPCurrdBLvl;
+    677          		dptr[rlen++] = Sts->OTUWaveCnt;
+    678          	}
+    679          	dptr[rlen++] = MySts->IsItLocalCtrl;
+    680          	
+    681          	return rlen;
+    682          }
+    683          
+    684          
+    685          INT32U RCSProtocolCheck(__SKProtocolPtr *nPtr)
+    686          {
+    687          	INT16U nInitCnt, nCnt;
+    688          	__SKProtocolSIO *Recv = nPtr->Recv;
+    689          	////////////////////////////////////////////////////////////////
+    690          	
+    691          	//------------------------------------------------------------//
+    692          	TimerRegist(nPtr->TimerRx, Time1Sec*3);
+    693          	
+    694          
+    695          	while(1)
+    696          	{
+    697          		if(TimeOverCheck(nPtr->TimerRx)) return FALSE;
+    698          		if(nPtr->CheckByte(4, &nCnt))
+    699          		{
+    700          		///////////////////////////////////////////////
+    701          			if(STX == nPtr->RxGetByte())
+    702          			{
+    703          				if(STX == nPtr->RxGetByte())
+    704          				{
+    705          					if(STX == nPtr->RxGetByte())
+    706          					{
+    707          						if(STX == nPtr->RxGetByte())
+    708          						{
+    709          							Recv->SERBASE.Sync[0] = STX;
+    710          							Recv->SERBASE.Sync[1] = STX;
+    711          							Recv->SERBASE.Sync[2] = STX;
+    712          							Recv->SERBASE.Sync[3] = STX;
+    713          							break;
+    714          						}
+    715          					}
+    716          				}
+    717          			}	
+    718          			else OSTimeDly(200L);
+    719          		}
+    720          		else OSTimeDly(200L);
+    721          	}
+    722          	//------------------------------------------------------------//
+    723          
+    724          		
+    725          	TimerRegist(nPtr->TimerRx, Time1Sec);
+    726          	nPtr->CheckByte(1, &nInitCnt);
+    727          	while(!nPtr->CheckByte(7, &nCnt))
+    728          	{
+    729          		if(TimeOverCheck(nPtr->TimerRx))
+    730          		{
+    731          			if(nCnt > nInitCnt)
+    732          			{
+    733          				nInitCnt = nCnt;
+    734          				TimerRegist(nPtr->TimerRx, Time100mSec);
+    735          			}
+    736          			else return FALSE;
+    737          		}
+    738          		OSTimeDly(100L);
+    739          	}
+    740          
+    741          	Recv->BODYFRAME.PortID		= nPtr->RxGetByte();
+    742          	Recv->BODYFRAME.Scode		= nPtr->RxGetByte();
+    743          	Recv->BODYFRAME.Command		= nPtr->RxGetByte();
+    744          	Recv->BODYFRAME.SubLen 		= nPtr->RxGetByte();
+    745          	Recv->BODYFRAME.Rcode 		= nPtr->RxGetByte();
+    746          	Recv->BODYFRAME.SubID[0] 	= nPtr->RxGetByte();
+    747          	Recv->BODYFRAME.SubID[1] 	= nPtr->RxGetByte();
+    748          	
+    749          	//if((Recv->BODYFRAME.SubLen < 3) || (Recv->BODYFRAME.SubLen > 93))return FALSE; 	//3~93
+    750          
+    751          	if(Recv->BODYFRAME.SubLen < 3) return FALSE;//|| (Recv->BODYFRAME.SubLen > 0xff))return FALSE; 	//3~93
+    752          
+    753          
+    754          	TimerRegist(nPtr->TimerRx, Time1Sec);
+    755          	nPtr->CheckByte(1, &nInitCnt);
+    756          
+    757          	while(!nPtr->CheckByte((Recv->BODYFRAME.SubLen-1 ), &nCnt))// -1 = -(Rcode + SubId[2]) + Crc[2] 
+    758          	{
+    759          		if(TimeOverCheck(nPtr->TimerRx))
+    760          		{
+    761          			if(nCnt > nInitCnt)
+    762          			{
+    763          				nInitCnt = nCnt;
+    764          				TimerRegist(nPtr->TimerRx, Time100mSec);
+    765          			}
+    766          			else return FALSE;
+    767          		}
+    768          		OSTimeDly(100L);
+    769          	}
+    770          
+    771          	{
+    772          		INT16U i;
+    773          		for(i = 0; i < Recv->BODYFRAME.SubLen-1 ; i++)
+    774          		{
+    775          			*((INT8U *)Recv->BODYFRAME.SubData+ i) = nPtr->RxGetByte();
+    776          		}
+    777          	}
+    778          
+    779          	Recv->BODYFRAME.Crc = Crc16Calc((INT8U *)&(Recv->BODYFRAME.PortID), Recv->BODYFRAME.SubLen + 4, 0); 
+    780          	Recv->BODYFRAME.CrcOK = TRUE;	
+    781          
+    782          	
+    783          	if( (INT8U)(Recv->BODYFRAME.Crc >> 8)   != Recv->BODYFRAME.SubData[Recv->BODYFRAME.SubLen-3] )
+    784          				Recv->BODYFRAME.CrcOK = FALSE;
+    785          	if( (INT8U)(Recv->BODYFRAME.Crc)		  != Recv->BODYFRAME.SubData[Recv->BODYFRAME.SubLen-2] )
+    786          				Recv->BODYFRAME.CrcOK = FALSE;
+    787          
+    788          	return TRUE;
+    789          }
+    790          
+    791          
+    792          void RCSStsCheckConnectionSet(__SKProtocolPtr *nPtr)
+    793          {
+    794          	if(nPtr == RcsSer)
+    795          	{
+    796          		RcsPadOnFlag = 1;
+    797          		MySts->ServerPadFlag = 1;
+    798          		TimerRegist(TimerRcsCheck, 60*Time1Sec);
+    799          		TimerRegist(TimerServerPadFlag, ServerPadTime);
+    800          	}
+    801          }
+    802          
+    803          void RCSStsCheckConnectionRst(__SKProtocolPtr *nPtr)
+    804          {
+    805          	if(nPtr == RcsSer && TimeOverCheck(TimerRcsCheck)) 		RcsPadOnFlag = 0;
+    806          }
+    807          
+    808          
+    809          void RCSDataAckTx (INT8U id0, INT8U id1,  INT8U *Data, INT8U nCnt, INT8U PortID, INT8U Comm)
+    810          {
+    811          
+    812          	INT8U err = 0;
+    813          	INT32U i;	
+    814          
+    815          	__SKProtocolSIO *Send = RcsSer->Send;
+    816          
+    817          	OSSemPend(RcsSer->Sem, 10, &err);
+    818          	if(err != OS_NO_ERR ) return ;//err;
+    819          
+    820          	Send->SERBASE.Sync[0] = STX;
+    821          	Send->SERBASE.Sync[1] = STX;
+    822          	Send->SERBASE.Sync[2] = STX;
+    823          	Send->SERBASE.Sync[3] = STX;
+    824          
+    825          	Send->BODYFRAME.PortID 	= PortID;
+    826          	Send->BODYFRAME.Scode 	= CCUSocde;
+    827          	Send->BODYFRAME.Command = Comm;
+    828          	Send->BODYFRAME.SubLen 	= nCnt + 3;  // Rcode+SubId[2]
+    829          	Send->BODYFRAME.Rcode 	= __RCS_R_SCAN_RM; 
+    830          
+    831          	Send->BODYFRAME.SubID[0] = id0;	//贸府秦具窃
+    832          	Send->BODYFRAME.SubID[1] = id1;	//贸府秦具窃
+    833          
+    834          	//for(i = 0 ; i < nCnt && i < 90; i++)	//Data Length 3~93
+    835          	for(i = 0 ; i < nCnt && i < 200; i++)	//Data Length 3~93
+    836          	{
+    837          		Send->BODYFRAME.SubData[i] = Data[i];
+    838          	}
+    839          	///////////// CRC //
+    840          	{
+    841              	Send->BODYFRAME.Crc = Crc16Calc ((INT8U *)&(Send->BODYFRAME.PortID), 7 + i, 0);
+    842          		Send->BODYFRAME.SubData[i++] = (INT8U)(Send->BODYFRAME.Crc >> 8);
+    843          		Send->BODYFRAME.SubData[i++] = (INT8U)(Send->BODYFRAME.Crc     );
+    844          	}
+    845          	
+    846          	RcsSer->PutStr((INT8U *)Send, 4 + 7 + i, ENABLE);
+    847          
+    848          	#ifdef RCS_DBG
+    849          	//debug
+    850          	PcSer->PutStr((INT8U *)Send, 4 + 7 + i, ENABLE);
+    851                                         //4: stx 4 byte
+    852                                         //7: PortID ~ SubID[2]
+    853          
+    854          	#endif
+    855          	OSSemPost(RcsSer->Sem);
+    856          }
+    857          
+    858          //////////////////////////////////////////////////////////////////////////////
+    859          // End of Source File
+    860          ////////////////////////
+    861          
+
+   Maximum stack usage in bytes:
+
+     Function                 .cstack
+     --------                 -------
+     RCSAnalyzeAidData           112
+     RCSComCheck                  64
+     RCSDataAckTx                 40
+     RCSDownloadFunc              48
+     RCSGenAidSts                 24
+     RCSProtocolCheck             24
+     RCSReceiveData               32
+     RCSSerInit                    8
+     RCSStsCheckConnectionRst      8
+     RCSStsCheckConnectionSet      8
+     RCSTask                      16
+     WhatRxRCS                     0
+
+
+   Section sizes:
+
+     Function/Label                         Bytes
+     --------------                         -----
+     RcsSerB                                  48
+     RcsPadOnFlag                           1576
+     RcsSer
+     RcsTaskStk
+     Swrcs
+     Rwrcs
+     RCSSerInit                              108
+     RCSTask                                  60
+     WhatRxRCS                                18
+     RCSComCheck                            1032
+     ?Subroutine0                             92
+     RCSDownloadFunc                         400
+     RCSReceiveData                          108
+     RCSAnalyzeAidData                       204
+     ?Subroutine1                              6
+     RCSGenAidSts                            424
+     RCSProtocolCheck                        412
+     RCSStsCheckConnectionSet                 46
+     RCSStsCheckConnectionRst                 24
+     RCSDataAckTx                            170
+     ??DataTable15                             4
+     ??DataTable17                             4
+     ??DataTable20                             4
+     ??DataTable21                             4
+     ??DataTable24                             4
+     ??DataTable25                             4
+     ??DataTable28                             4
+     ??DataTable30                             4
+     ?<Constant "RCS PORT INIT: 19200b...">   28
+     ?<Constant "PORTID CHANGED %02x\n">      60
+     ?<Constant {0}>                          28
+
+ 
+    48 bytes in section .bss
+ 1 576 bytes in section .data
+   116 bytes in section .rodata
+ 3 136 bytes in section .text
+ 
+ 3 136 bytes of CODE  memory
+   116 bytes of CONST memory
+ 1 624 bytes of DATA  memory
+
+Errors: none
+Warnings: none

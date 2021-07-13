@@ -1,0 +1,169 @@
+###############################################################################
+#                                                                             #
+# IAR ANSI C/C++ Compiler V5.30.2.51295/W32 for ARM     02/Apr/2012  19:03:59 #
+# Copyright 1999-2009 IAR Systems AB.                                         #
+#                                                                             #
+#    Cpu mode     =  thumb                                                    #
+#    Endian       =  little                                                   #
+#    Source file  =  D:\Project\TRIO\3.F_W\TRIO_appl_src_20120401\lib_stm32\s #
+#                    rc\stm32f10x_main.c                                      #
+#    Command line =  D:\Project\TRIO\3.F_W\TRIO_appl_src_20120401\lib_stm32\s #
+#                    rc\stm32f10x_main.c -D NDEBUG -lcN                       #
+#                    D:\Project\TRIO\3.F_W\TRIO_appl_src_20120401\sout\ -o    #
+#                    D:\Project\TRIO\3.F_W\TRIO_appl_src_20120401\sout\       #
+#                    --debug --endian=little --cpu=Cortex-M3 -e               #
+#                    --warnings_are_errors --fpu=None --dlib_config           #
+#                    "C:\Program Files\IAR Systems\Embedded Workbench         #
+#                    5.4\arm\INC\DLib_Config_Normal.h" -I                     #
+#                    D:\Project\TRIO\3.F_W\TRIO_appl_src_20120401\include\    #
+#                    -I D:\Project\TRIO\3.F_W\TRIO_appl_src_20120401\lib_stm3 #
+#                    2\inc\ -I D:\Project\TRIO\3.F_W\TRIO_appl_src_20120401\l #
+#                    ib_stm32\src\ -I D:\Project\TRIO\3.F_W\TRIO_appl_src_201 #
+#                    20401\uC-CPU\ -I D:\Project\TRIO\3.F_W\TRIO_appl_src_201 #
+#                    20401\uC-LIB\ -I D:\Project\TRIO\3.F_W\TRIO_appl_src_201 #
+#                    20401\uCOS-II\Ports\ -I D:\Project\TRIO\3.F_W\TRIO_appl_ #
+#                    src_20120401\uCOS-II\Source\ -I                          #
+#                    D:\Project\TRIO\3.F_W\TRIO_appl_src_20120401\uC-Probe\   #
+#                    -I "C:\Program Files\IAR Systems\Embedded Workbench      #
+#                    5.4\arm\INC\" -Oh                                        #
+#    List file    =  D:\Project\TRIO\3.F_W\TRIO_appl_src_20120401\sout\stm32f #
+#                    10x_main.lst                                             #
+#    Object file  =  D:\Project\TRIO\3.F_W\TRIO_appl_src_20120401\sout\stm32f #
+#                    10x_main.o                                               #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\Project\TRIO\3.F_W\TRIO_appl_src_20120401\lib_stm32\src\stm32f10x_main.c
+      1          /*
+      2          *********************************************************************************************************
+      3          *                                              EXAMPLE CODE
+      4          *
+      5          *                          (c) Copyright 2003-2007; Micrium, Inc.; Weston, FL
+      6          *
+      7          *               All rights reserved.  Protected by international copyright laws.
+      8          *               Knowledge of the source code may NOT be used to develop a similar product.
+      9          *               Please help us continue to provide the Embedded community with the finest
+     10          *               software available.  Your honesty is greatly appreciated.
+     11          *********************************************************************************************************
+     12          */
+     13          //#define EXT
+     14          
+     15          #include "stm32f10x_conf.h"
+     16          #include "stm32f10x_main.h"
+     17          
+     18          /*******************************************************************************
+     19          *                                                main()
+     20          *
+     21          * Description : This is the standard entry point for C code.  It is assumed that your code will call
+     22          *               main() once you have performed all necessary initialization.
+     23          *
+     24          * Arguments   : none
+     25          *
+     26          * Returns     : none
+     27          ********************************************************************************/
+     28          void __RESETPRIMASK(void);
+     29          
+     30          int  main (void)
+     31          {
+     32          //    CPU_IntDis();	// Disable all interrupts until we are ready to accept them
+     33          	
+     34          #ifndef OS_INCLUDED
+     35          	mainTask(NULL);
+     36          #else	
+     37              OSInit();			// Initialize "uC/OS-II, The Real-Time Kernel"
+     38          	OSTaskCreate(mainTask, (void *)NULL, (OS_STK *)&MainTaskStk[OS_TASK_STK_SIZE - 1], MAIN_START_PRIO);
+     39              OSStart();			// Start multitasking (i.e. give control to uC/OS-II)
+     40          #endif
+     41          
+     42          }
+     43          
+     44          /*
+     45          *********************************************************************************************************
+     46          *                                   APPLICATION-DEFINED HOOKS
+     47          *
+     48          * Description: These functions are called by the hooks in os_cpu_c.c.
+     49          *
+     50          * Returns    : none
+     51          *********************************************************************************************************
+     52          */
+     53          
+     54          #if (OS_APP_HOOKS_EN > 0)
+     55          void  App_TaskCreateHook (OS_TCB *ptcb)
+     56          {
+     57          #if (uC_PROBE_OS_PLUGIN > 0) && (OS_PROBE_HOOKS_EN > 0)
+     58              OSProbe_TaskCreateHook(ptcb);
+     59          #endif
+     60          }
+     61          
+     62          
+     63          void  App_TaskDelHook (OS_TCB *ptcb)
+     64          {
+     65              (void)ptcb;
+     66          }
+     67          
+     68          #if OS_VERSION >= 251
+     69          void  App_TaskIdleHook (void)
+     70          {
+     71          }
+     72          #endif
+     73          
+     74          
+     75          void  App_TaskStatHook (void)
+     76          {
+     77          }
+     78          
+     79          
+     80          #if OS_TASK_SW_HOOK_EN > 0
+     81          void  App_TaskSwHook (void)
+     82          {
+     83          #if (uC_PROBE_OS_PLUGIN > 0) && (OS_PROBE_HOOKS_EN > 0)
+     84              OSProbe_TaskSwHook();
+     85          #endif
+     86          }
+     87          #endif
+     88          
+     89          
+     90          #if OS_VERSION >= 204
+     91          void  App_TCBInitHook (OS_TCB *ptcb)
+     92          {
+     93              (void)ptcb;
+     94          }
+     95          #endif
+     96          
+     97          
+     98          #if OS_TIME_TICK_HOOK_EN > 0
+     99          void  App_TimeTickHook (void)
+    100          {
+    101          #if (uC_PROBE_OS_PLUGIN > 0) && (OS_PROBE_HOOKS_EN > 0)
+    102              OSProbe_TickHook();
+    103          #endif
+    104          }
+    105          #endif
+    106          #endif
+    107          
+    108          
+    109          ////////////////////////////////////////////////////////////////////////////////
+    110          // End of Sourece File
+    111          
+
+   Maximum stack usage in bytes:
+
+     Function .cstack
+     -------- -------
+     main          8
+
+
+   Section sizes:
+
+     Function/Label Bytes
+     -------------- -----
+     main             36
+
+ 
+ 36 bytes in section .text
+ 
+ 36 bytes of CODE memory
+
+Errors: none
+Warnings: none

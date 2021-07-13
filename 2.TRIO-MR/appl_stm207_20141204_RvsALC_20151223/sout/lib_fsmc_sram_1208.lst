@@ -1,0 +1,557 @@
+###############################################################################
+#                                                                             #
+# IAR ANSI C/C++ Compiler V6.21.1.52794/W32 for ARM     30/Aug/2012  21:21:48 #
+# Copyright 1999-2011 IAR Systems AB.                                         #
+#                                                                             #
+#    Cpu mode     =  thumb                                                    #
+#    Endian       =  little                                                   #
+#    Source file  =  D:\Work\Project\2012\NL_INBUILD\FW\MU\lib\fsmc\lib_fsmc_ #
+#                    sram_1208.c                                              #
+#    Command line =  D:\Work\Project\2012\NL_INBUILD\FW\MU\lib\fsmc\lib_fsmc_ #
+#                    sram_1208.c -D OS_INCLUDED -D APPL_SRC -lcN              #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\sout\ -o           #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\sout\              #
+#                    --endian=little --cpu=Cortex-M3 -e                       #
+#                    --warnings_are_errors --fpu=None --dlib_config           #
+#                    "C:\Programming\IAR Systems\Embedded Workbench           #
+#                    6.0\arm\INC\c\DLib_Config_Normal.h" -I                   #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\include\ -I        #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\..\..\STM32F2xx_St #
+#                    dPeriph_Driver\ -I D:\Work\Project\2012\NL_INBUILD\FW\MU #
+#                    \..\..\STM32F2xx_StdPeriph_Driver\inc\ -I                #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\uC-CPU\ -I         #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\uC-LIB\ -I         #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\uCOS-II\Ports\ -I  #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\uCOS-II\Source\    #
+#                    -I D:\Work\Project\2012\NL_INBUILD\FW\MU\uC-Probe\ -Oh   #
+#                    --use_c++_inline                                         #
+#    List file    =  D:\Work\Project\2012\NL_INBUILD\FW\MU\sout\lib_fsmc_sram #
+#                    _1208.lst                                                #
+#    Object file  =  D:\Work\Project\2012\NL_INBUILD\FW\MU\sout\lib_fsmc_sram #
+#                    _1208.o                                                  #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\Work\Project\2012\NL_INBUILD\FW\MU\lib\fsmc\lib_fsmc_sram_1208.c
+      1          /******************** (C) COPYRIGHT 2008 STMicroelectronics ********************
+      2          * File Name          : fsmc_sram.c
+      3          * Author             : MCD Application Team
+      4          * Version            : V2.0.2
+      5          * Date               : 07/11/2008
+      6          * Description        : This file provides a set of functions needed to drive the 
+      7          *                      IS61WV51216BLL SRAM memory mounted on STM3210E-EVAL board.
+      8          ********************************************************************************
+      9          * THE PRESENT FIRMWARE WHICH IS FOR GUIDANCE ONLY AIMS AT PROVIDING CUSTOMERS
+     10          * WITH CODING INFORMATION REGARDING THEIR PRODUCTS IN ORDER FOR THEM TO SAVE TIME.
+     11          * AS A RESULT, STMICROELECTRONICS SHALL NOT BE HELD LIABLE FOR ANY DIRECT,
+     12          * INDIRECT OR CONSEQUENTIAL DAMAGES WITH RESPECT TO ANY CLAIMS ARISING FROM THE
+     13          * CONTENT OF SUCH FIRMWARE AND/OR THE USE MADE BY CUSTOMERS OF THE CODING
+     14          * INFORMATION CONTAINED HEREIN IN CONNECTION WITH THEIR PRODUCTS.
+     15          *******************************************************************************/
+     16          
+     17          // Includes --------------------------------------------------------------------
+     18          #include "lib_fsmc_sram_1208.h"
+     19          
+     20          // Private variables -----------------------------------------------------------
+     21          
+     22          /*******************************************************************************
+     23          * Function Name  : FSMC_SRAM_Init
+     24          * Description    : Configures the FSMC and GPIOs to interface with the SRAM memory.
+     25          *                  This function must be called before any write/read operation
+     26          *                  on the SRAM.
+     27          * Input          : None 
+     28          * Output         : None
+     29          * Return         : None
+     30          *******************************************************************************/
+     31          void FSMC_SRAM_Init(void)
+     32          {
+     33          	GPIO_InitTypeDef GPIO_InitStructure; 
+     34          //#ifdef __EXT_RAM_USED
+     35          /*!<
+     36          	+-------------------+--------------------+------------------+------------------+
+     37          	+						SRAM pins assignment								  +
+     38          	+-------------------+--------------------+------------------+------------------+
+     39          	| PD0  <-> FSMC_D2	| PE0  <-> FSMC_NBL0 | PF0	<-> FSMC_A0 | PG0 <-> FSMC_A10 |
+     40          	| PD1  <-> FSMC_D3	| PE1  <-> FSMC_NBL1 | PF1	<-> FSMC_A1 | PG1 <-> FSMC_A11 |
+     41          	| PD4  <-> FSMC_NOE | PE7  <-> FSMC_D4	 | PF2	<-> FSMC_A2 | PG2 <-> FSMC_A12 |
+     42          	| PD5  <-> FSMC_NWE | PE8  <-> FSMC_D5	 | PF3	<-> FSMC_A3 | PG3 <-> FSMC_A13 |
+     43          	| PD8  <-> FSMC_D13 | PE9  <-> FSMC_D6	 | PF4	<-> FSMC_A4 | PG4 <-> FSMC_A14 |
+     44          	| PD9  <-> FSMC_D14 | PE10 <-> FSMC_D7	 | PF5	<-> FSMC_A5 | PG5 <-> FSMC_A15 |
+     45          	| PD10 <-> FSMC_D15 | PE11 <-> FSMC_D8	 | PF12 <-> FSMC_A6 | PG9 <-> FSMC_NE2 |
+     46          	| PD11 <-> FSMC_A16 | PE12 <-> FSMC_D9	 | PF13 <-> FSMC_A7 |------------------+
+     47          	| PD12 <-> FSMC_A17 | PE13 <-> FSMC_D10  | PF14 <-> FSMC_A8 | 
+     48          	| PD14 <-> FSMC_D0	| PE14 <-> FSMC_D11  | PF15 <-> FSMC_A9 | 
+     49          	| PD15 <-> FSMC_D1	| PE15 <-> FSMC_D12  |------------------+
+     50          	+-------------------+--------------------+
+     51          */
+     52          	// AHB ENABLE
+     53          	//RCC->APB2ENR.Data |= (__IOPBEN | __IOPDEN | __IOPEEN | __IOPFEN | __IOPGEN);
+     54          	/* Enable GPIOs clock */
+     55          	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD | RCC_AHB1Periph_GPIOE | RCC_AHB1Periph_GPIOF |
+     56          						   RCC_AHB1Periph_GPIOG, ENABLE);
+     57          	
+     58          	/* Enable FSMC clock */
+     59          	RCC_AHB3PeriphClockCmd(RCC_AHB3Periph_FSMC, ENABLE); 
+     60          /*
+     61              RCC->__B.AHB1ENR.IOPBEN = ENABLE;
+     62              RCC->__B.AHB1ENR.IOPDEN = ENABLE;
+     63              RCC->__B.AHB1ENR.IOPEEN = ENABLE;
+     64              RCC->__B.AHB1ENR.IOPFEN = ENABLE;
+     65              RCC->__B.AHB1ENR.IOPGEN = ENABLE;
+     66          
+     67          	RCC->__B.AHB3ENR.FSMCEN = ENABLE;
+     68          */
+     69          	///-- GPIO Configuration ------------------------------------------------------*/
+     70          	// SRAM Data lines(DATA0) configuration
+     71          	/////////////////////////////
+     72          	 __PD14_FSMC_D0();
+     73          	 __PD15_FSMC_D1();
+     74          	__PD0_FSMC_D2();
+     75          	__PD1_FSMC_D3();
+     76          
+     77          	__PE7_FSMC_D4();
+     78          	__PE8_FSMC_D5();
+     79          	__PE9_FSMC_D6();
+     80          	__PE10_FSMC_D7();
+     81          
+     82          #ifdef __UPPER_DATA_USED
+     83          	__PE11_FSMC_D8();
+     84          	__PE12_FSMC_D9();
+     85          	__PE13_FSMC_D10();
+     86          	__PE14_FSMC_D11();
+     87          	
+     88          	__PE15_FSMC_D12();
+     89          	__PD8_FSMC_D13();
+     90          	__PD9_FSMC_D14();
+     91          	__PD10_FSMC_D15();
+     92          
+     93          #endif
+     94          
+     95          
+     96          	__PF0_FSMC_A0();
+     97          	__PF1_FSMC_A1();
+     98          	__PF2_FSMC_A1();
+     99          	__PF3_FSMC_A3();
+    100          	
+    101          	__PF4_FSMC_A4();
+    102          	__PF5_FSMC_A5();
+    103          	__PF12_FSMC_A6();
+    104          	__PF13_FSMC_A7();
+    105          	
+    106          	__PF14_FSMC_A8();
+    107          	__PF15_FSMC_A9();	
+    108          	__PG0_FSMC_A10();
+    109          	__PG1_FSMC_A11();
+    110          
+    111          	__PG2_FSMC_A12();
+    112          	__PG3_FSMC_A13();
+    113          	__PG4_FSMC_A14();
+    114          	__PG5_FSMC_A15();
+    115          	
+    116          	__PD11_FSMC_A16();
+    117          	__PD12_FSMC_A17();
+    118          	__PD13_FSMC_A18();
+    119          	
+    120          	// NOE and NWE configuration
+    121          	__PD4_FSMC_nOE();
+    122          	__PD5_FSMC_nWE();
+    123          	
+    124          	
+    125          	// NE1 configuration
+    126          	//GPIOD->CNF.B7 = __NCE;
+    127          	//GPIOD->CNF.B7 = __NCE;
+    128          
+    129          	// NE2 configuration
+    130          	__PG9_FSMC_NE2();
+    131          
+    132          	// NBL0, NBL1 configuration
+    133          	//GPIOE->CR.Bit.CNF1 = __NBL1;
+    134          	//GPIOE->CR.Bit.CNF0 = __NBL0;
+    135          
+    136          	// NADV(ADDRESS LATCH ENABLE) configuration
+    137          	//GPIOB->CNF.B7 = __NADV;
+    138          	/* GPIOD configuration */
+    139          	 GPIO_PinAFConfig(GPIOD, GPIO_PinSource0, GPIO_AF_FSMC);
+    140          	 GPIO_PinAFConfig(GPIOD, GPIO_PinSource1, GPIO_AF_FSMC);
+    141          	 GPIO_PinAFConfig(GPIOD, GPIO_PinSource4, GPIO_AF_FSMC);
+    142          	 GPIO_PinAFConfig(GPIOD, GPIO_PinSource5, GPIO_AF_FSMC);
+    143          	 //GPIO_PinAFConfig(GPIOD, GPIO_PinSource8, GPIO_AF_FSMC);
+    144          	 //GPIO_PinAFConfig(GPIOD, GPIO_PinSource9, GPIO_AF_FSMC);
+    145          	 //GPIO_PinAFConfig(GPIOD, GPIO_PinSource10, GPIO_AF_FSMC);
+    146          	 GPIO_PinAFConfig(GPIOD, GPIO_PinSource11, GPIO_AF_FSMC); 
+    147          	 GPIO_PinAFConfig(GPIOD, GPIO_PinSource12, GPIO_AF_FSMC);
+    148          	 GPIO_PinAFConfig(GPIOD, GPIO_PinSource13, GPIO_AF_FSMC);
+    149          	 GPIO_PinAFConfig(GPIOD, GPIO_PinSource14, GPIO_AF_FSMC);
+    150          	 GPIO_PinAFConfig(GPIOD, GPIO_PinSource15, GPIO_AF_FSMC);
+    151          	
+    152          	 GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0  | GPIO_Pin_1  | GPIO_Pin_4  | GPIO_Pin_5  | 
+    153          								   /*GPIO_Pin_8  | GPIO_Pin_9  | GPIO_Pin_10 | */GPIO_Pin_11 |
+    154          								   GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15;
+    155          	 GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+    156          	 GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
+    157          	 GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+    158          	 GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_NOPULL;
+    159          	
+    160          	 GPIO_Init(GPIOD, &GPIO_InitStructure);
+    161          	
+    162          	
+    163          	 /* GPIOE configuration */
+    164          	 GPIO_PinAFConfig(GPIOE, GPIO_PinSource0 , GPIO_AF_FSMC);
+    165          	 GPIO_PinAFConfig(GPIOE, GPIO_PinSource1 , GPIO_AF_FSMC);
+    166          	 GPIO_PinAFConfig(GPIOE, GPIO_PinSource2 , GPIO_AF_FSMC);
+    167          	 GPIO_PinAFConfig(GPIOE, GPIO_PinSource3 , GPIO_AF_FSMC);
+    168          	 GPIO_PinAFConfig(GPIOE, GPIO_PinSource4 , GPIO_AF_FSMC);
+    169          	 GPIO_PinAFConfig(GPIOE, GPIO_PinSource5 , GPIO_AF_FSMC);
+    170          	 GPIO_PinAFConfig(GPIOE, GPIO_PinSource6 , GPIO_AF_FSMC);
+    171          	 GPIO_PinAFConfig(GPIOE, GPIO_PinSource7 , GPIO_AF_FSMC);
+    172          	 GPIO_PinAFConfig(GPIOE, GPIO_PinSource8 , GPIO_AF_FSMC);
+    173          	 GPIO_PinAFConfig(GPIOE, GPIO_PinSource9 , GPIO_AF_FSMC);
+    174          	 GPIO_PinAFConfig(GPIOE, GPIO_PinSource10 , GPIO_AF_FSMC);
+    175          	 //GPIO_PinAFConfig(GPIOE, GPIO_PinSource11 , GPIO_AF_FSMC);
+    176          	 //GPIO_PinAFConfig(GPIOE, GPIO_PinSource12 , GPIO_AF_FSMC);
+    177          	 //GPIO_PinAFConfig(GPIOE, GPIO_PinSource13 , GPIO_AF_FSMC);
+    178          	// GPIO_PinAFConfig(GPIOE, GPIO_PinSource14 , GPIO_AF_FSMC);
+    179          	 //GPIO_PinAFConfig(GPIOE, GPIO_PinSource15 , GPIO_AF_FSMC);
+    180          	
+    181          	 GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0  | GPIO_Pin_1  | GPIO_Pin_2  | GPIO_Pin_3 |  
+    182          								   GPIO_Pin_4  | GPIO_Pin_5  | GPIO_Pin_6  | GPIO_Pin_7 |
+    183          								   GPIO_Pin_8  | GPIO_Pin_9  | GPIO_Pin_10 /*| GPIO_Pin_11|
+    184          								   GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15*/;
+    185          	
+    186          	 GPIO_Init(GPIOE, &GPIO_InitStructure);
+    187          	
+    188          	
+    189          	 /* GPIOF configuration */
+    190          	 GPIO_PinAFConfig(GPIOF, GPIO_PinSource0 , GPIO_AF_FSMC);
+    191          	 GPIO_PinAFConfig(GPIOF, GPIO_PinSource1 , GPIO_AF_FSMC);
+    192          	 GPIO_PinAFConfig(GPIOF, GPIO_PinSource2 , GPIO_AF_FSMC);
+    193          	 GPIO_PinAFConfig(GPIOF, GPIO_PinSource3 , GPIO_AF_FSMC);
+    194          	 GPIO_PinAFConfig(GPIOF, GPIO_PinSource4 , GPIO_AF_FSMC);
+    195          	 GPIO_PinAFConfig(GPIOF, GPIO_PinSource5 , GPIO_AF_FSMC);
+    196          	 GPIO_PinAFConfig(GPIOF, GPIO_PinSource12 , GPIO_AF_FSMC);
+    197          	 GPIO_PinAFConfig(GPIOF, GPIO_PinSource13 , GPIO_AF_FSMC);
+    198          	 GPIO_PinAFConfig(GPIOF, GPIO_PinSource14 , GPIO_AF_FSMC);
+    199          	 GPIO_PinAFConfig(GPIOF, GPIO_PinSource15 , GPIO_AF_FSMC);
+    200          	
+    201          	 GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0  | GPIO_Pin_1  | GPIO_Pin_2  | GPIO_Pin_3  | 
+    202          								   GPIO_Pin_4  | GPIO_Pin_5  | GPIO_Pin_12 | GPIO_Pin_13 |
+    203          								   GPIO_Pin_14 | GPIO_Pin_15;	   
+    204          	
+    205          	 GPIO_Init(GPIOF, &GPIO_InitStructure);
+    206          	
+    207          	
+    208          	 /* GPIOG configuration */
+    209          	 GPIO_PinAFConfig(GPIOG, GPIO_PinSource0 , GPIO_AF_FSMC);
+    210          	 GPIO_PinAFConfig(GPIOG, GPIO_PinSource1 , GPIO_AF_FSMC);
+    211          	 GPIO_PinAFConfig(GPIOG, GPIO_PinSource2 , GPIO_AF_FSMC);
+    212          	 GPIO_PinAFConfig(GPIOG, GPIO_PinSource3 , GPIO_AF_FSMC);
+    213          	 GPIO_PinAFConfig(GPIOG, GPIO_PinSource4 , GPIO_AF_FSMC);
+    214          	 GPIO_PinAFConfig(GPIOG, GPIO_PinSource5 , GPIO_AF_FSMC);
+    215          	 GPIO_PinAFConfig(GPIOG, GPIO_PinSource9 , GPIO_AF_FSMC);
+    216          	
+    217          	 GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0  | GPIO_Pin_1  | GPIO_Pin_2  | GPIO_Pin_3 | 
+    218          								   GPIO_Pin_4  | GPIO_Pin_5  /*|GPIO_Pin_9*/;	   
+    219          	
+    220          	 GPIO_Init(GPIOG, &GPIO_InitStructure);
+    221          
+    222          
+    223          
+    224              {
+    225                //-- FSMC Configuration ----------------------------------------------------
+    226                  FSMC_NORSRAMInitTypeDef  FSMC_NORSRAMInitStructure;
+    227                  FSMC_NORSRAMTimingInitTypeDef  p;
+    228              
+    229                  p.FSMC_AddressSetupTime = 0;
+    230                  p.FSMC_AddressHoldTime = 0;
+    231                  p.FSMC_DataSetupTime = 4;
+    232                  p.FSMC_BusTurnAroundDuration = 1;
+    233                  p.FSMC_CLKDivision = 0;
+    234                  p.FSMC_DataLatency = 0;
+    235                  p.FSMC_AccessMode = FSMC_AccessMode_A;
+    236              
+    237                  FSMC_NORSRAMInitStructure.FSMC_Bank = FSMC_Bank1_NORSRAM2;
+    238                  FSMC_NORSRAMInitStructure.FSMC_DataAddressMux = FSMC_DataAddressMux_Disable;
+    239                  FSMC_NORSRAMInitStructure.FSMC_MemoryType = FSMC_MemoryType_PSRAM;
+    240                  FSMC_NORSRAMInitStructure.FSMC_MemoryDataWidth = FSMC_MemoryDataWidth_16b;
+    241                  FSMC_NORSRAMInitStructure.FSMC_BurstAccessMode = FSMC_BurstAccessMode_Disable;
+    242          		FSMC_NORSRAMInitStructure.FSMC_AsynchronousWait = FSMC_AsynchronousWait_Disable;	
+    243                  FSMC_NORSRAMInitStructure.FSMC_WaitSignalPolarity = FSMC_WaitSignalPolarity_Low;
+    244                  FSMC_NORSRAMInitStructure.FSMC_WrapMode = FSMC_WrapMode_Disable;
+    245                  FSMC_NORSRAMInitStructure.FSMC_WaitSignalActive = FSMC_WaitSignalActive_BeforeWaitState;
+    246                  FSMC_NORSRAMInitStructure.FSMC_WriteOperation = FSMC_WriteOperation_Enable;
+    247                  FSMC_NORSRAMInitStructure.FSMC_WaitSignal = FSMC_WaitSignal_Disable;
+    248                  FSMC_NORSRAMInitStructure.FSMC_ExtendedMode = FSMC_ExtendedMode_Disable;
+    249                  FSMC_NORSRAMInitStructure.FSMC_WriteBurst = FSMC_WriteBurst_Disable;
+    250                  FSMC_NORSRAMInitStructure.FSMC_ReadWriteTimingStruct = &p;
+    251                  FSMC_NORSRAMInitStructure.FSMC_WriteTimingStruct = &p;
+    252              
+    253                  FSMC_NORSRAMInit(&FSMC_NORSRAMInitStructure); 
+    254              
+    255                  // Enable FSMC Bank1_SRAM Bank
+    256                  FSMC_NORSRAMCmd(FSMC_Bank1_NORSRAM2, ENABLE); 
+    257          
+    258          #if 1
+    259          		/*-- FSMC Configuration ------------------------------------------------------*/
+    260          		p.FSMC_AddressSetupTime = 0;
+    261          		p.FSMC_AddressHoldTime = 0;
+    262          		p.FSMC_DataSetupTime = 4;
+    263          		p.FSMC_BusTurnAroundDuration = 1;
+    264          		p.FSMC_CLKDivision = 0;
+    265          		p.FSMC_DataLatency = 0;
+    266          		p.FSMC_AccessMode = FSMC_AccessMode_A;
+    267          
+    268          		FSMC_NORSRAMInitStructure.FSMC_Bank = FSMC_Bank1_NORSRAM2;
+    269          		FSMC_NORSRAMInitStructure.FSMC_DataAddressMux = FSMC_DataAddressMux_Disable;
+    270          		FSMC_NORSRAMInitStructure.FSMC_MemoryType = FSMC_MemoryType_PSRAM;
+    271          		FSMC_NORSRAMInitStructure.FSMC_MemoryDataWidth = FSMC_MemoryDataWidth_16b;
+    272          		FSMC_NORSRAMInitStructure.FSMC_BurstAccessMode = FSMC_BurstAccessMode_Disable;
+    273          		FSMC_NORSRAMInitStructure.FSMC_AsynchronousWait = FSMC_AsynchronousWait_Disable;	
+    274          		FSMC_NORSRAMInitStructure.FSMC_WaitSignalPolarity = FSMC_WaitSignalPolarity_Low;
+    275          		FSMC_NORSRAMInitStructure.FSMC_WrapMode = FSMC_WrapMode_Disable;
+    276          		FSMC_NORSRAMInitStructure.FSMC_WaitSignalActive = FSMC_WaitSignalActive_BeforeWaitState;
+    277          		FSMC_NORSRAMInitStructure.FSMC_WriteOperation = FSMC_WriteOperation_Enable;
+    278          		FSMC_NORSRAMInitStructure.FSMC_WaitSignal = FSMC_WaitSignal_Disable;
+    279          		FSMC_NORSRAMInitStructure.FSMC_ExtendedMode = FSMC_ExtendedMode_Disable;
+    280          		FSMC_NORSRAMInitStructure.FSMC_WriteBurst = FSMC_WriteBurst_Disable;
+    281          		FSMC_NORSRAMInitStructure.FSMC_ReadWriteTimingStruct = &p;
+    282          		FSMC_NORSRAMInitStructure.FSMC_WriteTimingStruct = &p;
+    283          
+    284          		FSMC_NORSRAMInit(&FSMC_NORSRAMInitStructure); 
+    285          
+    286          		/*!< Enable FSMC Bank1_SRAM2 Bank */
+    287          		FSMC_NORSRAMCmd(FSMC_Bank1_NORSRAM2, ENABLE); 
+    288          #endif
+    289              }
+    290          //#endif //__EXT_RAM_USED
+    291          
+    292          }
+    293          
+    294          void SRAM_Init(void)
+    295          {
+    296            FSMC_NORSRAMInitTypeDef  FSMC_NORSRAMInitStructure;
+    297            FSMC_NORSRAMTimingInitTypeDef  p;
+    298            GPIO_InitTypeDef GPIO_InitStructure; 
+    299            
+    300            /* Enable GPIOs clock */
+    301            RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD | RCC_AHB1Periph_GPIOE | RCC_AHB1Periph_GPIOF |
+    302                                   RCC_AHB1Periph_GPIOG, ENABLE);
+    303          
+    304            /* Enable FSMC clock */
+    305            RCC_AHB3PeriphClockCmd(RCC_AHB3Periph_FSMC, ENABLE); 
+    306            
+    307          /*-- GPIOs Configuration -----------------------------------------------------*/
+    308          /*
+    309           +-------------------+--------------------+------------------+------------------+
+    310           | PD0  <-> FSMC_D2  | PE0  <-> FSMC_NBL0 | PF0 <-> FSMC_A0  | PG0 <-> FSMC_A10 |
+    311           | PD1  <-> FSMC_D3  | PE1  <-> FSMC_NBL1 | PF1 <-> FSMC_A1  | PG1 <-> FSMC_A11 |
+    312           | PD4  <-> FSMC_NOE | PE2  <-> FSMC_A23  | PF2 <-> FSMC_A2  | PG2 <-> FSMC_A12 |
+    313           | PD5  <-> FSMC_NWE | PE3  <-> FSMC_A19  | PF3 <-> FSMC_A3  | PG3 <-> FSMC_A13 |
+    314           | PD8  <-> FSMC_D13 | PE4  <-> FSMC_A20  | PF4 <-> FSMC_A4  | PG4 <-> FSMC_A14 |
+    315           | PD9  <-> FSMC_D14 | PE5  <-> FSMC_A21  | PF5 <-> FSMC_A5  | PG5 <-> FSMC_A15 |
+    316           | PD10 <-> FSMC_D15 | PE6  <-> FSMC_A22  | PF12 <-> FSMC_A6 | PG9 <-> FSMC_NE2 |
+    317           | PD11 <-> FSMC_A16 | PE7  <-> FSMC_D4   | PF13 <-> FSMC_A7 |------------------+
+    318           | PD12 <-> FSMC_A17 | PE8  <-> FSMC_D5   | PF14 <-> FSMC_A8 |
+    319           | PD13 <-> FSMC_A18 | PE9  <-> FSMC_D6   | PF15 <-> FSMC_A9 |
+    320           | PD14 <-> FSMC_D0  | PE10 <-> FSMC_D7   |------------------+
+    321           | PD15 <-> FSMC_D1  | PE11 <-> FSMC_D8   |
+    322           +-------------------| PE12 <-> FSMC_D9   |
+    323                               | PE13 <-> FSMC_D10  |
+    324                               | PE14 <-> FSMC_D11  |
+    325                               | PE15 <-> FSMC_D12  |
+    326                               +--------------------+
+    327          */
+    328          
+    329            /* GPIOD configuration */
+    330            GPIO_PinAFConfig(GPIOD, GPIO_PinSource0, GPIO_AF_FSMC);
+    331            GPIO_PinAFConfig(GPIOD, GPIO_PinSource1, GPIO_AF_FSMC);
+    332            GPIO_PinAFConfig(GPIOD, GPIO_PinSource4, GPIO_AF_FSMC);
+    333            GPIO_PinAFConfig(GPIOD, GPIO_PinSource5, GPIO_AF_FSMC);
+    334            //GPIO_PinAFConfig(GPIOD, GPIO_PinSource8, GPIO_AF_FSMC);
+    335           // GPIO_PinAFConfig(GPIOD, GPIO_PinSource9, GPIO_AF_FSMC);
+    336            //GPIO_PinAFConfig(GPIOD, GPIO_PinSource10, GPIO_AF_FSMC);
+    337            GPIO_PinAFConfig(GPIOD, GPIO_PinSource11, GPIO_AF_FSMC); 
+    338            GPIO_PinAFConfig(GPIOD, GPIO_PinSource12, GPIO_AF_FSMC);
+    339            GPIO_PinAFConfig(GPIOD, GPIO_PinSource13, GPIO_AF_FSMC);
+    340            GPIO_PinAFConfig(GPIOD, GPIO_PinSource14, GPIO_AF_FSMC);
+    341            GPIO_PinAFConfig(GPIOD, GPIO_PinSource15, GPIO_AF_FSMC);
+    342          
+    343            GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0  | GPIO_Pin_1  | GPIO_Pin_4  | GPIO_Pin_5  | 
+    344                                          /*GPIO_Pin_8  | GPIO_Pin_9  | GPIO_Pin_10 | */GPIO_Pin_11 |
+    345                                          GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15;
+    346            GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+    347            GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
+    348            GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+    349            GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_NOPULL;
+    350          
+    351            GPIO_Init(GPIOD, &GPIO_InitStructure);
+    352          
+    353          
+    354            /* GPIOE configuration */
+    355            GPIO_PinAFConfig(GPIOE, GPIO_PinSource0 , GPIO_AF_FSMC);
+    356            GPIO_PinAFConfig(GPIOE, GPIO_PinSource1 , GPIO_AF_FSMC);
+    357            GPIO_PinAFConfig(GPIOE, GPIO_PinSource2 , GPIO_AF_FSMC);
+    358            GPIO_PinAFConfig(GPIOE, GPIO_PinSource3 , GPIO_AF_FSMC);
+    359            GPIO_PinAFConfig(GPIOE, GPIO_PinSource4 , GPIO_AF_FSMC);
+    360            GPIO_PinAFConfig(GPIOE, GPIO_PinSource5 , GPIO_AF_FSMC);
+    361            GPIO_PinAFConfig(GPIOE, GPIO_PinSource6 , GPIO_AF_FSMC);
+    362            GPIO_PinAFConfig(GPIOE, GPIO_PinSource7 , GPIO_AF_FSMC);
+    363            GPIO_PinAFConfig(GPIOE, GPIO_PinSource8 , GPIO_AF_FSMC);
+    364            GPIO_PinAFConfig(GPIOE, GPIO_PinSource9 , GPIO_AF_FSMC);
+    365            GPIO_PinAFConfig(GPIOE, GPIO_PinSource10 , GPIO_AF_FSMC);
+    366            //GPIO_PinAFConfig(GPIOE, GPIO_PinSource11 , GPIO_AF_FSMC);
+    367            //GPIO_PinAFConfig(GPIOE, GPIO_PinSource12 , GPIO_AF_FSMC);
+    368            //GPIO_PinAFConfig(GPIOE, GPIO_PinSource13 , GPIO_AF_FSMC);
+    369            //GPIO_PinAFConfig(GPIOE, GPIO_PinSource14 , GPIO_AF_FSMC);
+    370            //GPIO_PinAFConfig(GPIOE, GPIO_PinSource15 , GPIO_AF_FSMC);
+    371          
+    372            GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0  | GPIO_Pin_1  | GPIO_Pin_2  | GPIO_Pin_3 |  
+    373                                          GPIO_Pin_4  | GPIO_Pin_5  | GPIO_Pin_6  | GPIO_Pin_7 |
+    374                                          GPIO_Pin_8  | GPIO_Pin_9  | GPIO_Pin_10 /*| GPIO_Pin_11|
+    375                                          GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15*/;
+    376          
+    377            GPIO_Init(GPIOE, &GPIO_InitStructure);
+    378          
+    379          
+    380            /* GPIOF configuration */
+    381            GPIO_PinAFConfig(GPIOF, GPIO_PinSource0 , GPIO_AF_FSMC);
+    382            GPIO_PinAFConfig(GPIOF, GPIO_PinSource1 , GPIO_AF_FSMC);
+    383            GPIO_PinAFConfig(GPIOF, GPIO_PinSource2 , GPIO_AF_FSMC);
+    384            GPIO_PinAFConfig(GPIOF, GPIO_PinSource3 , GPIO_AF_FSMC);
+    385            GPIO_PinAFConfig(GPIOF, GPIO_PinSource4 , GPIO_AF_FSMC);
+    386            GPIO_PinAFConfig(GPIOF, GPIO_PinSource5 , GPIO_AF_FSMC);
+    387            GPIO_PinAFConfig(GPIOF, GPIO_PinSource12 , GPIO_AF_FSMC);
+    388            GPIO_PinAFConfig(GPIOF, GPIO_PinSource13 , GPIO_AF_FSMC);
+    389            GPIO_PinAFConfig(GPIOF, GPIO_PinSource14 , GPIO_AF_FSMC);
+    390            GPIO_PinAFConfig(GPIOF, GPIO_PinSource15 , GPIO_AF_FSMC);
+    391          
+    392            GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0  | GPIO_Pin_1  | GPIO_Pin_2  | GPIO_Pin_3  | 
+    393                                          GPIO_Pin_4  | GPIO_Pin_5  | GPIO_Pin_12 | GPIO_Pin_13 |
+    394                                          GPIO_Pin_14 | GPIO_Pin_15;      
+    395          
+    396            GPIO_Init(GPIOF, &GPIO_InitStructure);
+    397          
+    398          
+    399            /* GPIOG configuration */
+    400            GPIO_PinAFConfig(GPIOG, GPIO_PinSource0 , GPIO_AF_FSMC);
+    401            GPIO_PinAFConfig(GPIOG, GPIO_PinSource1 , GPIO_AF_FSMC);
+    402            GPIO_PinAFConfig(GPIOG, GPIO_PinSource2 , GPIO_AF_FSMC);
+    403            GPIO_PinAFConfig(GPIOG, GPIO_PinSource3 , GPIO_AF_FSMC);
+    404            GPIO_PinAFConfig(GPIOG, GPIO_PinSource4 , GPIO_AF_FSMC);
+    405            GPIO_PinAFConfig(GPIOG, GPIO_PinSource5 , GPIO_AF_FSMC);
+    406            GPIO_PinAFConfig(GPIOG, GPIO_PinSource9 , GPIO_AF_FSMC);
+    407          
+    408            GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0  | GPIO_Pin_1  | GPIO_Pin_2  | GPIO_Pin_3 | 
+    409                                          GPIO_Pin_4  | GPIO_Pin_5  |GPIO_Pin_9;      
+    410          
+    411            GPIO_Init(GPIOG, &GPIO_InitStructure);
+    412          
+    413          /*-- FSMC Configuration ------------------------------------------------------*/
+    414            p.FSMC_AddressSetupTime = 0;
+    415            p.FSMC_AddressHoldTime = 0;
+    416            p.FSMC_DataSetupTime = 4;
+    417            p.FSMC_BusTurnAroundDuration = 1;
+    418            p.FSMC_CLKDivision = 0;
+    419            p.FSMC_DataLatency = 0;
+    420            p.FSMC_AccessMode = FSMC_AccessMode_A;
+    421          
+    422            FSMC_NORSRAMInitStructure.FSMC_Bank = FSMC_Bank1_NORSRAM2;
+    423            FSMC_NORSRAMInitStructure.FSMC_DataAddressMux = FSMC_DataAddressMux_Disable;
+    424            FSMC_NORSRAMInitStructure.FSMC_MemoryType = FSMC_MemoryType_PSRAM;
+    425            FSMC_NORSRAMInitStructure.FSMC_MemoryDataWidth = FSMC_MemoryDataWidth_16b;
+    426            FSMC_NORSRAMInitStructure.FSMC_BurstAccessMode = FSMC_BurstAccessMode_Disable;
+    427            FSMC_NORSRAMInitStructure.FSMC_AsynchronousWait = FSMC_AsynchronousWait_Disable;  
+    428            FSMC_NORSRAMInitStructure.FSMC_WaitSignalPolarity = FSMC_WaitSignalPolarity_Low;
+    429            FSMC_NORSRAMInitStructure.FSMC_WrapMode = FSMC_WrapMode_Disable;
+    430            FSMC_NORSRAMInitStructure.FSMC_WaitSignalActive = FSMC_WaitSignalActive_BeforeWaitState;
+    431            FSMC_NORSRAMInitStructure.FSMC_WriteOperation = FSMC_WriteOperation_Enable;
+    432            FSMC_NORSRAMInitStructure.FSMC_WaitSignal = FSMC_WaitSignal_Disable;
+    433            FSMC_NORSRAMInitStructure.FSMC_ExtendedMode = FSMC_ExtendedMode_Disable;
+    434            FSMC_NORSRAMInitStructure.FSMC_WriteBurst = FSMC_WriteBurst_Disable;
+    435            FSMC_NORSRAMInitStructure.FSMC_ReadWriteTimingStruct = &p;
+    436            FSMC_NORSRAMInitStructure.FSMC_WriteTimingStruct = &p;
+    437          
+    438            FSMC_NORSRAMInit(&FSMC_NORSRAMInitStructure); 
+    439          
+    440            /*!< Enable FSMC Bank1_SRAM2 Bank */
+    441            FSMC_NORSRAMCmd(FSMC_Bank1_NORSRAM2, ENABLE); 
+    442          
+    443          }
+    444          
+    445          
+    446          /*******************************************************************************
+    447          * Function Name  : FSMC_SRAM_WriteBuffer
+    448          * Description    : Writes a Half-word buffer to the FSMC SRAM memory. 
+    449          * Input          : - pBuffer : pointer to buffer. 
+    450          *                  - WriteAddr : SRAM memory internal address from which the data 
+    451          *                    will be written.
+    452          *                  - NumHalfwordToWrite : number of half-words to write. 
+    453          *                    
+    454          * Output         : None
+    455          * Return         : None
+    456          *******************************************************************************/
+    457          void FSMC_SRAM_WriteBuffer(u16* pBuffer, u32 WriteAddr, u32 NumHalfwordToWrite)
+    458          {
+    459            for(; NumHalfwordToWrite != 0; NumHalfwordToWrite--) /* while there is data to write */
+    460            {
+    461              /* Transfer data to the memory */
+    462              *(u16 *) (Bank1_SRAM3_ADDR + WriteAddr) = *pBuffer++;
+    463              
+    464              /* Increment the address*/  
+    465              WriteAddr += 2;
+    466            }   
+    467          }
+    468          
+    469          /*******************************************************************************
+    470          * Function Name  : FSMC_SRAM_ReadBuffer
+    471          * Description    : Reads a block of data from the FSMC SRAM memory.
+    472          * Input          : - pBuffer : pointer to the buffer that receives the data read 
+    473          *                    from the SRAM memory.
+    474          *                  - ReadAddr : SRAM memory internal address to read from.
+    475          *                  - NumHalfwordToRead : number of half-words to read.
+    476          * Output         : None
+    477          * Return         : None
+    478          *******************************************************************************/
+    479          void FSMC_SRAM_ReadBuffer(u16* pBuffer, u32 ReadAddr, u32 NumHalfwordToRead)
+    480          {
+    481            for(; NumHalfwordToRead != 0; NumHalfwordToRead--) /* while there is data to read */
+    482            {
+    483              /* Read a half-word from the memory */
+    484              *pBuffer++ = *(vu16*) (Bank1_SRAM3_ADDR + ReadAddr);
+    485          
+    486              /* Increment the address*/  
+    487              ReadAddr += 2;
+    488            }  
+    489          }
+    490          /******************* (C) COPYRIGHT 2008 STMicroelectronics *****END OF FILE****/
+
+   Maximum stack usage in bytes:
+
+     Function              .cstack
+     --------              -------
+     FSMC_SRAM_Init           120
+     FSMC_SRAM_ReadBuffer       0
+     FSMC_SRAM_WriteBuffer      4
+     SRAM_Init                104
+
+
+   Section sizes:
+
+     Function/Label        Bytes
+     --------------        -----
+     FSMC_SRAM_Init        1098
+     SRAM_Init              560
+     FSMC_SRAM_WriteBuffer   22
+     FSMC_SRAM_ReadBuffer    20
+     ??DataTable1             4
+     ??DataTable1_1           4
+     ??DataTable1_2           4
+     ??DataTable1_3           4
+
+ 
+ 1 716 bytes in section .text
+ 
+ 1 716 bytes of CODE memory
+
+Errors: none
+Warnings: none

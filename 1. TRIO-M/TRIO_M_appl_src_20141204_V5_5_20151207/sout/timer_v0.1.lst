@@ -1,0 +1,236 @@
+###############################################################################
+#                                                                             #
+# IAR ANSI C/C++ Compiler V5.30.2.51295/W32 for ARM     18/May/2012  17:35:00 #
+# Copyright 1999-2009 IAR Systems AB.                                         #
+#                                                                             #
+#    Cpu mode     =  thumb                                                    #
+#    Endian       =  little                                                   #
+#    Source file  =  D:\Project\TRIO\3.F_W\TRIO_appl_src_20120516\lib\timer\t #
+#                    imer_v0.1.c                                              #
+#    Command line =  D:\Project\TRIO\3.F_W\TRIO_appl_src_20120516\lib\timer\t #
+#                    imer_v0.1.c -D NDEBUG -lcN D:\Project\TRIO\3.F_W\TRIO_ap #
+#                    pl_src_20120516\sout\ -o D:\Project\TRIO\3.F_W\TRIO_appl #
+#                    _src_20120516\sout\ --endian=little --cpu=Cortex-M3 -e   #
+#                    --warnings_are_errors --fpu=None --dlib_config           #
+#                    "C:\Program Files\IAR Systems\Embedded Workbench         #
+#                    5.4\arm\INC\DLib_Config_Normal.h" -I                     #
+#                    D:\Project\TRIO\3.F_W\TRIO_appl_src_20120516\include\    #
+#                    -I D:\Project\TRIO\3.F_W\TRIO_appl_src_20120516\lib_stm3 #
+#                    2\inc\ -I D:\Project\TRIO\3.F_W\TRIO_appl_src_20120516\l #
+#                    ib_stm32\src\ -I D:\Project\TRIO\3.F_W\TRIO_appl_src_201 #
+#                    20516\uC-CPU\ -I D:\Project\TRIO\3.F_W\TRIO_appl_src_201 #
+#                    20516\uC-LIB\ -I D:\Project\TRIO\3.F_W\TRIO_appl_src_201 #
+#                    20516\uCOS-II\Ports\ -I D:\Project\TRIO\3.F_W\TRIO_appl_ #
+#                    src_20120516\uCOS-II\Source\ -I                          #
+#                    D:\Project\TRIO\3.F_W\TRIO_appl_src_20120516\uC-Probe\   #
+#                    -I "C:\Program Files\IAR Systems\Embedded Workbench      #
+#                    5.4\arm\INC\" -Oh                                        #
+#    List file    =  D:\Project\TRIO\3.F_W\TRIO_appl_src_20120516\sout\timer_ #
+#                    v0.1.lst                                                 #
+#    Object file  =  D:\Project\TRIO\3.F_W\TRIO_appl_src_20120516\sout\timer_ #
+#                    v0.1.o                                                   #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\Project\TRIO\3.F_W\TRIO_appl_src_20120516\lib\timer\timer_v0.1.c
+      1          
+      2          /*********************************************
+      3          * File Name          : timer_vx.x.c
+      4          * Author             : 
+      5          * Date First Issued  : 01/17/2008
+      6          * Description        : This file provides all the USART0 firmware functions.
+      7          * $Revision: 0.1 $
+      8          * $Revision date: 2008.01.__
+      9          ********************************************************************************/
+     10          #include "stm32f10x_conf.h"
+     11          #include "../include/timerext.h"
+     12          #include "timer_v0.1.h"
+     13          
+     14          
+     15          void Tmr_TickInit(u32 ms)
+     16          {
+     17            	// Configure HCLK clock as SysTick clock source
+     18           	SysTick->CTRL.Bit.CLKSOURCE = __EXTSRC;
+     19            	// SysTick end of count event each 100us with input clock equal to 9MHz (HCLK/8, default)
+     20          	SysTick->LOAD.Data = ((unsigned long long )ms * SYSCLK)/(8L * 1000L);
+     21          	SysTick->CTRL.Bit.TICKINT = __PENDINT;	// tick interrupt enable
+     22            
+     23          	// Enable the SysTick Counter
+     24          	SysTick->CTRL.Bit.ENABLE = ENABLE;	// systick count enable
+     25          }
+     26          
+     27          
+     28          /*******************************************************************************
+     29          * Function Name  : SysTickHandler
+     30          * Description    : This function handles SysTick Handler.
+     31          * Input          : None
+     32          * Output         : None
+     33          * Return         : None
+     34          *******************************************************************************/
+     35          	
+     36          void  Tmr_TickISR_Handler (void)
+     37          {
+     38          	OS_CPU_SR  cpu_sr;
+     39          
+     40          
+     41          	OS_ENTER_CRITICAL();										// Tell uC/OS-II that we are starting an ISR
+     42          	OSIntNesting++;
+     43          	OS_EXIT_CRITICAL();
+     44          
+     45          	OSTimeTick();												// Call uC/OS-II's OSTimeTick()
+     46          	OSIntExit();												// Tell uC/OS-II that we are leaving the ISR
+     47          }
+     48          
+     49          void CheckSoftTimer(void)
+     50          {
+     51          	INT8U i = 0;
+     52          
+     53          	for(i = 0; i < TIMERmax; i++ )
+     54          	{
+     55          		if(LongTimer[i].Count != 0L ) LongTimer[i].Count--;
+     56          	}
+     57          }
+     58          
+     59          INT8U TimerRegist ( INT8U TimeId, INT32U TimeCnt)
+     60          {
+     61          
+     62              INT8U i;
+     63          
+     64              for( i = 0; i < TIMERmax; i++ )
+     65          		if ( LongTimer[i].TimerID == TimeId )
+     66          		{	LongTimer[i].Count = TimeCnt;	// TimeCnt/2 Down Fail
+     67          			return( TRUE );
+     68          		}
+     69              for( i = 0; i < TIMERmax; i++ )
+     70          		if ( LongTimer[i].TimerID == 0 )
+     71          		{	LongTimer[i].TimerID = TimeId;
+     72          			LongTimer[i].Count = TimeCnt;	// TimeCnt/2 Down Fail
+     73          			return( TRUE );
+     74          		}
+     75          	return( FALSE );
+     76          }
+     77          
+     78          INT32U TimeRemainCheck(INT8U TimeId)
+     79          {
+     80          	INT32U i;
+     81          
+     82          	for( i = 0; i < TIMERmax; i++ )
+     83          	{	if ( LongTimer[i].TimerID == TimeId )
+     84          		{
+     85          			i = LongTimer[i].Count;
+     86          			return(i);
+     87          		}
+     88          	}
+     89          	return( FALSE );
+     90          }
+     91          
+     92          INT8U TimeOverCheck ( INT8U TimeId )
+     93          {
+     94              INT8U i;
+     95          
+     96              for( i = 0; i < TIMERmax; i++ )
+     97          	{	if ( LongTimer[i].TimerID == TimeId )
+     98          		{	if ( LongTimer[i].Count == 0 )
+     99          			{	LongTimer[i].TimerID = 0;
+    100          				return( TRUE );
+    101          			}
+    102          		}
+    103          	}
+    104          	return( FALSE );
+    105          }
+    106          INT8U TimerCancel ( INT16U TimeId )
+    107          {
+    108          	INT16U	i;
+    109          
+    110              for( i = 0; i < TIMERmax; i++ )
+    111          		if ( LongTimer[i].TimerID == TimeId )
+    112          		{	LongTimer[i].TimerID = 0;
+    113          			LongTimer[i].Count = 0;
+    114          			return( TRUE );
+    115          		}
+    116          	return( FALSE );
+    117          }
+    118          
+    119          
+    120          void ForDelay(unsigned long int count)
+    121          {
+    122              while(count--){WatchdogClear();}
+    123          }
+    124          
+    125          ////////////////////////////////////////////////////////////////////////////////
+    126          void WatchdogInit(void)
+    127          {
+    128          	// IWDG timeout equal to 280 ms (the timeout may varies due to LSI frequency dispersion)
+    129          	// Enable write access to IWDG_PR and IWDG_RLR registers
+    130          	IWDG_WriteAccessCmd(IWDG_WriteAccess_Enable);
+    131          	
+    132          	// IWDG counter clock: 40KHz(LSI) / 32 = 1.25 KHz
+    133          	IWDG_SetPrescaler(IWDG_CLK64);
+    134          	
+    135          	// Set counter reload value to 349
+    136          	IWDG_SetReload(1000L);
+    137          	
+    138          	// Reload IWDG counter
+    139          	IWDG_ReloadCounter();
+    140          	
+    141          	// Enable IWDG (the LSI oscillator will be enabled by hardware)
+    142          	IWDG_Enable();
+    143          
+    144          
+    145          }
+    146          
+    147          void WatchdogClear(void)
+    148          {
+    149          	// Reload IWDG counter
+    150          	IWDG_ReloadCounter();
+    151          }
+    152          ////////////////////////////////////////////////////////////////////////////////
+    153          // End of Source File
+    154          /////////////////////
+    155          
+
+   Maximum stack usage in bytes:
+
+     Function            .cstack
+     --------            -------
+     CheckSoftTimer           0
+     ForDelay                 8
+     TimeOverCheck            8
+     TimeRemainCheck          8
+     TimerCancel              8
+     TimerRegist              8
+     Tmr_TickISR_Handler      8
+     Tmr_TickInit            16
+     WatchdogClear            8
+     WatchdogInit             8
+
+
+   Section sizes:
+
+     Function/Label      Bytes
+     --------------      -----
+     LongTimer            240
+     Tmr_TickInit          60
+     Tmr_TickISR_Handler   36
+     CheckSoftTimer        24
+     TimerRegist           72
+     TimeRemainCheck       32
+     ?Subroutine0           6
+     TimeOverCheck         42
+     ?Subroutine1           6
+     TimerCancel           44
+     ForDelay              18
+     WatchdogInit          36
+     WatchdogClear          4
+     ??DataTable3           4
+
+ 
+ 240 bytes in section .bss
+ 384 bytes in section .text
+ 
+ 384 bytes of CODE memory
+ 240 bytes of DATA memory
+
+Errors: none
+Warnings: none

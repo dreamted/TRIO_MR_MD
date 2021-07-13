@@ -1,0 +1,2680 @@
+###############################################################################
+#                                                                             #
+#                                                       19/May/2017  23:29:16 #
+# IAR ANSI C/C++ Compiler V5.50.5.21995/W32 EVALUATION for ARM                #
+# Copyright (C) 1999-2010 IAR Systems AB.                                     #
+#                                                                             #
+#    Cpu mode     =  thumb                                                    #
+#    Endian       =  little                                                   #
+#    Source file  =  D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V5_5_ #
+#                    20151207\code\Alarm.c                                    #
+#    Command line =  "D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V5_5 #
+#                    _20151207\code\Alarm.c" -D _MIMO_Type -D __2rd -D        #
+#                    __PLLEnToggle -lcN "D:\Project\TRIO\1.                   #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\sout\" -o  #
+#                    "D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V5_5 #
+#                    _20151207\sout\" --endian=little --cpu=Cortex-M3 -e      #
+#                    --require_prototypes --warnings_are_errors --fpu=None    #
+#                    --dlib_config "D:\Program Files (x86)\IAR                #
+#                    Systems\Embedded Workbench 5.4                           #
+#                    Evaluation\arm\INC\DLib_Config_Normal.h" -I              #
+#                    "D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V5_5 #
+#                    _20151207\include\" -I "D:\Project\TRIO\1.               #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\lib_stm32\ #
+#                    inc\" -I "D:\Project\TRIO\1.                             #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\lib_stm32\ #
+#                    src\" -I "D:\Project\TRIO\1.                             #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\uC-CPU\"   #
+#                    -I "D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V #
+#                    5_5_20151207\uC-LIB\" -I "D:\Project\TRIO\1.             #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\uCOS-II\Po #
+#                    rts\" -I "D:\Project\TRIO\1.                             #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\uCOS-II\So #
+#                    urce\" -I "D:\Project\TRIO\1.                            #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\uC-Probe\" #
+#                     -I "D:\Program Files (x86)\IAR Systems\Embedded         #
+#                    Workbench 5.4 Evaluation\arm\INC\" -Oh                   #
+#    List file    =  D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V5_5_ #
+#                    20151207\sout\Alarm.lst                                  #
+#    Object file  =  D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V5_5_ #
+#                    20151207\sout\Alarm.o                                    #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\code\Alarm.c
+      1          /*********************************************
+      2          * File Name          : alarm.c
+      3          * Author             :
+      4          * Date First Issued  : 10/20/2010
+      5          * Description        : This file provides all the port/input/update firmware functions.
+      6          * $Revision: 0.1 $
+      7          * $Revision date: 2010.10.__
+      8          ********************************************************************************/
+      9          
+     10          #define ALARM_C
+     11          
+     12          #include "../include/main.h"
+     13           #include <stdlib.h>
+     14          
+     15          void AlarmInitialize(void)
+     16          {
+     17          	__Dnr_Sts *Sts = tDnrSts;
+     18          
+     19          	Sts->Flag.FwdOutLowerLmtFail_2G		= SET;
+     20          	Sts->Flag.FwdOutUpperLmtFail_2G		= SET;
+     21          	Sts->Flag.FwdInUpperLmtFail_2G		= SET;
+     22          	Sts->Flag.OverInAlarm_3G			= SET;
+     23          	Sts->Flag.FwdOutLowerLmtFail_3G 	= SET;
+     24          	Sts->Flag.FwdOutUpperLmtFail_3G 	= SET;
+     25          	Sts->Flag.FwdInUpperLmtFail_3G		= SET;
+     26          
+     27          	Sts->Flag.FwdOutLowerLmtFail_LTE_A1	= SET;
+     28          	Sts->Flag.FwdOutUpperLmtFail_LTE_A1	= SET;
+     29          	Sts->Flag.FwdInUpperLmtFail_LTE_A1	= SET;
+     30          	Sts->Flag.OverInAlarm_CDMALTE		= SET;
+     31          	Sts->Flag.FwdOutLowerLmtFail_LTE	= SET;
+     32          	Sts->Flag.FwdOutUpperLmtFail_LTE	= SET;
+     33          	Sts->Flag.FwdInUpperLmtFail_LTE 	= SET;
+     34          
+     35          	Sts->Flag.Fwd1OutLowerLmtFail_LTE	= SET;
+     36          	Sts->Flag.Fwd1OutUpperLmtFail_LTE	= SET;
+     37          	Sts->Flag.Fwd1InUpperLmtFail_LTE	= SET;
+     38          	Sts->Flag.FwdOutLowerLmtFail_LTE_A2	= SET;
+     39          	Sts->Flag.FwdOutUpperLmtFail_LTE_A2	= SET;
+     40          	Sts->Flag.FwdInUpperLmtFail_LTE_A2	= SET;
+     41          	Sts->Flag.OverInAlarm_LTE_A			= SET;
+     42          
+     43          	Sts->Flag.Fwd1OutLowerLmtFail_LTE_A2= SET;
+     44          	Sts->Flag.Fwd1OutUpperLmtFail_LTE_A2= SET;
+     45          	Sts->Flag.Fwd1InUpperLmtFail_LTE_A2 = SET;
+     46          	Sts->Flag.Fwd1OutLowerLmtFail_LTE_A1= SET;
+     47          	Sts->Flag.Fwd1OutUpperLmtFail_LTE_A1= SET;
+     48          	Sts->Flag.Fwd1InUpperLmtFail_LTE_A1 = SET;
+     49          
+     50          	Sts->Flag.LocalFail_LTE_A2_1		= SET;
+     51          	Sts->Flag.LocalFail_LTE_A1_1		= SET;
+     52          	Sts->Flag.LocalFail_LTE_1			= SET;
+     53          	Sts->Flag.LocalFail_LTE_A2 			= SET;
+     54          	Sts->Flag.LocalFail_LTE_A1 			= SET;
+     55          	Sts->Flag.LocalFail_CDMALTE 		= SET;
+     56          	Sts->Flag.LocalFail_3G 				= SET;
+     57          
+     58          	Sts->Flag.Rvs1OutUpperLmtFail_LTE_A1= SET;
+     59          	Sts->Flag.Rvs1OutUpperLmtFail_LTE	= SET;
+     60          	Sts->Flag.RvsOutUpperLmtFail_LTE_A2 = SET;
+     61          	Sts->Flag.RvsOutUpperLmtFail_LTE_A1 = SET;
+     62          	Sts->Flag.RvsOutUpperLmtFail_LTE	= SET;
+     63          	Sts->Flag.RvsOutUpperLmtFail_2G 	= SET;
+     64          	Sts->Flag.RvsOutUpperLmtFail_3G 	= SET;
+     65          
+     66          	Sts->Flag.FwdAmp1OnOff_LTE_A1			= SET;
+     67          	Sts->Flag.FwdAmp1OnOff_LTE 				= SET;
+     68          	Sts->Flag.FwdAmpOnOff_LTE_A2			= SET;
+     69          	Sts->Flag.FwdAmpOnOff_LTE_A1			= SET;
+     70          	Sts->Flag.FwdAmpOnOff_2G				= SET;
+     71          	Sts->Flag.FwdAmpOnOff_LTE				= SET;
+     72          	Sts->Flag.FwdAmpOnOff_3G				= SET;
+     73          
+     74          	Sts->Flag.FwdAmp1OnOff_LTE_A2			= SET;
+     75          	Sts->Flag.Rvs1OutUpperLmtFail_LTE_A2	= SET;
+     76          	Sts->Flag.ACFail						= SET;
+     77          }
+     78          
+     79          void AlarmCheck(void)
+     80          {
+     81          	INT16S cval;
+     82          	INT16S tlimit;
+     83          	INT16U RecoveryAlarm;
+     84          
+     85          	INT8U FwdLowMask;
+     86          
+     87          	__Dnr_Sts *Sts = tDnrSts;
+     88          	
+     89          
+     90          	if(ChkTableAlarm)
+     91          	{
+     92          //		Table_Alarm();
+     93          		ChkTableAlarm = RESET;
+     94          	}
+     95          
+     96          	{
+     97          		if(AC_Alarm)
+     98          		{
+     99          			ACFailCnt = ACFailCnt + 1;
+    100          			if(ACFailCnt >= 4)
+    101          			{
+    102          				Sts->AlmSts.ACFail	= __SET;
+    103          				Pre_AC_Sts = Sts->AlmSts.ACFail;
+    104          			}
+    105          		}
+    106          		else
+    107          		{
+    108          			Sts->AlmSts.ACFail	= __RESET;
+    109          			ACFailCnt = 0;
+    110          			if(Pre_AC_Sts == __SET)
+    111          			{
+    112          				SetAcRecovery = SET;
+    113          				Chk_Reset = SET;
+    114          			}
+    115          			Pre_AC_Sts = Sts->AlmSts.ACFail;
+    116          		}
+    117          	}
+    118          
+    119          ///////////////////////////
+    120          
+    121          	{
+    122          		// DC Alarm
+    123          		cval = Sts->DetVolt.PSUDCVolt.Data;
+    124          		tlimit = Sts->VccDet_Lmt.Data;
+    125          		RecoveryAlarm  = tlimit + 200;
+    126          		if(cval <= tlimit)				PwrAlarm.DCFail = Alarm;
+    127          		else if(cval >= RecoveryAlarm)	PwrAlarm.DCFail = Normal;
+    128          	}	
+    129          
+    130          	if(PwrAlarm.DCFail)	    Sts->ModuleAlarm.Main.DCFail = Alarm;
+    131          	else					Sts->ModuleAlarm.Main.DCFail = Normal;
+    132          		
+    133          	//////////////////CDMA
+    134          
+    135          
+    136          	if(Sts->LTE15MUse == __NOTUSE)
+    137          	{
+    138          		AlarmCheck_2G = SET;
+    139          	}
+    140          	else
+    141          	{
+    142          		AlarmCheck_2G = RESET;
+    143          	}
+    144          
+    145          	if(Sts->FemtocellUseOnOff.LTE == __NOTUSE)
+    146          	{
+    147          		AlarmCheck_LTE = SET;
+    148          	}
+    149          	else
+    150          	{
+    151          		AlarmCheck_LTE = RESET;
+    152          	}
+    153          
+    154          
+    155          	if((Sts->Band_Select_LTE_A1 == __NOTUSE)||(Sts->FemtocellUseOnOff.LTE_A1 == __USE))
+    156          	{
+    157          		AlarmCheck_LTE_A1 = RESET;
+    158          	}
+    159          	else
+    160          	{
+    161          		AlarmCheck_LTE_A1 = SET;
+    162          	}
+    163          
+    164          
+    165          	if((Sts->Band_Select_LTE_A2[0]  == __NOTUSE)||(Sts->FemtocellUseOnOff.LTE_A2 == __USE))
+    166          	{
+    167          		AlarmCheck_LTE_A2 = RESET;
+    168          	}
+    169          	else
+    170          	{
+    171          		AlarmCheck_LTE_A2 = SET;
+    172          	}
+    173          
+    174          	if(Sts->FemtocellUseOnOff.LTE_1== __NOTUSE)
+    175          	{
+    176          		AlarmCheck_LTE_1= SET;
+    177          	}
+    178          	else
+    179          	{
+    180          		AlarmCheck_LTE_1 = RESET;
+    181          	}
+    182          
+    183          	if((Sts->Band_Select_LTE_A1 == __NOTUSE)||(Sts->FemtocellUseOnOff.LTE_A1_1 == __USE))
+    184          	{
+    185          		AlarmCheck_LTE_A1_1 = RESET;
+    186          	}
+    187          	else
+    188          	{
+    189          		AlarmCheck_LTE_A1_1 = SET;
+    190          	}
+    191          
+    192          	if((Sts->Band_Select_LTE_A2[0]	== __NOTUSE)||(Sts->FemtocellUseOnOff.LTE_A2_1 == __USE))
+    193          	{
+    194          		AlarmCheck_LTE_A2_1 = RESET;
+    195          	}
+    196          	else
+    197          	{
+    198          		AlarmCheck_LTE_A2_1 = SET;
+    199          	}
+    200          
+    201          
+    202          	
+    203          	if(AlarmCheck_2G == SET)
+    204          	{
+    205          		// 2G FWD OUT High
+    206          		{
+    207          			INT8S LimitLvl;
+    208          			INT8S DetLvl;
+    209          			DetLvl		= Sts->FwdOutPwr_2G[0]*2;
+    210          			if(Sts->FwdOutPwr_2G[1] >= 5)DetLvl++;
+    211          			
+    212          			LimitLvl		= Sts->FwdOutHighLmt_2G[0]*2;
+    213          			if(Sts->FwdOutHighLmt_2G[1] >= 5)LimitLvl++;
+    214          			
+    215          			if(Sd_Step[SD_FO_2G] != 0)	Sts->AlmSts.FwdOutUpperLmtFail_2G = Alarm;
+    216          			else 						Sts->AlmSts.FwdOutUpperLmtFail_2G = HighLimitCheck(DetLvl, LimitLvl, 2, Sts->AlmSts.FwdOutUpperLmtFail_2G);
+    217          
+    218          		}
+    219          
+    220          		{
+    221          			// 2G FWD OUT Low
+    222          			INT8S LimitLvl;
+    223          			INT8S DetLvl;
+    224          			
+    225          			DetLvl		= Sts->FwdOutPwr_2G[0]*2;
+    226          			if(Sts->FwdOutPwr_2G[1] >= 5)DetLvl++;
+    227          			LimitLvl		= Sts->FwdOutLowerLmt_2G[0]*2;
+    228          			if(Sts->FwdOutLowerLmt_2G[1] >= 5)LimitLvl++;
+    229          
+    230          
+    231          			if (((tDnrSts->FwdAmpOnOff_2G == Disable)&&(tDnrSts->AmpOffCase_2G == __UsrCtrl))
+    232          				||(Sd_Step[SD_FO_2G] > 1))
+    233          			{
+    234          				FwdLowMask = RESET;
+    235          			}
+    236          			else FwdLowMask = SET;
+    237          
+    238          			if(FwdLowMask)
+    239          			{
+    240          				Sts->AlmSts.FwdOutLowerLmtFail_2G = LowLimitCheck(DetLvl, LimitLvl, 2, Sts->AlmSts.FwdOutLowerLmtFail_2G);
+    241          				
+    242          				if( Sts->AlmSts.FwdOutLowerLmtFail_2G == Alarm)
+    243          				{
+    244          					if(++LimitAlarmCnt[PATH_2G]>= AlarmCheckTime)
+    245          					{
+    246          						PwrAlarm.FwdOutLowerLmtFail_2G = SET;
+    247          						LimitAlarmCnt[PATH_2G] = AlarmCheckTime;
+    248          					}	
+    249          				}
+    250          				else
+    251          				{
+    252          					PwrAlarm.FwdOutLowerLmtFail_2G = RESET;
+    253          					LimitAlarmCnt[PATH_2G] = 0;
+    254          				}
+    255          			}
+    256          			else
+    257          			{
+    258          				Sts->AlmSts.FwdOutLowerLmtFail_2G  = Normal;
+    259          				PwrAlarm.FwdOutLowerLmtFail_2G = RESET;
+    260          				LimitAlarmCnt[PATH_2G] = 0;
+    261          			}
+    262           		}
+    263          		{
+    264          			// Rvs Upper Limit	CDMA
+    265          			INT8S LimitLvl;
+    266          			INT8S DetLvl;
+    267          			
+    268          			DetLvl		= Sts->RvsOutPwr_2G[0]*2;
+    269          			if(Sts->RvsOutPwr_2G[1] >= 5)DetLvl++;
+    270          			LimitLvl		= Sts->RvsOutUpperLmt_2G[0]*2;
+    271          			if(Sts->RvsOutUpperLmt_2G[1] >= 5)LimitLvl++;
+    272          
+    273          			if(Sd_Step[SD_RO_2G] != 0)	Sts->AlmSts.RvsOutUpperLmtFail_2G = Alarm;
+    274          			else 						Sts->AlmSts.RvsOutUpperLmtFail_2G = HighLimitCheck(DetLvl, LimitLvl, 2, Sts->AlmSts.RvsOutUpperLmtFail_2G);
+    275          		}
+    276          		
+    277          		{
+    278          			// CDMA Over In Alarm 
+    279          			INT8S LimitLvl;
+    280          			INT8S DetLvl;
+    281          			
+    282          			DetLvl		= -(Sts->FwdInPwr_2G*1);
+    283          			LimitLvl	= FwdOverInAlmLmt_2G;   // 과입력 Alarm  '-24±2dBm~-11±2dBm
+    284          			if(Sd_Step[SD_FI_2G] != 0)	Sts->AlmSts.FwdInUpperLmtFail_2G = Alarm;
+    285          			else						Sts->AlmSts.FwdInUpperLmtFail_2G = HighLimitCheck(DetLvl, LimitLvl, 2, Sts->AlmSts.FwdInUpperLmtFail_2G);
+    286          		}
+    287          	}
+    288          	else
+    289          	{
+    290          		Sts->AlmSts.FwdOutUpperLmtFail_2G	= Normal;
+    291          		Sts->AlmSts.FwdOutLowerLmtFail_2G	= Normal;
+    292          		Sts->AlmSts.FwdInUpperLmtFail_2G	= Normal;
+    293          		Sts->AlmSts.RvsOutUpperLmtFail_2G	= Normal;
+    294          	}
+    295          
+    296          	
+    297          	////////////////// LTE
+    298          	if(AlarmCheck_LTE == SET)
+    299          	{
+    300          		{
+    301          			if(PLLAlarm_CDMALTE)	Sts->AlmSts.LocalFail_CDMALTE	= Normal;
+    302          			else					Sts->AlmSts.LocalFail_CDMALTE	= Alarm;
+    303          		}
+    304          
+    305          
+    306          		// LTE FWD OUT High
+    307          		{
+    308          			INT8S LimitLvl;
+    309          			INT8S DetLvl;
+    310          			DetLvl		= Sts->FwdOutPwr_LTE[0]*2;
+    311          			if(Sts->FwdOutPwr_LTE[1] >= 5)DetLvl++;
+    312          			
+    313          			LimitLvl		= Sts->FwdOutHighLmt_LTE[0]*2;
+    314          			if(Sts->FwdOutHighLmt_LTE[1] >= 5)LimitLvl++;
+    315          			
+    316          			if(Sd_Step[SD_FO_LTE] != 0)	Sts->AlmSts.FwdOutUpperLmtFail_LTE = Alarm;
+    317          			else						Sts->AlmSts.FwdOutUpperLmtFail_LTE = HighLimitCheck(DetLvl, LimitLvl, 2, Sts->AlmSts.FwdOutUpperLmtFail_LTE);
+    318          		}
+    319          
+    320          		{
+    321          			// LTE FWD OUT Low
+    322          			INT8S LimitLvl;
+    323          			INT8S DetLvl;
+    324          			
+    325          			DetLvl		= Sts->FwdOutPwrPeak_LTE[0]*2;
+    326          			if(Sts->FwdOutPwrPeak_LTE[1] >= 5)DetLvl++;
+    327          			LimitLvl		= Sts->FwdOutLowerLmt_LTE[0]*2;
+    328          			if(Sts->FwdOutLowerLmt_LTE[1] >= 5)LimitLvl++;
+    329          
+    330          
+    331          			if (((tDnrSts->FwdAmpOnOff_LTE == Disable)&&(tDnrSts->AmpOffCase_LTE== __UsrCtrl))
+    332          				||(Sd_Step[SD_FO_LTE] > 1))
+    333          			{
+    334          				FwdLowMask = RESET;
+    335          			}
+    336          			else FwdLowMask = SET;
+    337          
+    338          			if(FwdLowMask)
+    339          			{
+    340          				Sts->AlmSts.FwdOutLowerLmtFail_LTE = LowLimitCheck(DetLvl, LimitLvl, 2, Sts->AlmSts.FwdOutLowerLmtFail_LTE);
+    341          				if( Sts->AlmSts.FwdOutLowerLmtFail_LTE == Alarm)
+    342          				{
+    343          					if(++LimitAlarmCnt[PATH_LTE]>= AlarmCheckTime)
+    344          					{
+    345          						PwrAlarm.FwdOutLowerLmtFail_LTE = SET;
+    346          						LimitAlarmCnt[PATH_LTE] = AlarmCheckTime;
+    347          					}	
+    348          				}
+    349          				else
+    350          				{
+    351          					PwrAlarm.FwdOutLowerLmtFail_LTE = RESET;
+    352          					LimitAlarmCnt[PATH_LTE] = 0;
+    353          				}
+    354          			}
+    355          			else
+    356          			{
+    357          				Sts->AlmSts.FwdOutLowerLmtFail_LTE = Normal;
+    358          				PwrAlarm.FwdOutLowerLmtFail_LTE = RESET;
+    359          				LimitAlarmCnt[PATH_LTE] = 0;
+    360          			}
+    361          
+    362          		}
+    363          		{
+    364          			// LTE Rvs Upper Limit	
+    365          			INT8S LimitLvl;
+    366          			INT8S DetLvl;
+    367          			
+    368          			DetLvl		= Sts->RvsOutPwr_LTE[0]*2;
+    369          			if(Sts->RvsOutPwr_LTE[1] >= 5)DetLvl++;
+    370          			LimitLvl		= Sts->RvsOutUpperLmt_LTE[0]*2;
+    371          			if(Sts->RvsOutUpperLmt_LTE[1] >= 5)LimitLvl++;
+    372          			if(Sd_Step[SD_RO_LTE] != 0)		Sts->AlmSts.RvsOutUpperLmtFail_LTE = Alarm;
+    373          			else 							Sts->AlmSts.RvsOutUpperLmtFail_LTE = HighLimitCheck(DetLvl, LimitLvl, 2, Sts->AlmSts.RvsOutUpperLmtFail_LTE);
+    374          		}
+    375          
+    376          		{
+    377          			// LTE Over In Alarm 
+    378          			INT8S LimitLvl;
+    379          			INT8S DetLvl;
+    380          			
+    381          			DetLvl		= -(Sts->FwdInPwr_LTE*1);
+    382          
+    383          			if(tDnrSts->LTE15MUse == __NOTUSE)
+    384          			{
+    385          				LimitLvl	= FwdOverInAlmLmt_LTE;	// 과입력 Alarm  -21±2dBm~-8±2dBm
+    386          			}
+    387          			else
+    388          			{
+    389          				LimitLvl	= FwdOverInAlmLmt_LTE15M;	// 과입력 Alarm  -19±2dBm~-8±2dBm
+    390          			}
+    391          			
+    392          			if(Sd_Step[SD_FI_LTE] != 0)			Sts->AlmSts.FwdInUpperLmtFail_LTE = Alarm;
+    393          			else								Sts->AlmSts.FwdInUpperLmtFail_LTE = HighLimitCheck(DetLvl, LimitLvl, 2, Sts->AlmSts.FwdInUpperLmtFail_LTE);
+    394          		}
+    395          	}
+    396          	else
+    397          	{
+    398          		Sts->AlmSts.FwdOutUpperLmtFail_LTE = Normal;
+    399          		Sts->AlmSts.FwdOutLowerLmtFail_LTE = Normal;
+    400          		Sts->AlmSts.RvsOutUpperLmtFail_LTE = Normal;
+    401          		Sts->AlmSts.FwdInUpperLmtFail_LTE = Normal;
+    402          	}
+    403          	
+    404          	//////////////////CDMA LTE
+    405          	{
+    406          		// CDMA Over InAlarm 
+    407          
+    408          		INT8S LimitLvl;
+    409          		INT8S DetLvl;
+    410          
+    411          		
+    412          		if(AlarmCheck_2G == SET)
+    413          		{
+    414          			DetLvl		= Sts->DetPwr.FwdInPwr_CDMALTE + 25;
+    415          			LimitLvl	= Sts->FwdInPwr_2G;
+    416          //			if((Sts->AlmSts.FwdAmpOnOff_2G == Enable)&&( Sts->DetPwr.FwdOutAvgPwr_2G  > 0))
+    417          			if((Sts->AlmSts.FwdAmpOnOff_2G == Enable)&&( Sts->FwdOutPwr_2G[0] > Sts->FwdOutLowerLmt_2G[0]))
+    418          			{
+    419          				CurrAlarm.OverInAlarm_CDMALTE_1 = LowLimitCheck(DetLvl, LimitLvl, 1, CurrAlarm.OverInAlarm_CDMALTE_1);	//2dB 
+    420          			}
+    421          		}
+    422          		else
+    423          		{
+    424          			CurrAlarm.OverInAlarm_CDMALTE_1 = Normal;
+    425          		}
+    426          			
+    427          		
+    428          		if(AlarmCheck_LTE == SET)
+    429          		{
+    430          			DetLvl		= Sts->DetPwr.FwdInPwr_CDMALTE + 25;
+    431          			LimitLvl	= Sts->FwdInPwr_LTE;
+    432          
+    433          //			if((Sts->AlmSts.FwdAmpOnOff_LTE == Enable)&&( Sts->DetPwr.FwdOutAvgPwr_LTE > 0))
+    434          			if((Sts->AlmSts.FwdAmpOnOff_LTE == Enable)&&( Sts->FwdOutPwr_LTE[0] > Sts->FwdOutLowerLmt_LTE[0]))
+    435          			{
+    436          				CurrAlarm.OverInAlarm_CDMALTE_2 = LowLimitCheck(DetLvl, LimitLvl, 1, CurrAlarm.OverInAlarm_CDMALTE_2);	//2dB 
+    437          			}
+    438          			else
+    439          			{
+    440          				CurrAlarm.OverInAlarm_CDMALTE_2 = Normal;
+    441          			}
+    442          		}
+    443          		else
+    444          		{
+    445          			CurrAlarm.OverInAlarm_CDMALTE_2 = Normal;
+    446          		}
+    447          
+    448          
+    449          		if((AlarmCheck_2G == SET)&&(AlarmCheck_LTE == SET))
+    450          		{
+    451          
+    452          			INT8S LimitLvl;
+    453          			INT8S DetLvl;
+    454          #if 0
+    455          			if(Sts->FwdInPwr_2G >= Sts->FwdInPwr_LTE)   	LimitLvl = Sts->FwdInPwr_LTE;
+    456          			else if(Sts->FwdInPwr_2G < Sts->FwdInPwr_LTE)	LimitLvl = Sts->FwdInPwr_2G;
+    457          
+    458          			DetLvl	  = Sts->DetPwr.FwdInPwr_CDMALTE + 4;
+    459          			CurrAlarm.OverInAlarm_CDMALTE_3 = LowLimitCheck(DetLvl, LimitLvl, 1, CurrAlarm.OverInAlarm_CDMALTE_3);	//2dB 
+    460          #endif
+    461          			if(Sts->FwdInPwr_2G >= Sts->FwdInPwr_LTE)		
+    462          			{
+    463          				LimitLvl = Sts->FwdInPwr_LTE;
+    464          				DetLvl	 = Sts->FwdInPwr_2G - 25;
+    465          
+    466          //				SerPtr->printf("0: LimitLvl,DetLvl[%d][%d]\n", LimitLvl,DetLvl);
+    467          			}
+    468          			else if(Sts->FwdInPwr_2G < Sts->FwdInPwr_LTE)	
+    469          			{
+    470          				LimitLvl = Sts->FwdInPwr_2G;
+    471          				DetLvl	 = Sts->FwdInPwr_LTE - 25;
+    472          				
+    473          //				SerPtr->printf("1: LimitLvl,DetLvl[%d][%d]\n", LimitLvl,DetLvl);
+    474          			}
+    475          			CurrAlarm.OverInAlarm_CDMALTE_3 = LowLimitCheck(DetLvl, LimitLvl, 1, CurrAlarm.OverInAlarm_CDMALTE_3);	//2dB 
+    476          
+    477          //			SerPtr->printf("2: LimitLvl,DetLvl[%d]\n", CurrAlarm.OverInAlarm_CDMALTE_3);
+    478          
+    479          		}
+    480          //////
+    481          #if 0
+    482          		if(iRepeaterType == _TRIO_MM)
+    483          		{
+    484          			if(Sts->LTE15MUse == __NOTUSE)
+    485          			{
+    486          				if((CurrAlarm.OverInAlarm_CDMALTE_1)||(CurrAlarm.OverInAlarm_CDMALTE_2))
+    487          				{
+    488          					Sts->AlmSts.OverInAlarm_CDMALTE = Alarm;
+    489          				}
+    490          				else Sts->AlmSts.OverInAlarm_CDMALTE = Normal;
+    491          			}
+    492          			else
+    493          			{
+    494          				Sts->AlmSts.OverInAlarm_CDMALTE = CurrAlarm.OverInAlarm_CDMALTE_2;
+    495          			}
+    496          		}
+    497          		else
+    498          		{
+    499          			if(Sts->LTE15MUse == __NOTUSE)
+    500          			{
+    501          				if((CurrAlarm.OverInAlarm_CDMALTE_1)||(CurrAlarm.OverInAlarm_CDMALTE_2))
+    502          				{
+    503          					Sts->AlmSts.OverInAlarm_CDMALTE = Alarm;
+    504          				}
+    505          				else Sts->AlmSts.OverInAlarm_CDMALTE = Normal;
+    506          			}
+    507          			else
+    508          			{
+    509          				Sts->AlmSts.OverInAlarm_CDMALTE = CurrAlarm.OverInAlarm_CDMALTE_2;
+    510          			}
+    511          		}
+    512          #endif
+    513          ///// 2016 01 12
+    514          		{
+    515          			if(Sts->LTE15MUse == __NOTUSE)
+    516          			{
+    517          				if((CurrAlarm.OverInAlarm_CDMALTE_1)||(CurrAlarm.OverInAlarm_CDMALTE_2))
+    518          				{
+    519          					if(CurrAlarm.OverInAlarm_CDMALTE_3)
+    520          					{
+    521          						Sts->AlmSts.OverInAlarm_CDMALTE = Alarm;
+    522          					}
+    523          					else Sts->AlmSts.OverInAlarm_CDMALTE = Normal;
+    524          				}
+    525          				else Sts->AlmSts.OverInAlarm_CDMALTE = Normal;
+    526          				
+    527          			}
+    528          			else
+    529          			{
+    530          				Sts->AlmSts.OverInAlarm_CDMALTE = CurrAlarm.OverInAlarm_CDMALTE_2;
+    531          			}
+    532          		}
+    533          	}
+    534          	//////////////////LTE-A1
+    535          	
+    536          	if(AlarmCheck_LTE_A1 == SET)
+    537          	{
+    538          		{
+    539          			if(PLLAlarm_LTE_A1_0)	Sts->AlmSts.LocalFail_LTE_A1	= Normal;
+    540          			else					Sts->AlmSts.LocalFail_LTE_A1	= Alarm;
+    541          		}
+    542          		
+    543          
+    544          		// LTE-A1 FWD OUT High
+    545          		{
+    546          			INT8S LimitLvl;
+    547          			INT8S DetLvl;
+    548          			DetLvl		= Sts->FwdOutPwr_LTE_A1[0]*2;
+    549          			if(Sts->FwdOutPwr_LTE_A1[1] >= 5)DetLvl++;
+    550          			
+    551          			LimitLvl		= Sts->FwdOutHighLmt_LTE_A1[0]*2;
+    552          			if(Sts->FwdOutHighLmt_LTE_A1[1] >= 5)LimitLvl++;
+    553          			
+    554          
+    555          			if(Sd_Step[SD_FO_LTE_A1] != 0)	Sts->AlmSts.FwdOutUpperLmtFail_LTE_A1 = Alarm;
+    556          			else 							Sts->AlmSts.FwdOutUpperLmtFail_LTE_A1 = HighLimitCheck(DetLvl, LimitLvl, 2, Sts->AlmSts.FwdOutUpperLmtFail_LTE_A1);
+    557          		}
+    558          
+    559          		{
+    560          			// LTE-A1 FWD OUT Low
+    561          			INT8S LimitLvl;
+    562          			INT8S DetLvl;
+    563          			
+    564          			DetLvl		= Sts->FwdOutPwrPeak_LTE_A1[0]*2;
+    565          			if(Sts->FwdOutPwrPeak_LTE_A1[1] >= 5)DetLvl++;
+    566          			LimitLvl		= Sts->FwdOutLowerLmt_LTE_A1[0]*2;
+    567          			if(Sts->FwdOutLowerLmt_LTE_A1[1] >= 5)LimitLvl++;
+    568          
+    569          
+    570          			if (((tDnrSts->FwdAmpOnOff_LTE_A1 == Disable)&&(tDnrSts->AmpOffCase_LTE_A1 == __UsrCtrl))
+    571          				||(Sd_Step[SD_FO_LTE_A1 ] > 1))
+    572          			{
+    573          				FwdLowMask = RESET;
+    574          			}
+    575          			else FwdLowMask = SET;
+    576          
+    577          			if(FwdLowMask)
+    578          			{
+    579          				Sts->AlmSts.FwdOutLowerLmtFail_LTE_A1 = LowLimitCheck(DetLvl, LimitLvl, 2, Sts->AlmSts.FwdOutLowerLmtFail_LTE_A1);
+    580          				if( Sts->AlmSts.FwdOutLowerLmtFail_LTE_A1 == Alarm)
+    581          				{
+    582          					if(++LimitAlarmCnt[PATH_LTE_A1]>= AlarmCheckTime)
+    583          					{
+    584          						PwrAlarm.FwdOutLowerLmtFail_LTE_A1 = SET;
+    585          						LimitAlarmCnt[PATH_LTE_A1] = AlarmCheckTime;
+    586          					}	
+    587          				}
+    588          				else
+    589          				{
+    590          					PwrAlarm.FwdOutLowerLmtFail_LTE_A1 = RESET;
+    591          					LimitAlarmCnt[PATH_LTE_A1] = 0;
+    592          				}
+    593          			}
+    594          			else
+    595          			{
+    596          				Sts->AlmSts.FwdOutLowerLmtFail_LTE_A1 = Normal;
+    597          				PwrAlarm.FwdOutLowerLmtFail_LTE_A1 = RESET;
+    598          				LimitAlarmCnt[PATH_LTE_A1] = 0;
+    599          			}
+    600          		}
+    601          
+    602          		{
+    603          			// LTE-A1 Rvs Upper Limit	
+    604          			INT8S LimitLvl;
+    605          			INT8S DetLvl;
+    606          			
+    607          			DetLvl		= Sts->RvsOutPwr_LTE_A1[0]*2;
+    608          			if(Sts->RvsOutPwr_LTE_A1[1] >= 5)DetLvl++;
+    609          			LimitLvl		= Sts->RvsOutUpperLmt_LTE_A1[0]*2;
+    610          			if(Sts->RvsOutUpperLmt_LTE_A1[1] >= 5)LimitLvl++;
+    611          			
+    612          			if(Sd_Step[SD_RO_LTE_A1] != 0)	Sts->AlmSts.RvsOutUpperLmtFail_LTE_A1 = Alarm;
+    613          			else 							Sts->AlmSts.RvsOutUpperLmtFail_LTE_A1 = HighLimitCheck(DetLvl, LimitLvl, 2, Sts->AlmSts.RvsOutUpperLmtFail_LTE_A1);
+    614          
+    615          		}
+    616          
+    617          		{
+    618          			// LTE-A1 Over In Alarm 
+    619          			INT8S LimitLvl;
+    620          			INT8S DetLvl;
+    621          			
+    622          			DetLvl		= -(Sts->FwdInPwr_LTE_A1);
+    623          			LimitLvl	= Sts->OverInAlarmLmt_LTE_A1/2;// 과입력 Alarm  -15±2dBm
+    624          
+    625          	
+    626          			if(Sd_Step[SD_FI_LTE_A1] != 0)	Sts->AlmSts.FwdInUpperLmtFail_LTE_A1 = Alarm;
+    627          			else							Sts->AlmSts.FwdInUpperLmtFail_LTE_A1 = HighLimitCheck(DetLvl, LimitLvl, 2, Sts->AlmSts.FwdInUpperLmtFail_LTE_A1);
+    628          
+    629          		}
+    630          	}
+    631          	else
+    632          	{
+    633          		Sts->AlmSts.LocalFail_LTE_A1		= Normal;
+    634          		
+    635          		Sts->AlmSts.FwdOutUpperLmtFail_LTE_A1	= Normal;
+    636          		Sts->AlmSts.FwdInUpperLmtFail_LTE_A1	= Normal;
+    637          		Sts->AlmSts.RvsOutUpperLmtFail_LTE_A1	= Normal;
+    638          		Sts->AlmSts.FwdOutLowerLmtFail_LTE_A1	= Normal;
+    639          	}
+    640          
+    641          	//////////////////LTE-A2
+    642          	if(AlarmCheck_LTE_A2 == SET)
+    643          	{
+    644          		{
+    645          			if(PLLAlarm_LTE_A2_0)	Sts->AlmSts.LocalFail_LTE_A2	= Normal;
+    646          			else					Sts->AlmSts.LocalFail_LTE_A2	= Alarm;
+    647          		}
+    648          
+    649          		// LTE-A2 FWD OUT High
+    650          		{
+    651          			INT8S LimitLvl;
+    652          			INT8S DetLvl;
+    653          			DetLvl		= Sts->FwdOutPwr_LTE_A2[0]*2;
+    654          			if(Sts->FwdOutPwr_LTE_A2[1] >= 5)DetLvl++;
+    655          			
+    656          			LimitLvl		= Sts->FwdOutHighLmt_LTE_A2[0]*2;
+    657          			if(Sts->FwdOutHighLmt_LTE_A2[1] >= 5)LimitLvl++;
+    658          			
+    659          			if(Sd_Step[SD_FO_LTE_A2] != 0)	Sts->AlmSts.FwdOutUpperLmtFail_LTE_A2 = Alarm;
+    660          			else							Sts->AlmSts.FwdOutUpperLmtFail_LTE_A2 = HighLimitCheck(DetLvl, LimitLvl, 2, Sts->AlmSts.FwdOutUpperLmtFail_LTE_A2);
+    661          		}
+    662          
+    663          		{
+    664          			// LTE-A2 FWD OUT Low
+    665          			INT8S LimitLvl;
+    666          			INT8S DetLvl;
+    667          			
+    668          			DetLvl		= Sts->FwdOutPwrPeak_LTE_A2[0]*2;
+    669          			if(Sts->FwdOutPwrPeak_LTE_A2[1] >= 5)DetLvl++;
+    670          			LimitLvl		= Sts->FwdOutLowerLmt_LTE_A2[0]*2;
+    671          			if(Sts->FwdOutLowerLmt_LTE_A2[1] >= 5)LimitLvl++;
+    672          
+    673          			if (((tDnrSts->FwdAmpOnOff_LTE_A2 == Disable)&&(tDnrSts->AmpOffCase_LTE_A2 == __UsrCtrl))
+    674          				||(Sd_Step[SD_FO_LTE_A2 ] > 1))
+    675          			{
+    676          				FwdLowMask = RESET;
+    677          			}
+    678          			else FwdLowMask = SET;
+    679          
+    680          			if(FwdLowMask)
+    681          			{
+    682          				Sts->AlmSts.FwdOutLowerLmtFail_LTE_A2 = LowLimitCheck(DetLvl, LimitLvl, 2, Sts->AlmSts.FwdOutLowerLmtFail_LTE_A2);
+    683          
+    684          				if( Sts->AlmSts.FwdOutLowerLmtFail_LTE_A2 == Alarm)
+    685          				{
+    686          					if(++LimitAlarmCnt[PATH_LTE_A2]>= AlarmCheckTime)
+    687          					{
+    688          						PwrAlarm.FwdOutLowerLmtFail_LTE_A2 = SET;
+    689          						LimitAlarmCnt[PATH_LTE_A2] = AlarmCheckTime;
+    690          					}	
+    691          				}
+    692          				else
+    693          				{
+    694          					PwrAlarm.FwdOutLowerLmtFail_LTE_A2 = RESET;
+    695          					LimitAlarmCnt[PATH_LTE_A2] = 0;
+    696          				}
+    697          			}
+    698          			else
+    699          			{
+    700          				Sts->AlmSts.FwdOutLowerLmtFail_LTE_A2 = Normal;
+    701          				PwrAlarm.FwdOutLowerLmtFail_LTE_A2 = RESET;
+    702          				LimitAlarmCnt[PATH_LTE_A2] = 0;
+    703          			}
+    704          		}
+    705          
+    706          		{
+    707          			// LTE-A2 Rvs Upper Limit	
+    708          			INT8S LimitLvl;
+    709          			INT8S DetLvl;
+    710          			
+    711          			DetLvl		= Sts->RvsOutPwr_LTE_A2[0]*2;
+    712          			if(Sts->RvsOutPwr_LTE_A2[1] >= 5)DetLvl++;
+    713          			LimitLvl		= Sts->RvsOutUpperLmt_LTE_A2[0]*2;
+    714          			if(Sts->RvsOutUpperLmt_LTE_A2[1] >= 5)LimitLvl++;
+    715          
+    716          			if(Sd_Step[SD_RO_LTE_A2] != 0)	Sts->AlmSts.RvsOutUpperLmtFail_LTE_A2 = Alarm;
+    717          			else							Sts->AlmSts.RvsOutUpperLmtFail_LTE_A2 = HighLimitCheck(DetLvl, LimitLvl, 2, Sts->AlmSts.RvsOutUpperLmtFail_LTE_A2);
+    718          		}
+    719          		
+    720          		{
+    721          			// LTE-A2 Over In Alarm 
+    722          			INT8S LimitLvl;
+    723          			INT8S DetLvl;
+    724          			DetLvl		= -(Sts->FwdInPwr_LTE_A2);
+    725          			LimitLvl	= Sts->OverInAlarmLmt_LTE_A2/2;
+    726          
+    727          			
+    728          			if(Sd_Step[SD_FI_LTE_A2] != 0)	Sts->AlmSts.FwdInUpperLmtFail_LTE_A2 = Alarm;
+    729          			else							Sts->AlmSts.FwdInUpperLmtFail_LTE_A2 = HighLimitCheck(DetLvl, LimitLvl, 2, Sts->AlmSts.FwdInUpperLmtFail_LTE_A2);
+    730          		}
+    731          	}	
+    732          	else
+    733          	{
+    734          		Sts->AlmSts.LocalFail_LTE_A2			= Normal;
+    735          		Sts->AlmSts.FwdOutUpperLmtFail_LTE_A2	= Normal;
+    736          		Sts->AlmSts.FwdInUpperLmtFail_LTE_A2	= Normal;
+    737          		Sts->AlmSts.RvsOutUpperLmtFail_LTE_A2	= Normal;
+    738          		Sts->AlmSts.FwdOutLowerLmtFail_LTE_A2	= Normal;
+    739          	}
+    740          	
+    741          	{
+    742          		// LTE_A1 Over InAlarm 
+    743          
+    744          		INT8S LimitLvl;
+    745          		INT8S DetLvl;
+    746          		
+    747          		DetLvl		= Sts->DetPwr.FwdInPwr_LTE_A + 25;
+    748          		LimitLvl	= Sts->FwdInPwr_LTE_A1;
+    749          
+    750          		if(AlarmCheck_LTE_A1 == SET)
+    751          		{
+    752          			if((Sts->AlmSts.FwdAmpOnOff_LTE_A1 == Enable)&&( Sts->DetPwr.FwdOutPeakPwr_LTE_A1 > 0))
+    753          			{
+    754          				CurrAlarm.OverInAlarm_LTE_A1 = LowLimitCheck(DetLvl, LimitLvl, 1, CurrAlarm.OverInAlarm_LTE_A1);	//2dB 
+    755          			}
+    756          			else
+    757          			{
+    758          				CurrAlarm.OverInAlarm_LTE_A1 = Normal;
+    759          			}
+    760          		}
+    761          		else	CurrAlarm.OverInAlarm_LTE_A1 = Normal;
+    762          
+    763          	
+    764          		if(AlarmCheck_LTE_A2 == SET)
+    765          		{
+    766          			DetLvl		= Sts->DetPwr.FwdInPwr_LTE_A + 25;
+    767          			LimitLvl	= Sts->FwdInPwr_LTE_A2;
+    768          			if((Sts->AlmSts.FwdAmpOnOff_LTE_A2 == Enable)&&( Sts->DetPwr.FwdOutPeakPwr_LTE_A2 > 0))
+    769          			{
+    770          				CurrAlarm.OverInAlarm_LTE_A2 = LowLimitCheck(DetLvl, LimitLvl, 1, CurrAlarm.OverInAlarm_LTE_A2);	//2dB 
+    771          			}
+    772          			else
+    773          			{
+    774          				CurrAlarm.OverInAlarm_LTE_A2 = Normal;
+    775          			}
+    776          		}
+    777          		else	CurrAlarm.OverInAlarm_LTE_A2 = Normal;
+    778          
+    779          
+    780          		if((AlarmCheck_LTE_A1 == SET)&&(AlarmCheck_LTE_A2 == SET))
+    781          		{
+    782          
+    783          			INT8S LimitLvl;
+    784          			INT8S DetLvl;
+    785          #if 0
+    786          			if(Sts->FwdInPwr_LTE_A1 >= Sts->FwdInPwr_LTE_A2)   		LimitLvl = Sts->FwdInPwr_LTE_A2;
+    787          			else if(Sts->FwdInPwr_LTE_A1 < Sts->FwdInPwr_LTE_A2)	LimitLvl = Sts->FwdInPwr_LTE_A1;
+    788          
+    789          			DetLvl	  = Sts->DetPwr.FwdInPwr_LTE_A+4;
+    790          			LimitLvl  = LimitLvl ;
+    791          			CurrAlarm.OverInAlarm_LTE_A = LowLimitCheck(DetLvl, LimitLvl, 1, CurrAlarm.OverInAlarm_LTE_A);	//2dB 
+    792          #endif
+    793          			if(Sts->FwdInPwr_LTE_A1 >= Sts->FwdInPwr_LTE_A2)		
+    794          			{
+    795          				LimitLvl = Sts->FwdInPwr_LTE_A2;
+    796          				DetLvl	 = Sts->FwdInPwr_LTE_A1 - 25;
+    797          			
+    798          			}
+    799          			else if(Sts->FwdInPwr_LTE_A1 < Sts->FwdInPwr_LTE_A2)	
+    800          			{
+    801          				LimitLvl = Sts->FwdInPwr_LTE_A1;
+    802          				DetLvl	 = Sts->FwdInPwr_LTE_A2 - 25;
+    803          			}
+    804          			CurrAlarm.OverInAlarm_LTE_A = LowLimitCheck(DetLvl, LimitLvl, 1, CurrAlarm.OverInAlarm_LTE_A);	//2dB 
+    805          
+    806          		}		
+    807          	}
+    808          
+    809          	//////////////////WCDMA
+    810          	{
+    811          		{
+    812          			if(PLLAlarm_WCDMA)		Sts->AlmSts.LocalFail_3G		= Normal;
+    813          			else					Sts->AlmSts.LocalFail_3G		= Alarm;
+    814          		}
+    815          
+    816          
+    817          		// WCDMA FWD OUT High
+    818          		{
+    819          			INT8S LimitLvl;
+    820          			INT8S DetLvl;
+    821          			DetLvl		= Sts->FwdOutPwr_3G[0]*2;
+    822          			if(Sts->FwdOutPwr_3G[1] >= 5)DetLvl++;
+    823          			
+    824          			LimitLvl		= Sts->FwdOutHighLmt_3G[0]*2;
+    825          			if(Sts->FwdOutHighLmt_3G[1] >= 5)LimitLvl++;
+    826          
+    827          			
+    828          			if(Sd_Step[SD_FO_3G] != 0)	Sts->AlmSts.FwdOutUpperLmtFail_3G = Alarm;
+    829          			else						Sts->AlmSts.FwdOutUpperLmtFail_3G = HighLimitCheck(DetLvl, LimitLvl, 2, Sts->AlmSts.FwdOutUpperLmtFail_3G);
+    830          		}
+    831          
+    832          		{
+    833          			// WCDMA FWD OUT Low
+    834          			INT8S LimitLvl;
+    835          			INT8S DetLvl;
+    836          			
+    837          			DetLvl		= Sts->FwdOutPwr_3G[0]*2;
+    838          			if(Sts->FwdOutPwr_3G[1] >= 5)DetLvl++;
+    839          			LimitLvl		= Sts->FwdOutLowerLmt_3G[0]*2;
+    840          			if(Sts->FwdOutLowerLmt_3G[1] >= 5)LimitLvl++;
+    841          
+    842          			if (((tDnrSts->FwdAmpOnOff_3G == Disable)&&(tDnrSts->AmpOffCase_3G == __UsrCtrl))
+    843          				||(Sd_Step[SD_FO_3G] > 1))
+    844          			{
+    845          				FwdLowMask = RESET;
+    846          			}
+    847          			else FwdLowMask = SET;
+    848          
+    849          			if(FwdLowMask)
+    850          			{
+    851          				Sts->AlmSts.FwdOutLowerLmtFail_3G = LowLimitCheck(DetLvl, LimitLvl, 2, Sts->AlmSts.FwdOutLowerLmtFail_3G);
+    852          				if( Sts->AlmSts.FwdOutLowerLmtFail_3G == Alarm)
+    853          				{
+    854          					if(++LimitAlarmCnt[PATH_3G]>=AlarmCheckTime)
+    855          					{
+    856          						PwrAlarm.FwdOutLowerLmtFail_3G = SET;
+    857          						LimitAlarmCnt[PATH_3G] = AlarmCheckTime;
+    858          					}	
+    859          				}
+    860          				else
+    861          				{
+    862          					PwrAlarm.FwdOutLowerLmtFail_3G = RESET;
+    863          					LimitAlarmCnt[PATH_3G] = 0;
+    864          				}
+    865          			}
+    866          			else
+    867          			{
+    868          				Sts->AlmSts.FwdOutLowerLmtFail_3G = Normal;
+    869          				PwrAlarm.FwdOutLowerLmtFail_3G = RESET;
+    870          				LimitAlarmCnt[PATH_3G] = 0;
+    871          			}
+    872          		}
+    873          
+    874          		{
+    875          			// WCDMA Rvs Upper Limit	
+    876          			INT8S LimitLvl;
+    877          			INT8S DetLvl;
+    878          			
+    879          			DetLvl		= Sts->RvsOutPwr_3G[0]*2;
+    880          			if(Sts->RvsOutPwr_3G[1] >= 5)DetLvl++;
+    881          			LimitLvl		= Sts->RvsOutUpperLmt_3G[0]*2;
+    882          			if(Sts->RvsOutUpperLmt_3G[1] >= 5)LimitLvl++;
+    883          			
+    884          			if(Sd_Step[SD_RO_3G] != 0)	Sts->AlmSts.RvsOutUpperLmtFail_3G = Alarm;
+    885          			else						Sts->AlmSts.RvsOutUpperLmtFail_3G = HighLimitCheck(DetLvl, LimitLvl, 2, Sts->AlmSts.RvsOutUpperLmtFail_3G);
+    886          
+    887          		}
+    888          
+    889          
+    890          		{
+    891          			// WCDMA Over In Alarm 
+    892          			INT8S LimitLvl;
+    893          			INT8S DetLvl;
+    894          			
+    895          			DetLvl		= -(Sts->FwdInPwr_3G*1);
+    896          			LimitLvl	= Sts->OverInAlarmLmt_3G/2;	//-36*2
+    897          			if(Sd_Step[SD_FI_3G] != 0)	Sts->AlmSts.FwdInUpperLmtFail_3G = Alarm;
+    898          			else 						Sts->AlmSts.FwdInUpperLmtFail_3G = HighLimitCheck(DetLvl, LimitLvl, 2, Sts->AlmSts.FwdInUpperLmtFail_3G);
+    899          		}
+    900          		
+    901          		{
+    902          			// WCDMA Over InAlarm 
+    903          			INT8S LimitLvl;
+    904          			INT8S DetLvl;
+    905          			
+    906          			DetLvl		= Sts->DetPwr.FwdInPwr_3G + 25;
+    907          			LimitLvl	= Sts->FwdInPwr_3G;
+    908          			if((Sts->AlmSts.FwdAmpOnOff_3G == Enable)&&( Sts->DetPwr.FwdOutAvgPwr_3G  > 0))
+    909          			{
+    910          				Sts->AlmSts.OverInAlarm_3G = LowLimitCheck(DetLvl, LimitLvl, 1, Sts->AlmSts.OverInAlarm_3G);	//2dB 
+    911          			}
+    912          			else  Sts->AlmSts.OverInAlarm_3G = Normal;
+    913          		}
+    914          	}
+    915          
+    916          	if(iRepeaterType == _TRIO_MM)
+    917          	{
+    918          		//////////////////LTE MOMO
+    919          		
+    920          		if(AlarmCheck_LTE_1 == SET)
+    921          		{
+    922          			{
+    923          				if(PLLAlarm_LTE_1)		Sts->AlmSts.LocalFail_LTE_1 	= Normal;
+    924          				else					Sts->AlmSts.LocalFail_LTE_1 	= Alarm;
+    925          			}
+    926          			
+    927          
+    928          
+    929          			// LTE MOMO FWD OUT High
+    930          			{
+    931          				INT8S LimitLvl;
+    932          				INT8S DetLvl;
+    933          				DetLvl		= Sts->Fwd1OutPwr_LTE[0]*2;
+    934          				if(Sts->Fwd1OutPwr_LTE[1] >= 5)DetLvl++;
+    935          				
+    936          				LimitLvl		= Sts->Fwd1OutHighLmt_LTE[0]*2;
+    937          				if(Sts->Fwd1OutHighLmt_LTE[1] >= 5)LimitLvl++;
+    938          				
+    939          				if(Sd_Step[SD_FO_LTE_1] != 0)	Sts->AlmSts.Fwd1OutUpperLmtFail_LTE = Alarm;
+    940          				else							Sts->AlmSts.Fwd1OutUpperLmtFail_LTE = HighLimitCheck(DetLvl, LimitLvl, 2, Sts->AlmSts.Fwd1OutUpperLmtFail_LTE);
+    941          			}
+    942          	
+    943          			{
+    944          				// LTE MOMO FWD OUT Low
+    945          				INT8S LimitLvl;
+    946          				INT8S DetLvl;
+    947          				
+    948          				DetLvl		= Sts->Fwd1OutPwrPeak_LTE[0]*2;
+    949          				if(Sts->Fwd1OutPwrPeak_LTE[1] >= 5)DetLvl++;
+    950          				LimitLvl		= Sts->Fwd1OutLowerLmt_LTE[0]*2;
+    951          				if(Sts->Fwd1OutLowerLmt_LTE[1] >= 5)LimitLvl++;
+    952          
+    953          
+    954          				if (((tDnrSts->FwdAmp1OnOff_LTE == Disable)&&(tDnrSts->Amp1OffCase_LTE== __UsrCtrl))
+    955          					||(Sd_Step[SD_FO_LTE_1] > 1))
+    956          				{
+    957          					FwdLowMask = RESET;
+    958          				}
+    959          				else FwdLowMask = SET;
+    960          				
+    961          				if(FwdLowMask)
+    962          				{
+    963          					Sts->AlmSts.Fwd1OutLowerLmtFail_LTE = LowLimitCheck(DetLvl, LimitLvl, 2, Sts->AlmSts.Fwd1OutLowerLmtFail_LTE);
+    964          
+    965          					if( Sts->AlmSts.Fwd1OutLowerLmtFail_LTE == Alarm)
+    966          					{
+    967          						if(++LimitAlarmCnt[PATH_LTE_1]>=AlarmCheckTime)
+    968          						{
+    969          							PwrAlarm.Fwd1OutLowerLmtFail_LTE = SET;
+    970          							LimitAlarmCnt[PATH_LTE_1] = AlarmCheckTime;
+    971          						}	
+    972          					}
+    973          					else
+    974          					{
+    975          						PwrAlarm.Fwd1OutLowerLmtFail_LTE = RESET;
+    976          						LimitAlarmCnt[PATH_LTE_1] = 0;
+    977          					}		
+    978          				}
+    979          				else
+    980          				{
+    981          					Sts->AlmSts.Fwd1OutLowerLmtFail_LTE = Normal;
+    982          					PwrAlarm.Fwd1OutLowerLmtFail_LTE = RESET;
+    983          					LimitAlarmCnt[PATH_LTE_1] = 0;
+    984          				}
+    985          			}
+    986          			
+    987          			{
+    988          				// LTE MOMO Rvs Upper Limit	
+    989          				INT8S LimitLvl;
+    990          				INT8S DetLvl;
+    991          				
+    992          				DetLvl		= Sts->Rvs1OutPwr_LTE[0]*2;
+    993          				if(Sts->Rvs1OutPwr_LTE[1] >= 5)DetLvl++;
+    994          				LimitLvl		= Sts->Rvs1OutUpperLmt_LTE[0]*2;
+    995          				if(Sts->Rvs1OutUpperLmt_LTE[1] >= 5)LimitLvl++;
+    996          
+    997          				if(Sd_Step[SD_RO_LTE_1] != 0)	Sts->AlmSts.Rvs1OutUpperLmtFail_LTE = Alarm;
+    998          				else							Sts->AlmSts.Rvs1OutUpperLmtFail_LTE = HighLimitCheck(DetLvl, LimitLvl, 2, Sts->AlmSts.Rvs1OutUpperLmtFail_LTE);
+    999          			}
+   1000          			
+   1001          			{
+   1002          				// LTE Over In Alarm 
+   1003          				INT8S LimitLvl;
+   1004          				INT8S DetLvl;
+   1005          				DetLvl		= -(Sts->Fwd1InPwr_LTE);
+   1006          				LimitLvl	= Sts->OverInAlarmLmt_LTE/2;
+   1007          
+   1008          				
+   1009          				if(Sd_Step[SD_FI_LTE_1] != 0)	Sts->AlmSts.Fwd1InUpperLmtFail_LTE = Alarm;
+   1010          				else							Sts->AlmSts.Fwd1InUpperLmtFail_LTE = HighLimitCheck(DetLvl, LimitLvl, 2, Sts->AlmSts.Fwd1InUpperLmtFail_LTE);
+   1011          			}
+   1012          		}
+   1013          		else
+   1014          		{
+   1015          			Sts->AlmSts.Fwd1OutUpperLmtFail_LTE = Normal;
+   1016          			Sts->AlmSts.Fwd1OutLowerLmtFail_LTE = Normal;
+   1017          			Sts->AlmSts.Rvs1OutUpperLmtFail_LTE = Normal;
+   1018          			Sts->AlmSts.Fwd1InUpperLmtFail_LTE = Normal;
+   1019          		}
+   1020          /////////////////////////////////////////
+   1021          		{
+   1022          			// LTE MIMO Over InAlarm 
+   1023          
+   1024          			INT8S LimitLvl;
+   1025          			INT8S DetLvl;
+   1026          			
+   1027          			DetLvl		= Sts->Det1Pwr.Fwd1InPwr_LTE + 25;
+   1028          			LimitLvl	= Sts->Fwd1InPwr_LTE;
+   1029          
+   1030          			if((Sts->AlmSts.FwdAmp1OnOff_LTE == Enable)&&( Sts->Det1Pwr.Fwd1OutAvgPwr_LTE > 0))
+   1031          			{
+   1032          				CurrAlarm.OverInAlarm_LTE_1 = LowLimitCheck(DetLvl, LimitLvl, 2, CurrAlarm.OverInAlarm_LTE_1);	//2dB 
+   1033          			}
+   1034          			else
+   1035          			{
+   1036          				CurrAlarm.OverInAlarm_LTE_1 = Normal;
+   1037          			}
+   1038          		}
+   1039          /////////////////////////////////////////
+   1040          		//////////////////LTE-A1 MOMO
+   1041          		if(AlarmCheck_LTE_A1_1 == SET)
+   1042          		{
+   1043          
+   1044          			{
+   1045          				if(PLLAlarm_LTE_A1_1)	Sts->AlmSts.LocalFail_LTE_A1_1	= Normal;
+   1046          				else					Sts->AlmSts.LocalFail_LTE_A1_1	= Alarm;
+   1047          			}
+   1048          			
+   1049          
+   1050          			// LTE-A1 MOMO FWD OUT High
+   1051          			{
+   1052          				INT8S LimitLvl;
+   1053          				INT8S DetLvl;
+   1054          				DetLvl		= Sts->Fwd1OutPwr_LTE_A1[0]*2;
+   1055          				if(Sts->Fwd1OutPwr_LTE_A1[1] >= 5)DetLvl++;
+   1056          				
+   1057          				LimitLvl		= Sts->Fwd1OutHighLmt_LTE_A1[0]*2;
+   1058          				if(Sts->Fwd1OutHighLmt_LTE_A1[1] >= 5)LimitLvl++;
+   1059          
+   1060          				if(Sd_Step[SD_FO_LTE_A1_1] != 0)	Sts->AlmSts.Fwd1OutUpperLmtFail_LTE_A1 = Alarm;
+   1061          				else								Sts->AlmSts.Fwd1OutUpperLmtFail_LTE_A1 = HighLimitCheck(DetLvl, LimitLvl, 2, Sts->AlmSts.Fwd1OutUpperLmtFail_LTE_A1);
+   1062          
+   1063          			}
+   1064          	
+   1065          			{
+   1066          				// LTE-A1 MOMO FWD OUT Low
+   1067          				INT8S LimitLvl;
+   1068          				INT8S DetLvl;
+   1069          				
+   1070          				DetLvl		= Sts->Fwd1OutPwrPeak_LTE_A1[0]*2;
+   1071          				if(Sts->Fwd1OutPwrPeak_LTE_A1[1] >= 5)DetLvl++;
+   1072          				LimitLvl		= Sts->Fwd1OutLowerLmt_LTE_A1[0]*2;
+   1073          				if(Sts->Fwd1OutLowerLmt_LTE_A1[1] >= 5)LimitLvl++;
+   1074          
+   1075          				if (((tDnrSts->FwdAmp1OnOff_LTE_A1 == Disable)&&(tDnrSts->Amp1OffCase_LTE_A1 == __UsrCtrl))
+   1076          						||(Sd_Step[SD_FO_LTE_A1_1] > 1))
+   1077          				{
+   1078          					FwdLowMask = RESET;
+   1079          				}
+   1080          				else FwdLowMask = SET;
+   1081          				
+   1082          				if(FwdLowMask)
+   1083          				{
+   1084          					Sts->AlmSts.Fwd1OutLowerLmtFail_LTE_A1 = LowLimitCheck(DetLvl, LimitLvl, 2, Sts->AlmSts.Fwd1OutLowerLmtFail_LTE_A1);
+   1085          
+   1086          					if( Sts->AlmSts.Fwd1OutLowerLmtFail_LTE_A1 == Alarm)
+   1087          					{
+   1088          						if(++LimitAlarmCnt[PATH_LTE_A1_1]>=AlarmCheckTime)
+   1089          						{
+   1090          							PwrAlarm.Fwd1OutLowerLmtFail_LTE_A1 = SET;
+   1091          							LimitAlarmCnt[PATH_LTE_A1_1] = AlarmCheckTime;
+   1092          						}	
+   1093          					}
+   1094          					else
+   1095          					{
+   1096          						PwrAlarm.Fwd1OutLowerLmtFail_LTE_A1 = RESET;
+   1097          						LimitAlarmCnt[PATH_LTE_A1_1] = 0;
+   1098          					}
+   1099          				}
+   1100          				else
+   1101          				{
+   1102          					Sts->AlmSts.Fwd1OutLowerLmtFail_LTE_A1 = Normal;
+   1103          					PwrAlarm.Fwd1OutLowerLmtFail_LTE_A1 = RESET;
+   1104          					LimitAlarmCnt[PATH_LTE_A1_1] = 0;
+   1105          				}
+   1106          			}
+   1107          	
+   1108          			{
+   1109          				// LTE-A1 MOMO Rvs Upper Limit	
+   1110          				INT8S LimitLvl;
+   1111          				INT8S DetLvl;
+   1112          				
+   1113          				DetLvl		= Sts->Rvs1OutPwr_LTE_A1[0]*2;
+   1114          				if(Sts->Rvs1OutPwr_LTE_A1[1] >= 5)DetLvl++;
+   1115          				LimitLvl		= Sts->Rvs1OutUpperLmt_LTE_A1[0]*2;
+   1116          				if(Sts->Rvs1OutUpperLmt_LTE_A1[1] >= 5)LimitLvl++;
+   1117          
+   1118          				if(Sd_Step[SD_RO_LTE_A1_1] != 0)	Sts->AlmSts.Rvs1OutUpperLmtFail_LTE_A1 = Alarm;
+   1119          				else								Sts->AlmSts.Rvs1OutUpperLmtFail_LTE_A1 = HighLimitCheck(DetLvl, LimitLvl, 2, Sts->AlmSts.Rvs1OutUpperLmtFail_LTE_A1);
+   1120          			}
+   1121          			
+   1122          			{
+   1123          				// LTE-A1 Over In Alarm 
+   1124          				INT8S LimitLvl;
+   1125          				INT8S DetLvl;
+   1126          				
+   1127          				DetLvl		= -(Sts->Fwd1InPwr_LTE_A1);
+   1128          				LimitLvl	= Sts->OverInAlarmLmt_LTE_A1/2;
+   1129          
+   1130          				if(Sd_Step[SD_FI_LTE_A1_1] != 0)	Sts->AlmSts.Fwd1InUpperLmtFail_LTE_A1 = Alarm;
+   1131          				else								Sts->AlmSts.Fwd1InUpperLmtFail_LTE_A1 = HighLimitCheck(DetLvl, LimitLvl, 2, Sts->AlmSts.Fwd1InUpperLmtFail_LTE_A1);
+   1132          
+   1133          			}
+   1134          		}
+   1135          		else
+   1136          		{
+   1137           			Sts->AlmSts.LocalFail_LTE_A1_1 	= Normal;
+   1138           			
+   1139          			Sts->AlmSts.Fwd1OutUpperLmtFail_LTE_A1 	= Normal;
+   1140          			Sts->AlmSts.Fwd1InUpperLmtFail_LTE_A1	= Normal;
+   1141          			Sts->AlmSts.Rvs1OutUpperLmtFail_LTE_A1 	= Normal;
+   1142          			Sts->AlmSts.Fwd1OutLowerLmtFail_LTE_A1 	= Normal;
+   1143           		}
+   1144          
+   1145          		//////////////////LTE-A2 MOMO
+   1146          		if(AlarmCheck_LTE_A2_1 == SET)
+   1147          		{
+   1148          			{
+   1149          				if(PLLAlarm_LTE_A2_1)	Sts->AlmSts.LocalFail_LTE_A2_1	= Normal;
+   1150          				else					Sts->AlmSts.LocalFail_LTE_A2_1	= Alarm;
+   1151          			}
+   1152          
+   1153          			// LTE-A2 MOMO FWD OUT High
+   1154          			{
+   1155          				INT8S LimitLvl;
+   1156          				INT8S DetLvl;
+   1157          				DetLvl		= Sts->Fwd1OutPwr_LTE_A2[0]*2;
+   1158          				if(Sts->Fwd1OutPwr_LTE_A2[1] >= 5)DetLvl++;
+   1159          				
+   1160          				LimitLvl		= Sts->Fwd1OutHighLmt_LTE_A2[0]*2;
+   1161          				if(Sts->Fwd1OutHighLmt_LTE_A2[1] >= 5)LimitLvl++;
+   1162          
+   1163          				
+   1164          				if(Sd_Step[SD_FO_LTE_A2_1] != 0)	Sts->AlmSts.Fwd1OutUpperLmtFail_LTE_A2 = Alarm;
+   1165          				else								Sts->AlmSts.Fwd1OutUpperLmtFail_LTE_A2 = HighLimitCheck(DetLvl, LimitLvl, 2, Sts->AlmSts.Fwd1OutUpperLmtFail_LTE_A2);
+   1166          			}
+   1167          
+   1168          			{
+   1169          				// LTE-A2 MOMO FWD OUT Low
+   1170          				INT8S LimitLvl;
+   1171          				INT8S DetLvl;
+   1172          				
+   1173          				DetLvl		= Sts->Fwd1OutPwrPeak_LTE_A2[0]*2;
+   1174          				if(Sts->Fwd1OutPwrPeak_LTE_A2[1] >= 5)DetLvl++;
+   1175          				LimitLvl		= Sts->Fwd1OutLowerLmt_LTE_A2[0]*2;
+   1176          				if(Sts->Fwd1OutLowerLmt_LTE_A2[1] >= 5)LimitLvl++;
+   1177          
+   1178          				if (((tDnrSts->FwdAmp1OnOff_LTE_A2 == Disable)&&(tDnrSts->Amp1OffCase_LTE_A2 == __UsrCtrl))
+   1179          						||(Sd_Step[SD_FO_LTE_A2_1] > 1))
+   1180          				{
+   1181          					FwdLowMask = RESET;
+   1182          				}
+   1183          				else FwdLowMask = SET;
+   1184          				
+   1185          				if(FwdLowMask)
+   1186          				{
+   1187          					Sts->AlmSts.Fwd1OutLowerLmtFail_LTE_A2 = LowLimitCheck(DetLvl, LimitLvl, 2, Sts->AlmSts.Fwd1OutLowerLmtFail_LTE_A2);
+   1188          
+   1189          					if( Sts->AlmSts.Fwd1OutLowerLmtFail_LTE_A2 == Alarm)
+   1190          					{
+   1191          						if(++LimitAlarmCnt[PATH_LTE_A2_1]>=AlarmCheckTime)
+   1192          						{
+   1193          							PwrAlarm.Fwd1OutLowerLmtFail_LTE_A2 = SET;
+   1194          							LimitAlarmCnt[PATH_LTE_A2_1] = AlarmCheckTime;
+   1195          						}	
+   1196          					}
+   1197          					else
+   1198          					{
+   1199          						PwrAlarm.Fwd1OutLowerLmtFail_LTE_A2 = RESET;
+   1200          						LimitAlarmCnt[PATH_LTE_A2_1] = 0;
+   1201          					}					
+   1202          				}
+   1203          				else
+   1204          				{
+   1205          					Sts->AlmSts.Fwd1OutLowerLmtFail_LTE_A2 = Normal;
+   1206          					PwrAlarm.Fwd1OutLowerLmtFail_LTE_A2 = RESET;
+   1207          					LimitAlarmCnt[PATH_LTE_A2_1] = 0;
+   1208          				}
+   1209          			}
+   1210          
+   1211          			{
+   1212          				// LTE-A2 MOMO Rvs Upper Limit	
+   1213          				INT8S LimitLvl;
+   1214          				INT8S DetLvl;
+   1215          				
+   1216          				DetLvl		= Sts->Rvs1OutPwr_LTE_A2[0]*2;
+   1217          				if(Sts->Rvs1OutPwr_LTE_A2[1] >= 5)DetLvl++;
+   1218          				LimitLvl		= Sts->Rvs1OutUpperLmt_LTE_A2[0]*2;
+   1219          				if(Sts->Rvs1OutUpperLmt_LTE_A2[1] >= 5)LimitLvl++;
+   1220          
+   1221          				if(Sd_Step[SD_RO_LTE_A2_1] != 0)	Sts->AlmSts.Rvs1OutUpperLmtFail_LTE_A2 = Alarm;
+   1222          				else								Sts->AlmSts.Rvs1OutUpperLmtFail_LTE_A2 = HighLimitCheck(DetLvl, LimitLvl, 2, Sts->AlmSts.Rvs1OutUpperLmtFail_LTE_A2);
+   1223          			}
+   1224          
+   1225          			{
+   1226          				// LTE-A2 Over In Alarm 
+   1227          				INT8S LimitLvl;
+   1228          				INT8S DetLvl;
+   1229          				
+   1230          				DetLvl		= -(Sts->Fwd1InPwr_LTE_A2);
+   1231          				LimitLvl	= Sts->OverInAlarmLmt_LTE_A2/2;
+   1232          				
+   1233          				if(Sd_Step[SD_FI_LTE_A2_1] != 0)	Sts->AlmSts.Fwd1InUpperLmtFail_LTE_A2 = Alarm;
+   1234          				else								Sts->AlmSts.Fwd1InUpperLmtFail_LTE_A2 = HighLimitCheck(DetLvl, LimitLvl, 2, Sts->AlmSts.Fwd1InUpperLmtFail_LTE_A2);
+   1235          			}
+   1236          		}
+   1237          		else
+   1238          		{
+   1239          			Sts->AlmSts.LocalFail_LTE_A2_1 	= Normal;
+   1240          
+   1241          			Sts->AlmSts.Fwd1OutUpperLmtFail_LTE_A2 = Normal;
+   1242          			Sts->AlmSts.Fwd1InUpperLmtFail_LTE_A2	= Normal;
+   1243          			Sts->AlmSts.Rvs1OutUpperLmtFail_LTE_A2 = Normal;
+   1244          			Sts->AlmSts.Fwd1OutLowerLmtFail_LTE_A2 = Normal;
+   1245          		}
+   1246          
+   1247          		{
+   1248          			// LTE_A1 Over InAlarm 
+   1249          
+   1250          			INT8S LimitLvl;
+   1251          			INT8S DetLvl;
+   1252          			
+   1253          			if(AlarmCheck_LTE_A1_1 == SET)
+   1254          			{
+   1255          				DetLvl		= Sts->Det1Pwr.FwdInPwr_LTE_A_1 + 25;
+   1256          				LimitLvl	= Sts->Fwd1InPwr_LTE_A1;
+   1257          
+   1258          				if((Sts->AlmSts.FwdAmp1OnOff_LTE_A1 == Enable)&&( Sts->Det1Pwr.Fwd1OutPeakPwr_LTE_A1> 0))
+   1259          				{
+   1260          					CurrAlarm.OverInAlarm_LTE_A1_1 = LowLimitCheck(DetLvl, LimitLvl, 1, CurrAlarm.OverInAlarm_LTE_A1_1);	//2dB 
+   1261          				}
+   1262          				else
+   1263          				{
+   1264          					CurrAlarm.OverInAlarm_LTE_A1_1 = Normal;
+   1265          				}
+   1266          			}
+   1267          			else
+   1268          			{
+   1269          				CurrAlarm.OverInAlarm_LTE_A1_1 = Normal;
+   1270          			}
+   1271          
+   1272          		
+   1273          			if(AlarmCheck_LTE_A2_1 == SET)
+   1274          			{
+   1275          				DetLvl		= Sts->Det1Pwr.FwdInPwr_LTE_A_1 + 25;
+   1276          				LimitLvl	= Sts->Fwd1InPwr_LTE_A2;
+   1277          				if((Sts->AlmSts.FwdAmp1OnOff_LTE_A2 == Enable)&&( Sts->Det1Pwr.Fwd1OutPeakPwr_LTE_A2> 0))
+   1278          				{
+   1279          					CurrAlarm.OverInAlarm_LTE_A2_1 = LowLimitCheck(DetLvl, LimitLvl, 1, CurrAlarm.OverInAlarm_LTE_A2_1);	//2dB 
+   1280          				}
+   1281          				else
+   1282          				{
+   1283          					CurrAlarm.OverInAlarm_LTE_A2_1 = Normal;
+   1284          				}
+   1285          			}
+   1286          			else
+   1287          			{
+   1288          				CurrAlarm.OverInAlarm_LTE_A2_1 = Normal;
+   1289          			}
+   1290          
+   1291          			if((AlarmCheck_LTE_A1_1 == SET)&&(AlarmCheck_LTE_A2_1 == SET))
+   1292          			{
+   1293          
+   1294          				INT8S LimitLvl;
+   1295          				INT8S DetLvl;
+   1296          #if 0
+   1297          				if(Sts->Fwd1InPwr_LTE_A1 >= Sts->Fwd1InPwr_LTE_A2)   		LimitLvl = Sts->Fwd1InPwr_LTE_A2;
+   1298          				else if(Sts->Fwd1InPwr_LTE_A1 < Sts->Fwd1InPwr_LTE_A2)		LimitLvl = Sts->Fwd1InPwr_LTE_A1;
+   1299          
+   1300          				DetLvl	  = Sts->Det1Pwr.FwdInPwr_LTE_A_1+4;
+   1301          				LimitLvl  = LimitLvl;
+   1302          				CurrAlarm.OverInAlarm_LTE_A_1 = LowLimitCheck(DetLvl, LimitLvl, 1, CurrAlarm.OverInAlarm_LTE_A_1);	//2dB 
+   1303          #endif
+   1304          
+   1305          				if(Sts->Fwd1InPwr_LTE_A1 >= Sts->Fwd1InPwr_LTE_A2)		
+   1306          				{
+   1307          					LimitLvl = Sts->Fwd1InPwr_LTE_A2;
+   1308          					DetLvl	 = Sts->Fwd1InPwr_LTE_A1 + 25;
+   1309          				
+   1310          				}
+   1311          				else if(Sts->Fwd1InPwr_LTE_A1 < Sts->Fwd1InPwr_LTE_A2)	
+   1312          				{
+   1313          					LimitLvl = Sts->Fwd1InPwr_LTE_A1;
+   1314          					DetLvl	 = Sts->Fwd1InPwr_LTE_A2 + 25;
+   1315          				}
+   1316          				CurrAlarm.OverInAlarm_LTE_A_1 = LowLimitCheck(DetLvl, LimitLvl, 1, CurrAlarm.OverInAlarm_LTE_A_1);	//2dB 
+   1317          
+   1318          
+   1319          			}	
+   1320          		}
+   1321          	}
+   1322          
+   1323          	if(iRepeaterType == _TRIO_MM)
+   1324          	{
+   1325          #if 1  ///20151223 Adder
+   1326          		if((AlarmCheck_LTE_A1 == SET)&&(AlarmCheck_LTE_A2 == SET))
+   1327          		{
+   1328          			if	((CurrAlarm.OverInAlarm_LTE_A1)||(CurrAlarm.OverInAlarm_LTE_A2)||
+   1329          				(CurrAlarm.OverInAlarm_LTE_A1_1||CurrAlarm.OverInAlarm_LTE_A2_1))
+   1330          			{
+   1331          				if((CurrAlarm.OverInAlarm_LTE_A)||CurrAlarm.OverInAlarm_LTE_A_1)
+   1332          				{
+   1333          					Sts->AlmSts.OverInAlarm_LTE_A = Alarm;
+   1334          					}
+   1335          				else Sts->AlmSts.OverInAlarm_LTE_A = Normal;
+   1336          			}
+   1337          			else Sts->AlmSts.OverInAlarm_LTE_A = Normal;
+   1338          		}
+   1339          		else if(AlarmCheck_LTE_A1 == SET)
+   1340          		{
+   1341          			if((CurrAlarm.OverInAlarm_LTE_A1)||(CurrAlarm.OverInAlarm_LTE_A1_1))
+   1342          			{
+   1343          				Sts->AlmSts.OverInAlarm_LTE_A = Alarm;
+   1344          			}
+   1345          			else Sts->AlmSts.OverInAlarm_LTE_A = Normal;
+   1346          		}
+   1347          		else if(AlarmCheck_LTE_A2 == SET)
+   1348          		{
+   1349          			if((CurrAlarm.OverInAlarm_LTE_A2)||(CurrAlarm.OverInAlarm_LTE_A2_1))
+   1350          			{
+   1351          				Sts->AlmSts.OverInAlarm_LTE_A = Alarm;
+   1352          			}
+   1353          			else Sts->AlmSts.OverInAlarm_LTE_A = Normal;
+   1354          		}
+   1355          #endif
+   1356          	}
+   1357          	else
+   1358          	{
+   1359          #if 1  ///20151223 Adder
+   1360          		if((AlarmCheck_LTE_A1 == SET)&&(AlarmCheck_LTE_A2 == SET))
+   1361          		{
+   1362          			if	((CurrAlarm.OverInAlarm_LTE_A1)||(CurrAlarm.OverInAlarm_LTE_A2))
+   1363          			{
+   1364          				if(CurrAlarm.OverInAlarm_LTE_A)
+   1365          				{
+   1366          					Sts->AlmSts.OverInAlarm_LTE_A = Alarm;
+   1367          				}
+   1368          				else Sts->AlmSts.OverInAlarm_LTE_A = Normal;
+   1369          			}
+   1370          			else Sts->AlmSts.OverInAlarm_LTE_A = Normal;
+   1371          
+   1372          		}
+   1373          		else if(AlarmCheck_LTE_A1 == SET)
+   1374          		{
+   1375          			if((CurrAlarm.OverInAlarm_LTE_A1))
+   1376          			{
+   1377          				Sts->AlmSts.OverInAlarm_LTE_A = Alarm;
+   1378          			}
+   1379          			else Sts->AlmSts.OverInAlarm_LTE_A = Normal;
+   1380          		}
+   1381          		else if(AlarmCheck_LTE_A2 == SET)
+   1382          		{
+   1383          			if((CurrAlarm.OverInAlarm_LTE_A2))
+   1384          			{
+   1385          				Sts->AlmSts.OverInAlarm_LTE_A = Alarm;
+   1386          			}
+   1387          			else Sts->AlmSts.OverInAlarm_LTE_A = Normal;
+   1388          		}
+   1389          #endif
+   1390          
+   1391          	}
+   1392          
+   1393          	if(Sts->AlmSts.FwdAmpOnOff_LTE == Enable)
+   1394          	{
+   1395          		///LTE800 Uplink 자/타사 과입력 Alarm Count
+   1396          
+   1397          #if 0
+   1398          		if((Sts->CurrRvsInPwr_LTE <= 33)&&(Sts->RvsOutPwr_LTE[0] > 0))
+   1399          		{
+   1400          			Sts->ModuleAlarm.Main.RvsOverInAlarm = Alarm;  ///자사 
+   1401           		}
+   1402          		else							
+   1403          		{
+   1404          			Sts->ModuleAlarm.Main.RvsOverInAlarm = Normal;
+   1405          			ChkRvsOverInAlarm = SET;
+   1406          			RvsOverInAlarmCnt = 0;
+   1407          		}
+   1408          #endif
+   1409          		{
+   1410          			if((Sts->CurrRvsInPwr_LTE < 35))
+   1411          			{
+   1412          				if(Sts->CurrRvsInPwr_LTE >= Sts->DetPwr.RvsInPwr_CDMALTE + 25)		
+   1413          				{
+   1414          					Sts->ModuleAlarm.Main.RvsOtherOverInAlarm = Alarm; ///타사 
+   1415          				}
+   1416          				else
+   1417          				{
+   1418          					if((Sts->CurrRvsInPwr_LTE <= 33)&&(Sts->RvsOutPwr_LTE[0] > 0))
+   1419          					{
+   1420          						Sts->ModuleAlarm.Main.RvsOverInAlarm = Alarm;  ///자사 
+   1421          					}
+   1422          					else							
+   1423          					{
+   1424          						Sts->ModuleAlarm.Main.RvsOverInAlarm = Normal;
+   1425          						ChkRvsOverInAlarm = SET;
+   1426          						RvsOverInAlarmCnt = 0;
+   1427          					}
+   1428          				}
+   1429          			}
+   1430          		}
+   1431          
+   1432          		if ( Sts->DetPwr.RvsInPwr_CDMALTE <= 33)
+   1433          		{
+   1434          			// CDMA Over InAlarm 
+   1435          
+   1436          			INT32S gap;
+   1437          			gap = Sts->DetPwr.RvsInPwr_CDMALTE - Sts->CurrRvsInPwr_LTE;
+   1438          			if(Sts->DetPwr.RvsInPwr_CDMALTE < Sts->CurrRvsInPwr_LTE )
+   1439          			{
+   1440          				if(abs(gap) <= 3)
+   1441          				{
+   1442          					Sts->ModuleAlarm.Main.RvsOtherOverInAlarm = Normal;
+   1443          					Sts->ModuleAlarm.Main.RvsOverInAlarm = Alarm;
+   1444          				}
+   1445          				else
+   1446          				{
+   1447          					Sts->ModuleAlarm.Main.RvsOtherOverInAlarm = Alarm; ///타사 
+   1448          				}
+   1449          			}
+   1450          			else							
+   1451          			{
+   1452          				Sts->ModuleAlarm.Main.RvsOtherOverInAlarm = Alarm;
+   1453          			}
+   1454          		}
+   1455          		else
+   1456          		{
+   1457          			Sts->ModuleAlarm.Main.RvsOtherOverInAlarm = Normal;
+   1458          			ChkRvsOtherOverInAlarm = SET;
+   1459          			RvsOtherOverInAlarmCnt = 0;
+   1460          		}
+   1461          	}
+   1462          	else 
+   1463          	{
+   1464          		Sts->ModuleAlarm.Main.RvsOverInAlarm = Normal;
+   1465          		Sts->ModuleAlarm.Main.RvsOtherOverInAlarm = Normal;
+   1466          	}
+   1467          
+   1468          	if (Sts->ModuleAlarm.Main.RvsOverInAlarm ) RvsOverInAlarmCnt = RvsOverInAlarmCnt + 1;
+   1469          
+   1470          	if((RvsOverInAlarmCnt > 4) && ( ChkRvsOverInAlarm)) 
+   1471          	{
+   1472          		Sts->RvsOverInAlarmCount = Sts->RvsOverInAlarmCount + 1 ;
+   1473          		ChkRvsOverInAlarm = RESET;
+   1474          	}
+   1475          	if( Sts->RvsOverInAlarmCount > 127) Sts->RvsOverInAlarmCount = 1;
+   1476          
+   1477          	if (Sts->ModuleAlarm.Main.RvsOtherOverInAlarm ) RvsOtherOverInAlarmCnt = RvsOtherOverInAlarmCnt + 1;
+   1478          
+   1479          	if((RvsOtherOverInAlarmCnt > 6) && ( ChkRvsOtherOverInAlarm)) 
+   1480          	{
+   1481          		Sts->RvsOtherOverInAlarmCount  = Sts->RvsOtherOverInAlarmCount  + 1 ;
+   1482          		ChkRvsOtherOverInAlarm = RESET;
+   1483          	}
+   1484          	if( Sts->RvsOtherOverInAlarmCount > 127) Sts->RvsOtherOverInAlarmCount = 1;
+   1485          
+   1486          
+   1487          	if((Sts->AlmSts.FwdOutUpperLmtFail_3G )||(Sts->AlmSts.FwdInUpperLmtFail_3G))
+   1488          	{
+   1489          		Sts->LedAlarm._LED_3G.OverInAlarm = Alarm;
+   1490          	}
+   1491          	else
+   1492          	{
+   1493          		Sts->LedAlarm._LED_3G.OverInAlarm = Normal;
+   1494          	}
+   1495          
+   1496          	Sts->LedAlarm._LED_3G.RvsOscAlarm 		= Sts->AlmSts.RvsOutUpperLmtFail_3G;
+   1497          	Sts->LedAlarm._LED_3G.LowInputAlarm 	= Sts->AlmSts.FwdOutLowerLmtFail_3G;
+   1498          	Sts->LedAlarm._LED_3G.PllUnlock 		= Sts->AlmSts.LocalFail_3G;
+   1499          	Sts->LedAlarm._LED_3G.ShutDown 			= Sts->AlmSts.FwdAmpOnOff_3G;
+   1500          
+   1501          	if(AlarmCheck_2G == SET)
+   1502          	{
+   1503          	
+   1504          		if((Sts->AlmSts.FwdOutUpperLmtFail_2G)||(Sts->AlmSts.FwdInUpperLmtFail_2G))
+   1505          		{
+   1506          			Sts->LedAlarm._LED_2G.OverInAlarm = Alarm;
+   1507          		}
+   1508          		else
+   1509          		{
+   1510          			Sts->LedAlarm._LED_2G.OverInAlarm = Normal;
+   1511          		}
+   1512          		
+   1513          		Sts->LedAlarm._LED_2G.RvsOscAlarm		= Sts->AlmSts.RvsOutUpperLmtFail_2G;
+   1514          		Sts->LedAlarm._LED_2G.LowInputAlarm 	= Sts->AlmSts.FwdOutLowerLmtFail_2G;
+   1515          		Sts->LedAlarm._LED_2G.PllUnlock 		= Sts->AlmSts.LocalFail_CDMALTE;
+   1516          		Sts->LedAlarm._LED_2G.ShutDown			= Sts->AlmSts.FwdAmpOnOff_2G;
+   1517          	}
+   1518          
+   1519          
+   1520          	
+   1521          	if(AlarmCheck_LTE == SET)
+   1522          	{
+   1523          		if((Sts->AlmSts.FwdOutUpperLmtFail_LTE)||(Sts->AlmSts.FwdInUpperLmtFail_LTE))
+   1524          		{
+   1525          			Sts->LedAlarm._LED_LTE.OverInAlarm = Alarm;
+   1526          		}
+   1527          		else
+   1528          		{
+   1529          			Sts->LedAlarm._LED_LTE.OverInAlarm = Normal;
+   1530          		}
+   1531          		
+   1532          		Sts->LedAlarm._LED_LTE.RvsOscAlarm		= Sts->AlmSts.RvsOutUpperLmtFail_LTE;
+   1533          		Sts->LedAlarm._LED_LTE.LowInputAlarm	= Sts->AlmSts.FwdOutLowerLmtFail_LTE;
+   1534          		Sts->LedAlarm._LED_LTE.PllUnlock		= Sts->AlmSts.LocalFail_CDMALTE;
+   1535          		Sts->LedAlarm._LED_LTE.ShutDown 		= Sts->AlmSts.FwdAmpOnOff_LTE;
+   1536          	}
+   1537          
+   1538          
+   1539          	if(AlarmCheck_LTE_A1 == SET)
+   1540          	{
+   1541          		if((Sts->AlmSts.FwdOutUpperLmtFail_LTE_A1)||(Sts->AlmSts.FwdInUpperLmtFail_LTE_A1))
+   1542          		{
+   1543          			Sts->LedAlarm._LED_LTE_A1.OverInAlarm = Alarm;
+   1544          		}
+   1545          		else
+   1546          		{
+   1547          			Sts->LedAlarm._LED_LTE_A1.OverInAlarm = Normal;
+   1548          		}
+   1549          		
+   1550          		Sts->LedAlarm._LED_LTE_A1.RvsOscAlarm	= Sts->AlmSts.RvsOutUpperLmtFail_LTE_A1;
+   1551          		Sts->LedAlarm._LED_LTE_A1.LowInputAlarm = Sts->AlmSts.FwdOutLowerLmtFail_LTE_A1;
+   1552          		Sts->LedAlarm._LED_LTE_A1.PllUnlock 	= Sts->AlmSts.LocalFail_LTE_A1;
+   1553          		Sts->LedAlarm._LED_LTE_A1.ShutDown		= Sts->AlmSts.FwdAmpOnOff_LTE_A1;
+   1554          	}
+   1555          	
+   1556          	if(AlarmCheck_LTE_A2 == SET)
+   1557          	{
+   1558          		if((Sts->AlmSts.FwdOutUpperLmtFail_LTE_A2)||(Sts->AlmSts.FwdInUpperLmtFail_LTE_A2))
+   1559          		{
+   1560          			Sts->LedAlarm._LED_LTE_A2.OverInAlarm = Alarm;
+   1561          		}
+   1562          		else
+   1563          		{
+   1564          			Sts->LedAlarm._LED_LTE_A2.OverInAlarm = Normal;
+   1565          		}
+   1566          		
+   1567          		Sts->LedAlarm._LED_LTE_A2.RvsOscAlarm	= Sts->AlmSts.RvsOutUpperLmtFail_LTE_A2;
+   1568          		Sts->LedAlarm._LED_LTE_A2.LowInputAlarm = Sts->AlmSts.FwdOutLowerLmtFail_LTE_A2;
+   1569          		Sts->LedAlarm._LED_LTE_A2.PllUnlock 	= Sts->AlmSts.LocalFail_LTE_A2;
+   1570          		Sts->LedAlarm._LED_LTE_A2.ShutDown		= Sts->AlmSts.FwdAmpOnOff_LTE_A2;
+   1571          	}
+   1572          
+   1573          	if(AlarmCheck_LTE_1 == SET)
+   1574          	{
+   1575          		if((Sts->AlmSts.Fwd1OutUpperLmtFail_LTE))
+   1576          		{
+   1577          			Sts->LedAlarm._LED_LTE1.OverInAlarm = Alarm;
+   1578          		}
+   1579          		else
+   1580          		{
+   1581          			Sts->LedAlarm._LED_LTE1.OverInAlarm = Normal;
+   1582          		}
+   1583          		Sts->LedAlarm._LED_LTE1.RvsOscAlarm		= Sts->AlmSts.Rvs1OutUpperLmtFail_LTE;
+   1584          		Sts->LedAlarm._LED_LTE1.LowInputAlarm 	= Sts->AlmSts.Fwd1OutLowerLmtFail_LTE;
+   1585          		Sts->LedAlarm._LED_LTE1.PllUnlock 		= Sts->AlmSts.LocalFail_LTE_1;
+   1586          		Sts->LedAlarm._LED_LTE1.ShutDown		= Sts->AlmSts.FwdAmp1OnOff_LTE;
+   1587          	}
+   1588          
+   1589          	if(AlarmCheck_LTE_A1_1 == SET)
+   1590          	{
+   1591          		if((Sts->AlmSts.Fwd1OutUpperLmtFail_LTE_A1))
+   1592          		{
+   1593          			Sts->LedAlarm._LED_LTE_A1_1.OverInAlarm = Alarm;
+   1594          		}
+   1595          		else
+   1596          		{
+   1597          			Sts->LedAlarm._LED_LTE_A1_1.OverInAlarm = Normal;
+   1598          		}
+   1599          
+   1600          
+   1601          		Sts->LedAlarm._LED_LTE_A1_1.RvsOscAlarm		= Sts->AlmSts.Rvs1OutUpperLmtFail_LTE_A1;
+   1602          		Sts->LedAlarm._LED_LTE_A1_1.LowInputAlarm	= Sts->AlmSts.Fwd1OutLowerLmtFail_LTE_A1;
+   1603          		Sts->LedAlarm._LED_LTE_A1_1.PllUnlock		= Sts->AlmSts.LocalFail_LTE_A1_1;
+   1604          		Sts->LedAlarm._LED_LTE_A1_1.ShutDown		= Sts->AlmSts.FwdAmp1OnOff_LTE_A1;
+   1605          	}
+   1606          
+   1607          	if(AlarmCheck_LTE_A2_1 == SET)
+   1608          	{
+   1609          		if((Sts->AlmSts.Fwd1OutUpperLmtFail_LTE_A2))
+   1610          		{
+   1611          			Sts->LedAlarm._LED_LTE_A2_1.OverInAlarm = Alarm;
+   1612          		}
+   1613          		else
+   1614          		{
+   1615          			Sts->LedAlarm._LED_LTE_A2_1.OverInAlarm = Normal;
+   1616          		}
+   1617          		Sts->LedAlarm._LED_LTE_A2_1.RvsOscAlarm		= Sts->AlmSts.Rvs1OutUpperLmtFail_LTE_A2;
+   1618          		Sts->LedAlarm._LED_LTE_A2_1.LowInputAlarm	= Sts->AlmSts.Fwd1OutLowerLmtFail_LTE_A2;
+   1619          		Sts->LedAlarm._LED_LTE_A2_1.PllUnlock		= Sts->AlmSts.LocalFail_LTE_A2_1;
+   1620          		Sts->LedAlarm._LED_LTE_A2_1.ShutDown		= Sts->AlmSts.FwdAmp1OnOff_LTE_A2;
+   1621          	}
+   1622          
+   1623          }
+   1624          
+   1625          void AlarmStatusUpdate(void)
+   1626          {
+   1627          	__Dnr_Sts *Sts = tDnrSts;
+   1628          
+   1629          
+   1630          	PwrAlarm.ACFail						= Sts->AlmSts.ACFail;
+   1631          
+   1632          	if(AlarmCheck_2G == SET)
+   1633          	{
+   1634          		PwrAlarm.FwdInUpperLmtFail_2G	= Sts->AlmSts.FwdInUpperLmtFail_2G;	
+   1635          		if(Sd_Step[SD_FO_2G] >= 3) 	PwrAlarm.FwdOutUpperLmtFail_2G	= Sts->AlmSts.FwdOutUpperLmtFail_2G;
+   1636          		else						PwrAlarm.FwdOutUpperLmtFail_2G  = 0;
+   1637          		if(Sd_Step[SD_RO_2G] >= 3)  PwrAlarm.RvsOutUpperLmtFail_2G	= Sts->AlmSts.RvsOutUpperLmtFail_2G;	
+   1638          		else						PwrAlarm.RvsOutUpperLmtFail_2G  = 0;
+   1639          	}
+   1640          	
+   1641          	if(AlarmCheck_LTE == SET)
+   1642          	{
+   1643          		PwrAlarm.FwdInUpperLmtFail_LTE		= Sts->AlmSts.FwdInUpperLmtFail_LTE;	
+   1644          		if(Sd_Step[SD_FO_LTE] >= 3)	PwrAlarm.FwdOutUpperLmtFail_LTE	 = Sts->AlmSts.FwdOutUpperLmtFail_LTE;		
+   1645          		else						PwrAlarm.FwdOutUpperLmtFail_LTE  = 0;
+   1646          
+   1647          		if(Sd_Step[SD_RO_LTE] >= 3)	PwrAlarm.RvsOutUpperLmtFail_LTE	 = Sts->AlmSts.RvsOutUpperLmtFail_LTE;		
+   1648          		else						PwrAlarm.RvsOutUpperLmtFail_LTE  = 0;
+   1649          		PwrAlarm.LocalFail_CDMALTE			= Sts->AlmSts.LocalFail_CDMALTE;
+   1650          	}
+   1651          
+   1652          	if((AlarmCheck_2G == SET)||(AlarmCheck_LTE == SET))
+   1653          	{
+   1654          		PwrAlarm.OverInAlarm_CDMALTE		= Sts->AlmSts.OverInAlarm_CDMALTE;		
+   1655          	}
+   1656          	
+   1657          	if(Sd_Step[SD_FI_3G] >= 3)	PwrAlarm.FwdInUpperLmtFail_3G  = Sts->AlmSts.FwdInUpperLmtFail_3G;	
+   1658          	else						PwrAlarm.FwdInUpperLmtFail_3G  = 0;	
+   1659          	
+   1660          	if(Sd_Step[SD_FO_3G] >= 3)	PwrAlarm.FwdOutUpperLmtFail_3G	= Sts->AlmSts.FwdOutUpperLmtFail_3G;
+   1661          	else						PwrAlarm.FwdOutUpperLmtFail_3G  = 0;
+   1662          
+   1663          	if(Sd_Step[SD_RO_3G] >= 3)	PwrAlarm.RvsOutUpperLmtFail_3G	= Sts->AlmSts.RvsOutUpperLmtFail_3G;
+   1664          	else						PwrAlarm.RvsOutUpperLmtFail_3G  = 0;
+   1665          
+   1666          
+   1667          	PwrAlarm.OverInAlarm_3G				= Sts->AlmSts.OverInAlarm_3G;	
+   1668          	PwrAlarm.LocalFail_3G				= Sts->AlmSts.LocalFail_3G;		
+   1669          
+   1670          	if(AlarmCheck_LTE_A1 == SET)
+   1671          	{
+   1672          		if(Sd_Step[SD_FI_LTE_A1] >= 3) 	PwrAlarm.FwdInUpperLmtFail_LTE_A1	= Sts->AlmSts.FwdInUpperLmtFail_LTE_A1;
+   1673          		else							PwrAlarm.FwdInUpperLmtFail_LTE_A1	= 0;
+   1674          		
+   1675          		if(Sd_Step[SD_FO_LTE_A1] >= 3) 	PwrAlarm.FwdOutUpperLmtFail_LTE_A1	= Sts->AlmSts.FwdOutUpperLmtFail_LTE_A1;
+   1676          		else							PwrAlarm.FwdOutUpperLmtFail_LTE_A1	= 0;
+   1677          
+   1678          		if(Sd_Step[SD_FO_LTE_A1] >= 3)	PwrAlarm.RvsOutUpperLmtFail_LTE_A1	= Sts->AlmSts.RvsOutUpperLmtFail_LTE_A1;
+   1679          		else							PwrAlarm.RvsOutUpperLmtFail_LTE_A1	= 0;
+   1680          
+   1681          		PwrAlarm.LocalFail_LTE_A1			= Sts->AlmSts.LocalFail_LTE_A1;
+   1682          
+   1683          //		if((Sts->ModuleAlarm.Main.DCFail)||(PwrAlarm.ACFail))
+   1684          #if 0
+   1685          		if((PwrAlarm.ACFail))
+   1686          		{
+   1687          
+   1688          		}
+   1689          		else
+   1690          		{
+   1691          			PwrAlarm.FwdAmpOnOff_LTE_A1 	= Sts->AlmSts.FwdAmpOnOff_LTE_A1;
+   1692          		}
+   1693          #endif		
+   1694          	}
+   1695          
+   1696          	
+   1697          	if(AlarmCheck_LTE_A2 == SET)
+   1698          	{
+   1699          		if(Sd_Step[SD_FI_LTE_A2] >= 3) 	PwrAlarm.FwdInUpperLmtFail_LTE_A2	= Sts->AlmSts.FwdInUpperLmtFail_LTE_A2;
+   1700          		else							PwrAlarm.FwdInUpperLmtFail_LTE_A2	= 0;
+   1701          
+   1702          		if(Sd_Step[SD_FO_LTE_A2] >= 3) 	PwrAlarm.FwdOutUpperLmtFail_LTE_A2	= Sts->AlmSts.FwdOutUpperLmtFail_LTE_A2;	
+   1703          		else							PwrAlarm.FwdOutUpperLmtFail_LTE_A2	= 0;
+   1704          
+   1705          		if(Sd_Step[SD_RO_LTE_A2] >= 3)	PwrAlarm.RvsOutUpperLmtFail_LTE_A2	= Sts->AlmSts.RvsOutUpperLmtFail_LTE_A2;
+   1706          		else							PwrAlarm.RvsOutUpperLmtFail_LTE_A2	= 0;
+   1707          
+   1708          
+   1709          		PwrAlarm.LocalFail_LTE_A2			= Sts->AlmSts.LocalFail_LTE_A2;
+   1710          
+   1711          //		if((Sts->ModuleAlarm.Main.DCFail)||(PwrAlarm.ACFail))
+   1712          #if 0
+   1713          		if((PwrAlarm.ACFail))
+   1714          		{
+   1715          		
+   1716          		}
+   1717          		else
+   1718          		{
+   1719          			PwrAlarm.FwdAmpOnOff_LTE_A2 	= Sts->AlmSts.FwdAmpOnOff_LTE_A2;
+   1720          		}		
+   1721          #endif		
+   1722          	}
+   1723          	
+   1724          	if((AlarmCheck_LTE_A1 == SET)||(AlarmCheck_LTE_A2 == SET))
+   1725          	{
+   1726          		PwrAlarm.OverInAlarm_LTE_A1			= Sts->AlmSts.OverInAlarm_LTE_A;
+   1727          	}
+   1728          
+   1729          	
+   1730          	
+   1731          	if(AlarmCheck_LTE_1 == SET)
+   1732          	{
+   1733          		if(Sd_Step[SD_FI_LTE_1] >= 3) 	PwrAlarm.Fwd1InUpperLmtFail_LTE		= Sts->AlmSts.Fwd1InUpperLmtFail_LTE;
+   1734          		else							PwrAlarm.Fwd1InUpperLmtFail_LTE	= 0;
+   1735          
+   1736          		if(Sd_Step[SD_FO_LTE_1] >= 3) 	PwrAlarm.Fwd1OutUpperLmtFail_LTE	= Sts->AlmSts.Fwd1OutUpperLmtFail_LTE;
+   1737          		else							PwrAlarm.Fwd1OutUpperLmtFail_LTE	= 0;
+   1738          		if(Sd_Step[SD_FO_LTE_1] >= 3)	PwrAlarm.Rvs1OutUpperLmtFail_LTE	= Sts->AlmSts.Rvs1OutUpperLmtFail_LTE;
+   1739          		else							PwrAlarm.Rvs1OutUpperLmtFail_LTE	= 0;
+   1740          		PwrAlarm.LocalFail_LTE_1			= Sts->AlmSts.LocalFail_LTE_1;
+   1741          	}
+   1742          	
+   1743          	if(AlarmCheck_LTE_A1_1 == SET)
+   1744          	{
+   1745          		if(Sd_Step[SD_FI_LTE_A1_1] >= 3) 	PwrAlarm.Fwd1InUpperLmtFail_LTE_A1	= Sts->AlmSts.Fwd1InUpperLmtFail_LTE_A1;
+   1746          		else								PwrAlarm.Fwd1InUpperLmtFail_LTE_A1	= 0;
+   1747          		if(Sd_Step[SD_FO_LTE_A1_1] >= 3) 	PwrAlarm.Fwd1OutUpperLmtFail_LTE_A1	= Sts->AlmSts.Fwd1OutUpperLmtFail_LTE_A1;
+   1748          		else								PwrAlarm.Fwd1OutUpperLmtFail_LTE_A1	= 0;
+   1749          		if(Sd_Step[SD_FO_LTE_A1_1] >= 3)	PwrAlarm.Rvs1OutUpperLmtFail_LTE_A1	= Sts->AlmSts.Rvs1OutUpperLmtFail_LTE_A1;	
+   1750          		else								PwrAlarm.Rvs1OutUpperLmtFail_LTE_A1	= 0;
+   1751          		PwrAlarm.LocalFail_LTE_A1_1			= Sts->AlmSts.LocalFail_LTE_A1_1;
+   1752          
+   1753          //		if((Sts->ModuleAlarm.Main.DCFail)||(PwrAlarm.ACFail))
+   1754          #if 0
+   1755          		if((PwrAlarm.ACFail))
+   1756          		{
+   1757          
+   1758          		}
+   1759          		else
+   1760          		{
+   1761          			PwrAlarm.FwdAmp1OnOff_LTE_A1 	= Sts->AlmSts.FwdAmp1OnOff_LTE_A1;
+   1762          		}	
+   1763          #endif		
+   1764          	}
+   1765          	
+   1766          	if(AlarmCheck_LTE_A2_1 == SET)
+   1767          	{
+   1768          		if(Sd_Step[SD_FI_LTE_A2_1] >= 3) 	PwrAlarm.Fwd1InUpperLmtFail_LTE_A2	= Sts->AlmSts.Fwd1InUpperLmtFail_LTE_A2;
+   1769          		else								PwrAlarm.Fwd1InUpperLmtFail_LTE_A2	= 0;
+   1770          		if(Sd_Step[SD_FO_LTE_A2_1] >= 3) 	PwrAlarm.Fwd1OutUpperLmtFail_LTE_A2	= Sts->AlmSts.Fwd1OutUpperLmtFail_LTE_A2; 	
+   1771          		else								PwrAlarm.Fwd1OutUpperLmtFail_LTE_A2	= 0;
+   1772          		if(Sd_Step[SD_FO_LTE_A2_1] >= 3)	PwrAlarm.Rvs1OutUpperLmtFail_LTE_A2	= Sts->AlmSts.Rvs1OutUpperLmtFail_LTE_A2;	
+   1773          		else								PwrAlarm.Rvs1OutUpperLmtFail_LTE_A2	= 0;
+   1774          		PwrAlarm.LocalFail_LTE_A2_1			= Sts->AlmSts.LocalFail_LTE_A2_1;
+   1775          		
+   1776          //		if((Sts->ModuleAlarm.Main.DCFail)||(PwrAlarm.ACFail))
+   1777          #if 0
+   1778          		if((PwrAlarm.ACFail))
+   1779          		{
+   1780          
+   1781          		}
+   1782          		else
+   1783          		{
+   1784          			PwrAlarm.FwdAmp1OnOff_LTE_A2 	= Sts->AlmSts.FwdAmp1OnOff_LTE_A2;
+   1785          		}
+   1786          #endif		
+   1787          	}
+   1788          	
+   1789          //	if((Sts->ModuleAlarm.Main.DCFail)||(PwrAlarm.ACFail))
+   1790          	if((PwrAlarm.ACFail))
+   1791          	{
+   1792          
+   1793          	}
+   1794          	else
+   1795          	{
+   1796          #if 0
+   1797          		if (Sts->AmpOffCase_2G == CASE_User)
+   1798          		{
+   1799          			PwrAlarm.FwdAmpOnOff_2G 		= Sts->AlmSts.FwdAmpOnOff_2G;
+   1800          		}
+   1801          		if (Sts->AmpOffCase_3G == CASE_User)
+   1802          		{
+   1803          			PwrAlarm.FwdAmpOnOff_3G 		= Sts->AlmSts.FwdAmpOnOff_3G;
+   1804          		}
+   1805          
+   1806          		if (Sts->AmpOffCase_LTE== CASE_User)
+   1807          		{
+   1808          			PwrAlarm.FwdAmpOnOff_LTE = Sts->AlmSts.FwdAmpOnOff_LTE;
+   1809          		}
+   1810          
+   1811          		if (Sts->AmpOffCase_LTE_A1 == CASE_User)
+   1812          		{
+   1813          			PwrAlarm.FwdAmpOnOff_LTE_A1 = Sts->AlmSts.FwdAmpOnOff_LTE_A1;
+   1814          		}
+   1815          
+   1816          		if (Sts->AmpOffCase_LTE_A2 == CASE_User)
+   1817          		{
+   1818          			PwrAlarm.FwdAmpOnOff_LTE_A2 = Sts->AlmSts.FwdAmpOnOff_LTE_A2;
+   1819          		}
+   1820          
+   1821          		
+   1822          		if (Sts->Amp1OffCase_LTE== CASE_User)
+   1823          		{
+   1824          			PwrAlarm.FwdAmp1OnOff_LTE= Sts->AlmSts.FwdAmp1OnOff_LTE;
+   1825          		}
+   1826          		
+   1827          		if (Sts->Amp1OffCase_LTE_A1 == CASE_User)
+   1828          		{
+   1829          			PwrAlarm.FwdAmp1OnOff_LTE_A1 = Sts->AlmSts.FwdAmp1OnOff_LTE_A1;
+   1830          		}
+   1831          
+   1832          		if (Sts->Amp1OffCase_LTE_A2 == CASE_User)
+   1833          		{
+   1834          			PwrAlarm.FwdAmp1OnOff_LTE_A2 = Sts->AlmSts.FwdAmp1OnOff_LTE_A2;
+   1835          		}
+   1836          #endif
+   1837          
+   1838          #if 1  ///20151207 Adder
+   1839          		PwrAlarm.FwdAmpOnOff_3G 		= Sts->AlmSts.FwdAmpOnOff_3G;
+   1840          		if(AlarmCheck_2G == SET)		PwrAlarm.FwdAmpOnOff_2G 		= Sts->AlmSts.FwdAmpOnOff_2G;
+   1841          		if(AlarmCheck_LTE == SET)		PwrAlarm.FwdAmpOnOff_LTE		= Sts->AlmSts.FwdAmpOnOff_LTE;
+   1842          		if(AlarmCheck_LTE_A1 == SET)	PwrAlarm.FwdAmpOnOff_LTE_A1 	= Sts->AlmSts.FwdAmpOnOff_LTE_A1;
+   1843          		if(AlarmCheck_LTE_A2 == SET)  	PwrAlarm.FwdAmpOnOff_LTE_A2 	= Sts->AlmSts.FwdAmpOnOff_LTE_A2;
+   1844          		
+   1845          		if(AlarmCheck_LTE_1== SET)		PwrAlarm.FwdAmp1OnOff_LTE		= Sts->AlmSts.FwdAmp1OnOff_LTE;
+   1846          		if(AlarmCheck_LTE_A1_1 == SET) 	PwrAlarm.FwdAmp1OnOff_LTE_A1	= Sts->AlmSts.FwdAmp1OnOff_LTE_A1;
+   1847          		if(AlarmCheck_LTE_A2_1 == SET)  PwrAlarm.FwdAmp1OnOff_LTE_A2	= Sts->AlmSts.FwdAmp1OnOff_LTE_A2;
+   1848          #endif
+   1849          	}
+   1850          }
+   1851          
+   1852          
+   1853          void AttnOutBufferInit(void)
+   1854          {
+   1855          	CurrLTE15MUse 			= 0xFF;
+   1856          	CurrModemOnOff			= 0xFF;
+   1857          	ChkBandSelet			= 0xFF;
+   1858          
+   1859          	CurrFwdAttn1_3G 		= 0xFF; 
+   1860          	CurrFwdAttn2_3G 		= 0xFF; 
+   1861          	CurrRvsAttn1_3G 		= 0xFF; 
+   1862          	CurrRvsAttn2_3G 		= 0xFF; 
+   1863          	CurrRvsAttn3_3G 		= 0xFF; 
+   1864          	CurrRvsAttn4_3G 		= 0xFF; 
+   1865          
+   1866          	CurrFwdAttn1_2G 		= 0xFF; 
+   1867          	CurrFwdAttn2_2G 		= 0xFF; 
+   1868          	CurrRvsAttn1_2G 		= 0xFF; 
+   1869          	CurrRvsAttn2_2G 		= 0xFF; 
+   1870          	CurrRvsAttn3_2G 		= 0xFF; 
+   1871          
+   1872          	CurrFwdAttn1_LTE		= 0xFF; 
+   1873          	CurrFwdAttn2_LTE		= 0xFF; 
+   1874          	CurrRvsAttn1_LTE		= 0xFF; 
+   1875          	CurrRvsAttn2_LTE		= 0xFF; 
+   1876          	CurrRvsAttn3_LTE		= 0xFF; 
+   1877          
+   1878          	CurrFwdAttn1_CDMALTE 	= 0xFF;
+   1879          	CurrRvsAttn1_CDMALTE 	= 0xFF;
+   1880          
+   1881          	CurrFwdAttn1_LTE_A1		= 0xFF; 
+   1882          	CurrFwdAttn2_LTE_A1		= 0xFF; 
+   1883          	CurrRvsAttn1_LTE_A1		= 0xFF; 
+   1884          	CurrRvsAttn2_LTE_A1		= 0xFF; 
+   1885          	CurrRvsAttn3_LTE_A1		= 0xFF; 
+   1886          
+   1887          	CurrFwdAttn1_LTE_A2		= 0xFF; 
+   1888          	CurrFwdAttn2_LTE_A2		= 0xFF; 
+   1889          	CurrRvsAttn1_LTE_A2		= 0xFF; 
+   1890          	CurrRvsAttn2_LTE_A2		= 0xFF; 
+   1891          	CurrRvsAttn3_LTE_A2		= 0xFF; 
+   1892          
+   1893          
+   1894          	CurrFwdAttn1_LTE_A 		= 0xFF;
+   1895          	CurrRvsAttn1_LTE_A 		= 0xFF;
+   1896          
+   1897          	CurrFwd1Attn1_LTE		= 0xFF; 
+   1898          	CurrFwd1Attn2_LTE		= 0xFF; 
+   1899          	CurrRvs1Attn1_LTE		= 0xFF; 
+   1900          	CurrRvs1Attn2_LTE		= 0xFF; 
+   1901          	CurrRvs1Attn3_LTE		= 0xFF; 
+   1902          	CurrRvs1Attn4_LTE		= 0xFF; 
+   1903          
+   1904          	CurrFwd1Attn1_LTE_A1 	= 0xFF;
+   1905          	CurrFwd1Attn2_LTE_A1 	= 0xFF;
+   1906          	CurrRvs1Attn1_LTE_A1 	= 0xFF;
+   1907          	CurrRvs1Attn2_LTE_A1 	= 0xFF;
+   1908          	CurrRvs1Attn3_LTE_A1 	= 0xFF;
+   1909          
+   1910          	CurrFwd1Attn1_LTE_A2 	= 0xFF;
+   1911          	CurrFwd1Attn2_LTE_A2 	= 0xFF;
+   1912          	CurrRvs1Attn1_LTE_A2 	= 0xFF;
+   1913          	CurrRvs1Attn2_LTE_A2 	= 0xFF;
+   1914          	CurrRvs1Attn3_LTE_A2 	= 0xFF;	
+   1915          
+   1916          	CurrFwd1Attn1_LTE_A 	= 0xFF;
+   1917          	CurrRvs1Attn1_LTE_A 	= 0xFF;
+   1918          }
+   1919          
+   1920          
+   1921          void ResetCaseBackup(INT8U Cause)
+   1922          {
+   1923          	rambackup[0] = Cause;
+   1924          }
+   1925          
+   1926          
+   1927          void PeriodReportCheck(void)
+   1928          {
+   1929          	INT16U	PeriodSec = 1;
+   1930          	
+   1931          	if(TimeOverCheck(TimerPerReport))
+   1932          	{
+   1933          		TimePeriodElased++;
+   1934          		TimerRegist(TimerPerReport, Time1Sec);	
+   1935          	}
+   1936          
+   1937          	if(TimePeriodElased >= PeriodSec)
+   1938          	{
+   1939          		TimePeriodElased = 0;
+   1940          		
+   1941          		if(!FirstCheckFlag)
+   1942          		{
+   1943          		//	*SmsDnrPreAlm = *(_SmsDnrAlarm *)SmsDnrAlarm;
+   1944          		//	*SmsRmtPreAlm = *(_SmsRmtAlarm *)SmsRmtAlarm;
+   1945          			
+   1946          			FirstCheckFlag = TRUE;
+   1947          		}
+   1948          			
+   1949          		SmsDnrAlarm_Check();
+   1950          	}
+   1951          }
+   1952          
+   1953          
+   1954          void SmsDnrAlarm_Check(void)
+   1955          {
+   1956          	 if(chkDnrAlarmReport == SET)return;
+   1957          	 if( DnrAlarmCheckUpdate(tDnrSts->AlarmMask) != 0)chkDnrAlarmReport = SET;
+   1958          }
+   1959          
+   1960          INT32U DnrAlarmCheckUpdate(INT8U TotMask)
+   1961          {
+   1962          	int i;
+   1963          
+   1964          	INT8U *CurSts		= (INT8U *)&PwrAlarm;
+   1965          	INT8U *PreSts		= (INT8U *)&PwrAlarmPre;
+   1966          	INT8U *ChangeFlag	= (INT8U *)&PwrAlarmChange;
+   1967          	INT8U *AlarmTimer	= (INT8U *)&PwrAlarmTimer;
+   1968          	INT8U *AlarmCnt		= (INT8U *)&PwrAlarmCnt;
+   1969          
+   1970          	INT8U DataLen	= sizeof(__PwrAlmStr)/1;
+   1971          
+   1972          	INT8U tCnt = 0;
+   1973          
+   1974          	for(i = 0; i < DataLen; i++)
+   1975          	{
+   1976          		tCnt += UPdateAlarm(CurSts + i, PreSts + i, ChangeFlag + i, AlarmTimer + i, AlarmCnt+ i);
+   1977          	}
+   1978          	
+   1979          	if(TotMask)
+   1980          	{
+   1981          		return FALSE;	 // Mask 이면 check 하지 않는다.
+   1982          	}
+   1983          
+   1984          	if(tCnt != 0) return TRUE;
+   1985          	return FALSE;
+   1986          }
+   1987          
+   1988          INT8U UPdateAlarm(INT8U *CurSts, INT8U *PreSts, INT8U *ChangeFlag, INT8U *AlarmTimer, INT8U *AlarmCnt)
+   1989          {
+   1990          //	*ChangeFlag = 0;
+   1991           	if( (*CurSts) ==  (*PreSts) )
+   1992          	{
+   1993          		*AlarmTimer = *AlarmCnt;
+   1994          	}
+   1995          	else
+   1996           	{
+   1997          		if(*AlarmTimer == 0)
+   1998          		{
+   1999          			*PreSts = *CurSts;
+   2000          			*ChangeFlag = 1;
+   2001          			return TRUE;
+   2002          		}
+   2003          		else *AlarmTimer = *AlarmTimer - 1;
+   2004          	}
+   2005          	return FALSE;
+   2006          }
+   2007          
+   2008          void Table_Alarm(void)
+   2009          {
+   2010          	INT8U AlarmSum = 0;
+   2011          
+   2012          	INT8U i;
+   2013          	INT8U Pwr0TblAlarm = 0;
+   2014          	INT8U Att0TblAlarm = 0;
+   2015          	
+   2016          	INT8U Pwr1TblAlarm = 0;
+   2017          	INT8U Att1TblAlarm = 0;
+   2018          	
+   2019          	
+   2020          	for(i = Index_FwdOutAvgPwr_2G; i <= Index_RvsOutPwr_3G; i++)
+   2021          	{
+   2022          		Pwr0TblAlarm 	+= OutPutTable_Alarm_check(i);
+   2023          	}
+   2024          
+   2025          	for(i = Index_FwdAttn1_2G; i <= Index_RvsAttn4_CDMALTE; i++)
+   2026          	{
+   2027          		Att0TblAlarm 	+= AttTable_Alarm_check(i);
+   2028          	}
+   2029          
+   2030          	if(iRepeaterType == _TRIO_MM)
+   2031          	{
+   2032          		for(i = Index_Fwd1InPwr_LTE; i <= Index_Fwd1OutPeakPwr_LTE_A1; i++)
+   2033          		{
+   2034          			Pwr1TblAlarm 	+= OutPutTable_Alarm_check(i);
+   2035          		}
+   2036          		
+   2037          		for(i = Index_Fwd1Attn1_LTE; i <= Index_RvsAttn4_LTE_A_1; i++)
+   2038          		{
+   2039          			Att1TblAlarm 	+= AttTable_Alarm_check(i);
+   2040          		}
+   2041          	}
+   2042          	AlarmSum = Pwr0TblAlarm + Att0TblAlarm + Pwr1TblAlarm + Att1TblAlarm;
+   2043          
+   2044          	if(AlarmSum)	tDnrSts->TableStatus = Alarm;
+   2045          	else			tDnrSts->TableStatus = Normal;
+   2046          
+   2047          }
+   2048          
+   2049          
+   2050          INT8U OutPutTable_Alarm_check(INT8U TblID)
+   2051          {
+   2052          	INT8S tIndex = 0;
+   2053          	INT8S tLocation = 0;
+   2054          	
+   2055          	INT32S i = 0;
+   2056          	INT8U rval = Normal;
+   2057          
+   2058          	tLocation = TableLocation(TblID);
+   2059          	if( (tIndex = TableIndex(TblID)) == -1) return Normal;
+   2060          
+   2061          	if(tLocation == _DnrPwr0_Location)
+   2062          	{
+   2063          		__Dnr0OutputTblStr *table =(__Dnr0OutputTblStr *)&vEE_TABLE1->Dnr0OutputTbl[tIndex];
+   2064          
+   2065          		INT16U *dptr = table->Data;
+   2066          		INT32S nsize = table->nsize;
+   2067          		
+   2068          		for(i = 0; i < nsize && i < Dnr0OutputTBL_Size; i++)
+   2069          		{
+   2070          //			if((dptr[i] > 3500)||(dptr[i] < 200)) 	
+   2071          			if((dptr[i] > 3500)) 	
+   2072          			{
+   2073          				rval = Alarm;  
+   2074          
+   2075          			}
+   2076          		    if(i)
+   2077          	        {
+   2078          	            if( dptr[i-1] < dptr[i] )			
+   2079                      	{
+   2080          					rval = Alarm;  
+   2081                      	}
+   2082          	        }
+   2083          		}
+   2084          
+   2085          		if((nsize < 10)||(nsize > Dnr0OutputTBL_Size))  rval = Alarm;  
+   2086          	}
+   2087          	else if(tLocation == _SvrPwr0_Location)
+   2088          	{
+   2089          		__Svr0OutputTblStr *table =(__Svr0OutputTblStr *)&vEE_TABLE->Svr0OutputTbl[tIndex];
+   2090          
+   2091          		INT16U *dptr = table->Data;
+   2092          		INT32S nsize = table->nsize;
+   2093          		
+   2094          		for(i = 0; i < nsize && i < Svr0OutputTBL_Size; i++)
+   2095          		{
+   2096          //			if((dptr[i] > 3500)||(dptr[i] < 200)) 	rval = Alarm;  
+   2097          			if((dptr[i] > 3500))	rval = Alarm;  
+   2098          
+   2099          		    if(i)
+   2100          	        {
+   2101          	            if( dptr[i-1] < dptr[i] )			rval = Alarm;  
+   2102          	        }
+   2103          		}
+   2104          
+   2105          		if((nsize < 10)||(nsize > Svr0OutputTBL_Size))  rval = Alarm;  
+   2106          	}
+   2107          	else if(tLocation == _DnrPwr1_Location)
+   2108          	{
+   2109          		rval = Normal;
+   2110          	}
+   2111          	else if(tLocation == _SvrPwr1_Location)
+   2112          	{
+   2113          		rval = Normal;
+   2114          	}
+   2115          	else if(tLocation == _ETC_Location)
+   2116          	{
+   2117          		rval = Normal;
+   2118          	}
+   2119          		
+   2120          	return rval;
+   2121          }
+   2122          
+   2123          INT8U AttTable_Alarm_check(INT8U TblID)
+   2124          {
+   2125          	INT8S tIndex = 0;
+   2126          	INT8S tLocation = 0;
+   2127          
+   2128          	INT32S i = 0;
+   2129          	INT8U rval = Normal;
+   2130          
+   2131          	tLocation = AttnTableLocation(TblID);
+   2132          	if( (tIndex = TableIndex(TblID)) == -1) return Normal;
+   2133          
+   2134          	if(tLocation == _DnrAttn_Location)
+   2135          	{
+   2136          		__AttnOffsetTblStr *AttTblStr = &vSYS_TABLE->DnrAttnTbl[tIndex];
+   2137          
+   2138          	
+   2139          		INT8S *dptr = AttTblStr->Data;
+   2140          		INT8U nsize = AttTblStr->nsize;
+   2141          		
+   2142          		for(i = 0; i < nsize && i < AttTBL_Size; i++)
+   2143          		{
+   2144          			if(abs(dptr[i]) > 10)	rval = Alarm;
+   2145          		}
+   2146          		
+   2147          		if((nsize < 10)||(nsize > AttTBL_Size))  rval = Alarm;	
+   2148          
+   2149          		DnrAttnTblAlarm[tIndex]= rval;
+   2150          	}
+   2151          	else if(tLocation == _SvrAttn_Location)
+   2152          	{
+   2153          		__AttnOffsetTblStr *AttTblStr;
+   2154          
+   2155          		AttTblStr = &vEE_BACK1->SvrAttnTbl[tIndex];
+   2156          	
+   2157          		INT8S *dptr = AttTblStr->Data;
+   2158          		INT8U nsize = AttTblStr->nsize;
+   2159          		
+   2160          		for(i = 0; i < nsize && i < AttTBL_Size; i++)
+   2161          		{
+   2162          			if(abs(dptr[i]) > 10)	rval = Alarm;
+   2163          		}
+   2164          		
+   2165          		if((nsize < 10)||(nsize > AttTBL_Size))  rval = Alarm;
+   2166          		
+   2167          		SvrAttnTblAlarm[tIndex]= rval;
+   2168          	}
+   2169          	
+   2170          	return rval;
+   2171          }
+   2172          
+   2173          
+   2174          
+   2175          INT16S TableOffset(INT16S Temp, INT16S Temp10x, INT16S Offset, INT16S *Ret10x)
+   2176          {
+   2177          	INT8S DectVal = 0;
+   2178          
+   2179          	DectVal = Temp + Offset;
+   2180          	*Ret10x = Temp10x + (Offset*10);
+   2181          	
+   2182          	return (DectVal);
+   2183          }
+   2184          
+   2185          
+   2186          
+   2187          INT8U LimitAlarmUpdate( INT8U CurrAlarm, INT8U PreAlarm, INT16U AlarmIndex)
+   2188          {
+   2189          	if(CurrAlarm != PreAlarm)
+   2190          	{
+   2191          		LimitAlarmCnt[AlarmIndex]++;
+   2192          		
+   2193          		if(LimitAlarmCnt[AlarmIndex] > AlarmCheckTime)
+   2194          		{
+   2195          			LimitAlarmCnt[AlarmIndex] = 0;
+   2196          			
+   2197          			return CurrAlarm;
+   2198          		}
+   2199          	}
+   2200          	else LimitAlarmCnt[AlarmIndex] = 0;
+   2201          
+   2202          	return PreAlarm;
+   2203          }
+   2204          
+   2205          INT8U HighLimitCheck(INT16S DetLvl,INT16S LimitLvl,INT16S Offset, INT8U CurrentAlarm)
+   2206          {
+   2207           	     if(DetLvl >= LimitLvl)	return Alarm;
+   2208          	else if(DetLvl <= LimitLvl - Offset)return Normal;
+   2209          
+   2210          	return CurrentAlarm;
+   2211          
+   2212          }
+   2213          
+   2214          INT8U LowLimitCheck(INT16S DetLvl,INT16S LimitLvl,INT16S Offset, INT8U CurrentAlarm)
+   2215          {
+   2216           	     if(DetLvl <= LimitLvl)	return Alarm;
+   2217          	else if(DetLvl >= LimitLvl + Offset)return Normal;
+   2218          
+   2219          	return CurrentAlarm;
+   2220          
+   2221          }
+   2222          
+   2223          INT8S RetSMStoNormalData(INT8U Data)
+   2224          {
+   2225          	INT8S rVal = Data & 0x3f;
+   2226          
+   2227          	if(BitRead(Data, 6))rVal = -rVal;
+   2228          
+   2229          	return rVal;
+   2230          }
+   2231          
+   2232          INT8U RetNormaltoSMSData(INT8S Data)
+   2233          {
+   2234          	INT8S rVal = 0;
+   2235          
+   2236          	if(Data < 0)
+   2237          	{
+   2238          		rVal = -Data;
+   2239          		BitSet(rVal, 6);
+   2240          	}
+   2241          	else rVal = Data;
+   2242          	
+   2243          	return rVal;
+   2244          }
+   2245          
+   2246          
+   2247          INT8U RetSmsOffVal(INT8U OnOff)
+   2248          {
+   2249          	INT8U rVal;
+   2250          	
+   2251          	rVal = (~(OnOff - '0')) & 0x01;
+   2252          
+   2253          	return rVal;
+   2254          }
+   2255          
+   2256          #if 0
+   2257          INT8U RvsSleepMode(void)
+   2258          {
+   2259          	INT8U rVal = 0;
+   2260          
+   2261          	__Dnr_Sts *Sts = tDnrSts;
+   2262          
+   2263          ////////////////////////////////////////////////
+   2264          	{
+   2265          		if( Sts->SleepMode_2G.SleepMode_OnOff == Enable)
+   2266          		{
+   2267          			if( tDnrSts->ModeValue == 1)
+   2268          			{
+   2269          				SerPtr->printf(" [%d][%d]>[%d][%d]:[%d]\n", Sts->DetVolt.RvsOutVolt_2G.Data,Sts->SleepMode_2G.SleepModeOnVolt.Data,SleepModeCnt[PATH_2G],Sts->ModuleAlarm.Main.SleepMode_2G,chkSleepMode[PATH_2G]);
+   2270          			}
+   2271          			if(chkSleepMode[PATH_2G] == RESET)
+   2272          			{
+   2273          				if( Sts->DetVolt.RvsOutVolt_2G.Data < Sts->SleepMode_2G.SleepModeOnVolt.Data)
+   2274          				{
+   2275          					Sts->ModuleAlarm.Main.SleepMode_2G = Alarm;
+   2276          
+   2277          					if(++SleepModeCnt[PATH_2G]>= SleepAlarmCheckTime)
+   2278          					{
+   2279          						chkSleepMode[PATH_2G] = SET;
+   2280          						SleepModeCnt[PATH_2G] = SleepAlarmCheckTime;
+   2281          						
+   2282          						InitSleepMode[PATH_2G] = SET;
+   2283          					}				
+   2284          				}
+   2285          				else
+   2286          				{
+   2287          					Sts->ModuleAlarm.Main.SleepMode_2G = Normal;
+   2288          					SleepModeCnt[PATH_2G] = 0;
+   2289          				}
+   2290          			}
+   2291          			
+   2292          			if (( Sts->DetVolt.RvsOutVolt_2G.Data > Sts->SleepMode_2G.SleepModeOffVolt.Data)&&(chkSleepMode[PATH_2G]))
+   2293          			{
+   2294          				Sts->ModuleAlarm.Main.SleepMode_2G = Normal;
+   2295          				SleepModeCnt[PATH_2G] = 0;
+   2296          				chkSleepMode[PATH_2G] = RESET;
+   2297          
+   2298          				if( InitSleepMode[PATH_2G] == SET)
+   2299          				{
+   2300          					InitSleepMode[PATH_2G] = RESET;
+   2301          					Sts->RvsGainAttn_2G = GainAttnCalculation(Sts->Rvs0GainSet_2G,Gain_2G,ATTENMIN);
+   2302          				}
+   2303          			}
+   2304          		}
+   2305          		else
+   2306          		{
+   2307          			Sts->ModuleAlarm.Main.SleepMode_2G = Normal;
+   2308          			SleepModeCnt[PATH_2G] = 0;
+   2309          			chkSleepMode[PATH_2G] = RESET;
+   2310          			if( InitSleepMode[PATH_2G] == SET)
+   2311          			{
+   2312          				InitSleepMode[PATH_2G] = RESET;
+   2313          				Sts->RvsGainAttn_2G = GainAttnCalculation(Sts->Rvs0GainSet_2G,Gain_2G,ATTENMIN);
+   2314          			}			
+   2315          		}
+   2316          	}
+   2317          
+   2318          	{
+   2319          		if( Sts->SleepMode_LTE.SleepMode_OnOff == Enable)
+   2320          		{
+   2321          			if( tDnrSts->ModeValue == 2)
+   2322          			{
+   2323          				SerPtr->printf(" [%d][%d]>[%d][%d]:[%d]\n", Sts->DetVolt.RvsOutVolt_LTE.Data,Sts->SleepMode_LTE.SleepModeOnVolt.Data,SleepModeCnt[PATH_LTE],Sts->ModuleAlarm.Main.SleepMode_LTE,chkSleepMode[PATH_LTE]);
+   2324          			}
+   2325          
+   2326          			if(chkSleepMode[PATH_LTE] == RESET)
+   2327          			{
+   2328          				if( Sts->DetVolt.RvsOutVolt_LTE.Data < Sts->SleepMode_LTE.SleepModeOnVolt.Data)
+   2329          				{
+   2330          					Sts->ModuleAlarm.Main.SleepMode_LTE = Alarm;
+   2331          
+   2332          					if(++SleepModeCnt[PATH_LTE]>= SleepAlarmCheckTime)
+   2333          					{
+   2334          						chkSleepMode[PATH_LTE] = SET;
+   2335          						InitSleepMode[PATH_LTE] = SET;
+   2336          						
+   2337          						SleepModeCnt[PATH_LTE] = SleepAlarmCheckTime;
+   2338          					}				
+   2339          				}
+   2340          				else
+   2341          				{
+   2342          					Sts->ModuleAlarm.Main.SleepMode_LTE = Normal;
+   2343          					SleepModeCnt[PATH_LTE] = 0;
+   2344          				}
+   2345          			}
+   2346          			
+   2347          			if (( Sts->DetVolt.RvsOutVolt_LTE.Data > Sts->SleepMode_LTE.SleepModeOffVolt.Data)&&(chkSleepMode[PATH_LTE]))
+   2348          			{
+   2349          				Sts->ModuleAlarm.Main.SleepMode_LTE = Normal;
+   2350          				SleepModeCnt[PATH_LTE] = 0;
+   2351          				chkSleepMode[PATH_LTE] = RESET;
+   2352          
+   2353          //				SerPtr->printf("0 InitSleepMode [%d] \n", InitSleepMode[PATH_LTE]);
+   2354          
+   2355          				if( InitSleepMode[PATH_LTE] == SET)
+   2356          				{
+   2357          					InitSleepMode[PATH_LTE] = RESET;
+   2358          					Sts->RvsGainAttn_LTE = GainAttnCalculation(Sts->Rvs0GainSet_LTE,Gain_LTE,ATTENMIN);
+   2359          //					SerPtr->printf("1 InitSleepMode [%d]:[%d][%d] \n", InitSleepMode[PATH_LTE],Sts->RvsGainAttn_LTE,Sts->Rvs0GainSet_LTE);
+   2360          				}				
+   2361          			}
+   2362          		}
+   2363          		else
+   2364          		{
+   2365          			Sts->ModuleAlarm.Main.SleepMode_LTE = Normal;
+   2366          			SleepModeCnt[PATH_LTE] = 0;
+   2367          			chkSleepMode[PATH_LTE] = RESET;
+   2368          			
+   2369          			if( InitSleepMode[PATH_LTE] == SET)
+   2370          			{
+   2371          				InitSleepMode[PATH_LTE] = RESET;
+   2372          				Sts->RvsGainAttn_LTE = GainAttnCalculation(Sts->Rvs0GainSet_LTE,Gain_LTE,ATTENMIN);
+   2373          			}				
+   2374          		}
+   2375          	}
+   2376          
+   2377          	{
+   2378          		if( Sts->SleepMode_LTE_A1.SleepMode_OnOff == Enable)
+   2379          		{
+   2380          			if(chkSleepMode[PATH_LTE_A1] == RESET)
+   2381          			{
+   2382          				if( Sts->DetVolt.RvsOutVolt_LTE_A1.Data < Sts->SleepMode_LTE_A1.SleepModeOnVolt.Data)
+   2383          				{
+   2384          					Sts->ModuleAlarm.Main.SleepMode_LTE_A1 = Alarm;
+   2385          
+   2386          					if(++SleepModeCnt[PATH_LTE_A1]>= SleepAlarmCheckTime)
+   2387          					{
+   2388          						chkSleepMode[PATH_LTE_A1] = SET;
+   2389          						InitSleepMode[PATH_LTE_A1] = SET;
+   2390          						
+   2391          						SleepModeCnt[PATH_LTE_A1] = SleepAlarmCheckTime;
+   2392          					}				
+   2393          				}
+   2394          				else
+   2395          				{
+   2396          					Sts->ModuleAlarm.Main.SleepMode_LTE_A1 = Normal;
+   2397          					SleepModeCnt[PATH_LTE_A1] = 0;
+   2398          				}
+   2399          			}
+   2400          			
+   2401          			if (( Sts->DetVolt.RvsOutVolt_LTE_A1.Data > Sts->SleepMode_LTE_A1.SleepModeOffVolt.Data)&&(chkSleepMode[PATH_LTE]))
+   2402          			{
+   2403          				Sts->ModuleAlarm.Main.SleepMode_LTE_A1 = Normal;
+   2404          				SleepModeCnt[PATH_LTE_A1] = 0;
+   2405          				chkSleepMode[PATH_LTE_A1] = RESET;
+   2406          				if( InitSleepMode[PATH_LTE_A1] == SET)
+   2407          				{
+   2408          					InitSleepMode[PATH_LTE_A1] = RESET;
+   2409          					Sts->RvsGainAttn_LTE_A1 = GainAttnCalculation(Sts->Rvs0GainSet_LTE_A1,Gain_LTE_A,ATTENMIN);
+   2410          				}					
+   2411          			}
+   2412          		}
+   2413          		else
+   2414          		{
+   2415          			Sts->ModuleAlarm.Main.SleepMode_LTE_A1 = Normal;
+   2416          			SleepModeCnt[PATH_LTE_A1] = 0;
+   2417          			chkSleepMode[PATH_LTE_A1] = RESET;
+   2418          
+   2419          			if( InitSleepMode[PATH_LTE_A1] == SET)
+   2420          			{
+   2421          				InitSleepMode[PATH_LTE_A1] = RESET;
+   2422          				Sts->RvsGainAttn_LTE_A1 = GainAttnCalculation(Sts->Rvs0GainSet_LTE_A1,Gain_LTE_A,ATTENMIN);
+   2423          			}					
+   2424          		}
+   2425          	}	
+   2426          
+   2427          	{
+   2428          		if( Sts->SleepMode_LTE_A2.SleepMode_OnOff == Enable)
+   2429          		{
+   2430          			if(chkSleepMode[PATH_LTE_A2] == RESET)
+   2431          			{
+   2432          				if( Sts->DetVolt.RvsOutVolt_LTE_A2.Data < Sts->SleepMode_LTE_A2.SleepModeOnVolt.Data)
+   2433          				{
+   2434          					Sts->ModuleAlarm.Main.SleepMode_LTE_A2 = Alarm;
+   2435          
+   2436          					if(++SleepModeCnt[PATH_LTE_A2]>= SleepAlarmCheckTime)
+   2437          					{
+   2438          						chkSleepMode[PATH_LTE_A2] = SET;
+   2439          						InitSleepMode[PATH_LTE_A2] = SET;
+   2440          						
+   2441          						SleepModeCnt[PATH_LTE_A2] = SleepAlarmCheckTime;
+   2442          					}				
+   2443          				}
+   2444          				else
+   2445          				{
+   2446          					Sts->ModuleAlarm.Main.SleepMode_LTE_A2 = Normal;
+   2447          					SleepModeCnt[PATH_LTE_A2] = 0;
+   2448          				}
+   2449          			}			
+   2450          			
+   2451          			if (( Sts->DetVolt.RvsOutVolt_LTE_A2.Data > Sts->SleepMode_LTE_A2.SleepModeOffVolt.Data)&&(chkSleepMode[PATH_LTE_A2]))
+   2452          			{
+   2453          				Sts->ModuleAlarm.Main.SleepMode_LTE_A2 = Normal;
+   2454          				SleepModeCnt[PATH_LTE_A2] = 0;
+   2455          				chkSleepMode[PATH_LTE_A2] = RESET;
+   2456          
+   2457          				if( InitSleepMode[PATH_LTE_A2] == SET)
+   2458          				{
+   2459          					InitSleepMode[PATH_LTE_A2] = RESET;
+   2460          					Sts->RvsGainAttn_LTE_A2 = GainAttnCalculation(Sts->Rvs0GainSet_LTE_A2,Gain_LTE_A,ATTENMIN);
+   2461          				}					
+   2462          			}
+   2463          		}
+   2464          		else
+   2465          		{
+   2466          			Sts->ModuleAlarm.Main.SleepMode_LTE_A2 = Normal;
+   2467          			SleepModeCnt[PATH_LTE_A2] = 0;
+   2468          			chkSleepMode[PATH_LTE_A2] = RESET;
+   2469          
+   2470          			if( InitSleepMode[PATH_LTE_A2] == SET)
+   2471          			{
+   2472          				InitSleepMode[PATH_LTE_A2] = RESET;
+   2473          				Sts->RvsGainAttn_LTE_A2 = GainAttnCalculation(Sts->Rvs0GainSet_LTE_A2,Gain_LTE_A,ATTENMIN);
+   2474          			}				
+   2475          		}
+   2476          	}	
+   2477          	return rVal;
+   2478          }
+   2479          #endif
+
+   Maximum stack usage in bytes:
+
+     Function                .cstack
+     --------                -------
+     AlarmCheck                  36
+     AlarmInitialize              0
+     AlarmStatusUpdate           32
+     AttTable_Alarm_check        16
+     AttnOutBufferInit            0
+     DnrAlarmCheckUpdate         24
+     HighLimitCheck               0
+     LimitAlarmUpdate             8
+     LowLimitCheck                0
+     OutPutTable_Alarm_check     16
+     PeriodReportCheck            8
+     ResetCaseBackup              0
+     RetNormaltoSMSData           0
+     RetSMStoNormalData           0
+     RetSmsOffVal                 0
+     SmsDnrAlarm_Check            8
+     TableOffset                  4
+     Table_Alarm                 24
+     UPdateAlarm                  8
+
+
+   Section sizes:
+
+     Function/Label          Bytes
+     --------------          -----
+     rambackup                  4
+     tAttAccu                   1
+     PwrAlarm                 280
+     PwrAlarmPre
+     PwrAlarmChange
+     PwrAlarmTimer
+     PwrAlarmCnt
+     CurrAlarm                 25
+     ChkTableAlarm
+     RvsOverInAlarmCnt
+     RvsOtherOverInAlarmCnt
+     ChkRvsOverInAlarm
+     ChkRvsOtherOverInAlarm
+     AlarmCheck_2G
+     AlarmCheck_LTE
+     AlarmCheck_LTE_A1
+     AlarmCheck_LTE_A2
+     AlarmCheck_LTE_1
+     AlarmCheck_LTE_A1_1
+     AlarmCheck_LTE_A2_1
+     ACFailCnt
+     FirstPNCheckFlag           1
+     DnrAttnTblAlarm           52
+     SvrAttnTblAlarm
+     FirstCheckFlag             8
+     TimePeriodElased
+     AlarmInitialize           70
+     AlarmCheck              6352
+     AlarmStatusUpdate        712
+     AttnOutBufferInit        302
+     ResetCaseBackup            8
+     PeriodReportCheck         50
+     SmsDnrAlarm_Check         30
+     DnrAlarmCheckUpdate       62
+     UPdateAlarm               38
+     Table_Alarm              122
+     OutPutTable_Alarm_check  112
+     AttTable_Alarm_check     160
+     TableOffset               20
+     LimitAlarmUpdate          48
+     HighLimitCheck            22
+     LowLimitCheck             22
+     RetSMStoNormalData        16
+     RetNormaltoSMSData        14
+     RetSmsOffVal               8
+     ??DataTable0               4
+     ??DataTable1               4
+     ??DataTable1_1             4
+     ??DataTable1_2             4
+     ??DataTable9               4
+     ??DataTable11              4
+     ??DataTable11_1            4
+     ??DataTable11_2            4
+     ??DataTable11_3            4
+     ??DataTable11_4            4
+     ??DataTable11_5            4
+     ??DataTable11_6            4
+     ??DataTable11_7            4
+     ??DataTable11_8            4
+     ??DataTable11_9            4
+     ??DataTable11_10           4
+     ??DataTable11_11           4
+     ??DataTable11_12           4
+     ??DataTable11_13           4
+     ??DataTable11_14           4
+     ??DataTable11_15           4
+     ??DataTable11_16           4
+     ??DataTable11_17           4
+     ??DataTable11_18           4
+     ??DataTable11_19           4
+     ??DataTable11_20           4
+     ??DataTable11_21           4
+     ??DataTable11_22           4
+     ??DataTable11_23           4
+     ??DataTable11_24           4
+     ??DataTable11_25           4
+     ??DataTable11_26           4
+     ??DataTable11_27           4
+     ??DataTable11_28           4
+     ??DataTable11_29           4
+     ??DataTable11_30           4
+     ??DataTable11_31           4
+     ??DataTable11_32           4
+     ??DataTable11_33           4
+     ??DataTable11_34           4
+     ??DataTable11_35           4
+     ??DataTable11_36           4
+     ??DataTable11_37           4
+     ??DataTable11_38           4
+     ??DataTable11_39           4
+     ??DataTable11_40           4
+     ??DataTable11_41           4
+     ??DataTable11_42           4
+     ??DataTable11_43           4
+     ??DataTable11_44           4
+     ??DataTable11_45           4
+     ??DataTable11_46           4
+     ??DataTable11_47           4
+     ??DataTable11_48           4
+     ??DataTable11_49           4
+     ??DataTable11_50           4
+     ??DataTable11_51           4
+     ??DataTable11_52           4
+     ??DataTable11_53           4
+     ??DataTable11_54           4
+     ??DataTable11_55           4
+     ??DataTable11_56           4
+     ??DataTable11_57           4
+     ??DataTable11_58           4
+     ??DataTable11_59           4
+     ??DataTable11_60           4
+     ??DataTable11_61           4
+     ??DataTable11_62           4
+     ??DataTable11_63           4
+     ??DataTable11_64           4
+
+ 
+    87 bytes in section .bss
+   284 bytes in section .data
+ 8 448 bytes in section .text
+ 
+ 8 448 bytes of CODE memory
+   371 bytes of DATA memory
+
+Errors: none
+Warnings: none

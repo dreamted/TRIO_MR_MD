@@ -1,0 +1,360 @@
+###############################################################################
+#                                                                             #
+# IAR ANSI C/C++ Compiler V6.21.1.52794/W32 for ARM     30/Aug/2012  21:29:29 #
+# Copyright 1999-2011 IAR Systems AB.                                         #
+#                                                                             #
+#    Cpu mode     =  thumb                                                    #
+#    Endian       =  little                                                   #
+#    Source file  =  D:\Work\Project\2012\NL_INBUILD\FW\MU\code\exlib.c       #
+#    Command line =  D:\Work\Project\2012\NL_INBUILD\FW\MU\code\exlib.c -D    #
+#                    OS_INCLUDED -D APPL_SRC -lcN                             #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\sout\ -lB          #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\sout\ -o           #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\sout\              #
+#                    --endian=little --cpu=Cortex-M3 -e --fpu=None            #
+#                    --dlib_config "C:\Programming\IAR Systems\Embedded       #
+#                    Workbench 6.0\arm\INC\c\DLib_Config_Normal.h" -I         #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\include\ -I        #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\..\..\STM32F2xx_St #
+#                    dPeriph_Driver\ -I D:\Work\Project\2012\NL_INBUILD\FW\MU #
+#                    \..\..\STM32F2xx_StdPeriph_Driver\inc\ -I                #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\uC-CPU\ -I         #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\uC-LIB\ -I         #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\uCOS-II\Ports\ -I  #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\uCOS-II\Source\    #
+#                    -I D:\Work\Project\2012\NL_INBUILD\FW\MU\uC-Probe\ -Oh   #
+#                    --use_c++_inline --require_prototypes                    #
+#    List file    =  D:\Work\Project\2012\NL_INBUILD\FW\MU\sout\exlib.lst     #
+#    Object file  =  D:\Work\Project\2012\NL_INBUILD\FW\MU\sout\exlib.o       #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\Work\Project\2012\NL_INBUILD\FW\MU\code\exlib.c
+      1          
+      2          /******************** (C) COPYRIGHT 2008 PILOG, NSINFO *************************
+      3          * File Name          : exlib.c
+      4          * Author             : Yoon Byong-Gyu(bgyoon@naver.com)
+      5          * Date First Issued  : 02/01/2008
+      6          * Description        : This file provides all the port/input/update firmware functions.
+      7          * $Revision: 0.1 $
+      8          * $Revision date: 2008.01.__
+      9          ********************************************************************************/
+     10          
+     11          #define EXLIB_C
+     12          
+     13          #include "../include/main.h"
+     14          
+     15          
+     16          void ExpioModeChanege(INT8U tmode)
+     17          {
+     18          	if(tmode == 0)
+     19          	{
+     20          		__PD14_PP_PP();
+     21          		__PD15_PP_PP();
+     22          		__PD0_PP_PP();
+     23          		__PD1_PP_PP();
+     24          		__PE7_PP_PP();
+     25          		__PE8_PP_PP();
+     26          		__PE9_PP_PP();
+     27          		__PE10_PP_PP();
+     28          	}
+     29          	else
+     30          	{
+     31          		__PD14_IN_FL();
+     32          		__PD15_IN_FL();
+     33          		__PD0_IN_FL();
+     34          		__PD1_IN_FL();
+     35          		__PE7_IN_FL();
+     36          		__PE8_IN_FL();
+     37          		__PE9_IN_FL();
+     38          		__PE10_IN_FL();
+     39          	}
+     40          /*
+     41          #ifdef STM32FRxT6_USED
+     42          	GPIOC->CNF.B6 = tmode;
+     43          	GPIOC->CNF.B7 = tmode;
+     44          	GPIOC->CNF.B8 = tmode;
+     45          	GPIOC->CNF.B9 = tmode;
+     46          	GPIOC->CNF.B10 = tmode;
+     47          	GPIOC->CNF.B11 = tmode;
+     48          	GPIOC->CNF.B12 = tmode;
+     49          	GPIOD->CNF.B2 = tmode;
+     50          #else
+     51          	GPIOD->CNF.B14 = tmode;
+     52          	GPIOD->CNF.B15 = tmode;
+     53          	GPIOD->CNF.B0 = tmode;
+     54          	GPIOD->CNF.B1 = tmode;
+     55          	GPIOE->CNF.B7 = tmode;
+     56          	GPIOE->CNF.B8 = tmode;
+     57          	GPIOE->CNF.B9 = tmode;
+     58          	GPIOE->CNF.B10 = tmode;
+     59          #endif
+     60          */
+     61          }
+     62          
+     63          
+     64          void ExpioWriteData(INT8U SEL, INT16U Data)
+     65          {
+     66          	INT8U err;
+     67          	
+     68           	OSSemPend(ExpioSem, 0, &err);
+     69          	EXPIOrawData[SEL] = Data;
+     70          
+     71          	#ifdef __FSMC_SRAM_H
+     72          		*(vu8 *)(EXPIOptr + SEL*EXPIOsize) = Data;
+     73          	#else
+     74          	{
+     75          	
+     76          		INT32U Addr = ExpioCS[SEL]/16;
+     77          		INT32U BitAddr = ExpioCS[SEL]%16;
+     78          
+     79          		ExpioModeChanege(0);
+     80          
+     81          #ifdef STM32FRxT6_USED
+     82          		GPIOC->ODR.B6  = (Data >> 0) & 0x01;
+     83          		GPIOC->ODR.B7  = (Data >> 1) & 0x01;
+     84          		GPIOC->ODR.B8  = (Data >> 2) & 0x01;
+     85          		GPIOC->ODR.B9  = (Data >> 3) & 0x01;
+     86          		GPIOC->ODR.B10 = (Data >> 4) & 0x01;
+     87          		GPIOC->ODR.B11 = (Data >> 5) & 0x01;
+     88          		GPIOC->ODR.B12 = (Data >> 6) & 0x01;
+     89          		GPIOD->ODR.B2  = (Data >> 7) & 0x01;
+     90          #else
+     91          		GPIOD->__B.ODR.B14	= (Data >> 0) & 0x01;
+     92          		GPIOD->__B.ODR.B15	= (Data >> 1) & 0x01;
+     93          		GPIOD->__B.ODR.B0	= (Data >> 2) & 0x01;
+     94          		GPIOD->__B.ODR.B1	= (Data >> 3) & 0x01;
+     95          		GPIOE->__B.ODR.B7	= (Data >> 4) & 0x01;
+     96          		GPIOE->__B.ODR.B8	= (Data >> 5) & 0x01;
+     97          		GPIOE->__B.ODR.B9	= (Data >> 6) & 0x01;
+     98          		GPIOE->__B.ODR.B10	= (Data >> 7) & 0x01;
+     99          #endif
+    100          
+    101          		// low
+    102          		*(volatile INT32U *)(AHB1PERIPH_BASE + Addr + 0x0C) &=  ~(1 << BitAddr);
+    103          		// high
+    104          		*(volatile INT32U *)(AHB1PERIPH_BASE + Addr + 0x0C) |=   (1 << BitAddr);
+    105          
+    106          		ExpioModeChanege(1);
+    107          	}
+    108          	#endif
+    109          	
+    110          	OSSemPost(ExpioSem);
+    111          
+    112          }
+    113          
+    114          INT16U ExpioReadData(INT8U SEL)
+    115          {
+    116          	INT16U ret = 0;
+    117          	INT8U err;
+    118          	
+    119           	OSSemPend(ExpioSem, 0, &err);
+    120          
+    121          	#ifdef __FSMC_SRAM_H
+    122          		ret = EXPIOrawData[SEL] = *(vu8 *)(EXPIOptr + SEL*EXPIOsize);
+    123          	#else
+    124          	{
+    125          		INT32U Addr = ExpioCS[SEL]/16;
+    126          		INT32U BitAddr = ExpioCS[SEL]%16;
+    127          
+    128          		*(volatile INT32U *)(AHB1PERIPH_BASE + Addr + 0x0C) &=  ~(1 << BitAddr);
+    129          		ExpioModeChanege(1);
+    130          
+    131          		// low
+    132          #ifdef STM32FRxT6_USED
+    133          
+    134          		ret = (ret << 1) | (GPIOD->IDR.B2);
+    135          		ret = (ret << 1) | (GPIOC->IDR.B12);
+    136          		ret = (ret << 1) | (GPIOC->IDR.B11);
+    137          		ret = (ret << 1) | (GPIOC->IDR.B10);
+    138          		ret = (ret << 1) | (GPIOC->IDR.B9);
+    139          		ret = (ret << 1) | (GPIOC->IDR.B8);
+    140          		ret = (ret << 1) | (GPIOC->IDR.B7);
+    141          		ret = (ret << 1) | (GPIOC->IDR.B6);
+    142          #else
+    143          		ret = (ret << 1) | (GPIOE->__B.IDR.B10);
+    144          		ret = (ret << 1) | (GPIOE->__B.IDR.B9);
+    145          		ret = (ret << 1) | (GPIOE->__B.IDR.B8);
+    146          		ret = (ret << 1) | (GPIOE->__B.IDR.B7);
+    147          		ret = (ret << 1) | (GPIOD->__B.IDR.B1);
+    148          		ret = (ret << 1) | (GPIOD->__B.IDR.B0);
+    149          		ret = (ret << 1) | (GPIOD->__B.IDR.B15);
+    150          		ret = (ret << 1) | (GPIOD->__B.IDR.B14);
+    151          #endif
+    152          		// SEL
+    153          		// high
+    154          		*(volatile INT32U *)(AHB1PERIPH_BASE + Addr + 0x0C) |=   (1 << BitAddr);
+    155          
+    156          		EXPIOrawData[SEL] = ret;
+    157          	}
+    158          	#endif
+    159          	OSSemPost(ExpioSem);
+    160          
+    161              return ret;
+    162          }
+    163          
+    164          unsigned short int ExpioBitRead (unsigned short int Bitaddr)
+    165          {
+    166          	INT16U	ExselNo;
+    167          	INT16U	BitNumber;
+    168          
+    169          	ExselNo = (Bitaddr/16);
+    170          	BitNumber = (Bitaddr % 16);
+    171          
+    172          	ExpioReadData(ExselNo);
+    173          	return BitRead(EXPIOrawData[ExselNo], BitNumber);	
+    174          }
+    175          void ExpioBitSet (unsigned short int Bitaddr)
+    176          {
+    177          	INT16U	ExselNo;
+    178          	INT16U	BitNumber;
+    179          
+    180          	ExselNo = (Bitaddr/16);
+    181          	BitNumber = (Bitaddr % 16);
+    182           	EXPIOrawData[ExselNo] = ( EXPIOrawData[ExselNo] |(1 << BitNumber) );
+    183          	ExpioWriteData(ExselNo, EXPIOrawData[ExselNo]);
+    184          }
+    185          
+    186          void ExpioBitRst(unsigned short int Bitaddr)
+    187          {
+    188          	INT16U	ExselNo;
+    189          	INT16U	BitNumber;
+    190          
+    191          	ExselNo = (Bitaddr/16);
+    192          	BitNumber = (Bitaddr % 16);
+    193          	EXPIOrawData[ExselNo] = ( EXPIOrawData[ExselNo] & ~(1 << BitNumber) );
+    194          	ExpioWriteData(ExselNo, EXPIOrawData[ExselNo]);
+    195          	
+    196          }
+    197          /*
+    198          INT8U atoh (INT8U value )
+    199          {
+    200          	INT16U	num;
+    201          
+    202          	// isdigit() 는 입력값이 '0' ~ '9' 일경우 True
+    203          	if( isdigit(value) ) num = value - '0';
+    204          	else if( (value >= 'a') && (value <= 'f') ) num = 10 + value - 'a';
+    205          	else if( (value >= 'A') && (value <= 'F') ) num = 10 + value - 'A';
+    206          	else										num = 0x0100;
+    207          
+    208          	return (INT8U)num;
+    209          }
+    210          */
+    211          INT16U ByteToWord(INT8U HighByte, INT8U LowByte)
+    212          {
+    213          	INT16U WordByte = 0;
+    214          	
+    215          	WordByte = (INT16U)HighByte;
+    216          	WordByte = (WordByte << 8)& 0xff00;
+    217          	WordByte = WordByte |(INT16U)LowByte;
+    218          	return(WordByte);
+    219          }
+    220          
+    221          /*******************************************************************************
+    222          * Table에서 Search한다.
+    223          *******************************************************************************/
+    224          INT8U SearchWord(INT8U IsDec,INT8U nLen, INT16U SearchVal, INT16U *Buff)
+    225          {
+    226              unsigned char Max = nLen - 1 ,Mid , Min = 0;
+    227          
+    228          	if(IsDec)///1
+    229          	{ /* 정렬이 내림 차순으로 된경우.  RSSI */
+    230          		Max = nLen-1;
+    231          		Min = 0;
+    232          	    if((Buff[Max] & 0x0FFF) >= SearchVal)    return(Max);
+    233          	    if((Buff[Min] & 0x0FFF) <= SearchVal)    return(Min);
+    234          
+    235          	    while(1)
+    236          		{
+    237          		    if((Min+1) == Max)
+    238          			{
+    239          			    if((Buff[Min] & 0x0FFF)- SearchVal > SearchVal - (Buff[Max] & 0x0FFF))return(Max);
+    240          				else return(Min);
+    241          			}
+    242          
+    243          			Mid = Min + (Max - Min)/2;
+    244          			if((Buff[Mid] & 0x0FFF) == SearchVal)  	return(Mid);
+    245          			else if((Buff[Mid] & 0x0FFF) > SearchVal) 	Min = Mid;
+    246          			else										Max = Mid;
+    247          		}
+    248          	}
+    249          	else
+    250          	{      /* 정렬이 오름 차순으로 된 경우. PM */
+    251          
+    252          		Max = nLen - 1;
+    253          		Min = 0;
+    254          
+    255          	    if((Buff[Max] & 0x0FFF) <= SearchVal)	return(Max);
+    256          	    if((Buff[Min] & 0x0FFF) >= SearchVal)   return(Min);
+    257          
+    258          	    while(1)
+    259          		{
+    260          		    if((Min + 1) == Max)
+    261          			{
+    262          			    if((Buff[Min] & 0x0FFF) - SearchVal < SearchVal - (Buff[Max] & 0x0FFF))	return(Max);
+    263          				else																	return(Min);
+    264          			}
+    265          
+    266          			Mid = Min + (Max - Min)/2;
+    267          			     if((Buff[Mid] & 0x0FFF) == SearchVal)	return(Mid);
+    268          			else if((Buff[Mid] & 0x0FFF) < SearchVal) 	Min = Mid;
+    269          			else										Max = Mid;
+    270          		}
+    271          	}
+    272          
+    273          }
+    274          
+    275          ///////////////////////////////////////////////////////////////////////////////
+    276          // End of Source File
+    277          ////////////////////////
+    278          
+
+   Maximum stack usage in bytes:
+
+     Function         .cstack
+     --------         -------
+     ByteToWord            0
+     ExpioBitRead         16
+     ExpioBitRst           8
+     ExpioBitSet           8
+     ExpioModeChanege     16
+     ExpioReadData        32
+     ExpioWriteData       24
+     SearchWord           16
+
+
+   Section sizes:
+
+     Function/Label   Bytes
+     --------------   -----
+     ExpioCS            80
+     EXPIOrawData       40
+     ExpioModeChanege  204
+     ExpioWriteData    172
+     ExpioReadData     162
+     ExpioBitRead       30
+     ExpioBitSet        30
+     ?Subroutine0        6
+     ExpioBitRst        32
+     ByteToWord          6
+     SearchWord        200
+     ??DataTable5        4
+     ??DataTable5_1      4
+     ??DataTable5_2      4
+     ??DataTable5_3      4
+     ??DataTable5_4      4
+     ??DataTable5_5      4
+     ??DataTable5_6      4
+     ??DataTable5_7      4
+     ??DataTable5_8      4
+
+ 
+  40 bytes in section .bss
+ 958 bytes in section .text
+ 
+ 958 bytes of CODE memory
+  40 bytes of DATA memory
+
+Errors: none
+Warnings: none

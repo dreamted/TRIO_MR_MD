@@ -1,0 +1,66 @@
+###############################################################################
+#                                                                             #
+# IAR ANSI C/C++ Compiler V6.21.1.52794/W32 for ARM     19/Oct/2013  11:05:57 #
+# Copyright 1999-2011 IAR Systems AB.                                         #
+#                                                                             #
+#    Cpu mode     =  thumb                                                    #
+#    Endian       =  little                                                   #
+#    Source file  =  C:\Project\TRIO\2차버전\3.F_W\appl_stm207_20131019\code\ #
+#                    expio.c                                                  #
+#    Command line =  C:\Project\TRIO\2차버전\3.F_W\appl_stm207_20131019\code\ #
+#                    expio.c -lC C:\Project\TRIO\2차버전\3.F_W\appl_stm207_20 #
+#                    131019\out\ -o C:\Project\TRIO\2차버전\3.F_W\appl_stm207 #
+#                    _20131019\out\ --endian=little --cpu=Cortex-M3 -e        #
+#                    --fpu=None --dlib_config "C:\Program Files (x86)\IAR     #
+#                    Systems\Embedded Workbench 6.0\arm\INC\c\DLib_Config_Nor #
+#                    mal.h" -I C:\Project\TRIO\2차버전\3.F_W\appl_stm207_2013 #
+#                    1019\include\ -I C:\Project\TRIO\2차버전\3.F_W\appl_stm2 #
+#                    07_20131019\STM32F2xx_StdPeriph_Driver_v1212\ -I         #
+#                    C:\Project\TRIO\2차버전\3.F_W\appl_stm207_20131019\STM32 #
+#                    F2xx_StdPeriph_Driver_v1212\inc\ -I                      #
+#                    C:\Project\TRIO\2차버전\3.F_W\appl_stm207_20131019\uC-CP #
+#                    U\ -I C:\Project\TRIO\2차버전\3.F_W\appl_stm207_20131019 #
+#                    \uC-LIB\ -I C:\Project\TRIO\2차버전\3.F_W\appl_stm207_20 #
+#                    131019\uCOS-II\Ports\ -I C:\Project\TRIO\2차버전\3.F_W\a #
+#                    ppl_stm207_20131019\uCOS-II\Source\ -I                   #
+#                    C:\Project\TRIO\2차버전\3.F_W\appl_stm207_20131019\uC-Pr #
+#                    obe\ -Oh --use_c++_inline                                #
+#    List file    =  C:\Project\TRIO\2차버전\3.F_W\appl_stm207_20131019\out\e #
+#                    xpio.lst                                                 #
+#    Object file  =  C:\Project\TRIO\2차버전\3.F_W\appl_stm207_20131019\out\e #
+#                    xpio.o                                                   #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+C:\Project\TRIO\2차버전\3.F_W\appl_stm207_20131019\code\expio.c
+      1          
+      2          /*********************************************
+      3          * File Name          : exlib.c
+      4          * Author             :
+      5          * Date First Issued  : 02/01/2008
+      6          * Description        : This file provides all the port/input/update firmware functions.
+      7          * $Revision: 0.1 $
+      8          * $Revision date: 2008.01.__
+      9          ********************************************************************************/
+     10          
+     11          #define EXPIO_C1
+     12          
+     13          #include "../include/main.h"
+     14          
+     15          #include <stdlib.h>
+     16          
+     17          
+     18          
+     19          ///////////////////////////////////////////////////////////////////////////////
+     20          // End of Source File
+     21          
+     22          ////////////////////////
+
+
+ 
+ 
+ 0 bytes of memory
+
+Errors: none
+Warnings: none

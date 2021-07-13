@@ -1,0 +1,478 @@
+###############################################################################
+#                                                                             #
+# IAR ANSI C/C++ Compiler V6.21.1.52794/W32 for ARM     05/Dec/2012  00:31:45 #
+# Copyright 1999-2011 IAR Systems AB.                                         #
+#                                                                             #
+#    Cpu mode     =  thumb                                                    #
+#    Endian       =  little                                                   #
+#    Source file  =  C:\user\project\FR-DB家屈\fw\appl_stm207_20121201\dev\MB #
+#                    15E07SL\MB15E07SL_v1209.c                                #
+#    Command line =  C:\user\project\FR-DB家屈\fw\appl_stm207_20121201\dev\MB #
+#                    15E07SL\MB15E07SL_v1209.c -lC                            #
+#                    C:\user\project\FR-DB家屈\fw\appl_stm207_20121201\out\   #
+#                    -o C:\user\project\FR-DB家屈\fw\appl_stm207_20121201\out #
+#                    \ --endian=little --cpu=Cortex-M3 -e --fpu=None          #
+#                    --dlib_config "C:\compiler\ewarm                         #
+#                    6.2\arm\INC\c\DLib_Config_Normal.h" -I                   #
+#                    C:\user\project\FR-DB家屈\fw\appl_stm207_20121201\includ #
+#                    e\ -I C:\user\project\FR-DB家屈\fw\appl_stm207_20121201\ #
+#                    STM32F2xx_StdPeriph_Driver_v1212\ -I                     #
+#                    C:\user\project\FR-DB家屈\fw\appl_stm207_20121201\STM32F #
+#                    2xx_StdPeriph_Driver_v1212\inc\ -I                       #
+#                    C:\user\project\FR-DB家屈\fw\appl_stm207_20121201\uC-CPU #
+#                    \ -I C:\user\project\FR-DB家屈\fw\appl_stm207_20121201\u #
+#                    C-LIB\ -I C:\user\project\FR-DB家屈\fw\appl_stm207_20121 #
+#                    201\uCOS-II\Ports\ -I C:\user\project\FR-DB家屈\fw\appl_ #
+#                    stm207_20121201\uCOS-II\Source\ -I                       #
+#                    C:\user\project\FR-DB家屈\fw\appl_stm207_20121201\uC-Pro #
+#                    be\ -Oh --use_c++_inline                                 #
+#    List file    =  C:\user\project\FR-DB家屈\fw\appl_stm207_20121201\out\MB #
+#                    15E07SL_v1209.lst                                        #
+#    Object file  =  C:\user\project\FR-DB家屈\fw\appl_stm207_20121201\out\MB #
+#                    15E07SL_v1209.o                                          #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+C:\user\project\FR-DB家屈\fw\appl_stm207_20121201\dev\MB15E07SL\MB15E07SL_v1209.c
+      1          #define PLL_C
+      2          
+      3          #include "../include/main.h"
+
+   \                                 In section .bss, align 4
+   \   __absolute _MB15E07SLStr p4GApll
+   \                     p4GApll:
+   \   00000000                      DS8 40
+
+   \                                 In section .bss, align 4
+   \   __absolute _MB15E07SLStr p3GApll
+   \                     p3GApll:
+   \   00000000                      DS8 40
+
+   \                                 In section .bss, align 4
+   \   __absolute _MB15E07SLStr p3GApll_1
+   \                     p3GApll_1:
+   \   00000000                      DS8 40
+      4          //#define Pll_debug
+      5          
+      6          #define __PRE			32
+      7          
+      8          
+
+   \                                 In section .text, align 2, keep-with-next
+      9          void LM15E07SLCreate(_pMB15E07SLStr ptr, 
+     10          						void (*SetClk)(), void (*RstClk)(), 
+     11          							void (*SetData)(), void (*RstData)(),
+     12          							  void (*SetEn)(), void (*RstEn)() )
+     13          {
+   \                     LM15E07SLCreate:
+   \   00000000   70B4               PUSH     {R4-R6}
+   \   00000002   039C               LDR      R4,[SP, #+12]
+   \   00000004   049D               LDR      R5,[SP, #+16]
+   \   00000006   059E               LDR      R6,[SP, #+20]
+     14              ptr->SetPllClk = SetClk;
+   \   00000008   C160               STR      R1,[R0, #+12]
+     15              ptr->RstPllClk = RstClk;
+   \   0000000A   0261               STR      R2,[R0, #+16]
+     16              ptr->SetPllData = SetData;
+   \   0000000C   4361               STR      R3,[R0, #+20]
+     17              ptr->RstPllData = RstData;
+   \   0000000E   8461               STR      R4,[R0, #+24]
+     18              ptr->SetPllEn = SetEn;
+   \   00000010   C561               STR      R5,[R0, #+28]
+     19              ptr->RstPllEn = RstEn;    
+   \   00000012   0662               STR      R6,[R0, #+32]
+     20          }
+   \   00000014   70BC               POP      {R4-R6}
+   \   00000016   7047               BX       LR               ;; return
+     21          
+     22          
+
+   \                                 In section .text, align 2, keep-with-next
+     23          void LM15E07SLInit(INT32U rfrq, INT32U dRatio, _pMB15E07SLStr ptr)	//rfrq: Reference Freq,  dRatio: dRatio: Devide Prescaler
+     24          {
+     25          	ptr->rfrq = rfrq;
+   \                     LM15E07SLInit:
+   \   00000000   1060               STR      R0,[R2, #+0]
+     26          	ptr->dRatio = dRatio;
+   \   00000002   5160               STR      R1,[R2, #+4]
+     27          	ptr->PR = rfrq/dRatio;
+   \   00000004   B0FBF1F0           UDIV     R0,R0,R1
+   \   00000008   9060               STR      R0,[R2, #+8]
+     28          
+     29          	ptr->fvco = 0;
+   \   0000000A   0020               MOVS     R0,#+0
+   \   0000000C   5062               STR      R0,[R2, #+36]
+     30          }
+   \   0000000E   7047               BX       LR               ;; return
+     31          
+     32          
+
+   \                                 In section .text, align 2, keep-with-next
+     33          void LM15E07SLOutput(INT32U fvco, _pMB15E07SLStr ptr)
+     34          {
+   \                     LM15E07SLOutput:
+   \   00000000   F8B5               PUSH     {R3-R7,LR}
+   \   00000002   0C46               MOV      R4,R1
+     35          	INT32U tMsb = (1 << 18);
+     36          	INT32U i = 0;
+     37          	//INT32U cpu_sr;
+     38          
+     39          	if(ptr->fvco == fvco) return;
+   \   00000004   616A               LDR      R1,[R4, #+36]
+   \   00000006   8142               CMP      R1,R0
+   \   00000008   3AD0               BEQ.N    ??LM15E07SLOutput_0
+     40          	
+     41          
+     42          	fvco = fvco/ptr->dRatio;
+   \   0000000A   6168               LDR      R1,[R4, #+4]
+   \   0000000C   B0FBF1F0           UDIV     R0,R0,R1
+     43          	{
+     44          		_RCounterReg RCounter;
+     45          		_NCounterReg NCounter;
+     46          
+     47          		RCounter.Data = 0;				// init
+     48          		NCounter.Data = 0;				// init
+     49          		
+     50          		RCounter.CNT = __RCounter;
+     51          		RCounter.R = ptr->PR;
+     52          #if (__PRE == 32)
+     53          		RCounter.SW = __32;
+     54          #else
+     55          		RCounter.SW = __64;
+     56          #endif
+     57          		RCounter.FC = SET;
+     58          		RCounter.LDS = __LD;
+     59          		RCounter.CS = __1p5mA;
+   \   00000010   A168               LDR      R1,[R4, #+8]
+   \   00000012   47F6FE72           MOVW     R2,#+32766
+   \   00000016   02EA4101           AND      R1,R2,R1, LSL #+1
+   \   0000001A   41F4C035           ORR      R5,R1,#0x18000
+   \   0000001E   45F00105           ORR      R5,R5,#0x1
+     60          
+     61          		NCounter.CNT = __NCounter;
+     62          		
+     63          		NCounter.A = fvco%__PRE;
+     64          		NCounter.N = fvco/__PRE;
+   \   00000022   00F01F01           AND      R1,R0,#0x1F
+   \   00000026   ....               LDR.N    R2,??DataTable8  ;; 0x7ff00
+   \   00000028   02EAC000           AND      R0,R2,R0, LSL #+3
+   \   0000002C   40EA4106           ORR      R6,R0,R1, LSL #+1
+     65          
+     66          		#ifdef Pll_debug
+     67          		{
+     68          			SerPtr->printf("R Counter: %03x \n", RCounter.Data & 0xffffff);
+     69          			SerPtr->printf("N Counter: %03x \n", NCounter.Data & 0xffffff);
+     70          			OSTimeDly(100);
+     71          		}
+     72          		#endif
+     73          		
+     74          		ptr->RstPllEn();
+   \   00000030   206A               LDR      R0,[R4, #+32]
+   \   00000032   8047               BLX      R0
+     75          
+     76          		for(i = 0; i < 19; i++)			// R Counter Program modes	(5bit)
+   \   00000034   1327               MOVS     R7,#+19
+     77          		{	
+     78          			if(RCounter.Data & tMsb)	ptr->SetPllData();
+   \                     ??LM15E07SLOutput_1:
+   \   00000036   6803               LSLS     R0,R5,#+13
+   \   00000038   02D5               BPL.N    ??LM15E07SLOutput_2
+   \   0000003A   6069               LDR      R0,[R4, #+20]
+   \   0000003C   8047               BLX      R0
+   \   0000003E   01E0               B.N      ??LM15E07SLOutput_3
+     79          			else						ptr->RstPllData();
+   \                     ??LM15E07SLOutput_2:
+   \   00000040   A069               LDR      R0,[R4, #+24]
+   \   00000042   8047               BLX      R0
+     80          
+     81          			RCounter.Data <<= 1;
+   \                     ??LM15E07SLOutput_3:
+   \   00000044   6D00               LSLS     R5,R5,#+1
+     82          			ptr->SetPllClk();
+   \   00000046   E068               LDR      R0,[R4, #+12]
+   \   00000048   8047               BLX      R0
+     83          			ptr->RstPllClk();
+   \   0000004A   2069               LDR      R0,[R4, #+16]
+   \   0000004C   8047               BLX      R0
+     84          		}	
+   \   0000004E   7F1E               SUBS     R7,R7,#+1
+   \   00000050   F1D1               BNE.N    ??LM15E07SLOutput_1
+     85          
+     86          		ptr->SetPllEn();
+   \   00000052   E069               LDR      R0,[R4, #+28]
+   \   00000054   8047               BLX      R0
+     87          		ptr->RstPllEn();
+   \   00000056   206A               LDR      R0,[R4, #+32]
+   \   00000058   8047               BLX      R0
+     88          
+     89          		for(i = 0; i < 19; i++) 		// R Counter Program modes	(5bit)
+   \   0000005A   1325               MOVS     R5,#+19
+     90          		{	
+     91          			if(NCounter.Data & tMsb)	ptr->SetPllData();
+   \                     ??LM15E07SLOutput_4:
+   \   0000005C   7003               LSLS     R0,R6,#+13
+   \   0000005E   02D5               BPL.N    ??LM15E07SLOutput_5
+   \   00000060   6069               LDR      R0,[R4, #+20]
+   \   00000062   8047               BLX      R0
+   \   00000064   01E0               B.N      ??LM15E07SLOutput_6
+     92          			else					 	ptr->RstPllData();
+   \                     ??LM15E07SLOutput_5:
+   \   00000066   A069               LDR      R0,[R4, #+24]
+   \   00000068   8047               BLX      R0
+     93          
+     94          			NCounter.Data <<= 1; 
+   \                     ??LM15E07SLOutput_6:
+   \   0000006A   7600               LSLS     R6,R6,#+1
+     95          			ptr->SetPllClk();
+   \   0000006C   E068               LDR      R0,[R4, #+12]
+   \   0000006E   8047               BLX      R0
+     96          			ptr->RstPllClk();
+   \   00000070   2069               LDR      R0,[R4, #+16]
+   \   00000072   8047               BLX      R0
+     97          		}		
+   \   00000074   6D1E               SUBS     R5,R5,#+1
+   \   00000076   F1D1               BNE.N    ??LM15E07SLOutput_4
+     98          		ptr->SetPllEn();
+   \   00000078   E069               LDR      R0,[R4, #+28]
+   \   0000007A   8047               BLX      R0
+     99          		ptr->RstPllEn();
+   \   0000007C   206A               LDR      R0,[R4, #+32]
+   \   0000007E   8047               BLX      R0
+    100          	
+    101          	}
+    102          	////////////////////////////////////////////////////////////	
+    103          }
+   \                     ??LM15E07SLOutput_0:
+   \   00000080   F1BD               POP      {R0,R4-R7,PC}    ;; return
+    104          
+
+   \                                 In section .text, align 2, keep-with-next
+    105          void SetPllClk(void)
+    106          {
+    107          	_PLL_CLK = 1;
+   \                     SetPllClk:
+   \   00000000   ....               LDR.N    R0,??DataTable8_1  ;; 0x40020814
+   \   00000002   0168               LDR      R1,[R0, #+0]
+   \   00000004   41F08001           ORR      R1,R1,#0x80
+   \   00000008   0160               STR      R1,[R0, #+0]
+    108          
+    109          #if PLL_DEFINE	
+    110          	ForDelay(PLL_DELAY);
+    111          #endif
+    112          }
+   \   0000000A   7047               BX       LR               ;; return
+    113          
+
+   \                                 In section .text, align 2, keep-with-next
+    114          void RstPllClk(void)
+    115          {
+    116          	_PLL_CLK = 0;
+   \                     RstPllClk:
+   \   00000000   ....               LDR.N    R0,??DataTable8_1  ;; 0x40020814
+   \   00000002   0168               LDR      R1,[R0, #+0]
+   \   00000004   21F08001           BIC      R1,R1,#0x80
+   \   00000008   0160               STR      R1,[R0, #+0]
+    117          #if PLL_DEFINE	
+    118          	ForDelay(PLL_DELAY);
+    119          #endif
+    120          }
+   \   0000000A   7047               BX       LR               ;; return
+    121          
+
+   \                                 In section .text, align 2, keep-with-next
+    122          void SetPllData(void)
+    123          {
+    124          	_PLL_DATA = 1;
+   \                     SetPllData:
+   \   00000000   ....               LDR.N    R0,??DataTable8_1  ;; 0x40020814
+   \   00000002   0168               LDR      R1,[R0, #+0]
+   \   00000004   41F04001           ORR      R1,R1,#0x40
+   \   00000008   0160               STR      R1,[R0, #+0]
+    125          #if PLL_DEFINE	
+    126          	ForDelay(PLL_DELAY);
+    127          #endif
+    128          }
+   \   0000000A   7047               BX       LR               ;; return
+    129          
+
+   \                                 In section .text, align 2, keep-with-next
+    130          void RstPllData(void)
+    131          {
+    132          	_PLL_DATA = 0;
+   \                     RstPllData:
+   \   00000000   ....               LDR.N    R0,??DataTable8_1  ;; 0x40020814
+   \   00000002   0168               LDR      R1,[R0, #+0]
+   \   00000004   21F04001           BIC      R1,R1,#0x40
+   \   00000008   0160               STR      R1,[R0, #+0]
+    133          #if PLL_DEFINE	
+    134          	ForDelay(PLL_DELAY);
+    135          #endif
+    136          }
+   \   0000000A   7047               BX       LR               ;; return
+    137          
+
+   \                                 In section .text, align 2, keep-with-next
+    138          void SetPllEnA(void)	// PLL IN1
+    139          {
+    140          	_4G_PLL_EN = 1;
+   \                     SetPllEnA:
+   \   00000000   ....               LDR.N    R0,??DataTable8_2  ;; 0x40021814
+   \   00000002   0168               LDR      R1,[R0, #+0]
+   \   00000004   4FF48072           MOV      R2,#+256
+   \   00000008   1143               ORRS     R1,R2,R1
+   \   0000000A   0160               STR      R1,[R0, #+0]
+    141          #if PLL_DEFINE	
+    142          	ForDelay(PLL_DELAY);
+    143          #endif
+    144          }
+   \   0000000C   7047               BX       LR               ;; return
+    145          
+
+   \                                 In section .text, align 2, keep-with-next
+    146          void RstPllEnA(void)	// PLL IN1
+    147          {
+    148          	_4G_PLL_EN = 0;
+   \                     RstPllEnA:
+   \   00000000   ....               LDR.N    R0,??DataTable8_2  ;; 0x40021814
+   \   00000002   0168               LDR      R1,[R0, #+0]
+   \   00000004   21F48071           BIC      R1,R1,#0x100
+   \   00000008   0160               STR      R1,[R0, #+0]
+    149          #if PLL_DEFINE	
+    150          	ForDelay(PLL_DELAY);
+    151          #endif
+    152          }
+   \   0000000A   7047               BX       LR               ;; return
+    153          
+
+   \                                 In section .text, align 2, keep-with-next
+    154          void SetPllEnB(void)	// PLL IN1
+    155          {
+    156          	//_3G_PLL_EN_GT = 1;
+    157          #if PLL_DEFINE	
+    158          	ForDelay(PLL_DELAY);
+    159          #endif
+    160          }
+   \                     SetPllEnB:
+   \   00000000   7047               BX       LR               ;; return
+    161          
+
+   \                                 In section .text, align 2, keep-with-next
+    162          void RstPllEnB(void)	// PLL IN1
+    163          {
+    164          	//_3G_PLL_EN_GT = 0;
+    165          #if PLL_DEFINE	
+    166          	ForDelay(PLL_DELAY);
+    167          #endif
+    168          }
+   \                     RstPllEnB:
+   \   00000000   7047               BX       LR               ;; return
+    169          
+
+   \                                 In section .text, align 2, keep-with-next
+    170          void SetPllEnC(void)	// PLL IN1
+    171          {
+    172          	_3G_PLL_EN = 1;
+   \                     SetPllEnC:
+   \   00000000   ....               LDR.N    R0,??DataTable8_3  ;; 0x40020c14
+   \   00000002   0168               LDR      R1,[R0, #+0]
+   \   00000004   41F01001           ORR      R1,R1,#0x10
+   \   00000008   0160               STR      R1,[R0, #+0]
+    173          #if PLL_DEFINE	
+    174          	ForDelay(PLL_DELAY);
+    175          #endif
+    176          }
+   \   0000000A   7047               BX       LR               ;; return
+    177          
+
+   \                                 In section .text, align 2, keep-with-next
+    178          void RstPllEnC(void)	// PLL IN1
+    179          {
+    180          	_3G_PLL_EN = 0;
+   \                     RstPllEnC:
+   \   00000000   ....               LDR.N    R0,??DataTable8_3  ;; 0x40020c14
+   \   00000002   0168               LDR      R1,[R0, #+0]
+   \   00000004   21F01001           BIC      R1,R1,#0x10
+   \   00000008   0160               STR      R1,[R0, #+0]
+    181          #if PLL_DEFINE	
+    182          	ForDelay(PLL_DELAY);
+    183          #endif
+    184          }
+   \   0000000A   7047               BX       LR               ;; return
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable8:
+   \   00000000   00FF0700           DC32     0x7ff00
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable8_1:
+   \   00000000   14080240           DC32     0x40020814
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable8_2:
+   \   00000000   14180240           DC32     0x40021814
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable8_3:
+   \   00000000   140C0240           DC32     0x40020c14
+    185          
+    186          
+    187          
+    188          ////////////////////////////////////////////////////////////////////////////////
+    189          // End of Source File
+    190          /////////////////////
+    191          
+
+   Maximum stack usage in bytes:
+
+     Function        .cstack
+     --------        -------
+     LM15E07SLCreate     12
+     LM15E07SLInit        0
+     LM15E07SLOutput     24
+     RstPllClk            0
+     RstPllData           0
+     RstPllEnA            0
+     RstPllEnB            0
+     RstPllEnC            0
+     SetPllClk            0
+     SetPllData           0
+     SetPllEnA            0
+     SetPllEnB            0
+     SetPllEnC            0
+
+
+   Section sizes:
+
+     Function/Label  Bytes
+     --------------  -----
+     p4GApll           40
+     p3GApll           40
+     p3GApll_1         40
+     LM15E07SLCreate   24
+     LM15E07SLInit     16
+     LM15E07SLOutput  130
+     SetPllClk         12
+     RstPllClk         12
+     SetPllData        12
+     RstPllData        12
+     SetPllEnA         14
+     RstPllEnA         12
+     SetPllEnB          2
+     RstPllEnB          2
+     SetPllEnC         12
+     RstPllEnC         12
+     ??DataTable8       4
+     ??DataTable8_1     4
+     ??DataTable8_2     4
+     ??DataTable8_3     4
+
+ 
+ 120 bytes in section .bss
+ 288 bytes in section .text
+ 
+ 288 bytes of CODE memory
+ 120 bytes of DATA memory
+
+Errors: none
+Warnings: none

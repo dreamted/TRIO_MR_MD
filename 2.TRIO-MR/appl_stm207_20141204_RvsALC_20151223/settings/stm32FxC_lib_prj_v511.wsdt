@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<Workspace>
+  <ConfigDictionary>
+    
+  <CurrentConfigs><Project>stm32F_cpulib_prj_v62/Release</Project><Project>stm32FxC_lib_prj_v511/Release</Project><Project>stm32FxC_ucos_prj_v511/Release</Project></CurrentConfigs><CurrentProj>stm32FxC_ucos_prj_v511</CurrentProj><OverviewSelected>0</OverviewSelected></ConfigDictionary>
+  <Desktop>
+    <Static>
+      <Workspace>
+        <ColumnWidths>
+          
+          
+          
+          
+        <Column0>193</Column0><Column1>27</Column1><Column2>27</Column2><Column3>27</Column3></ColumnWidths>
+      <PreferedWindows><Position>1</Position><ScreenPosX>0</ScreenPosX><ScreenPosY>0</ScreenPosY><Windows/></PreferedWindows></Workspace>
+      <Build>
+        
+        
+        
+        
+      <PreferedWindows><Position>3</Position><ScreenPosX>0</ScreenPosX><ScreenPosY>0</ScreenPosY><Windows/></PreferedWindows><ColumnWidth0>20</ColumnWidth0><ColumnWidth1>719</ColumnWidth1><ColumnWidth2>191</ColumnWidth2><ColumnWidth3>47</ColumnWidth3></Build>
+    <Debug-Log><PreferedWindows><Position>3</Position><ScreenPosX>0</ScreenPosX><ScreenPosY>0</ScreenPosY><Windows><Window><Factory>Build</Factory></Window></Windows></PreferedWindows><ColumnWidth0>26</ColumnWidth0><ColumnWidth1>1512</ColumnWidth1></Debug-Log><TerminalIO/></Static>
+    <Windows>
+      
+      
+    <Wnd0><Tabs><Tab><Identity>TabID-2109-18105</Identity><TabName>Workspace</TabName><Factory>Workspace</Factory><Session><NodeDict><ExpandedNode>&lt;ws&gt;</ExpandedNode><ExpandedNode>stm32F_cpulib_prj_v62</ExpandedNode><ExpandedNode>stm32F_cpulib_prj_v62/Output</ExpandedNode><ExpandedNode>stm32F_cpulib_prj_v62/lib_stm32</ExpandedNode><ExpandedNode>stm32F_cpulib_prj_v62/stm_core_m3</ExpandedNode><ExpandedNode>stm32FxC_lib_prj_v511</ExpandedNode><ExpandedNode>stm32FxC_lib_prj_v511/Output</ExpandedNode><ExpandedNode>stm32FxC_lib_prj_v511/extdevlib.c</ExpandedNode><ExpandedNode>stm32FxC_ucos_prj_v511</ExpandedNode><ExpandedNode>stm32FxC_ucos_prj_v511/Output</ExpandedNode><ExpandedNode>stm32FxC_ucos_prj_v511/WRCS</ExpandedNode><ExpandedNode>stm32FxC_ucos_prj_v511/[]version</ExpandedNode><ExpandedNode>stm32FxC_ucos_prj_v511/dev</ExpandedNode><ExpandedNode>stm32FxC_ucos_prj_v511/source</ExpandedNode><ExpandedNode>stm32FxC_ucos_prj_v511/u_lib</ExpandedNode></NodeDict></Session></Tab></Tabs><SelectedTab>0</SelectedTab></Wnd0><Wnd1><Tabs><Tab><Identity>TabID-24118-26613</Identity><TabName>Build</TabName><Factory>Build</Factory><Session/></Tab><Tab><Identity>TabID-19487-5895</Identity><TabName>Debug Log</TabName><Factory>Debug-Log</Factory><Session/></Tab></Tabs><SelectedTab>0</SelectedTab></Wnd1></Windows>
+    <Editor>
+      
+      
+      
+      
+    <Pane><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\code\aa_alc.c</Filename><XPos>0</XPos><YPos>2756</YPos><SelStart>72038</SelStart><SelEnd>72038</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\code\main.c</Filename><XPos>0</XPos><YPos>261</YPos><SelStart>6151</SelStart><SelEnd>6151</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\code\cdma.c</Filename><XPos>0</XPos><YPos>2917</YPos><SelStart>74192</SelStart><SelEnd>74192</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\uC-LIB\lib_def.h</Filename><XPos>0</XPos><YPos>296</YPos><SelStart>14644</SelStart><SelEnd>14644</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\version.txt</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>602</SelStart><SelEnd>602</SelEnd></Tab><ActiveTab>4</ActiveTab></Pane><ActivePane>0</ActivePane><Sizes><Pane><X>1000000</X><Y>1000000</Y></Pane></Sizes><SplitMode>1</SplitMode></Editor>
+    <Positions>
+      
+      
+      
+      
+      
+    <Top><Row0><Sizes><Toolbar-00f8e8c8><key>iaridepm.enu1</key></Toolbar-00f8e8c8></Sizes></Row0></Top><Left><Row0><Sizes><Wnd0><Rect><Top>-2</Top><Left>-2</Left><Bottom>426</Bottom><Right>283</Right><x>-2</x><y>-2</y><xscreen>-789420</xscreen><yscreen>-593453</yscreen><sizeHorzCX>-778520709</sizeHorzCX><sizeHorzCY>-815182691</sizeHorzCY><sizeVertCX>281065</sizeVertCX><sizeVertCY>587912</sizeVertCY></Rect></Wnd0></Sizes></Row0></Left><Right><Row0><Sizes/></Row0></Right><Bottom><Row0><Sizes><Wnd1><Rect><Top>-2</Top><Left>-2</Left><Bottom>257</Bottom><Right>1016</Right><x>-2</x><y>-2</y><xscreen>1018</xscreen><yscreen>259</yscreen><sizeHorzCX>1003945</sizeHorzCX><sizeHorzCY>355769</sizeHorzCY><sizeVertCX>249507</sizeVertCX><sizeVertCY>247253</sizeVertCY></Rect></Wnd1></Sizes></Row0></Bottom><Float><Sizes/></Float></Positions>
+  </Desktop>
+</Workspace>
+
+

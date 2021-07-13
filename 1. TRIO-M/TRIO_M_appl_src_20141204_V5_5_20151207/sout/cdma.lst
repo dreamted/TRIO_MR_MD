@@ -1,0 +1,4139 @@
+###############################################################################
+#                                                                             #
+#                                                       19/May/2017  23:29:32 #
+# IAR ANSI C/C++ Compiler V5.50.5.21995/W32 EVALUATION for ARM                #
+# Copyright (C) 1999-2010 IAR Systems AB.                                     #
+#                                                                             #
+#    Cpu mode     =  thumb                                                    #
+#    Endian       =  little                                                   #
+#    Source file  =  D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V5_5_ #
+#                    20151207\code\cdma.c                                     #
+#    Command line =  "D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V5_5 #
+#                    _20151207\code\cdma.c" -D _MIMO_Type -D __2rd -D         #
+#                    __PLLEnToggle -lcN "D:\Project\TRIO\1.                   #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\sout\" -o  #
+#                    "D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V5_5 #
+#                    _20151207\sout\" --endian=little --cpu=Cortex-M3 -e      #
+#                    --require_prototypes --warnings_are_errors --fpu=None    #
+#                    --dlib_config "D:\Program Files (x86)\IAR                #
+#                    Systems\Embedded Workbench 5.4                           #
+#                    Evaluation\arm\INC\DLib_Config_Normal.h" -I              #
+#                    "D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V5_5 #
+#                    _20151207\include\" -I "D:\Project\TRIO\1.               #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\lib_stm32\ #
+#                    inc\" -I "D:\Project\TRIO\1.                             #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\lib_stm32\ #
+#                    src\" -I "D:\Project\TRIO\1.                             #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\uC-CPU\"   #
+#                    -I "D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V #
+#                    5_5_20151207\uC-LIB\" -I "D:\Project\TRIO\1.             #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\uCOS-II\Po #
+#                    rts\" -I "D:\Project\TRIO\1.                             #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\uCOS-II\So #
+#                    urce\" -I "D:\Project\TRIO\1.                            #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\uC-Probe\" #
+#                     -I "D:\Program Files (x86)\IAR Systems\Embedded         #
+#                    Workbench 5.4 Evaluation\arm\INC\" -Oh                   #
+#    List file    =  D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V5_5_ #
+#                    20151207\sout\cdma.lst                                   #
+#    Object file  =  D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V5_5_ #
+#                    20151207\sout\cdma.o                                     #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\code\cdma.c
+      1          /*******************************************************************************
+      2           *
+      3           * This module contains the function 7092 original header file, a function
+      4           * whole things  initializations - global, include function and so on
+      5           *
+      6           *
+      7           * Note that this function is called before the data segments are
+      8           * initialized, this means that this function cannot rely on the
+      9           * values of global or static variables.
+     10           *
+     11           *
+     12           * $Revision: 0.1 $
+     13           * $Revision date: 2006.03.__
+     14           *
+     15           ******************************************************************************/
+     16          #define SMS_C
+     17          
+     18          #include "../include/main.h"
+     19          
+     20          void SmsInit(void)
+     21          {
+     22          	SmsSer = &SmsSerB;
+     23          
+     24           	SmsSer->CheckByte 		= pUSART4.CheckByte;
+     25          	SmsSer->RxGetByte 		= pUSART4.RxGetByte;
+     26          	SmsSer->PutStr 			= pUSART4.PutStr;
+     27          	SmsSer->TxCheckByte 	= pUSART4.TxCheckByte;
+     28          
+     29          	SmsSer->TimerRx 		= TimerSmsRx;
+     30          	SmsSer->TimerEndWait	= TimerSmsEndWait;
+     31          
+     32          	SmsSer->WRCSRecv 		= &Rtcpsms;
+     33          	SmsSer->WRCSSend 		= &Stcpsms;
+     34          
+     35          	SmsSer->SmsRecv 		= &Rwrcssms;
+     36          	SmsSer->SmsSend 		= &Swrcssms;	
+     37          
+     38          	
+     39          	SmsSer->Sem = OSSemCreate(1);
+     40          	
+     41          	CdmaSem = OSSemCreate(1);				
+     42          
+     43          	OSTaskCreate(DnrSmsTask, (void *)NULL, (OS_STK *)&CDMATaskStk[CDMA_START_STK_SIZE-1], SMSTASK_PRIO);
+     44          }
+     45          
+     46          
+     47          void ResetPeriodSet(void)
+     48          {
+     49          	TimerRegist(TimerSmsFirstTx, Time1Sec*540L); // 9min
+     50          
+     51          	OSTimeDly(1000L);
+     52          	
+     53          	SmsResetPeriodFlag = FALSE; //Reset 주기 체크 한다.
+     54          }
+     55          
+     56          INT32S CdmaFuncselect(void)
+     57          {
+     58          	// Modem Status Check.
+     59          ////////////////////////////////////////////////////////////////////////////////////////	
+     60          	// error Case
+     61          
+     62          	if(BcMRtryNo >= MaxTryNo)
+     63          	{	
+     64          		BcMRtryNo = 0;
+     65          		return  MAX_TRY;
+     66          	}
+     67          	if(++TimeReqCnt > 5)
+     68          	{
+     69          		TimeReqCnt = 0;
+     70          		return SELF_TIME;
+     71          	}
+     72          
+     73          	else if(TimeReqCnt%2)	return SELF_RECV;
+     74          	else					return SELF_SEND;
+     75          
+     76          //	return SELF_RECV;
+     77          }
+     78          
+     79          void DnrSMS2Data(void)
+     80          {
+     81          	__Dnr_Sts *Sts = tDnrSts;
+     82          
+     83          
+     84          	memcpy((INT8U *)&Sts->MinNumber, BcMSrcTel, 11);
+     85          	
+     86          	if( ModemType == _WCMDA_Modem)
+     87          	{
+     88          		memcpy((INT8U *)&Sts->EsnNumber, ICCIDNum, 19);
+     89          	}
+     90          	else
+     91          	{
+     92          		memcpy((INT8U *)&Sts->EsnNumber, BcMEsnNum, 8);
+     93          	}
+     94          
+     95          	Sts->MobileManufacture 	= BcMMaker;
+     96          	Sts->MobileModel		= BcMType;
+     97          	Sts->MobileVer[0]		= atoh(BcMVerNum[0]);
+     98          	Sts->MobileVer[1]		= (atoh(BcMVerNum[1]) << 4) | (atoh(BcMVerNum[2]) & 0x0f);
+     99          
+    100          	Sts->ReportHours[0] 	= PresentHour;		//자동 보고 시간
+    101          	Sts->ReportHours[1] 	= PresentMin; 		//자동 보고 시간
+    102          	if( ModemType == _WCMDA_Modem)
+    103          	{
+    104          		Sts->LockOrderSts 		= LockOrder;	
+    105          	}
+    106          }
+    107          
+    108          
+    109          
+    110          INT8U sms_buff[256];
+    111          INT8U sentTel[TelNo];
+    112          INT32S sms_len;
+    113          BcMTimeStr sms_time;
+    114          BcMRfStsStr Rf_sts;
+    115          BcMPilotStsStr Pilot_Sts;
+    116          INT32S tcp_port;
+    117          INT32S tcp_len;
+    118          
+    119          void DnrSmsTask(void * pdata)
+    120          {
+    121          	INT16U InitCnt = 0;
+    122          	INT8S s = 0 ;
+    123          		
+    124          	__ProtocolPtr *nPtr = SmsSer;
+    125          
+    126          	pdata = pdata;
+    127          
+    128          	iSMS_Debug_Mode = SET;//SET;//RESET;
+    129          	
+    130          	TcpDnLoadFlag = RESET;
+    131          	OneDayResetCnt = RESET;
+    132          
+    133          	// SmsResetPeriodFlag : TRUE 이면 Reset허용
+    134          	// SmsResetPeriodFlag : FALSE 이면 Reset불가
+    135          	
+    136          	SmsResetPeriodFlag = TRUE; //Reset 주기 체크 한다.
+    137          	SmsTxFailFlag = FALSE;
+    138          	
+    139          	USART4BuffClear();
+    140          
+    141          	SMS_PWR = 1;
+    142          	OSTimeDly(1000L*5L);
+    143          	SMS_PWR = 0;
+    144          
+    145          	BcMdemTcpExit();
+    146          		
+    147          	OSTimeDly(1000L*20L);  ///3G Modem Pwr On  20SEC 대기 
+    148          	PeriodStart = 1;
+    149          
+    150          	BcMdemDebug(iSMS_Debug_Mode, (INT32S *)SerPtr);
+    151          
+    152          	BootAlarmFlag = TRUE;		
+    153          	goto RETRY_START;
+    154          
+    155          SWRST_START:
+    156          	BcMdemTcpExit();
+    157          	SmsResetPeriodFlag = TRUE;
+    158          	
+    159          		
+    160          PWRST_START:
+    161          	USART1Printf("PWRST_START \n");
+    162          	if(tDnrSts->ModemOnOff == Disable)  goto PWRST_START;
+    163          
+    164          	InitCnt = 0;
+    165          	SMS_PWR = 1;
+    166          	OSTimeDly(1000L*5L);
+    167          	SMS_PWR = 0;	
+    168          
+    169          	BootAlarmFlag = TRUE;
+    170          	OneDayResetCnt = NULL;
+    171          	TcpDnLoadFlag = RESET;
+    172          				
+    173          	OSTimeDly(1000L*20L);
+    174          
+    175          	if(AutoResetFlg)
+    176          	{
+    177          		AutoResetFlg = RESET;
+    178          		TimerRegist(Timer_ModemReset, Time1Day*1L);
+    179          	}
+    180          
+    181          	
+    182          RETRY_START:
+    183          	USART1Printf("RETRY_START \n");
+    184           		if( BcMdemInit(Ser4Ptr, TimerSmsRx) <= 0)
+    185          		{
+    186          			while(tTestFlag)
+    187          			{
+    188          				OSTimeDly(100L);
+    189          			}	
+    190          			if(++InitCnt > MaxTryNo)
+    191          			{	
+    192          				InitCnt = 0;
+    193          				
+    194          				if(SmsResetPeriodFlag)
+    195          				{					
+    196          					 ResetPeriodSet();
+    197          					 SmsTxFailFlag = FALSE;
+    198          					 
+    199          					 goto PWRST_START;
+    200          				}
+    201          				else goto RETRY_START;
+    202          			}
+    203          			else goto RETRY_START;
+    204          		}
+    205          		else
+    206          		{
+    207          			InitCnt = 0;
+    208          		}	
+    209          	
+    210          ModemLock_START:	
+    211          		ModemEsnCheck();
+    212          		
+    213          		if( ModemType == _WCMDA_Modem)
+    214          		{
+    215          			ModemLockOrder();
+    216          		}
+    217          		DnrSMS2Data();
+    218          		Auto_ResetCheckInit();
+    219          
+    220          		#ifdef __SmsDebug
+    221          			iSMS_Debug_Mode = SET;
+    222          		#else
+    223          			iSMS_Debug_Mode = RESET;
+    224          		#endif
+    225          
+    226          		while(1)
+    227          		{
+    228          			if(!tTestFlag)
+    229          			{
+    230          //				if(!WRCS_DownLoadGiveupTimerSet(NULL))
+    231          				while(!WRCS_DownLoadGiveupTimerSet(NULL))
+    232          				{
+    233          					BcMdemDebug(iSMS_Debug_Mode, (INT32S *)SerPtr);
+    234          				
+    235          					AutoResetCheck();
+    236          					if(SmsTxFailFlag)
+    237          					{
+    238          						if(SmsResetPeriodFlag)
+    239          						{
+    240          	//						SmsDataAckTx(Rmt_ID,Dnr_ID, (INT8U *)SmsDnrSts, sizeof(_SmsDnrStatus)-2, StatusQue,SmsSer);
+    241          							SmsTxFailFlag = FALSE;
+    242          						}	
+    243          					}
+    244          					
+    245          					if(TcpDnLoadFlag)	goto SWRST_START;
+    246          					
+    247          					{
+    248          						s = CdmaFuncselect();
+    249          						switch(s)
+    250          						{
+    251          							case SELF_RECV:
+    252          							if( (sms_len = BcMdemRecv(sms_buff, sentTel, &sms_time)) > 0)
+    253          							{
+    254          								if(0)
+    255          								{
+    256          									USART1PutStr(sms_buff, sms_len, ENABLE);
+    257          									USART1Printf("\n");
+    258          									USART1Printf("SendTel: %s \n", sentTel);
+    259          									USART1Printf("sms_len: %d \n", sms_len);
+    260          								
+    261          									USART1Printf("Arrive Time: %s %s %s %s %s %s %s\n",
+    262          								
+    263          									sms_time.Year,
+    264          									sms_time.Month,
+    265          									sms_time.Day,
+    266          									sms_time.Hour,
+    267          									sms_time.Min,
+    268          									sms_time.Sec,
+    269          									sms_time.Week);
+    270          								}
+    271          
+    272          								if(Sms1_Protocol_Check(nPtr)) //Ser0ComCheck();
+    273          								{			
+    274          									SmsComCheck (nPtr);
+    275          									if(TcpDnLoadFlag) goto TCP_DNLOAD;
+    276          								}
+    277          							}
+    278          							#if 0
+    279          							else
+    280          							{
+    281          	 							if(PcFreqStsRqstFlag)
+    282          								{
+    283          									INT8U tid[3] = {0xff, 0xff, 0xff};
+    284          									SpecFreqState_RspFunc(tid,RadioAutoReport,2,NormalMode,nPtr);
+    285          									PcFreqStsRqstFlag = FALSE;
+    286          								}	
+    287          	  
+    288          
+    289          								///////// SEND ///////////
+    290          								if((BcMRtryNo < MaxTryNo)&&(LockOrder == 1))
+    291          								{
+    292          									OSTimeDly(1000L*2L);
+    293          									if( tDnrSts->ResetCase == EtcReset)
+    294          									{
+    295          										FirstFlag = 0;
+    296          										BootAlarmFlag = 0;
+    297          									}
+    298          									
+    299          									if(!FirstFlag)
+    300          									{	
+    301          										INT8U i= 0;
+    302          										WhatTime();
+    303          
+    304          										for(i = 0; i < 11; i++)tDnrSts->MinNumber[i] = BcMSrcTel[i];
+    305          										for(i = 0; i < 8;  i++)tDnrSts->EsnNumber[i] = BcMEsnNum[i];
+    306          
+    307          										SmsAlarmRptFunc(Index_ResetAlarm,AlarmSCODE,Endcode,SmsSer);
+    308          
+    309          										if (BootAlarmFlag)
+    310          										{
+    311          											SmsAlarmRptFunc(Index_BootAlarm,AlarmSCODE,Endcode,SmsSer);
+    312          											TimerRegist(TimerPerReport, Time1Sec*10L);	
+    313          											BootAlarmFlag = FALSE;
+    314          										}
+    315          										
+    316          										FirstFlag = 1;
+    317          									}
+    318          
+    319          									SmsAlarm();
+    320          
+    321          //									SmsAutoReportCheck(nPtr);
+    322          
+    323          									DnrSMS2Data();
+    324          
+    325          									if(SetSMS_PWR)
+    326          									{
+    327          										ModemPwrOFF();
+    328          										OSTimeDly(1000*10L);
+    329          										
+    330          										SetSMS_PWR = RESET;
+    331          									}
+    332          								}
+    333          								else if(LockOrder == 0)
+    334          								{
+    335          									if( LockOrderCnt++ > 5*30)	 /// 1이 2초 
+    336          									{
+    337          										LockOrderCnt = 0;
+    338          										chkLockOrder = chkLockOrder + 1;
+    339          
+    340          										if( chkLockOrder >= 3 ) 
+    341          										{
+    342          	//										tDnrSts->ModemOnOff = Disable;
+    343          										}
+    344          										else
+    345          										{
+    346          											goto ModemLock_START;
+    347          										}
+    348          									}
+    349          								}
+    350          							}
+    351          							#endif
+    352          							break;
+    353          
+    354          							case SELF_TIME:
+    355          //								SmsAutoReportCheck(nPtr);
+    356          							break;
+    357          
+    358          							
+    359          							case SELF_SEND:
+    360          								// if you want send ... please insert this area..
+    361          
+    362          								if(PcFreqStsRqstFlag)
+    363          								{
+    364          									INT8U tid[3] = {0xff, 0xff, 0xff};
+    365          									SpecFreqState_RspFunc(tid,RadioAutoReport,2,NormalMode,nPtr);
+    366          									PcFreqStsRqstFlag = FALSE;
+    367          								}	
+    368          	  
+    369          
+    370          								///////// SEND ///////////
+    371          								if((BcMRtryNo < MaxTryNo)&&(LockOrder == 1))
+    372          								{
+    373          //									OSTimeDly(1000L*2L);
+    374          
+    375          									if( tDnrSts->ResetCase == EtcReset)
+    376          									{
+    377          										FirstFlag = 0;
+    378          										BootAlarmFlag = 0;
+    379          									}
+    380          									
+    381          									if(!FirstFlag)
+    382          									{	
+    383          										INT8U i= 0;
+    384          										WhatTime();
+    385          
+    386          										for(i = 0; i < 11; i++)tDnrSts->MinNumber[i] = BcMSrcTel[i];
+    387          										for(i = 0; i < 8;  i++)tDnrSts->EsnNumber[i] = BcMEsnNum[i];
+    388          
+    389          										SmsAlarmRptFunc(Index_ResetAlarm,AlarmSCODE,Endcode,SmsSer);
+    390          
+    391          										if (BootAlarmFlag)
+    392          										{
+    393          											SmsAlarmRptFunc(Index_BootAlarm,AlarmSCODE,Endcode,SmsSer);
+    394          											TimerRegist(TimerPerReport, Time1Sec*10L);	
+    395          											BootAlarmFlag = FALSE;
+    396          										}
+    397          										
+    398          										FirstFlag = 1;
+    399          									}
+    400          									WhatTime();
+    401          
+    402          									SmsAlarm();
+    403          
+    404          									SmsAutoReportCheck(nPtr);
+    405          
+    406          									DnrSMS2Data();
+    407          
+    408          									if(SetSMS_PWR)
+    409          									{
+    410          										ModemPwrOFF();
+    411          										OSTimeDly(1000*10L);
+    412          										SetSMS_PWR = RESET;
+    413          									}
+    414          								}
+    415          								else if(LockOrder == 0)
+    416          								{
+    417          									if( LockOrderCnt++ > 5*30)	 /// 1이 2초 
+    418          									{
+    419          										LockOrderCnt = 0;
+    420          										chkLockOrder = chkLockOrder + 1;
+    421          
+    422          										if( chkLockOrder >= 3 ) 
+    423          										{
+    424          	//										tDnrSts->ModemOnOff = Disable;
+    425          										}
+    426          										else
+    427          										{
+    428          											goto ModemLock_START;
+    429          										}
+    430          									}
+    431          								}
+    432          
+    433          
+    434          							break;
+    435          											
+    436          							case MAX_TRY:
+    437          								// if(iSMS_Debug_Mode)	USART1Printf("MAX_TRY \n");
+    438          								// reset routine!!
+    439          
+    440          								if(TimeOverCheck(TimerSmsFirstTx))
+    441          								{
+    442          									SmsResetPeriodFlag = TRUE;
+    443          								}
+    444          
+    445          								if(SmsResetPeriodFlag)
+    446          								{	
+    447          									 SmsTxFailFlag = TRUE;
+    448          									 ResetPeriodSet();
+    449          
+    450          									 goto PWRST_START;
+    451          								}
+    452          												
+    453          							default:					
+    454          							break;
+    455          						}
+    456          					}	
+    457          				OSTimeDly(1000L);
+    458          //				OSTimeDly(500L);
+    459          			}
+    460          			while(WRCS_DownLoadGiveupTimerSet(NULL))
+    461          			{
+    462          	TCP_DNLOAD: 
+    463          				if(BcMdemTCPRxCheck(tcp_buff))
+    464          				{	
+    465          					if(TCPProtocolCheck(nPtr)) TCPComCheck(nPtr);
+    466          				}
+    467          //				USART1Printf("TCP_DNLOAD \n");	
+    468          //				OSTimeDly(500);
+    469          				OSTimeDly(100L);
+    470          			}		
+    471          		}
+    472          		else OSTimeDly(500L);			
+    473          	}
+    474          }
+    475          
+    476          void Auto_ResetCheckInit(void)
+    477          {
+    478          	if		( tDnrSts->RepeatResetPriod == 0x01 )	tPeriod = ((24L*3600L)*1)/2;
+    479          	else if ( tDnrSts->RepeatResetPriod == 0x02 )	tPeriod = ((24L*3600L)*3)/2;
+    480          	else if ( tDnrSts->RepeatResetPriod == 0x03 )	tPeriod = ((24L*3600L)*7)/2;
+    481          	else if ( tDnrSts->RepeatResetPriod == 0x04 )	tPeriod = ((24L*3600L)*10)/2;	
+    482          	else if ( tDnrSts->RepeatResetPriod == 0x05 )	tPeriod = ((24L*3600L)*30)/2;
+    483          	else 											tPeriod = ((24L*3600L)*1)/2;
+    484          
+    485          	OneDayPeriod = (24L*3600L)*1;
+    486          
+    487          	CheckTime(tDnrSts->ResetPeriodCountSet,tPeriod);
+    488          }
+    489          
+    490          
+    491          void CheckTime(INT8U *tCount,INT32U tTime)
+    492          {
+    493          	INT32U Temp,Temp1,Temp2;
+    494          
+    495          	Temp = tTime / 60;
+    496          
+    497          	Temp1 = Temp % 60;
+    498          	Temp2 = Temp / 60;
+    499          
+    500          	tCount[2] = (INT8U)Temp1;
+    501          	tCount[1] = (INT8U)(Temp2 % 24);
+    502          	tCount[0] = (INT8U)(Temp2 / 24);
+    503          }
+    504          
+    505          void AutoResetCheck(void)
+    506          {
+    507          	AutoResetCnt++;
+    508          	OneDayResetCnt++;
+    509          
+    510          	if(OneDayResetCnt > OneDayPeriod )
+    511          	{
+    512          		SET_ULAlarmCnt = SET;
+    513          		OneDayResetCnt = NULL;		
+    514          	}
+    515          
+    516          	if(AutoResetCnt > OneDayPeriod )
+    517          	{
+    518          		SET_ULAlarmCnt = SET;
+    519          	}
+    520          
+    521           	if( tDnrSts->RepeatResetPriod == 0x7f) return;
+    522          
+    523          	if(AutoResetCnt > tPeriod )
+    524          	{
+    525          		BcMRtryNo = MaxTryNo;
+    526          		AutoResetCnt = NULL;	
+    527          		AutoResetFlg = SET;
+    528          	}
+    529          
+    530          	CheckTime(tDnrSts->ResetPeriodCountSts,OneDayResetCnt);
+    531          }
+    532          
+    533          //////////////////////////////////////////////////////////////////////////////////////////////////////
+    534          INT16U ArRemainTime[4]; // 자동보고 남은 시간 10초단위 환산. [0/1/2] ==>[상태/전파/idle]
+    535          static INT16U Init_ar_time[4] = {0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF}; // 현재의 시스템시간을 10초단위 저장.
+    536          
+    537          // 자동보고주기를 10초단위로 환산, index : 1일(0),5분(1),...,12시간(9) 
+    538          // 10초단위 카운트 수.
+    539          // 1일 = 8640 = 24 x 60 x 60 / 10초단위
+    540          const INT16U AutoTime[10] = { 8640, 30, 60, 120, 180, 360, 720, 1440, 2160, 4320 }; // {1일, 5분, 10분,..,12시간}
+    541          
+    542          
+    543          // 현재설정된 자동보고주기를 10초단위로 환산한 값을 리턴한다.
+    544          //
+    545          // idx : 0(상태), 1(전파), 2(idle전파)
+    546          // 자동보고 주기 : 
+    547          // 5분~12시간 : 1~9
+    548          // 1일 : 0x10
+    549          // 없음: 0x7F
+    550          /*******************************************************************************
+    551           자동보고주기(10초단위 환산시간)을 리턴한다. 1일이상은 무조건 1일 이상.
+    552          --------------------------------------------------------------------------------
+    553          [IN] 
+    554          idx	: 0 ~ 2 [상태/전파1/전파2]
+    555          [OUT]
+    556          [RET]
+    557          *******************************************************************************/
+    558          INT16U GetPeriod( INT8U idx )
+    559          {
+    560          	// 5분(1) ~ 12시간(9) 주기이면 해당되는 10초단위환산주기값을 리턴하고, 그렇지 않으면, 1일자동주기로 환산한다.
+    561          	// 10 : 자동보고주기 1일 이하의 경우, 자동주기에 해당하는 시간(10초단위)리턴
+    562          	if( m_sms.ArPeriod[idx]<10 ) return AutoTime[m_sms.ArPeriod[idx]];
+    563          	else return 8640; // 1일 이상은 무조건 1일.
+    564          }
+    565          
+    566          // idx : 0(상태), 1(전파), 2(idle전파)
+    567          // 자동보고 기준시 및 자동보고 주기 변경되면 호출됨.
+    568          // 자동보고여부 체크시, 초기자동보고시간(Init_ar_time)이 0xFFFF이면 호출됨.
+    569          // 자동보고 남은시간 갱신 및 Init_ar_time 를 현재의 시스템 시간 10초환산단위로 갱신.
+    570          /*******************************************************************************
+    571           자동보고시간을 계산.
+    572          --------------------------------------------------------------------------------
+    573          [IN] 
+    574          idx	: 0 ~ 2 [상태/전파1/전파2]
+    575          [OUT]
+    576          [RET]
+    577          *******************************************************************************/
+    578          void CalcARTime( INT8U idx )
+    579          {
+    580          	INT16U	ar_time, period; // 10초단위 환산값.
+    581          	INT16U	a_r, c_r;
+    582          	
+    583          	
+    584          	// 모뎀에서 아직 시간을 받지 못해서 업데이트 안되었으면, 그냥 리턴.
+    585          	if( cur_10s_time == 0xFFFF )
+    586          	{
+    587          		Init_ar_time[idx] = 0xFFFF;
+    588          		return;
+    589          	}
+    590          
+    591          	// 자동보고 기준시/분을 10초 단위로 환산하여 ar_time 에 저장.
+    592          	
+    593          	// 자동보고 기준시를 10초단위로 환산한 절대값 계산. 기준시가 0시1분이면, ar_time은 6이 된다.
+    594          	// 상태자동보고
+    595          	if( idx == 0 ) 
+    596          	{
+    597          		ar_time = (m_sms.RepArTime[0]*360) + (m_sms.RepArTime[1]*6);
+    598          	}	
+    599          	// 전파자동보고
+    600          	else 
+    601          	{
+    602          		ar_time = (m_sms.RfArTime[0]*360) + (m_sms.RfArTime[1]*6);
+    603          	}
+    604          	
+    605          	// ar_time ==> 자동보고 기준시,기준분을 10초 단위 환산.
+    606          
+    607          	// 자동보고 주기 10 초 단위 시간( 5분 주기의 경우, 30)
+    608          	period = GetPeriod(idx);
+    609          
+    610          
+    611          	// 자동보고 기준시의 주기와 현재 시간의 주기의 남은 시간 비교
+    612          	a_r = ar_time%period; // 기준시를 주기로 나눈 나머지. 
+    613          	c_r = cur_10s_time%period; // 현재시간을 주기로 나눈 나머지.
+    614          
+    615          	ar_time = cur_10s_time - c_r;
+    616          	ar_time += a_r;
+    617          
+    618          	if( c_r>=a_r ) ar_time += period;
+    619          	
+    620          //	m_sms.ArRemain[idx] = next_ar_time[idx] - cur_10s_time;
+    621          
+    622          	// 10초단위의 자동보고 남은 시간.
+    623          	ArRemainTime[idx] = ar_time - cur_10s_time;
+    624          	m_sms.ArRemain[idx] = ArRemainTime[idx];
+    625          	Init_ar_time[idx] = cur_10s_time;
+    626          
+    627          //	if( next_ar_time[idx]=>8640 ) next_ar_time[idx] = 8640-next_ar_time[idx];
+    628          	
+    629          }
+    630          
+    631          
+    632          
+    633          // 자동보고 시간되었는지 확인. 자동보고 해야 하면 1 아니면 0 리턴.
+    634          // idx : 0(상태) 1(전파) 2(idle 전파)
+    635          /*******************************************************************************
+    636           지금 시간이 자동보고해야하는 시간인지 체크
+    637          --------------------------------------------------------------------------------
+    638          [IN] 
+    639          idx	: 0 ~ 2 [상태/전파1/전파2]
+    640          [OUT]
+    641          [RET] 지금 자동보고 해야 할 시간이면 1을 아니면 0을 리턴
+    642          *******************************************************************************/
+    643          INT8U CheckARTime( INT8U idx )
+    644          {
+    645          	INT16U ref_time; // 경과시간
+    646          
+    647          	// 자동보고 없음(0x7F)이면 : 해당항목이 자동보고주기가 자동보고없음이면 리턴 0.
+    648          	if( m_sms.ArPeriod[idx] == 0x7F ) return 0;
+    649          
+    650          	// 전파/idle전파 이나, 자동보고 안함(0x03)이면 리턴 0, 자동보고 안함.
+    651          	if(idx) 
+    652          	{
+    653          		if( m_sms.ArMode[idx-1] == 0x03 ) return 0;
+    654          	}
+    655          
+    656          	if( Init_ar_time[idx] == 0xFFFF ) 
+    657          	{
+    658          		CalcARTime( idx );
+    659          	}
+    660          
+    661          	// 경과시간
+    662          	if( cur_10s_time>=Init_ar_time[idx] )
+    663          		ref_time = cur_10s_time-Init_ar_time[idx];
+    664          	else ref_time = (8640-Init_ar_time[idx])+cur_10s_time;
+    665          	
+    666          	// 자동보고 남은 시간 계산
+    667          	// 경과시간이 남은시간보다 크면 자동보고 해야함.
+    668          	if( ref_time >= ArRemainTime[idx] )
+    669          		m_sms.ArRemain[idx] = 0;
+    670          	else m_sms.ArRemain[idx] = ArRemainTime[idx] - ref_time;
+    671          
+    672          	// 자동보고 남은 시간이 0이면, 자동보고해야 할 시간.
+    673          	if( m_sms.ArRemain[idx] == 0 )
+    674          	{
+    675          		CalcARTime( idx );
+    676          		return 1; // 자동보고 해야함.
+    677          	}
+    678          	
+    679          	return 0;
+    680          }
+    681          
+    682          /////////////////////////////////////////////////////////////////////////////////
+    683          void SmsAlarm(void)
+    684          {
+    685          	INT16U tcnt = 0;
+    686          	
+    687          	__BODYFRAME  *Send = SmsSer->SmsSend;
+    688          
+    689          	if(chkDnrAlarmReport == SET)
+    690          	{
+    691          		INT8U tid[3] = {0xff, 0xff, 0xff};
+    692          
+    693          		tcnt = DnrAlarmReport((INT8U *)Send->SubData, SmsSer);
+    694          		if( tcnt > 4) 	SmsDataAckTx(tid, (INT8U *)Send->SubData, tcnt, AlarmSCODE,SmsSer);
+    695          
+    696          		if(( SetAcRecovery == 0)&&PwrAlarm.ACFail)
+    697          		{
+    698          			tcnt = DnrAlarmReport((INT8U *)Send->SubData, SmsSer);
+    699          			if( tcnt >= 4)
+    700          			{
+    701          				OSTimeDly(1000*2L);
+    702          				SmsDataAckTx(tid, (INT8U *)Send->SubData, tcnt, AlarmSCODE,SmsSer);
+    703          			}
+    704          		}
+    705          		chkDnrAlarmReport = RESET;
+    706          	}
+    707          }
+    708          
+    709          void SmsAutoReportCheck(__ProtocolPtr *nPtr)
+    710          {
+    711          	INT8U tid[3] = {0xff, 0xff, 0xff};
+    712          	
+    713          //	WhatTime();
+    714          
+    715          	if(AutoRptChk())
+    716          	{
+    717          		tDnrSts->ReportHours[0] = PresentHour;			//자동 보고 시간
+    718          		tDnrSts->ReportHours[1] = PresentMin;			//자동 보고 시간
+    719          
+    720          		SmsStsTransmitData(tid,AutoReportSCODE,SmsSer);
+    721          	}
+    722          	
+    723          	if(WavTwoAutoRptChk()|| (PcFreqStsRqstFlag == SET))
+    724          	{
+    725          		if ( tDnrSts->WaveCtrl.AR_Mode[0] != 0x03 )
+    726          		{
+    727          			SpecFreqState_RspFunc(tid, RadioAutoReport,tDnrSts->WaveCtrl.AR_Mode[0],NormalMode,nPtr);	// ID Modify
+    728          			PcFreqStsRqstFlag = RESET;
+    729          		}	
+    730          	}
+    731          
+    732          	if(WavThrAutoRptChk())
+    733          	{
+    734          		if ( tDnrSts->WaveCtrl.AR_Mode[1] != 0x03 )
+    735          		{
+    736          			SpecFreqState_RspFunc(tid, IdleStatusReport,tDnrSts->WaveCtrl.AR_Mode[1],IdleMode,nPtr);  	// ID Modify
+    737          		}	
+    738          	}
+    739          }
+    740          
+    741          INT32U Sms1_Protocol_Check(__ProtocolPtr *nPtr)
+    742          {
+    743          	INT8U CHKSUM = 0;
+    744          	INT16U DataCnt = 0;
+    745          
+    746          	__BODYFRAME *Recv = nPtr->SmsRecv;
+    747          
+    748          	{
+    749          		if( (Recv->SubID[0] = sms_buff[DataCnt++]) != 0xff) Recv->SubID[0] &= 0x7f;
+    750          		if( (Recv->SubID[1] = sms_buff[DataCnt++]) != 0xff) Recv->SubID[1] &= 0x7f;
+    751          		if( (Recv->SubID[2] = sms_buff[DataCnt++]) != 0xff) Recv->SubID[2] &= 0x7f;
+    752          
+    753          		Recv->Command = sms_buff[DataCnt++] & 0x7f;
+    754          		Recv->RCode = sms_buff[DataCnt++] & 0x7f;
+    755          		Recv->SubLen[0] = sms_buff[DataCnt++] & 0x7f;
+    756          		Recv->SubLen[1] = sms_buff[DataCnt++]& 0x7f;
+    757          		Recv->SubLength = (Recv->SubLen[0] << 8) | (Recv->SubLen[1]);
+    758          	}
+    759          
+    760              {
+    761          		INT16U i;
+    762          		INT8U *dptr = (INT8U *)Recv->SubData;
+    763          
+    764          		for(i = 0; i < (Recv->SubLength + 2); i++) *dptr++ = sms_buff[DataCnt++] & 0x7f;
+    765          
+    766          		// Frame CHKSUM //
+    767          		{
+    768          		INT8U  i = 0;
+    769          		for(i = 0; i < Recv->SubLen[1] + 7; i++) CHKSUM = CHKSUM + *((INT8U *)Recv->SubID+ i);
+    770          		}
+    771          		Recv->CrcOK = TRUE;
+    772          	
+    773          		if(Recv->SubData[Recv->SubLen[1]] != DataConv(HIGH,CHKSUM))
+    774          		{
+    775          			SmsAlarmRptFunc(Index_ErrRsp,ErrorCODE,EsnMismatch,nPtr);
+    776          
+    777          			Recv->CrcOK = FALSE;
+    778          			return FALSE;
+    779          		}
+    780          		if(Recv->SubData[Recv->SubLen[1]+1] != DataConv(LOW,CHKSUM))
+    781          		{
+    782          			SmsAlarmRptFunc(Index_ErrRsp,ErrorCODE,EsnMismatch,nPtr);
+    783          
+    784          			Recv->CrcOK = FALSE;
+    785          			return FALSE;
+    786          		}
+    787          	}
+    788          
+    789          	return TRUE;
+    790          }
+    791          
+    792          
+    793          INT8U WhatRxSms(__ProtocolPtr *nPtr)
+    794          {
+    795          	INT16U RetVal = 0;
+    796          
+    797          	//SIO´ BODY is ONLY ONE(1)
+    798          	if(nPtr->SmsRecv->CrcOK)	// CRC OK
+    799          	{
+    800          		RetVal = nPtr->SmsRecv->Command;
+    801          	}
+    802          	else //NO ERROR
+    803          	{
+    804          		//ERROR CASE
+    805          		RetVal = crcERROR;
+    806          	}
+    807              return (RetVal);	
+    808          }
+    809          
+    810          
+    811          void SmsComCheck (__ProtocolPtr *nPtr)
+    812          {
+    813          	INT16U tcnt = 0;
+    814          	INT8U Comm;
+    815          	//INT8U DataCnt=0;
+    816          
+    817          	__BODYFRAME *Recv = nPtr->SmsRecv;
+    818          	__BODYFRAME *Send = nPtr->SmsSend;
+    819           
+    820           	Comm = WhatRxSms(nPtr);
+    821          
+    822              INT8U tid[3] = {Recv->SubID[0], Recv->SubID[1], Recv->SubID[2]};
+    823          
+    824          	
+    825          	switch(Comm)	//command 체크
+    826          	{
+    827          
+    828          		case EtcInforStsQue: 
+    829          			SmsStsTransmitData(tid,Comm,SmsSer);
+    830          		break;
+    831          
+    832          		case Etc1InforStsQue: 
+    833          			SmsEtcTransmitData(tid,Comm,SmsSer);
+    834          		break;
+    835          
+    836          
+    837          		case StatusQue:	
+    838          			SmsStsTransmitData(tid,Comm,SmsSer);
+    839          		break;
+    840          
+    841          		
+    842          
+    843          		case InforStsQue:	
+    844          			tcnt = GenEtcStsAid((INT8U *)Send->SubData,tDnrSts);
+    845          			SmsDataAckTx(tid, (INT8U *)Send->SubData, tcnt, Comm,SmsSer);
+    846          		break;
+    847          		
+    848          		case ControlQue:
+    849          		case RadioSetRQST:
+    850          
+    851          //			if(Sms_Response_Control(tid,Comm,SmsSer)== TRUE)
+    852          			if(Sms_Response_Control(SmsSer,TRUE)== TRUE)
+    853          			{
+    854          				if( Comm == ControlQue)
+    855          				{
+    856          					SmsStsTransmitData(tid,Comm,SmsSer);
+    857          				}
+    858          				else if( Comm == RadioSetRQST)
+    859          				{
+    860          					tcnt = GenWaveStsAid((INT8U *)Send->SubData,tDnrSts);
+    861          					SmsDataAckTx(tid, (INT8U *)Send->SubData, tcnt, Comm,SmsSer);
+    862          				}
+    863          			}
+    864          			else
+    865          			{
+    866           				SmsAlarmRptFunc(Index_ErrRsp,ErrorCODE,EsnMismatch,nPtr);
+    867           			}
+    868          		break;
+    869          
+    870          		case AlarmMaskSetSCODE:
+    871          			tDnrSts->AlarmMask = Recv->SubData[0];
+    872          			SaveBackupData();	
+    873          			SmsDataAckTx(tid, Recv->SubData, 1, Comm,nPtr);
+    874          		break;
+    875          		
+    876          		case SpecFreqStateSCODE:
+    877          			SpecFreqState_RspFunc(tid,Comm,0x01,NormalMode,nPtr);	
+    878          		break;
+    879          
+    880          		case DnrSwHistorySCODE:
+    881          			SwHistroyRspFunc(tid,Comm,nPtr);
+    882          		break;
+    883          
+    884          		case FreqConfigValSCODE :
+    885          			tcnt = GenWaveStsAid((INT8U *)Send->SubData,tDnrSts);
+    886          			SmsDataAckTx(tid, (INT8U *)Send->SubData, tcnt, Comm,SmsSer);
+    887          		break;
+    888          	
+    889          		case DnrIpAddressSCODE:
+    890          			DnrIpAddressAck(tid,Comm,nPtr);
+    891          			DnrPacketReadyFunc(nPtr);
+    892          		break;
+    893          				
+    894          		default:
+    895          		break;
+    896          	}
+    897          }	
+    898          
+    899          void SmsStsTransmitData(INT8U* tid,INT8U Comm,__ProtocolPtr *nPtr)
+    900          {
+    901          	INT16U tcnt = 0;
+    902          	__BODYFRAME *Send = nPtr->SmsSend;
+    903          
+    904          	{
+    905          		tcnt = GenSmsStsAidSts_1St((INT8U *)Send->SubData,tDnrSts);
+    906          		SmsDataAckTx(tid, (INT8U *)Send->SubData, tcnt, Comm,SmsSer);
+    907          	}
+    908          	
+    909          	{
+    910          		tcnt = GenSmsStsAidSts_2St((INT8U *)Send->SubData,tDnrSts);
+    911          		SmsDataAckTx(tid, (INT8U *)Send->SubData, tcnt, Comm,SmsSer);
+    912          	}
+    913            
+    914          	{
+    915          		tcnt = GenEtcStsAid((INT8U *)Send->SubData,tDnrSts);
+    916          		SmsDataAckTx(tid, (INT8U *)Send->SubData, tcnt, InforStsQue,SmsSer);
+    917          	}
+    918          	
+    919          	if(SET_ULAlarmCnt)
+    920          	{
+    921          		tDnrSts->RvsOverInAlarmCount		= 0;
+    922          		tDnrSts->RvsOtherOverInAlarmCount	= 0;
+    923          		SET_ULAlarmCnt = SET;
+    924          	}
+    925          
+    926          #ifdef __RvsCount
+    927          	if(Chk_RvsOSCAlarmCount)
+    928          	{
+    929          		tDnrSts->CurrRvsOSCAlarmCount_3G      = 0;		
+    930          		tDnrSts->CurrRvsOSCAlarmCount_2G      = 0;		
+    931          		tDnrSts->CurrRvsOSCAlarmCount_LTE     = 0; 	
+    932          		tDnrSts->CurrRvsOSCAlarmCount_LTE_A1  = 0;	
+    933          		tDnrSts->CurrRvsOSCAlarmCount_LTE_A2  = 0;	
+    934          		tDnrSts->CurrRvs1OSCAlarmCount_LTE    = 0;	
+    935          		tDnrSts->CurrRvs1OSCAlarmCount_LTE_A1 = 0;
+    936          		tDnrSts->CurrRvs1OSCAlarmCount_LTE_A2 = 0;
+    937          
+    938          		Chk_RvsOSCAlarmCount = RESET;
+    939          	}
+    940          #endif
+    941          	
+    942          }
+    943          
+    944          
+    945          // ===========================================================
+    946          //	CONTROL & 응답 정보 전송
+    947          // ===========================================================
+    948          INT8U Sms_Response_Control(__ProtocolPtr *nPtr, INT8U Ctrl)
+    949          
+    950          
+    951          {
+    952          	INT8U  Len = 0,   Length = 0;
+    953          	INT8U i= 0;
+    954          	INT8U  A_ID[2];
+    955          	INT8U AID_Value[40];
+    956          	INT16U  AID_Command;
+    957          
+    958          	INT8U rval = TRUE;
+    959          	INT32U cpu_sr;
+    960          	
+    961          	__BODYFRAME *Recv = nPtr->SmsRecv;
+    962          
+    963          	ModemEsnCheck();
+    964          
+    965          	OS_ENTER_CRITICAL();
+    966          	{
+    967          		EE_BACK1 *tptr = (EE_BACK1 *)RoadBackuptobuffer(vEE_BACK1Addr);
+    968          		
+    969            		while(Recv->SubLength >  Len)
+    970          		{
+    971          
+    972          			A_ID[0] = (INT8U)(Recv->SubData[Len++]);
+    973          			A_ID[1] = (INT8U)(Recv->SubData[Len++]);
+    974          			AID_Command = ((INT16U)(A_ID[0] << 8)& 0xff00) | ((INT16U)(A_ID[1] & 0x00ff));
+    975          			Length = Recv->SubData[Len++];
+    976          
+    977          			for (i = 0 ; i<Length && i < 40; i++) AID_Value[i] = (INT8U)(Recv->SubData[Len++]);
+    978          
+    979          			rval += SetCtrlData(AID_Command, AID_Value, Length, TRUE,nPtr, tptr);
+    980          
+    981          			if( iMobileESN == NACK) 	return FALSE;
+    982          
+    983          			if(Len >= Recv->SubLength)break;
+    984          		}		
+    985          		
+    986          		if(rval)
+    987          		{
+    988          			//write eeprom!!
+    989          			WriteBuffertoBackup(vEE_BACK1Addr, sizeof(EE_BACK1));
+    990          		}
+    991          	}
+    992          	
+    993          	OS_EXIT_CRITICAL();
+    994          	
+    995          	return TRUE;
+    996          }
+    997          
+    998          void SmsDataAckTx (INT8U* tid,  INT8U *Data, INT16U nCnt,  INT8U Comm,__ProtocolPtr *nPtr)
+    999          {
+   1000          	INT16U i;
+   1001          	INT8U	CHKSUM = 0;
+   1002          	INT8U err = 0;  
+   1003          	
+   1004          	__BODYFRAME  *Send = nPtr->SmsSend;
+   1005          
+   1006          	OSSemPend(nPtr->Sem, 0, &err);	
+   1007          
+   1008          	Send->SubID[0] = tid[0];
+   1009          	Send->SubID[1] = tid[1];
+   1010          	Send->SubID[2] = tid[2];
+   1011          
+   1012          	Send->Command = Comm;
+   1013          	Send->RCode = TRIO_RCODE;
+   1014          
+   1015          	Send->SubLength = nCnt;
+   1016          	
+   1017          	Send->SubLen[0] = (INT8U)(Send->SubLength >> 8);
+   1018          	Send->SubLen[1] = (INT8U)(Send->SubLength);
+   1019          
+   1020          	for(i = 0; i < nCnt && i < BODYSIZEMAX; i++)
+   1021          	{
+   1022          		Send->SubData[i] =  Data[i];
+   1023          	}
+   1024          
+   1025          	for(i = 0; i < nCnt+7; i++) CHKSUM = CHKSUM + *((INT8U *)Send->SubID + i);
+   1026          	
+   1027          	//CHKSUM = 0xff;	//	지워야함 임시 테스트
+   1028          		
+   1029          	Send->SubData[nCnt++] = DataConv(HIGH,CHKSUM);
+   1030          	Send->SubData[nCnt++] = DataConv(LOW,CHKSUM);
+   1031          
+   1032          	OSSemPost(nPtr->Sem);
+   1033          
+   1034          	Sms_DataAckTx(Send->Command,nPtr);
+   1035          }
+   1036          
+   1037          
+   1038          void Sms_DataAckTx(INT8U Comm,__ProtocolPtr *nPtr)
+   1039          {
+   1040          	INT8U i;
+   1041            	INT32S ret = 0;
+   1042              ret = ret;
+   1043              
+   1044          	__BODYFRAME  *Send = nPtr->SmsSend;
+   1045          	
+   1046          	if(Send->Command == DnrSwHistorySCODE)
+   1047          	{
+   1048          		for ( i=0; i< (7 + 2); i++ )
+   1049          		{
+   1050          			*((INT8U *)Send->SubID + i) = *((INT8U *)Send->SubID + i)|0x80;
+   1051          		}
+   1052          	}
+   1053          	else
+   1054          	{
+   1055          		for(i = 0; i < Send->SubLength + 7 + 2; i++ )
+   1056          		{
+   1057          			*((INT8U *)Send->SubID + i) = *((INT8U *)Send->SubID + i)|0x80;
+   1058          		}
+   1059          	}
+   1060          	
+   1061          	for(i = 0 ;i < 13; i++)HostStation[i] = 0;
+   1062          	for(i = 0 ;i < 11; i++)HostStation[i] = tDnrSts->HostNumber[i];	
+   1063          	DnrSMS2Data();
+   1064          
+   1065          	if((HostStation[0] < '0')||(HostStation[0] > '9')) return;
+   1066          
+   1067          	{
+   1068          		INT8U Flag = TRUE;	
+   1069          		for(i = 1; i < 11 && (HostStation[i] != 0); i++)
+   1070          		{
+   1071          			if (HostStation[0] != HostStation[i]) Flag = FALSE;
+   1072          		}
+   1073          	
+   1074          		if (Flag) return; 
+   1075          	}
+   1076          
+   1077          	for(i = 0 ;i < 3; i++)
+   1078          	{
+   1079          		if((Send->Command == EtcInforStsQue)||(Comm == Etc1InforStsQue))
+   1080          		{
+   1081          			if( (ret = BcMdemMSGSentTx((char *)HostStation,(char *)sentTel,(char *)Send, (Send->SubLength+ 7 + 2) )) > 0)
+   1082          			{
+   1083          				BcMRtryNo = 0;
+   1084          				SmsTxFailFlag = FALSE;
+   1085          				break;
+   1086          			}
+   1087          			else
+   1088          			{
+   1089          				BcMRtryNo = MaxTryNo;
+   1090          			}
+   1091          		}
+   1092          		else
+   1093          		{
+   1094          	
+   1095          			if( (ret = BcMdemMSGTx((char *)HostStation, (char *)Send, (Send->SubLength+ 7 + 2) )) > 0)
+   1096          			{
+   1097          				BcMRtryNo = 0;
+   1098          				SmsTxFailFlag = FALSE;
+   1099          				break;
+   1100          			}
+   1101          			else
+   1102          			{
+   1103          				BcMRtryNo = MaxTryNo;
+   1104          			}
+   1105          		}
+   1106          		OSTimeDly(1000*10L);
+   1107          	}
+   1108          	
+   1109          //	OneDayResetCnt = NULL;	
+   1110          	
+   1111          	OSTimeDly(1000*5L);
+   1112          	if(Comm == AutoReportSCODE)
+   1113          	{
+   1114          		tDnrSts->Last_AutoReport[0] = TwoAsciDeciNum2OneHex(sms_time.Year[2],sms_time.Year[3]);
+   1115          		tDnrSts->Last_AutoReport[1] = TwoAsciDeciNum2OneHex(sms_time.Month[0],sms_time.Month[1]);
+   1116          		tDnrSts->Last_AutoReport[2] = TwoAsciDeciNum2OneHex(sms_time.Day[0],sms_time.Day[1]);
+   1117          		tDnrSts->Last_AutoReport[3] = TwoAsciDeciNum2OneHex(sms_time.Hour[0],sms_time.Hour[1]);
+   1118          		tDnrSts->Last_AutoReport[4] = TwoAsciDeciNum2OneHex(sms_time.Min[0],sms_time.Min[1]);
+   1119          		tDnrSts->Last_AutoReport[5] = TwoAsciDeciNum2OneHex(sms_time.Sec[0],sms_time.Sec[1]);
+   1120          	}
+   1121          	else
+   1122          	{
+   1123          		tDnrSts->Backup_Time[0] = TwoAsciDeciNum2OneHex(sms_time.Year[2],sms_time.Year[3]);
+   1124          		tDnrSts->Backup_Time[1] = TwoAsciDeciNum2OneHex(sms_time.Month[0],sms_time.Month[1]);
+   1125          		tDnrSts->Backup_Time[2] = TwoAsciDeciNum2OneHex(sms_time.Day[0],sms_time.Day[1]);
+   1126          		tDnrSts->Backup_Time[3] = TwoAsciDeciNum2OneHex(sms_time.Hour[0],sms_time.Hour[1]);
+   1127          		tDnrSts->Backup_Time[4] = TwoAsciDeciNum2OneHex(sms_time.Min[0],sms_time.Min[1]);
+   1128          		tDnrSts->Backup_Time[5] = TwoAsciDeciNum2OneHex(sms_time.Sec[0],sms_time.Sec[1]);
+   1129          	}		
+   1130          }
+   1131          
+   1132          
+   1133          INT32U AutoTimeChk ( INT8U ReportPriod )
+   1134          {
+   1135          	INT8U 	Temp=0;
+   1136          	long	Period;
+   1137          
+   1138          	Temp = ReportPriod;
+   1139          	if		( Temp == 0x01 )	Period = 5;
+   1140          	else if ( Temp == 0x02 )	Period = 10;
+   1141          	else if ( Temp == 0x03 )	Period = 20;
+   1142          	else if ( Temp == 0x04 )	Period = 30;
+   1143          	else if ( Temp == 0x05 )	Period = 1*60;
+   1144          	else if ( Temp == 0x06 )	Period = 2*60;
+   1145          	else if ( Temp == 0x07 )	Period = 4*60;
+   1146          	else if ( Temp == 0x08 )	Period = 6*60;
+   1147          	else if ( Temp == 0x09 )	Period = 12*60;
+   1148          	else if ( Temp == 0x10 )	Period = 1*24*60;
+   1149          	else if ( Temp == 0x11 )	Period = 2*24*60;
+   1150          	else if ( Temp == 0x12 )	Period = 3*24*60;
+   1151          	else if ( Temp == 0x13 )	Period = 7*24*60;
+   1152          	else if ( Temp == 0x7f )	return(FALSE);
+   1153          	else 						return(FALSE);
+   1154          
+   1155          	return Period;
+   1156          }
+   1157          
+   1158          #if 0
+   1159          BOOL AutoRptChk ( void )
+   1160          {
+   1161          	INT8U 	Temp=0;
+   1162          	long	Period, Present, Base=0;//, Past;
+   1163          	INT16U	tPresentHour,tPresentMin;
+   1164          
+   1165          	tPresentHour = PresentHour * 60;
+   1166          	tPresentMin  = PresentMin * 60 + PresentSec;
+   1167          	Present = 60*tPresentHour + tPresentMin;
+   1168          	Base	= (60*tDnrSts->AutoReportBasePer[0] + tDnrSts->AutoReportBasePer[1])* 60;
+   1169          	Temp	= tDnrSts->AutoReportPriod;
+   1170          
+   1171          
+   1172          	/* Period 기호 -> 분 */
+   1173          	if 		( Temp == 0x01 )	Period = 5;
+   1174          	else if ( Temp == 0x02 )	Period = 10;
+   1175          	else if ( Temp == 0x03 )	Period = 20;
+   1176          	else if ( Temp == 0x04 )	Period = 30;
+   1177          	else if ( Temp == 0x05 )	Period = 1*60;
+   1178          	
+   1179          	else if ( Temp == 0x06 )	Period = 2*60;
+   1180          	else if ( Temp == 0x07 )	Period = 4*60;
+   1181          	else if ( Temp == 0x08 )	Period = 6*60;
+   1182          	else if ( Temp == 0x09 )	Period = 12*60;	
+   1183          	else if ( Temp == 0x10 )	Period = 1*24*60;
+   1184          	else if ( Temp == 0x11 )	Period = 2*24*60;	
+   1185          	else if ( Temp == 0x12 )	Period = 3*24*60;
+   1186          	else if ( Temp == 0x13 )	Period = 7*24*60;
+   1187          	else if ( Temp == 0x7f )	return(FALSE);
+   1188          	else return(FALSE);
+   1189          
+   1190          	Period = Period*60;
+   1191          //	Present = Present;
+   1192          //	Base = Base;
+   1193          
+   1194          #if 1	
+   1195          	if 		( PastMin < tPresentMin ) 
+   1196          	{
+   1197          		TimeElapse += (tPresentMin-PastMin);
+   1198          		if(iSMS_Debug_Mode) USART1Printf("0 : TimeElapse : [%d]:[%d][%d]>[%d]\n",TimeElapse,PastMin,tPresentMin,Period);
+   1199          	}
+   1200          	else if ( PastMin > tPresentMin ) 
+   1201          	{
+   1202          		TimeElapse += (60+tPresentMin-PastMin);
+   1203          		
+   1204          		if(iSMS_Debug_Mode) USART1Printf("1: TimeElapse : [%d]:[%d][%d]>[%d]\n",TimeElapse,PastMin,tPresentMin,Period);
+   1205          	}
+   1206          
+   1207          	PastHour = tPresentHour;
+   1208          	PastMin  = tPresentMin;
+   1209          
+   1210          	/*  제어설정후 기준시각 체크  */
+   1211          	if ( TimeStart )
+   1212          	{
+   1213          		TimeStart = 0;
+   1214          		TimeElapse = 0;
+   1215          		
+   1216          		if ( Present >= Base )return(TRUE);
+   1217          		else				  return(FALSE);
+   1218          	}
+   1219          
+   1220          	// New Period Check //
+   1221          	if ( PeriodStart )
+   1222          	{
+   1223          		PeriodStart = 0;
+   1224          		if ( Present >= Base )	TimeElapse = (Present-Base)%Period;
+   1225          		else					TimeElapse = (24*60+Present-Base)%Period;
+   1226          		return(FALSE);
+   1227          	}
+   1228          
+   1229          	tDnrSts->Auto_Remain_Time = (Period - TimeElapse) / 10; 
+   1230          
+   1231          //	if(iSMS_Debug_Mode) USART1Printf("Auto_Remain_Time : [%d][%d][%d]\n",tDnrSts->Auto_Remain_Time,Period,TimeElapse);
+   1232          
+   1233          	if ( TimeElapse >= Period )
+   1234          	{
+   1235          		TimeElapse = (TimeElapse%Period);
+   1236          		return(TRUE);
+   1237          	}
+   1238          #endif
+   1239          #if 0
+   1240          	{
+   1241          	//	long	Period, Present, Base=0;//, Past;
+   1242          	//	INT16U	tPresentHour,tPresentMin;
+   1243          
+   1244          		INT32U	CurrTime;
+   1245          		long	tPeriod, tBase=0,TmpSum = 0;//, Past;
+   1246          
+   1247          	//	INT16U	ar_time, period; // 10초단위 환산값.
+   1248          	//	INT16U	a_r, c_r;
+   1249          
+   1250          		tBase	= (60*tDnrSts->AutoReportBasePer[0] + tDnrSts->AutoReportBasePer[1])* 60;
+   1251          		CurrTime = PresentHour * 60 *60 +  PresentMin*60 + PresentSec;
+   1252          
+   1253          		switch(Temp)
+   1254          		{
+   1255          			case 1:
+   1256          			case 2:
+   1257          			case 3:
+   1258          			case 4:
+   1259          			case 5:
+   1260          				tPeriod   = Period;
+   1261          				CurrTime = PresentMin*60 + PresentSec;
+   1262          				tBase	= tDnrSts->AutoReportBasePer[1]* 60;
+   1263          //				tTimeElapse += tBase + tPeriod ;
+   1264          				tTimeElapse += CurrTime;
+   1265          				TmpSum = ( tBase + tPeriod);
+   1266          
+   1267          				if( TmpSum < tTimeElapse)
+   1268          				{
+   1269          					tTimeElapse = tTimeElapse %TmpSum;
+   1270          
+   1271          					if(iSMS_Debug_Mode) USART1Printf("3: tPresent [%d][%d] :[%d][%d][%d]\n",tBase,tPeriod,TmpSum,tTimeElapse,CurrTime);
+   1272          				}
+   1273          				
+   1274          				if(iSMS_Debug_Mode) USART1Printf("4: tPresent [%d][%d]:[%d][%d]\n",tBase,tPeriod,tTimeElapse,CurrTime);
+   1275          			break;
+   1276          
+   1277          
+   1278          
+   1279          			default:
+   1280          				
+   1281          			break;
+   1282          
+   1283          		}
+   1284          
+   1285          	}
+   1286          #endif
+   1287          
+   1288          
+   1289          	
+   1290          	return (FALSE);
+   1291          }
+   1292          #endif
+   1293          
+   1294          
+   1295          
+   1296          BOOL AutoRptChk ( void )
+   1297          {
+   1298          	INT8U 	Temp = 0;
+   1299          	long	Period, Present, Base = 0;//, Past;
+   1300           
+   1301          	Temp	= tDnrSts->AutoReportPriod;
+   1302          	
+   1303          	Present = 60 * PresentHour + PresentMin;
+   1304          	Base	= (60*tDnrSts->AutoReportBasePer[0] + tDnrSts->AutoReportBasePer[1]);
+   1305          
+   1306          	/* Period 기호 -> 분 */
+   1307          	
+   1308          	Period = AutoTimeChk(Temp);
+   1309          
+   1310          	if 		( Period == FALSE )	return(FALSE);
+   1311          
+   1312          	if((PresentDay == 0)&&(PresentMonth == 0))
+   1313          	{
+   1314          		PresentHour	= iPresentHourCnt;
+   1315          		PresentMin	= iPresentMinCnt;
+   1316          	}
+   1317          
+   1318          	if 		( PastMin < PresentMin ) TimeElapse += (PresentMin - PastMin);
+   1319          	else if ( PastMin > PresentMin ) TimeElapse += (60 + PresentMin - PastMin);
+   1320          
+   1321          	PastHour = PresentHour;
+   1322          	PastMin  = PresentMin;
+   1323          
+   1324          	/*  제어설정후 기준시각 체크  */
+   1325          	
+   1326          	if ( TimeStart )
+   1327          	{
+   1328          		TimeStart = 0;
+   1329          		TimeElapse = 0;
+   1330          		
+   1331          		if ( Present >= Base )return(TRUE);
+   1332          		else				  return(FALSE);
+   1333          	}
+   1334          	// New Period Check //
+   1335          	if ( PeriodStart )
+   1336          	{
+   1337          		PeriodStart = 0;
+   1338          		if ( Present >= Base )	TimeElapse = (Present - Base) % Period;
+   1339          		else					TimeElapse = (24 * 60 + Present - Base) % Period;
+   1340          		return(FALSE);
+   1341          	}
+   1342          
+   1343          	tDnrSts->Auto_Remain_Time = ((Period - TimeElapse) * 6)- PresentSec/10; 
+   1344          
+   1345          	if(iSMS_Debug_Mode) USART1Printf("TimeElapse [%d][%d]\n",TimeElapse,Period);
+   1346          
+   1347          	if ( TimeElapse >= Period )
+   1348          	{
+   1349          		TimeElapse = (TimeElapse % Period);
+   1350          		return(TRUE);
+   1351          	}
+   1352          	return (FALSE);
+   1353          }
+   1354          
+   1355          
+   1356          #if 0
+   1357          BOOL WavTwoAutoRptChk ( void )
+   1358          {
+   1359          	INT8U 	Temp;
+   1360          	long	Period, Present, Base;
+   1361          	INT16U	tPresentHour,tPresentMin;
+   1362          	
+   1363          	tPresentHour = PresentHour * 60;
+   1364          	tPresentMin  = PresentMin * 60 + PresentSec;
+   1365          	Present = 60*tPresentHour + tPresentMin;
+   1366          	Base	= (60*tDnrSts->WaveCtrl.Radio_ReportTime[0] + tDnrSts->WaveCtrl.Radio_ReportTime[1])* 60;
+   1367          	Temp	= tDnrSts->WaveCtrl.Radio_ReportPeriod[0];
+   1368          
+   1369          
+   1370          	/* Period 기호 -> 분 */
+   1371          	     if ( Temp == 0x01 )	Period = 5;
+   1372          	else if ( Temp == 0x02 )	Period = 10;
+   1373          	else if ( Temp == 0x03 )	Period = 20;
+   1374          	else if ( Temp == 0x04 )	Period = 30;
+   1375          	else if ( Temp == 0x05 )	Period = 1*60;
+   1376          	else if ( Temp == 0x06 )	Period = 2*60;
+   1377          	else if ( Temp == 0x07 )	Period = 4*60;
+   1378          	else if ( Temp == 0x08 )	Period = 6*60;
+   1379          	else if ( Temp == 0x09 )	Period = 12*60;	
+   1380          	else if ( Temp == 0x10 )	Period = 1*24*60;
+   1381          	else if ( Temp == 0x11 )	Period = 2*24*60;	
+   1382          	else if ( Temp == 0x12 )	Period = 3*24*60;
+   1383          	else if ( Temp == 0x13 )	Period = 7*24*60;
+   1384          	else if ( Temp == 0x7f )	return(FALSE);
+   1385          	else return(FALSE);
+   1386          	Period = Period*60;
+   1387          
+   1388          	/**********************************************************************
+   1389          	Period = (Temp>>4)*10 + (Temp&0x0f);
+   1390          	if ( Period <= 0 )	return(FALSE);
+   1391          	***********************************************************************/
+   1392          
+   1393          	if 		( WTwoPastMin < tPresentMin ) WTwoTimeElapse += (tPresentMin-WTwoPastMin);
+   1394          	else if ( WTwoPastMin > tPresentMin ) WTwoTimeElapse += (60+tPresentMin-WTwoPastMin);
+   1395          
+   1396          	WTwoPastHour = tPresentHour;
+   1397          	WTwoPastMin  = tPresentMin;
+   1398          
+   1399          	// New Base Time Check //
+   1400          	if ( WTwoTimeStart )
+   1401          	{ 	
+   1402          		WTwoTimeStart = 0;
+   1403          		WTwoTimeElapse = 0;
+   1404          			
+   1405          		if ( Present>=Base )return(TRUE);
+   1406          		else				return(FALSE);
+   1407          	}
+   1408          
+   1409          	// New Period Check //
+   1410          	if ( WTwoPeriodStart )
+   1411          	{	
+   1412          		WTwoPeriodStart = 0;
+   1413          		if ( Present >= Base )	WTwoTimeElapse = (Present-Base)%Period;
+   1414          		else					WTwoTimeElapse = (24*60+Present-Base)%Period;
+   1415          		return(FALSE);
+   1416          	}
+   1417          	tDnrSts->AR2_Remain_Time = (Period - WTwoTimeElapse) / 10; 
+   1418          
+   1419          	// Elapsed Time Over Check //
+   1420          	if ( WTwoTimeElapse >= Period )
+   1421          	{	
+   1422          		WTwoTimeElapse = (WTwoTimeElapse%Period);
+   1423          		return(TRUE);
+   1424          	}
+   1425          	return (FALSE);
+   1426          }
+   1427          #endif
+   1428          
+   1429          
+   1430          
+   1431          BOOL WavTwoAutoRptChk ( void )
+   1432          {
+   1433          	INT8U 	Temp;
+   1434          	long	Period, Present, Base;
+   1435          
+   1436          	Temp	= tDnrSts->WaveCtrl.Radio_ReportPeriod[0];
+   1437          	Present = 60*PresentHour + PresentMin;
+   1438          	Base	= 60*tDnrSts->WaveCtrl.Radio_ReportTime[0] + tDnrSts->WaveCtrl.Radio_ReportTime[1];
+   1439          
+   1440          	/* Period 기호 -> 분 */
+   1441          	Period = AutoTimeChk(Temp);
+   1442          	if 		( Period == FALSE )	return(FALSE);
+   1443          	/**********************************************************************
+   1444          	Period = (Temp>>4)*10 + (Temp&0x0f);
+   1445          	if ( Period <= 0 )	return(FALSE);
+   1446          	***********************************************************************/
+   1447          	/////////////////////////
+   1448          	if 		( WTwoPastMin < PresentMin ) WTwoTimeElapse = WTwoTimeElapse + (PresentMin-WTwoPastMin);
+   1449          	else if ( WTwoPastMin > PresentMin ) WTwoTimeElapse = WTwoTimeElapse + (60+PresentMin-WTwoPastMin);
+   1450          
+   1451          	WTwoPastHour = PresentHour;
+   1452          	WTwoPastMin  = PresentMin;
+   1453          
+   1454          	// New Base Time Check //
+   1455          
+   1456          	if ( WTwoTimeStart )
+   1457          	{ 	
+   1458          		WTwoTimeStart = 0;
+   1459          		WTwoTimeElapse = 0;
+   1460          			
+   1461          		if ( Present>=Base )return(TRUE);
+   1462          		else				return(FALSE);
+   1463          	}
+   1464          
+   1465          	// New Period Check //
+   1466          	if ( WTwoPeriodStart )
+   1467          	{	
+   1468          		WTwoPeriodStart = 0;
+   1469          		if ( Present >= Base )	WTwoTimeElapse = (Present-Base)%Period;
+   1470          		else					WTwoTimeElapse = (24*60+Present-Base)%Period;
+   1471          		return(FALSE);
+   1472          	}
+   1473          
+   1474          	tDnrSts->AR2_Remain_Time = ((Period - WTwoTimeElapse) * 6)- PresentSec/10; 
+   1475          
+   1476          	// Elapsed Time Over Check //
+   1477          	if ( WTwoTimeElapse >= Period )
+   1478          	{	
+   1479          		WTwoTimeElapse = (WTwoTimeElapse%Period);
+   1480          		return(TRUE);
+   1481          	}
+   1482          	return (FALSE);
+   1483          }
+   1484          
+   1485          
+   1486          #if 0
+   1487          BOOL WavThrAutoRptChk ( void )
+   1488          {
+   1489          	INT8U 	Temp;
+   1490          	long	Period, Present, Base;//, Past;
+   1491          	INT16U	tPresentHour,tPresentMin;
+   1492          	
+   1493          	tPresentHour = PresentHour * 60;
+   1494          	tPresentMin  = PresentMin * 60 + PresentSec;
+   1495          	Present = 60*tPresentHour + tPresentMin;
+   1496          	Base	= (60*tDnrSts->WaveCtrl.Radio_ReportTime[0] + tDnrSts->WaveCtrl.Radio_ReportTime[1])* 60;
+   1497          	Temp	= tDnrSts->WaveCtrl.Radio_ReportPeriod[1];
+   1498          
+   1499          	if 		( Temp == 0x01 )	Period = 5;
+   1500          	else if ( Temp == 0x02 )	Period = 10;
+   1501          	else if ( Temp == 0x03 )	Period = 20;
+   1502          	else if ( Temp == 0x04 )	Period = 30;
+   1503          	else if ( Temp == 0x05 )	Period = 1*60;
+   1504          	else if ( Temp == 0x06 )	Period = 2*60;
+   1505          	else if ( Temp == 0x07 )	Period = 4*60;
+   1506          	else if ( Temp == 0x08 )	Period = 6*60;
+   1507          	else if ( Temp == 0x09 )	Period = 12*60;	
+   1508          	else if ( Temp == 0x10 )	Period = 1*24*60;
+   1509          	else if ( Temp == 0x11 )	Period = 2*24*60;	
+   1510          	else if ( Temp == 0x12 )	Period = 3*24*60;
+   1511          	else if ( Temp == 0x13 )	Period = 7*24*60;
+   1512          	else if ( Temp == 0x7f )	return(FALSE);
+   1513          	else return(FALSE);
+   1514          	Period = Period*60;
+   1515          
+   1516          	if 		( WThreePastMin < tPresentMin ) WThreeTimeElapse += (tPresentMin-WThreePastMin);
+   1517          	else if ( WThreePastMin > tPresentMin ) WThreeTimeElapse += (60+tPresentMin-WThreePastMin);
+   1518          
+   1519          	WThreePastHour = tPresentHour;
+   1520          	WThreePastMin  = tPresentMin;
+   1521          
+   1522          	// New Base Time Check //
+   1523          	if ( WThreeTimeStart )
+   1524          	{ 	if ( Present>=Base )
+   1525          		{
+   1526          			WThreeTimeStart = 0;
+   1527          			WThreeTimeElapse = 0;
+   1528          			return(TRUE);
+   1529          		}
+   1530          		return(FALSE);
+   1531          	}
+   1532          
+   1533          	// New Period Check //
+   1534          	if ( WThreePeriodStart )
+   1535          	{	
+   1536          		WThreePeriodStart = 0;
+   1537          		if ( Present >= Base )	WThreeTimeElapse = (Present-Base)%Period;
+   1538          		else					WThreeTimeElapse = (24*60+Present-Base)%Period;
+   1539          		return(FALSE);
+   1540          	}
+   1541          	tDnrSts->AR3_Remain_Time = (Period - WThreeTimeElapse) / 10; 
+   1542          
+   1543          	// Elapsed Time Over Check //
+   1544          	if ( WThreeTimeElapse >= Period )
+   1545          	{	
+   1546          		WThreeTimeElapse = (WThreeTimeElapse%Period);
+   1547          		return(TRUE);
+   1548          	}
+   1549          	return (FALSE);
+   1550          }
+   1551          #endif
+   1552          
+   1553          BOOL WavThrAutoRptChk ( void )
+   1554          {
+   1555          	INT8U 	Temp;
+   1556          	long	Period, Present, Base;//, Past;
+   1557          
+   1558          	Temp	= tDnrSts->WaveCtrl.Radio_ReportPeriod[1];
+   1559          	
+   1560          	Present = 60*PresentHour + PresentMin;
+   1561          	Base	= 60*tDnrSts->WaveCtrl.Radio_ReportTime[0] + tDnrSts->WaveCtrl.Radio_ReportTime[1];
+   1562          
+   1563          	Period = AutoTimeChk(Temp);
+   1564          	if 		( Period == FALSE )	return(FALSE);
+   1565          
+   1566          	if 		( WThreePastMin < PresentMin ) WThreeTimeElapse = WThreeTimeElapse + (PresentMin-WThreePastMin);
+   1567          	else if ( WThreePastMin > PresentMin ) WThreeTimeElapse = WThreeTimeElapse + (60+PresentMin-WThreePastMin);
+   1568          
+   1569          	WThreePastHour = PresentHour;
+   1570          	WThreePastMin  = PresentMin;
+   1571          
+   1572          	// New Base Time Check //
+   1573          	if ( WThreeTimeStart )
+   1574          	{ 	
+   1575          		WThreeTimeStart = 0;
+   1576          		WThreeTimeElapse = 0;
+   1577          			
+   1578          		if ( Present>=Base )return(TRUE);
+   1579          		else				return(FALSE);
+   1580          	}
+   1581          
+   1582          	// New Period Check //
+   1583          	if ( WThreePeriodStart )
+   1584          	{	
+   1585          		WThreePeriodStart = 0;
+   1586          		if ( Present >= Base )	WThreeTimeElapse = (Present-Base)%Period;
+   1587          		else					WThreeTimeElapse = (24*60+Present-Base)%Period;
+   1588          		return(FALSE);
+   1589          	}
+   1590          
+   1591          	tDnrSts->AR3_Remain_Time = ((Period - WThreeTimeElapse) * 6)- PresentSec/10; 
+   1592          
+   1593          	// Elapsed Time Over Check //
+   1594          	if ( WThreeTimeElapse >= Period )
+   1595          	{	
+   1596          		WThreeTimeElapse = (WThreeTimeElapse%Period);
+   1597          		return(TRUE);
+   1598          	}
+   1599          	return (FALSE);
+   1600          }
+   1601          
+   1602          
+   1603          
+   1604          void ModemEsnCheck ( void )
+   1605          {
+   1606          	INT16U	EsnChk = 0;
+   1607          	
+   1608          	INT16U	i;
+   1609          //	if((BcMType == 0x0C)||(BcMType == 0x0D))
+   1610          	if( ModemType == _WCMDA_Modem)
+   1611          	{
+   1612          		for( i = 0; i < 19; i++ )
+   1613          		{
+   1614          			EsnChk += atoh( ICCIDNum[i] );
+   1615          		}
+   1616          	}
+   1617          	else
+   1618          	{
+   1619          		EsnChk = TwoAsciNum2OneHex( BcMEsnNum[0], BcMEsnNum[1] )
+   1620          				+TwoAsciNum2OneHex( BcMEsnNum[2], BcMEsnNum[3] )
+   1621          				+TwoAsciNum2OneHex( BcMEsnNum[4], BcMEsnNum[5] )
+   1622          				+TwoAsciNum2OneHex( BcMEsnNum[6], BcMEsnNum[7] );
+   1623          	}
+   1624          	
+   1625          	EsnChecksumH = DataConv(HIGH, EsnChk);
+   1626          	EsnChecksumL = DataConv(LOW, EsnChk);
+   1627          }
+   1628          
+   1629          void WhatTime(void)
+   1630          {
+   1631          	__Dnr_Sts *Sts = tDnrSts;
+   1632          
+   1633          	BcdemTimeGet(&sms_time);
+   1634          	{
+   1635          		PresentDay = TwoAsciDeciNum2OneHex(sms_time.Day[0],sms_time.Day[1]);	
+   1636          		PresentHour = TwoAsciDeciNum2OneHex(sms_time.Hour[0],sms_time.Hour[1]);
+   1637          		PresentMin  = TwoAsciDeciNum2OneHex(sms_time.Min[0],sms_time.Min[1]);
+   1638          		PresentSec	= TwoAsciDeciNum2OneHex(sms_time.Sec[0],sms_time.Sec[1]);
+   1639          		
+   1640          		PresentMonth = TwoAsciDeciNum2OneHex(sms_time.Month[0],sms_time.Month[1]);
+   1641          	}
+   1642          
+   1643          	Sts->System_Time[0] = TwoAsciDeciNum2OneHex(sms_time.Year[2],sms_time.Year[3]);
+   1644          	Sts->System_Time[1] = TwoAsciDeciNum2OneHex(sms_time.Month[0],sms_time.Month[1]);
+   1645          
+   1646          	Sts->System_Time[2] = TwoAsciDeciNum2OneHex(sms_time.Day[0],sms_time.Day[1]);
+   1647          	Sts->System_Time[3] = TwoAsciDeciNum2OneHex(sms_time.Hour[0],sms_time.Hour[1]);
+   1648          
+   1649          	Sts->System_Time[4] = TwoAsciDeciNum2OneHex(sms_time.Min[0],sms_time.Min[1]);
+   1650          	Sts->System_Time[5] = TwoAsciDeciNum2OneHex(sms_time.Sec[0],sms_time.Sec[1]);
+   1651          
+   1652          }
+   1653          
+   1654          void SwHistroyRspFunc (INT8U* tid,INT8U Comm,__ProtocolPtr *nPtr)
+   1655          {
+   1656              INT8U	CHKSUM=0, DataCnt=0, i,j;
+   1657          
+   1658          	__BODYFRAME  *Send = nPtr->SmsSend;
+   1659          
+   1660          	// Frame Header //
+   1661          	Send->SubID[0] = tid[0];
+   1662          	Send->SubID[1] = tid[1];
+   1663          	Send->SubID[2] = tid[2];
+   1664              
+   1665          	Send->RCode			= TRIO_RCODE;
+   1666          	Send->Command		= Comm;
+   1667          	Send->SubLen[0]		= 0;
+   1668          	Send->SubLen[1]		= LineLengh+1+1; // more + line lenght + line data
+   1669          
+   1670          	
+   1671          	for(j = 0; j < VersionNum; j++)
+   1672          	{
+   1673          		DataCnt = 0, CHKSUM = 0;
+   1674          		
+   1675          		if(j == VersionNum - 1)	Send->SubData[DataCnt++] = 0x00;		// more 추가 정보
+   1676          		else					Send->SubData[DataCnt++] = 0x01;		// more 추가 정보
+   1677          		
+   1678          		Send->SubData[DataCnt++] = LineLengh;	// LineLengh
+   1679          		for(i = 0; i < LineLengh; i++)
+   1680          		{
+   1681          		   Send->SubData[DataCnt++] = *(DnrVerString+ (i +(j*LineLengh)));	// LineLengh
+   1682          	    }
+   1683          	    /*********************/		
+   1684          		// Frame CHKSUM //
+   1685          		for(i = 0; i < DataCnt+7; i++) CHKSUM = CHKSUM + *((INT8U *)Send->SubID + i);
+   1686          
+   1687          		Send->SubData[DataCnt++] = DataConv(HIGH,CHKSUM);
+   1688          		Send->SubData[DataCnt++] = DataConv(LOW,CHKSUM);
+   1689          		Send->SubLength = ((Send->SubLen[0] << 8)& 0xff00) +  ((Send->SubLen[1]	)& 0x00ff);
+   1690          
+   1691          		Sms_DataAckTx(Send->Command,nPtr);
+   1692          	}
+   1693          }
+   1694          
+   1695          void DnrIpAddressAck(INT8U* tid,INT8U Comm,__ProtocolPtr *nPtr)
+   1696          {
+   1697          	INT16U i;
+   1698          	INT8U	CHKSUM = 0;
+   1699          	__BODYFRAME  *Send = nPtr->SmsSend;
+   1700          	__BODYFRAME  *Recv = nPtr->SmsRecv;
+   1701          
+   1702          	Send->SubID[0] = tid[0];
+   1703          	Send->SubID[1] = tid[1];
+   1704          	Send->SubID[2] = tid[2];
+   1705          
+   1706          	Send->Command = Comm;
+   1707          	Send->RCode = Recv->RCode;
+   1708          
+   1709          	Send->SubLength = Recv->SubLength ;
+   1710          
+   1711          	Send->SubLen[0]	= (INT8U)(Send->SubLength >> 8);
+   1712          	Send->SubLen[1]	= (INT8U)(Send->SubLength);
+   1713          
+   1714          	for(i = 0; i < Send->SubLength && i < BODYSIZEMAX; i++)
+   1715          	{
+   1716          		Send->SubData[i] =  Recv->SubData[i];
+   1717          	}
+   1718          
+   1719          	for(i = 0; i < Send->SubLength+7; i++) CHKSUM = CHKSUM + *((INT8U *)Send->SubID + i);
+   1720          	Send->SubData[Send->SubLength++] = DataConv(HIGH,CHKSUM);
+   1721          	Send->SubData[Send->SubLength++] = DataConv(LOW,CHKSUM);
+   1722          
+   1723          	Send->SubLength = ((Send->SubLen[0] << 8)& 0xff00) +  ((Send->SubLen[1] )& 0x00ff);
+   1724          
+   1725          	Sms_DataAckTx(Send->Command,nPtr);
+   1726          }
+   1727          
+   1728          
+   1729          void DnrPacketReadyFunc(__ProtocolPtr *nPtr)
+   1730          {
+   1731          	INT16U i;
+   1732              INT32S ret = 0;
+   1733          		
+   1734          	ret=ret;// 
+   1735          	__BODYFRAME  *Recv = nPtr->SmsRecv;
+   1736          	
+   1737          	tcp_port = 8081;
+   1738          
+   1739          	for(i = 0 ; i < 5; i++)
+   1740          	{
+   1741           		if(ret=(BcMdemTcpConnect(Recv->SubData,Recv->SubLen[1],tcp_port))==1)
+   1742          		{
+   1743          			//if(iSMS_Debug_Mode)USART1Printf("IP Connect[%d] \n",ret);
+   1744          			WRCS_DownLoadGiveupTimerSet(Ser4DownLoading);
+   1745          			break;
+   1746          		}
+   1747          		else
+   1748          		{
+   1749          			// if(iSMS_Debug_Mode)USART1Printf("IP Not Connect \n");
+   1750          //			ModemHangUp();
+   1751          			if(iSMS_Debug_Mode)USART1Printf("IP Not Connect \n");
+   1752          		}
+   1753          		OSTimeDly(1000*5L);
+   1754          	}
+   1755          
+   1756          	if(i > 4)TcpExit();
+   1757          }
+   1758          
+   1759          INT8U TcpExit(void)
+   1760          {
+   1761          	INT8U nRet = TRUE;
+   1762          //	INT16U i;
+   1763          
+   1764          //	for( i = 0; i < 5; i++)
+   1765          	{
+   1766          		if( nRet = BcMdemTcpExit() > 3)
+   1767          		{
+   1768          			// if(iSMS_Debug_Mode)	USART1Printf("BcMdemTcpExit[%d] \n",nRet);
+   1769          			return TRUE;
+   1770          		}
+   1771          		else
+   1772          		{
+   1773          			nRet = FALSE;
+   1774          			// if(iSMS_Debug_Mode)USART1Printf("Tx FALSE: BcMdemTcpExit[%d]\n",nRet);
+   1775          		}
+   1776          		OSTimeDly(1000*5L);
+   1777          	}
+   1778          	return nRet;
+   1779          }
+   1780          
+   1781          void SpecFreqState_RspFunc (INT8U* tid,INT8U Comm, INT8U Auto, INT8U Idle,__ProtocolPtr *nPtr )
+   1782          {
+   1783          	INT8U CHKSUM=0,Count=0,i;
+   1784          
+   1785          	__BODYFRAME  *Send = nPtr->SmsSend;
+   1786          
+   1787          	for(i = 0; i < 13; i++)TestStation[i] = 0;
+   1788          	for(i = 0; i < 13; i++)TestStation[i] = tDnrSts->TestStn[i];
+   1789          
+   1790          #if 1/// Test
+   1791          	if (Idle == NormalMode)
+   1792          	{
+   1793          		for(i = 0 ; i<3; i++)
+   1794          		{
+   1795          			if((TestStation[0] >= '0')&&(TestStation[0] <= '9'))
+   1796          			{
+   1797          				if(BcMdemCalling((char *)TestStation) == TRUE)
+   1798          				{
+   1799          				 	break;
+   1800          				}
+   1801          			}
+   1802          			else break;
+   1803          			
+   1804          			OSTimeDly(1000 * 5L);
+   1805          		}
+   1806          
+   1807          		{
+   1808          			if(TrafficCheck() == TRUE) 	tDnrSts->WaveSts.OneFAStatus = 0x03;	// Call OK!
+   1809          			else 						tDnrSts->WaveSts.OneFAStatus = 0x04;	// Call Fail!
+   1810          		}
+   1811          	}
+   1812          	else	tDnrSts->WaveSts.OneFAStatus = 0x03;				// Call OK!
+   1813          #endif
+   1814          
+   1815          #if 1
+   1816          
+   1817          	SpecFreqStateUpdate();
+   1818          
+   1819          	for ( i = 0; i < 3; i++ ) 
+   1820          	{
+   1821          		INT32S ret = TrafficCheck();
+   1822          
+   1823          		if(ret == TRUE)	CdmaModemHangUp();
+   1824          		else  			break;	// Hang Up //
+   1825          		OSTimeDly(1000*5L);
+   1826          	}
+   1827          #endif
+   1828          	if(!PcFreqStsRqstFlag)FreqAlarmCheckRpt(tid,nPtr);
+   1829          
+   1830          	{
+   1831          	// Frame Header //
+   1832             	Send->SubID[0] = tid[0];
+   1833          	Send->SubID[1] = tid[1];
+   1834          	Send->SubID[2] = tid[2];
+   1835          
+   1836              
+   1837          	Send->Command = Comm;
+   1838          	Send->RCode = TRIO_RCODE;
+   1839          
+   1840           
+   1841          	Send->SubData[Count++]= 0x00;
+   1842          	Send->SubData[Count++]= 0x01;
+   1843          	Send->SubData[Count++]= 0x04;
+   1844          
+   1845          	// 알람 체크 Flag 설정
+   1846          	Send->SubData[Count++]= 0x7e;
+   1847          	Send->SubData[Count++]= 0x7e;
+   1848          	Send->SubData[Count++]= tDnrSts->RFAlarm.RxTxAlarm.Data;
+   1849          	Send->SubData[Count++]= tDnrSts->RFAlarm.EcIo.Data;
+   1850          
+   1851          
+   1852          	if(Auto == 0x01)
+   1853          	{
+   1854          		Send->SubData[Count++] = hibyte(Aid_SMS_TxRetry); // A_ID
+   1855          		Send->SubData[Count++] = lobyte(Aid_SMS_TxRetry);
+   1856          		Send->SubData[Count++] = 0x01;
+   1857          		Send->SubData[Count++] = tDnrSts->WaveSts.SMS_TxRetry;
+   1858          
+   1859          //		if((BcMType == 0x0C)||(BcMType == 0x0D))
+   1860          		if( ModemType == _WCMDA_Modem)
+   1861          		{
+   1862          			Send->SubData[Count++] = hibyte(Aid_WcdmaChannel); // A_ID
+   1863          			Send->SubData[Count++] = lobyte(Aid_WcdmaChannel);
+   1864          			Send->SubData[Count++] = 0x03;
+   1865          			Send->SubData[Count++] = tDnrSts->WaveSts.WcdmaChannel[0];
+   1866          			Send->SubData[Count++] = tDnrSts->WaveSts.WcdmaChannel[1];
+   1867          			Send->SubData[Count++] = tDnrSts->WaveSts.WcdmaChannel[1];
+   1868          		}
+   1869          		else
+   1870          		{
+   1871          			Send->SubData[Count++] = hibyte(Aid_ActChannel); // A_ID
+   1872          			Send->SubData[Count++] = lobyte(Aid_ActChannel);
+   1873          			Send->SubData[Count++] = 0x02;
+   1874          			Send->SubData[Count++] = tDnrSts->WaveSts.ActChannel[0];
+   1875          			Send->SubData[Count++] = tDnrSts->WaveSts.ActChannel[1];
+   1876          		}
+   1877          		Send->SubData[Count++] = hibyte(Aid_OneFAStatus); // A_ID
+   1878          		Send->SubData[Count++] = lobyte(Aid_OneFAStatus);
+   1879          		Send->SubData[Count++] = 0x01;
+   1880          		Send->SubData[Count++] = tDnrSts->WaveSts.OneFAStatus;
+   1881          
+   1882          		Send->SubData[Count++] = hibyte(Aid_FARxValue); // A_ID
+   1883          		Send->SubData[Count++] = lobyte(Aid_FARxValue);
+   1884          		Send->SubData[Count++] = 0x02;
+   1885          		Send->SubData[Count++] = tDnrSts->WaveSts.FARxVal[0];
+   1886          		Send->SubData[Count++] = tDnrSts->WaveSts.FARxVal[1];
+   1887          
+   1888          		Send->SubData[Count++] = hibyte(Aid_TxVal); // A_ID
+   1889          		Send->SubData[Count++] = lobyte(Aid_TxVal);
+   1890          		Send->SubData[Count++] = 0x02;
+   1891          		Send->SubData[Count++] = tDnrSts->WaveSts.TxVal[0];
+   1892          		Send->SubData[Count++] = tDnrSts->WaveSts.TxVal[1];
+   1893          
+   1894          		if (Idle == NormalMode)
+   1895          		{
+   1896          			Send->SubData[Count++] = hibyte(Aid_FAFerValue); // A_ID
+   1897          			Send->SubData[Count++] = lobyte(Aid_FAFerValue);
+   1898          			Send->SubData[Count++] = 0x01;
+   1899          			Send->SubData[Count++] = tDnrSts->WaveSts.WaveNormalStatus.FAFerVal;
+   1900          		}
+   1901          		Send->SubData[Count++] = hibyte(Aid_PN_Val); // A_ID
+   1902          		Send->SubData[Count++] = lobyte(Aid_PN_Val);
+   1903          		Send->SubData[Count++] = 0x0c;
+   1904          		Send->SubData[Count++] = tDnrSts->WaveSts.PN_Val[0];
+   1905          		Send->SubData[Count++] = tDnrSts->WaveSts.PN_Val[1];
+   1906          		Send->SubData[Count++] = tDnrSts->WaveSts.PN_Val[2];
+   1907          		Send->SubData[Count++] = tDnrSts->WaveSts.PN_Val[3];
+   1908          		Send->SubData[Count++] = tDnrSts->WaveSts.PN_Val[4];
+   1909          		Send->SubData[Count++] = tDnrSts->WaveSts.PN_Val[5];
+   1910          		Send->SubData[Count++] = tDnrSts->WaveSts.PN_Val[6];
+   1911          		Send->SubData[Count++] = tDnrSts->WaveSts.PN_Val[7];
+   1912          		Send->SubData[Count++] = tDnrSts->WaveSts.PN_Val[8];
+   1913          		Send->SubData[Count++] = tDnrSts->WaveSts.PN_Val[9];
+   1914          		Send->SubData[Count++] = tDnrSts->WaveSts.PN_Val[10];
+   1915          		Send->SubData[Count++] = tDnrSts->WaveSts.PN_Val[11];
+   1916          
+   1917          		Send->SubData[Count++] = hibyte(Aid_EcIo_Val); // A_ID
+   1918          		Send->SubData[Count++] = lobyte(Aid_EcIo_Val);
+   1919          		Send->SubData[Count++] = 0x06;
+   1920          		Send->SubData[Count++] = tDnrSts->WaveSts.EcIo_Val[0];
+   1921          		Send->SubData[Count++] = tDnrSts->WaveSts.EcIo_Val[1];
+   1922          		Send->SubData[Count++] = tDnrSts->WaveSts.EcIo_Val[2];
+   1923          		Send->SubData[Count++] = tDnrSts->WaveSts.EcIo_Val[3];
+   1924          		Send->SubData[Count++] = tDnrSts->WaveSts.EcIo_Val[4];
+   1925          		Send->SubData[Count++] = tDnrSts->WaveSts.EcIo_Val[5];
+   1926          
+   1927          		if ((Comm == RadioAutoReport)||(Comm == IdleStatusReport))
+   1928          		{
+   1929          			Send->SubData[Count++] = hibyte(Aid_ReportHours); // A_ID
+   1930          			Send->SubData[Count++] = lobyte(Aid_ReportHours);
+   1931          			Send->SubData[Count++] = 0x02;
+   1932          			Send->SubData[Count++] = PresentHour;
+   1933          			Send->SubData[Count++] = PresentMin;
+   1934          
+   1935          			tDnrSts->WaveSts.PresentHour = dtoh(PresentHour);
+   1936          			tDnrSts->WaveSts.PresentMin	= dtoh(PresentMin);
+   1937          		}
+   1938          	}
+   1939          
+   1940          		Send->SubLen[0] = 0;
+   1941          		Send->SubLen[1] = Count;
+   1942          	
+   1943          		
+   1944          		// Frame CHKSUM //
+   1945          		for(i = 0; i < Count+ 7; i++) CHKSUM = CHKSUM + *((INT8U *)Send->SubID + i);
+   1946          		Send->SubData[Count++] = DataConv(HIGH,CHKSUM);
+   1947          		Send->SubData[Count++] = DataConv(LOW,CHKSUM);
+   1948          		Send->SubLength = ((Send->SubLen[0] << 8)& 0xff00) +  ((Send->SubLen[1] )& 0x00ff);
+   1949          
+   1950          		Sms_DataAckTx(Send->Command,nPtr);
+   1951          	}
+   1952          }
+   1953          
+   1954          
+   1955          INT8U TrafficCheck(void)
+   1956          {
+   1957          	INT8U j;
+   1958          	INT8U nRet = TRUE;
+   1959          
+   1960          	for(j = 0 ; j < 3; j++)
+   1961          	{
+   1962          		INT32S ret = 0;
+   1963                  ret=ret;
+   1964          
+   1965          		if( ModemType == _WCMDA_Modem)
+   1966          		{
+   1967          			if( ret= CdmaModemTrafficCheck() == '1') 	nRet = TRUE;
+   1968          			else  										nRet = FALSE;				
+   1969          		}
+   1970          		else
+   1971          		{
+   1972          			if( ret= CdmaModemTrafficCheck() == '3')  	nRet = TRUE;
+   1973          			else		 								nRet = FALSE;		
+   1974          		}
+   1975          
+   1976          		OSTimeDly(500);
+   1977          	}
+   1978          	
+   1979          	return nRet;
+   1980          }
+   1981          
+   1982          void SpecFreqStateUpdate ( void )
+   1983          {
+   1984          	 int	 i = 0, TempThreshold = 0;
+   1985          	 int	 NumTry = 0,j = 0;
+   1986          	 INT8U	 TempCopy;
+   1987          	
+   1988          	 INT16S CurrFer=0;
+   1989          	 INT16S CurrRx=0;
+   1990          	 INT16S CurrAdj=0;
+   1991          	 INT16S CurrTx =0;
+   1992          
+   1993          	
+   1994           //=======================//
+   1995           // Rx, Tx, Adj Averaging //
+   1996           //=========================================================================//
+   1997          
+   1998          	BcdemRfStsGet(&Rf_sts);
+   1999          
+   2000          	CurrFer = Rf_sts.FerValue;
+   2001          	CurrRx  = Rf_sts.RxValue;
+   2002          	CurrAdj = Rf_sts.AdjValue;
+   2003          	CurrTx = Rf_sts.TxValue;
+   2004          	 
+   2005          	OSTimeDly(1000L*2L);
+   2006          
+   2007          	NumTry = 5;
+   2008          	for ( j=0; j<  NumTry ; j++ )
+   2009          	{
+   2010          		BcdemRfStsGet(&Rf_sts);
+   2011          
+   2012          		CurrFer = (CurrFer + Rf_sts.FerValue)/2;
+   2013          		CurrRx  = (CurrRx + Rf_sts.RxValue)/2;
+   2014          		CurrAdj = (CurrAdj + Rf_sts.AdjValue)/2;
+   2015          		CurrTx  = (CurrTx + Rf_sts.TxValue)/2;
+   2016          		OSTimeDly(1000L*2L);
+   2017          	}
+   2018          
+   2019          	tDnrSts->WaveSts.WaveNormalStatus.FAFerVal = lobyte(CurrFer);
+   2020          
+   2021          	tDnrSts->WaveSts.ActChannel[0] = (Rf_sts.ActChannel >> 6) & 0x3f;
+   2022          	tDnrSts->WaveSts.ActChannel[1] = (Rf_sts.ActChannel	   ) & 0x3f;
+   2023          
+   2024          	BcdemPilotGet(&Pilot_Sts);
+   2025          
+   2026          	tDnrSts->WaveSts.PN_Val[0] = (Rf_sts.PN_Vaule[0]>>6)&0x3f;
+   2027          	tDnrSts->WaveSts.PN_Val[1] = (Rf_sts.PN_Vaule[0])&0x3f;
+   2028          	tDnrSts->WaveSts.EcIo_Val[0] = abs(Rf_sts.EcIo[0]);
+   2029          
+   2030          	for(i = 0; i < 4; i++)
+   2031          	{
+   2032          		tDnrSts->WaveSts.PN_Val[i*2 ] = (Pilot_Sts.PN_Vaule[i]>>6) & 0x3f;
+   2033          		tDnrSts->WaveSts.PN_Val[i*2 + 1] = (Pilot_Sts.PN_Vaule[i]) & 0x3f;
+   2034          		tDnrSts->WaveSts.EcIo_Val[i]= abs(Pilot_Sts.EcIo[i]);
+   2035          	}
+   2036          		
+   2037          
+   2038          	TempCopy = 0;
+   2039          	
+   2040          	if( ModemType == _WCMDA_Modem)
+   2041          	{
+   2042          		// RX = CurrRx + CPL(10)
+   2043          		CurrRx = (CurrRx + (INT8S)10);
+   2044          
+   2045          //		tDnrSts->WaveSts.TxVal[0] = (Rf_sts.TxValue >> 6) & 0x3f;
+   2046          //		tDnrSts->WaveSts.TxVal[1] = (Rf_sts.TxValue	   ) & 0x3f;
+   2047          //		Rf_sts.TxValue = Rf_sts.TxValue + 10;
+   2048          
+   2049          		tDnrSts->WaveSts.TxVal[0] =  DataConv(HIGH,Rf_sts.TxValue);
+   2050          		tDnrSts->WaveSts.TxVal[1] =  DataConv(LOW,Rf_sts.TxValue);
+   2051          
+   2052          		tDnrSts->WaveSts.WcdmaChannel[0] = (unsigned char)((Rf_sts.ActChannel>>12)&0x3F); 
+   2053          		tDnrSts->WaveSts.WcdmaChannel[1] = (unsigned char)((Rf_sts.ActChannel>>6)&0x3F); 
+   2054          		tDnrSts->WaveSts.WcdmaChannel[2] = (unsigned char)(Rf_sts.ActChannel&0x3F); 
+   2055          	}
+   2056          	else
+   2057          	{
+   2058          
+   2059          		tDnrSts->WaveSts.ActChannel[0] = (unsigned char)((Rf_sts.ActChannel>>6)&0x3F); 
+   2060          		tDnrSts->WaveSts.ActChannel[1] = (unsigned char)(Rf_sts.ActChannel&0x3F); 
+   2061          
+   2062          		// RX = CurrRx + EcIo + CPL(10)
+   2063          		CurrRx = (CurrRx + (INT8S)tDnrSts->WaveSts.EcIo_Val[0]) + (INT8S)11;
+   2064          
+   2065          		CurrTx = - CurrRx + CurrAdj - 73;
+   2066          	}
+   2067          
+   2068          	tDnrSts->WaveSts.FARxVal[0] = DataConv(HIGH,CurrRx);
+   2069          	tDnrSts->WaveSts.FARxVal[1] = DataConv(LOW,CurrRx);
+   2070          
+   2071          
+   2072          	tDnrSts->WaveSts.ActChannel[0] = (Rf_sts.ActChannel >> 6) & 0x3f;
+   2073          	tDnrSts->WaveSts.ActChannel[1] = (Rf_sts.ActChannel	   ) & 0x3f;
+   2074          
+   2075          	
+   2076          	if(CurrRx > TwoAsciNum2OneHex(tDnrSts->WaveCtrl.RxMaxVal[0], tDnrSts->WaveCtrl.RxMaxVal[1]))	 BitSet(TempCopy, 6);
+   2077          	if(CurrRx < TwoAsciNum2OneHex(tDnrSts->WaveCtrl.RxMinVal[0], tDnrSts->WaveCtrl.RxMinVal[1]))	 BitSet(TempCopy, 5);
+   2078          	if(CurrTx > TwoAsciNum2OneHex(tDnrSts->WaveCtrl.TxMaxVal[0], tDnrSts->WaveCtrl.TxMaxVal[1]))	 BitSet(TempCopy, 4);
+   2079          	if(CurrTx < TwoAsciNum2OneHex(tDnrSts->WaveCtrl.TxMinVal[0], tDnrSts->WaveCtrl.TxMinVal[1]))	 BitSet(TempCopy, 3);
+   2080          
+   2081          
+   2082          	iTxValH = DataConv(HIGH,CurrTx);
+   2083          	iTxValL = DataConv(LOW,CurrTx);
+   2084          
+   2085          	tDnrSts->RFAlarm.RxTxAlarm.Data = TempCopy;
+   2086          	//=======================================//
+   2087          	// Each PN Ecio Threshold Check -> Alarm //
+   2088          	//=========================================================================//
+   2089          	TempThreshold = ((tDnrSts->WaveCtrl.EcIo>>4)*10) + (tDnrSts->WaveCtrl.EcIo&0x0f);
+   2090          
+   2091          	TempCopy = 0;
+   2092          	for ( i = 0; i < 1; i++ )
+   2093          //	for ( i = 0; i < 6; i++ )
+   2094          	{
+   2095          		if((tDnrSts->WaveSts.EcIo_Val[i]> TempThreshold)&& (tDnrSts->WaveSts.EcIo_Val[i]!= 0)) BitSet(TempCopy, 6-i);
+   2096          	}
+   2097          	tDnrSts->RFAlarm.EcIo.Data = TempCopy;
+   2098          
+   2099          	//=================================//
+   2100          	// Master Pn Update Check & Report //
+   2101          	//=========================================================================//
+   2102          	for ( i = 0; i < 6; i++ )	
+   2103          	{	
+   2104          		iPNVal_Old[i*2] = tDnrSts->WaveSts.PN_Val[i*2];
+   2105          		iPNVal_Old[i*2+1] = tDnrSts->WaveSts.PN_Val[i*2+1];
+   2106          	}
+   2107          
+   2108          	for(i = 0 ; i < 6 ; i++)	// EcIo -> 24일 경우 0x24로 만든다. 08/07/15
+   2109          	{
+   2110          		TempCopy = tDnrSts->WaveSts.EcIo_Val[i];
+   2111          		
+   2112          		tDnrSts->WaveSts.EcIo_Val[i] = ((TempCopy/10)*0x10) + (TempCopy%10);
+   2113          	}
+   2114          	
+   2115          	if(!FirstPNCheckFlag)
+   2116          	{
+   2117          		iMasterPNH  = tDnrSts->WaveSts.PN_Val[0];
+   2118          		iMasterPNL  = tDnrSts->WaveSts.PN_Val[1];
+   2119          		
+   2120          		FirstPNCheckFlag = TRUE;
+   2121          	}
+   2122          
+   2123          	if ((iMasterPNH == tDnrSts->WaveSts.PN_Val[0])&&(iMasterPNL == tDnrSts->WaveSts.PN_Val[1]))  PnChangeCnt = 0;
+   2124          	else PnChangeCnt++;
+   2125          
+   2126          
+   2127          	if ( PnChangeCnt >= 2 )
+   2128          	{
+   2129          		iMasterPNH  = tDnrSts->WaveSts.PN_Val[0];
+   2130          		iMasterPNL  = tDnrSts->WaveSts.PN_Val[1];
+   2131          
+   2132          		// WriteEEprom(MasterPNH,iMasterPNH);
+   2133          		// WriteEEprom(MasterPNL,iMasterPNL);
+   2134          		PnAlarm=Alarm;
+   2135          		PnChangeCnt = 0;
+   2136          		
+   2137          		SaveBackupData();	
+   2138          	}
+   2139          }
+   2140          
+   2141          
+   2142          void FreqAlarmCheckRpt (INT8U* tid,__ProtocolPtr *nPtr)
+   2143          {
+   2144           //=========================//
+   2145           // Rx, Tx, Adj, EcIo Check //
+   2146           //=========================================================================//
+   2147          	 
+   2148          	if(tDnrSts->AlarmMask == 0x01)	 return;
+   2149          	
+   2150          	RxTxAlarmNew = tDnrSts->RFAlarm.RxTxAlarm.Data;
+   2151          	RxTxAlarmFlag = RxTxAlarmNew ^ RxTxAlarmOld;
+   2152          	RxTxAlarmOld = RxTxAlarmNew;
+   2153          
+   2154          
+   2155          	EcIoNew = tDnrSts->RFAlarm.EcIo.Data;
+   2156          	EcIoFlag = EcIoNew ^EcIoOld;
+   2157          	EcIoOld = EcIoNew;
+   2158          
+   2159          	PnAlarmNew = PnAlarm;
+   2160          	PnAlarmFlag = PnAlarmNew ^PnAlarmOld;
+   2161          	PnAlarmOld = PnAlarmNew;
+   2162          
+   2163          
+   2164          	if ((RxTxAlarmFlag) ||(EcIoFlag ) ||(PnAlarmFlag ))
+   2165          	{
+   2166          		FreqAlarmRptFunc(tid,nPtr);
+   2167          	}
+   2168          }
+   2169          
+   2170          
+   2171          void FreqAlarmRptFunc(INT8U* tid,__ProtocolPtr *nPtr)
+   2172          {
+   2173          	 INT8U CHKSUM=0,Count=0,i;
+   2174          
+   2175          	 __BODYFRAME  *Send = nPtr->SmsSend;
+   2176          
+   2177          	 // Frame Header //
+   2178          	Send->SubID[0] = tid[0];
+   2179          	Send->SubID[1] = tid[1];
+   2180          	Send->SubID[2] = tid[2];
+   2181          
+   2182          	Send->RCode		 = TRIO_RCODE;
+   2183          	Send->Command	 = RadioAlarmReport;
+   2184          
+   2185          	if(BitRead(RxTxAlarmFlag, 6))
+   2186          	{
+   2187          		Send->SubData[Count++] = hibyte(Aid_RxMaxVal); // A_ID
+   2188          		Send->SubData[Count++] = lobyte(Aid_RxMaxVal);
+   2189          
+   2190          		if(BitRead(RxTxAlarmOld, 6))	 Send->SubData[Count++] = 0x01;  // 발생
+   2191          		else							 Send->SubData[Count++] = 0x00;  // 해제
+   2192          
+   2193          		Send->SubData[Count++] = 0x02; 						 // Lenght
+   2194          
+   2195          		Send->SubData[Count++] = tDnrSts->WaveSts.FARxVal[0];						
+   2196          		Send->SubData[Count++] = tDnrSts->WaveSts.FARxVal[1];		
+   2197          	}
+   2198          
+   2199          	if(BitRead(RxTxAlarmFlag, 5))
+   2200          	{
+   2201          		Send->SubData[Count++] = hibyte(Aid_RxMinVal); // A_ID
+   2202          		Send->SubData[Count++] = lobyte(Aid_RxMinVal);
+   2203          
+   2204          		if(BitRead(RxTxAlarmOld, 5))	 Send->SubData[Count++] = 0x01;  // 발생
+   2205          		else							 Send->SubData[Count++] = 0x00;  // 해제
+   2206          
+   2207          		Send->SubData[Count++] = 0x02; 											 // Lenght
+   2208          
+   2209          		Send->SubData[Count++] = tDnrSts->WaveSts.FARxVal[0];						
+   2210          		Send->SubData[Count++] = tDnrSts->WaveSts.FARxVal[1];					
+   2211          	}
+   2212          
+   2213          	if(BitRead(RxTxAlarmFlag, 4))
+   2214          	{
+   2215          		Send->SubData[Count++] = hibyte(Aid_TxMaxVal); 			 // A_ID
+   2216          		Send->SubData[Count++] = lobyte(Aid_TxMaxVal);
+   2217          
+   2218          		if(BitRead(RxTxAlarmOld, 4))	 Send->SubData[Count++] = 0x01; 	 // 발생
+   2219          		else							 Send->SubData[Count++] = 0x00; 	 // 해제
+   2220          
+   2221          		Send->SubData[Count++] = 0x02; 											 // Lenght
+   2222          		Send->SubData[Count++] = iTxValH;						
+   2223          		Send->SubData[Count++] = iTxValL;						
+   2224          	}
+   2225          
+   2226          	if(BitRead(RxTxAlarmFlag, 3))
+   2227          	{
+   2228          		Send->SubData[Count++] = hibyte(Aid_TxMinVal); 			 // A_ID
+   2229          		Send->SubData[Count++] = lobyte(Aid_TxMinVal);
+   2230          
+   2231          		if(BitRead(RxTxAlarmOld, 3))	 Send->SubData[Count++] = 0x01;  // 발생
+   2232          		else							 Send->SubData[Count++] = 0x00;  // 해제
+   2233          		Send->SubData[Count++] = 0x02; 											 // Lenght
+   2234          
+   2235          		Send->SubData[Count++] = iTxValH;						
+   2236          		Send->SubData[Count++] = iTxValL;
+   2237          	}
+   2238          
+   2239          	if(EcIoFlag != 0)		
+   2240          	{
+   2241          		Send->SubData[Count++] = hibyte(Aid_EcIo); 			 // A_ID
+   2242          		Send->SubData[Count++] = lobyte(Aid_EcIo);
+   2243          
+   2244          		if(EcIoOld!=0) 	 Send->SubData[Count++] = 0x01; 		 // 발생
+   2245          		else				 Send->SubData[Count++] = 0x00; 		 // 해제
+   2246          
+   2247          		Send->SubData[Count++] = 0x01; 										 // Lenght
+   2248          		Send->SubData[Count++] = tDnrSts->WaveSts.EcIo_Val[0]; 			
+   2249          	}
+   2250          
+   2251          	if(PnAlarmFlag)
+   2252          	{
+   2253          		Send->SubData[Count++] = hibyte(Aid_PNUpdate);				 // A_ID
+   2254          		Send->SubData[Count++] = lobyte(Aid_PNUpdate);
+   2255          
+   2256          		if(PnAlarm)	 Send->SubData[Count++] = 0x01; 			 // 발생
+   2257          		else			 Send->SubData[Count++] = 0x00; 			 // 해제
+   2258          
+   2259          		Send->SubData[Count++] = 0x02; 							 // Lenght
+   2260          		Send->SubData[Count++] = iMasterPNH;						
+   2261          		Send->SubData[Count++] = iMasterPNL;						
+   2262          	}
+   2263          
+   2264          	/***************************************/
+   2265          	Send->SubLen[0] = 0;
+   2266          	Send->SubLen[1] = Count;
+   2267          
+   2268          	// Frame CHKSUM //
+   2269          	for(i = 0; i < Count+7; i++) CHKSUM = CHKSUM + *((INT8U *)Send->SubID + i);
+   2270          	Send->SubData[Count++] = DataConv(HIGH,CHKSUM);
+   2271          	Send->SubData[Count++] = DataConv(LOW,CHKSUM);
+   2272          
+   2273          	Send->SubLength = ((Send->SubLen[0] << 8)& 0xff00) +  ((Send->SubLen[1] )& 0x00ff);
+   2274          
+   2275          	Sms_DataAckTx(Send->Command,nPtr);
+   2276          }
+   2277          
+   2278          INT32U TCPProtocolCheck(__ProtocolPtr *nPtr)
+   2279          {
+   2280          
+   2281          	INT16U Data;
+   2282          	INT16U DataCnt = 0;
+   2283          	__WRCSSIO *Recv = nPtr->WRCSRecv;
+   2284          	while(1)
+   2285          	{
+   2286          			
+   2287          		if (  (STX == tcp_buff[DataCnt++])
+   2288          			&&(STX == tcp_buff[DataCnt++])
+   2289          			&&(STX == tcp_buff[DataCnt++])
+   2290          			&&(STX == tcp_buff[DataCnt++])   )
+   2291          		{
+   2292          
+   2293          			Recv->Sync[0] = STX;
+   2294          			Recv->Sync[1] = STX;
+   2295          			Recv->Sync[2] = STX;
+   2296          			Recv->Sync[3] = STX;
+   2297          			break;
+   2298          		}
+   2299          	OSTimeDly(1);
+   2300          	}
+   2301          
+   2302          	Recv->TryNo 		= tcp_buff[DataCnt++];
+   2303          	Recv->BodyLen[0]	= tcp_buff[DataCnt++];
+   2304          	Recv->BodyLen[1]	= tcp_buff[DataCnt++];
+   2305          	Recv->CheckSum		= tcp_buff[DataCnt++];
+   2306          
+   2307          	Recv->BodyLength = (Recv->BodyLen[0] << 8) + (Recv->BodyLen[1]);
+   2308          
+   2309          	if(Recv->CheckSum != (INT8U)(Recv->TryNo + Recv->BodyLen[0] + Recv->BodyLen[1])
+   2310          		|| (Recv->BodyLength >= BODYSIZEMAX) // Error check, 2004. 02. 24
+   2311          	)
+   2312          	{								
+   2313          		return FALSE;
+   2314          	}
+   2315          
+   2316          	{
+   2317          		INT16U i;
+   2318          		for(i = 0; i < 7 ; i++)
+   2319          		{
+   2320          		*((INT8U *)Recv->BodyFrame[0].SubID+ i) = tcp_buff[DataCnt++];
+   2321          		}
+   2322          	}
+   2323          	Recv->BodyFrame[0].SubLength
+   2324          		=	 ((Recv->BodyFrame[0].SubLen[0] << 8)& 0xff00)
+   2325          		  +  ((Recv->BodyFrame[0].SubLen[1]	 )& 0x00ff) ;
+   2326          	{
+   2327          		INT16U i;
+   2328          		for(i = 0; i < Recv->BodyFrame[0].SubLength +2 ; i++)
+   2329          		{
+   2330          		*((INT8U *)Recv->BodyFrame[0].SubData+ i) = tcp_buff[DataCnt++];
+   2331          		}
+   2332          	}
+   2333          	Recv->BodyFrame[0].Crc
+   2334          		= Crc16Calc ( &(Recv->BodyFrame[0].SubID[0])
+   2335          					   ,Recv->BodyFrame[0].SubLength + 5 + 2, NULL);
+   2336          	nPtr->WRCSRecv->BodyFrame[0].CrcOK = TRUE;
+   2337          
+   2338          	Data = Recv->BodyFrame[0].SubLength;
+   2339          
+   2340          	if ( ((INT8U)(Recv->BodyFrame[0].Crc >> 8)  != Recv->BodyFrame[0].SubData[Data] )
+   2341          		|| ( (INT8U)(Recv->BodyFrame[0].Crc)	 != Recv->BodyFrame[0].SubData[Data+1] )  )
+   2342          	{
+   2343          		//CRC ERROR!!
+   2344          		nPtr->WRCSRecv->BodyFrame[0].CrcOK = FALSE;
+   2345          		return TRUE;
+   2346          	}
+   2347          
+   2348          	Data = tcp_buff[DataCnt++];
+   2349          	if(Data != ETX)	return FALSE;
+   2350          	
+   2351          	return TRUE;
+   2352          }
+   2353          
+   2354          
+   2355          INT8U WhatRxTCP(__ProtocolPtr *nPtr)
+   2356          {
+   2357          	INT16U RetVal = 0;
+   2358          
+   2359          	//SIO´ BODY is ONLY ONE(1)
+   2360          	if(nPtr->WRCSRecv->BodyFrame[0].CrcOK)	// CRC OK
+   2361          	{
+   2362          		RetVal = nPtr->WRCSRecv->BodyFrame[0].Command;
+   2363          	}
+   2364          	else //NO ERROR
+   2365          	{
+   2366          		//ERROR CASE
+   2367          		RetVal = crcERROR;
+   2368          	}
+   2369              return (RetVal);	
+   2370          }
+   2371          
+   2372          void TCPComCheck (__ProtocolPtr *nPtr)
+   2373          {
+   2374          	INT8U Comm;
+   2375          
+   2376           	Comm = WhatRxTCP(nPtr);
+   2377          
+   2378          	switch(Comm)	//command 체크
+   2379          	{
+   2380          		case DownloadMinNumCMD:
+   2381          		case DownloadCMD:
+   2382          		case DownloadCMDConfirm:
+   2383          		case DownLoadData:
+   2384          		case DownLoadDataConfirm:
+   2385          		{
+   2386          			WRCS_DownLoadGiveupTimerSet(Ser4DownLoading);
+   2387          			WRCS_DownloadFunc(nPtr);
+   2388          			TcpDnLoadFlag = SET;
+   2389          			
+   2390          			if(Comm == DownLoadDataConfirm )
+   2391          			{
+   2392          				TcpExit();
+   2393          				DownLoadBootingJump();
+   2394          			}
+   2395          		}
+   2396          		break;
+   2397          
+   2398          		default:
+   2399          		break;
+   2400          	}
+   2401          }	
+   2402          
+   2403          unsigned char TCPProDataAckTx (INT8U* tid, INT8U *Data, INT16U nCnt,  INT8U Comm,__ProtocolPtr *nPtr)
+   2404          {
+   2405          	INT8U err = 0;  
+   2406          	
+   2407          	INT32U i;
+   2408          	INT32U Cnt = 0;
+   2409          	INT16U SndCnt = 0;
+   2410          	__WRCSSIO *Send = nPtr->WRCSSend;
+   2411          	__WRCSSIO *Recv = nPtr->WRCSRecv;
+   2412          
+   2413          		OSSemPend(nPtr->Sem, 0, &err);	
+   2414          	if(err != OS_NO_ERR ) return err;	
+   2415          
+   2416          	Send->BodyFrame[0].SubID[0] = tid[0];
+   2417          	Send->BodyFrame[0].SubID[1] = tid[1];
+   2418          	Send->BodyFrame[0].SubID[2] = tid[2];
+   2419          
+   2420          	Send->BodyFrame[0].Command = Comm;
+   2421          	Send->BodyFrame[0].RCode = Recv->BodyFrame[0].RCode;
+   2422          //	Send->BodyFrame[0].RCode = TRIO_RCODE;
+   2423          
+   2424          	Send->BodyFrame[0].SubLength = nCnt;
+   2425          
+   2426          	for(i = 0; i < nCnt && i < BODYSIZEMAX; i++)
+   2427          	{
+   2428          		Send->BodyFrame[0].SubData[i] =  Data[i];
+   2429          	}
+   2430          
+   2431          	Send->BodyFrame[0].SubLen[0]	= (INT8U)(Send->BodyFrame[0].SubLength >> 8);
+   2432          	Send->BodyFrame[0].SubLen[1]	= (INT8U)(Send->BodyFrame[0].SubLength);
+   2433          
+   2434          	///////////// CRC //
+   2435          	Send->BodyFrame[0].Crc = Crc16Calc ( &(Send->BodyFrame[0].SubID[0]), Send->BodyFrame[0].SubLength + 5 + 2, NULL);
+   2436          	Send->BodyFrame[0].SubData[nCnt++] = (INT8U)(Send->BodyFrame[0].Crc >> 8);
+   2437          	Send->BodyFrame[0].SubData[nCnt++] = (INT8U)(Send->BodyFrame[0].Crc);
+   2438          
+   2439          	Send->BodyFrame[0].SubData[nCnt++] = 0x03;
+   2440          
+   2441          	for(i = 0; i < 4; i++) Send->Sync[i] = STX;
+   2442          
+   2443          	Send->TryNo = 0x30;
+   2444          	Send->BodyLength = 0;
+   2445          
+   2446          	Cnt = ((Send->BodyFrame[0].SubLen[0] << 8) | Send->BodyFrame[0].SubLen[1]) + 5 + 2 + 2;
+   2447          
+   2448          	Send->BodyLength = Cnt;
+   2449          
+   2450          	Send->BodyLen[0] = (INT8U)(Send->BodyLength >> 8);
+   2451          	Send->BodyLen[1] = (INT8U)(Send->BodyLength);
+   2452          	// CheckSum
+   2453          	Send->CheckSum = 0;
+   2454          	
+   2455          	Send->CheckSum = (INT8U)(Send->TryNo + Send->BodyLen[0] + Send->BodyLen[1]);
+   2456          	Send->BodyFrame[0].SubLength = (Send->BodyFrame[0].SubLen[0] << 8) | (Send->BodyFrame[0].SubLen[1]);
+   2457           	// Error Check
+   2458          	if(Send->BodyFrame[0].SubLength >= BODYSIZEMAX)
+   2459          	{
+   2460          		OSSemPost(nPtr->Sem);
+   2461          		return FALSE;
+   2462          	}
+   2463          	OSSemPost(nPtr->Sem);
+   2464          
+   2465          	for(i = 0; i < 8; i++) 											 	t1SndData[SndCnt++] = *((INT8U *)Send->Sync+ i);
+   2466          	for(i = 0; i < (Send->BodyFrame[0].SubLength + 5 + 2 + 2 + 1); i++) t1SndData[SndCnt++] = *((INT8U *)Send->BodyFrame[0].SubID+ i);
+   2467          
+   2468          	BcMdemTCPTx((char *)t1SndData, SndCnt);
+   2469          
+   2470          	return OS_NO_ERR;
+   2471          }
+   2472          
+   2473          
+   2474          INT8U DataConv ( INT8U HighLow, INT8U Value )
+   2475          {
+   2476          	INT8U Digit10;
+   2477          	INT8U Digit1;
+   2478          
+   2479          	Digit1 = (Value & 0x0f) + 0x30;
+   2480          	Digit10 = ((Value >> 4) & 0x0f) + 0x30;
+   2481          
+   2482          	if(Digit1 >= 0x3a) Digit1 += 0x07;
+   2483          	if(Digit10 >= 0x3a) Digit10 += 0x07;
+   2484          
+   2485          	if(HighLow == HIGH) return( Digit10 );
+   2486          	if(HighLow == LOW) return( Digit1 );
+   2487          	return(0);
+   2488          }
+   2489          
+   2490          
+   2491          INT8S TwoAsciNum2OneHex( INT8U Upper, INT8U Lower )
+   2492          {
+   2493          	//if ( Upper >= 0x41 ) Upper = Upper - 0x07;
+   2494          	//if ( Lower >= 0x41 ) Lower = Lower - 0x07;
+   2495          	
+   2496          	//return ( atoh((Upper-0x30)<<4)|(Lower-0x30) );
+   2497          
+   2498          	return((atoh(Upper) & 0x0f) << 4)|((atoh(Lower) & 0x0f)<< 0);
+   2499          }
+   2500          
+   2501          INT8U TwoAsciDeciNum2OneHex( INT8U Upper, INT8U Lower )
+   2502          {
+   2503          	return ( (Upper-0x30)*10 + (Lower-0x30)*1);
+   2504          }
+   2505          
+   2506          INT8U htod (INT8U value )
+   2507          {
+   2508          	INT8U	num;
+   2509          
+   2510          	num = ((value >> 4)*10) + (value & 0x0f);
+   2511          	
+   2512          	return (INT8U)num;
+   2513          }
+   2514          
+   2515          INT8U dtoh (INT8U value )
+   2516          {
+   2517          	INT8U	num;
+   2518          
+   2519          	num = ((value/10) << 4) | (value % 10);
+   2520          	
+   2521          	return (INT8U)num;
+   2522          }
+   2523          
+   2524          
+   2525          INT16U GenSmsStsAidSts_1St(INT8U *dptr, __Dnr_Sts *Sts)
+   2526          {
+   2527          	INT16U rlen = 0;
+   2528          	INT16U i = 0;
+   2529          
+   2530          	if(AlarmCheck_LTE_A1 != SET) 	Sts->AlmSts.FwdAmpOnOff_LTE_A1 = Enable;
+   2531          	if(AlarmCheck_LTE_A2 != SET)	Sts->AlmSts.FwdAmpOnOff_LTE_A2 = Enable;
+   2532          	if(AlarmCheck_LTE_A1_1 != SET)	Sts->AlmSts.FwdAmp1OnOff_LTE_A1 = Enable;
+   2533          	if(AlarmCheck_LTE_A2_1 != SET)	Sts->AlmSts.FwdAmp1OnOff_LTE_A2 = Enable;
+   2534          
+   2535          	if(AlarmCheck_LTE != SET)		Sts->AlmSts.FwdAmpOnOff_LTE = Enable;
+   2536          	if(AlarmCheck_LTE_1!= SET)		Sts->AlmSts.FwdAmp1OnOff_LTE = Enable;
+   2537          
+   2538          	
+   2539          	dptr[rlen++] = Sts->AlmSts.Data[0];
+   2540          	dptr[rlen++] = Sts->AlmSts.Data[1];
+   2541          	dptr[rlen++] = Sts->AlmSts.Data[2];
+   2542          	dptr[rlen++] = Sts->AlmSts.Data[3];
+   2543          	dptr[rlen++] = Sts->AlmSts.Data[4];
+   2544          	dptr[rlen++] = Sts->AlmSts.Data[5];
+   2545          	dptr[rlen++] = Sts->AlmSts.Data[6];
+   2546          	dptr[rlen++] = Sts->AlmSts.Data[7];
+   2547          	dptr[rlen++] = '1';
+   2548          
+   2549          	dptr[rlen++] = Sts->Manufacture;
+   2550          	dptr[rlen++] = Sts->Supplier;
+   2551          	dptr[rlen++] = Sts->RepeaterType[0];
+   2552          	dptr[rlen++] = Sts->RepeaterType[1];
+   2553          	dptr[rlen++] = Sts->SWVer;
+   2554          	dptr[rlen++] = Sts->MobileManufacture;
+   2555          	dptr[rlen++] = Sts->MobileModel;
+   2556          	dptr[rlen++] = Sts->MobileVer[0];
+   2557          	dptr[rlen++] = Sts->MobileVer[1];
+   2558          
+   2559          
+   2560          	dptr[rlen++] = RetNormaltoSMSData(Sts->FwdInPwr_3G);
+   2561          	dptr[rlen++] = RetNormaltoSMSData(Sts->FwdOutPwr_3G[0]);
+   2562          	dptr[rlen++] = RetNormaltoSMSData(Sts->FwdOutPwr_3G[1]);
+   2563          	dptr[rlen++] = RetNormaltoSMSData(Sts->FwdOutUpperLmt_3G[0]);
+   2564          	dptr[rlen++] = RetNormaltoSMSData(Sts->FwdOutUpperLmt_3G[1]);
+   2565          	dptr[rlen++] = Sts->FwdGainSet_3G/2;
+   2566          	dptr[rlen++] = Sts->FwdGain_3G/2;
+   2567          	
+   2568          	dptr[rlen++] = RetNormaltoSMSData(Sts->FwdInPwr_2G);
+   2569          	dptr[rlen++] = RetNormaltoSMSData(Sts->FwdOutPwr_2G[0]);
+   2570          	dptr[rlen++] = RetNormaltoSMSData(Sts->FwdOutPwr_2G[1]);
+   2571          	dptr[rlen++] = RetNormaltoSMSData(Sts->FwdOutUpperLmt_2G[0]);
+   2572          	dptr[rlen++] = RetNormaltoSMSData(Sts->FwdOutUpperLmt_2G[1]);
+   2573          	dptr[rlen++] = Sts->FwdGainSet_2G/2;
+   2574          	dptr[rlen++] = Sts->FwdGain_2G/2;
+   2575          
+   2576          	if(iRepeaterType == _TRIO_M)
+   2577          	{
+   2578          		for(i = 0; i < 7; i++)
+   2579          		{
+   2580          			dptr[rlen++] = 0;
+   2581          		}
+   2582          	}
+   2583          	else
+   2584          	{
+   2585          		dptr[rlen++] = RetNormaltoSMSData(Sts->Fwd1InPwr_LTE);
+   2586          		dptr[rlen++] = RetNormaltoSMSData(Sts->Fwd1OutPwr_LTE[0]);
+   2587          		dptr[rlen++] = RetNormaltoSMSData(Sts->Fwd1OutPwr_LTE[1]);
+   2588          		dptr[rlen++] = RetNormaltoSMSData(Sts->Fwd1OutUpperLmt_LTE[0]);
+   2589          		dptr[rlen++] = RetNormaltoSMSData(Sts->Fwd1OutUpperLmt_LTE[1]);
+   2590          		dptr[rlen++] = Sts->Fwd1GainSet_LTE/2;
+   2591          		dptr[rlen++] = Sts->Fwd1Gain_LTE/2;
+   2592          	}
+   2593          
+   2594          	dptr[rlen++] = Sts->Rvs0GainSet_3G/2;
+   2595          	dptr[rlen++] = Sts->RvsGainSts_3G/2;
+   2596          	dptr[rlen++] = Sts->RvsGainBalance_3G;
+   2597          	dptr[rlen++] = Sts->Rvs0GainSet_2G/2;
+   2598          	dptr[rlen++] = Sts->RvsGainSts_2G/2;
+   2599          	dptr[rlen++] = Sts->RvsGainBalance_2G;
+   2600          
+   2601          	if(iRepeaterType == _TRIO_M)
+   2602          	{
+   2603          		for(i = 0; i < 3; i++)
+   2604          		{
+   2605          			dptr[rlen++] = 0;
+   2606          		}
+   2607          	}
+   2608          	else
+   2609          	{
+   2610          		dptr[rlen++] = Sts->Rvs1GainSet_LTE/2;
+   2611          		dptr[rlen++] = Sts->Rvs1GainSts_LTE/2;
+   2612          		dptr[rlen++] = Sts->Rvs1GainBalance_LTE;
+   2613          	}
+   2614          
+   2615          	dptr[rlen++] = Sts->AGCOnOff_3G;
+   2616          	dptr[rlen++] = Sts->AGCOnOff_CDMALTE;
+   2617          	dptr[rlen++] = Sts->AGCOnOff_LTE_A_0;
+   2618          	dptr[rlen++] = Sts->AGC1OnOff_LTE;
+   2619          	dptr[rlen++] = Sts->AGCOnOff_LTE_A_1;
+   2620          
+   2621          	dptr[rlen++] = Sts->AmpOffCase_3G;
+   2622          	dptr[rlen++] = Sts->AmpOffCase_2G;	
+   2623          	dptr[rlen++] = Sts->AmpOffCase_LTE;	
+   2624          	dptr[rlen++] = Sts->AmpOffCase_LTE_A1;		
+   2625          	dptr[rlen++] = Sts->AmpOffCase_LTE_A2;
+   2626          	dptr[rlen++] = Sts->Amp1OffCase_LTE;	
+   2627          	dptr[rlen++] = Sts->Amp1OffCase_LTE_A1;
+   2628          	dptr[rlen++] = Sts->Amp1OffCase_LTE_A2;
+   2629          
+   2630          	for(i = 0; i < 5; i++)
+   2631          	{
+   2632          		dptr[rlen++] = 0;
+   2633          	}
+   2634          
+   2635          	dptr[rlen++] = Sts->AutoReportPriod;
+   2636          	dptr[rlen++] = Sts->AutoReportBasePer[0];
+   2637          	dptr[rlen++] = Sts->AutoReportBasePer[1];
+   2638          	dptr[rlen++] = Sts->ReportHours[0];
+   2639          	dptr[rlen++] = Sts->ReportHours[1];
+   2640          
+   2641           	return rlen;
+   2642          }
+   2643          
+   2644          INT16U GenSmsStsAidSts_2St(INT8U *dptr, __Dnr_Sts *Sts)
+   2645          {
+   2646          	INT16U rlen = 0;
+   2647          	INT16U i = 0;
+   2648          
+   2649          	if(AlarmCheck_LTE_A1 != SET) 	Sts->AlmSts.FwdAmpOnOff_LTE_A1 = Enable;
+   2650          	if(AlarmCheck_LTE_A2 != SET)	Sts->AlmSts.FwdAmpOnOff_LTE_A2 = Enable;
+   2651          	if(AlarmCheck_LTE_A1_1 != SET)	Sts->AlmSts.FwdAmp1OnOff_LTE_A1 = Enable;
+   2652          	if(AlarmCheck_LTE_A2_1 != SET)	Sts->AlmSts.FwdAmp1OnOff_LTE_A2 = Enable;
+   2653          	if(AlarmCheck_LTE != SET)		Sts->AlmSts.FwdAmpOnOff_LTE = Enable;
+   2654          	if(AlarmCheck_LTE_1!= SET)		Sts->AlmSts.FwdAmp1OnOff_LTE = Enable;
+   2655          
+   2656          
+   2657          	dptr[rlen++] = Sts->AlmSts.Data[0];
+   2658          	dptr[rlen++] = Sts->AlmSts.Data[1];
+   2659          	dptr[rlen++] = Sts->AlmSts.Data[2];
+   2660          	dptr[rlen++] = Sts->AlmSts.Data[3];
+   2661          	dptr[rlen++] = Sts->AlmSts.Data[4];
+   2662          	dptr[rlen++] = Sts->AlmSts.Data[5];
+   2663          	dptr[rlen++] = Sts->AlmSts.Data[6];
+   2664          	dptr[rlen++] = Sts->AlmSts.Data[7];
+   2665          
+   2666          	dptr[rlen++] = '2';
+   2667          
+   2668          	dptr[rlen++] = RetNormaltoSMSData(Sts->FwdInPwr_LTE);
+   2669          	dptr[rlen++] = RetNormaltoSMSData(Sts->FwdOutPwr_LTE[0]);
+   2670          	dptr[rlen++] = RetNormaltoSMSData(Sts->FwdOutPwr_LTE[1]);
+   2671          	dptr[rlen++] = RetNormaltoSMSData(Sts->FwdOutUpperLmt_LTE[0]);
+   2672          	dptr[rlen++] = RetNormaltoSMSData(Sts->FwdOutUpperLmt_LTE[1]);
+   2673          	dptr[rlen++] = Sts->FwdGainSet_LTE/2;
+   2674          	dptr[rlen++] = Sts->FwdGain_LTE/2;
+   2675          	
+   2676          	dptr[rlen++] = RetNormaltoSMSData(Sts->FwdInPwr_LTE_A1);
+   2677          	dptr[rlen++] = RetNormaltoSMSData(Sts->FwdOutPwr_LTE_A1[0]);
+   2678          	dptr[rlen++] = RetNormaltoSMSData(Sts->FwdOutPwr_LTE_A1[1]);
+   2679          	dptr[rlen++] = RetNormaltoSMSData(Sts->FwdOutUpperLmt_LTE_A1[0]);
+   2680          	dptr[rlen++] = RetNormaltoSMSData(Sts->FwdOutUpperLmt_LTE_A1[1]);
+   2681          	dptr[rlen++] = Sts->FwdGainSet_LTE_A1/2;
+   2682          	dptr[rlen++] = Sts->FwdGain_LTE_A1/2;
+   2683          
+   2684          	dptr[rlen++] = RetNormaltoSMSData(Sts->FwdInPwr_LTE_A2);
+   2685          	dptr[rlen++] = RetNormaltoSMSData(Sts->FwdOutPwr_LTE_A2[0]);
+   2686          	dptr[rlen++] = RetNormaltoSMSData(Sts->FwdOutPwr_LTE_A2[1]);
+   2687          	dptr[rlen++] = RetNormaltoSMSData(Sts->FwdOutUpperLmt_LTE_A2[0]);
+   2688          	dptr[rlen++] = RetNormaltoSMSData(Sts->FwdOutUpperLmt_LTE_A2[1]);
+   2689          	dptr[rlen++] = Sts->FwdGainSet_LTE_A2/2;
+   2690          	dptr[rlen++] = Sts->FwdGain_LTE_A2/2;
+   2691          
+   2692          	if(iRepeaterType == _TRIO_M)
+   2693          	{
+   2694          		for(i = 0; i < 14; i++)
+   2695          		{
+   2696          			dptr[rlen++] = 0;
+   2697          		}
+   2698          	}
+   2699          	else
+   2700          	{
+   2701          		dptr[rlen++] = RetNormaltoSMSData(Sts->Fwd1InPwr_LTE_A1);
+   2702          		dptr[rlen++] = RetNormaltoSMSData(Sts->Fwd1OutPwr_LTE_A1[0]);
+   2703          		dptr[rlen++] = RetNormaltoSMSData(Sts->Fwd1OutPwr_LTE_A1[1]);
+   2704          		dptr[rlen++] = RetNormaltoSMSData(Sts->Fwd1OutUpperLmt_LTE_A1[0]);
+   2705          		dptr[rlen++] = RetNormaltoSMSData(Sts->Fwd1OutUpperLmt_LTE_A1[1]);
+   2706          		dptr[rlen++] = Sts->Fwd1GainSet_LTE_A1/2;
+   2707          		dptr[rlen++] = Sts->Fwd1Gain_LTE_A1/2;
+   2708          
+   2709          		dptr[rlen++] = RetNormaltoSMSData(Sts->Fwd1InPwr_LTE_A2);
+   2710          		dptr[rlen++] = RetNormaltoSMSData(Sts->Fwd1OutPwr_LTE_A2[0]);
+   2711          		dptr[rlen++] = RetNormaltoSMSData(Sts->Fwd1OutPwr_LTE_A2[1]);
+   2712          		dptr[rlen++] = RetNormaltoSMSData(Sts->Fwd1OutUpperLmt_LTE_A2[0]);
+   2713          		dptr[rlen++] = RetNormaltoSMSData(Sts->Fwd1OutUpperLmt_LTE_A2[1]);
+   2714          		dptr[rlen++] = Sts->Fwd1GainSet_LTE_A2/2;
+   2715          		dptr[rlen++] = Sts->Fwd1Gain_LTE_A2/2;
+   2716          	}
+   2717          
+   2718          	dptr[rlen++] = Sts->Rvs0GainSet_LTE/2;
+   2719          	dptr[rlen++] = Sts->RvsGainSts_LTE/2;
+   2720          	dptr[rlen++] = Sts->RvsGainBalance_LTE;
+   2721          	
+   2722          	dptr[rlen++] = Sts->Rvs0GainSet_LTE_A1/2;
+   2723          	dptr[rlen++] = Sts->RvsGainSts_LTE_A1/2;
+   2724          	dptr[rlen++] = Sts->RvsGainBalance_LTE_A1;
+   2725          
+   2726          	dptr[rlen++] = Sts->Rvs0GainSet_LTE_A2/2;
+   2727          	dptr[rlen++] = Sts->RvsGainSts_LTE_A2/2;
+   2728          	dptr[rlen++] = Sts->RvsGainBalance_LTE_A2;
+   2729          
+   2730          	if(iRepeaterType == _TRIO_M)
+   2731          	{
+   2732          		for(i = 0; i < 6; i++)
+   2733          		{
+   2734          			dptr[rlen++] = 0;
+   2735          		}
+   2736          	}
+   2737          	else
+   2738          	{
+   2739          		dptr[rlen++] = Sts->Rvs1GainSet_LTE_A1/2;
+   2740          		dptr[rlen++] = Sts->Rvs1GainSts_LTE_A1/2;
+   2741          		dptr[rlen++] = Sts->Rvs1GainBalance_LTE_A1;
+   2742          
+   2743          		dptr[rlen++] = Sts->Rvs1GainSet_LTE_A2/2;
+   2744          		dptr[rlen++] = Sts->Rvs1GainSts_LTE_A2/2;
+   2745          		dptr[rlen++] = Sts->Rvs1GainBalance_LTE_A2;
+   2746          	}
+   2747          	dptr[rlen++] = Sts->Band_Select_LTE_A1;
+   2748          	dptr[rlen++] = Sts->Band_Select_LTE_A2[0];
+   2749          	dptr[rlen++] = Sts->Band_Select_LTE_A2[1];
+   2750          	dptr[rlen++] = Sts->Band_Select_LTE_A2[2];
+   2751          
+   2752          	for(i = 0; i < 3; i++)
+   2753          	{
+   2754          		dptr[rlen++] = 0;
+   2755          	}
+   2756          
+   2757          	dptr[rlen++] = Sts->AutoReportPriod;
+   2758          	dptr[rlen++] = Sts->AutoReportBasePer[0];
+   2759          	dptr[rlen++] = Sts->AutoReportBasePer[1];
+   2760          	dptr[rlen++] = Sts->ReportHours[0];
+   2761          	dptr[rlen++] = Sts->ReportHours[1];
+   2762          
+   2763           	return rlen;
+   2764          }
+   2765          
+   2766          INT16U GenEtcStsAid(INT8U *dptr, __Dnr_Sts *Sts)
+   2767          {
+   2768          	INT16U rlen = 0;
+   2769          
+   2770          	dptr[rlen++] = Sts->AGCMode_3G;
+   2771          	dptr[rlen++] = Sts->AGCMode_2G;
+   2772          	dptr[rlen++] = Sts->AGCMode_LTE;
+   2773          	dptr[rlen++] = Sts->AGCMode_LTE_A1;
+   2774          	dptr[rlen++] = Sts->AGCMode_LTE_A2;
+   2775          	dptr[rlen++] = Sts->LTE15MUse;
+   2776          	dptr[rlen++] = Sts->FemtocellUseOnOff.Data;
+   2777          	dptr[rlen++] = Sts->RepeatResetPriod;
+   2778          	dptr[rlen++] = Sts->RvsOverInAlarmCount;
+   2779          	dptr[rlen++] = Sts->RvsOtherOverInAlarmCount;
+   2780          
+   2781          	
+   2782          #ifdef __RvsCount
+   2783          
+   2784          	dptr[rlen++] = Sts->RvsOSCAlarmCount_3G;		
+   2785          	dptr[rlen++] = Sts->RvsOSCAlarmCount_2G;		
+   2786          	dptr[rlen++] = Sts->RvsOSCAlarmCount_LTE; 	
+   2787          	dptr[rlen++] = Sts->RvsOSCAlarmCount_LTE_A1;
+   2788          	dptr[rlen++] = Sts->RvsOSCAlarmCount_LTE_A2;
+   2789          	dptr[rlen++] = Sts->Rvs1OSCAlarmCount_LTE;	
+   2790          	dptr[rlen++] = Sts->Rvs1OSCAlarmCount_LTE_A1;
+   2791          	dptr[rlen++] = Sts->Rvs1OSCAlarmCount_LTE_A2;
+   2792          
+   2793          #endif
+   2794          
+   2795          	return rlen;
+   2796          
+   2797          }
+   2798          
+   2799          
+   2800          void SmsEtcTransmitData(INT8U* tid,INT8U Comm,__ProtocolPtr *nPtr)
+   2801          {
+   2802          
+   2803          	INT16U tcnt = 0;
+   2804          	__BODYFRAME *Send = nPtr->SmsSend;
+   2805          
+   2806          	{
+   2807          		tcnt = GenEtc1StsAid((INT8U *)Send->SubData,tDnrSts);
+   2808          		SmsDataAckTx(tid, (INT8U *)Send->SubData, tcnt, Comm,SmsSer);
+   2809          	}
+   2810          }
+   2811          
+   2812          
+   2813          INT16U GenEtc1StsAid(INT8U *dptr, __Dnr_Sts *Sts)
+   2814          {
+   2815          	INT16U rlen = 0;
+   2816          	INT16U i = 0;
+   2817          
+   2818          
+   2819          	for(i = 0; i < 6; i++)dptr[rlen++] = Sts->System_Time[i];
+   2820          	for(i = 0; i < 6; i++)dptr[rlen++] = Sts->Backup_Time[i];
+   2821          	for(i = 0; i < 6; i++)dptr[rlen++] = Sts->Last_AutoReport[i];
+   2822          
+   2823          	dptr[rlen++] = hibyte(Sts->Auto_Remain_Time);
+   2824          	dptr[rlen++] = lobyte(Sts->Auto_Remain_Time);
+   2825          	dptr[rlen++] = hibyte(Sts->AR2_Remain_Time);
+   2826          	dptr[rlen++] = lobyte(Sts->AR2_Remain_Time);
+   2827          	dptr[rlen++] = hibyte(Sts->AR3_Remain_Time);
+   2828          	dptr[rlen++] = lobyte(Sts->AR3_Remain_Time);
+   2829          
+   2830          	dptr[rlen++] = Sts->RvsOverInAlarmCount;
+   2831          	dptr[rlen++] = Sts->RvsOtherOverInAlarmCount;
+   2832          
+   2833          	dptr[rlen++] = Sts->ReportHours[0];
+   2834          	dptr[rlen++] = Sts->ReportHours[1];
+   2835          
+   2836          	return rlen;
+   2837          }
+   2838          
+   2839          
+   2840          
+   2841          INT16U GenWaveStsAid(INT8U *dptr, __Dnr_Sts *Sts)
+   2842          {
+   2843          	INT16U rlen = 0;
+   2844          
+   2845          	rlen += GenAidData(Aid_RxMaxVal,			(INT8U *)&dptr[rlen], (INT8U *)&(Sts->WaveCtrl.RxMaxVal), sizeof(Sts->WaveCtrl.RxMaxVal));
+   2846          	rlen += GenAidData(Aid_RxMinVal,			(INT8U *)&dptr[rlen], (INT8U *)&(Sts->WaveCtrl.RxMinVal), sizeof(Sts->WaveCtrl.RxMinVal));
+   2847          	rlen += GenAidData(Aid_TxMaxVal,			(INT8U *)&dptr[rlen], (INT8U *)&(Sts->WaveCtrl.TxMaxVal), sizeof(Sts->WaveCtrl.TxMaxVal));
+   2848          	rlen += GenAidData(Aid_TxMinVal,			(INT8U *)&dptr[rlen], (INT8U *)&(Sts->WaveCtrl.TxMinVal), sizeof(Sts->WaveCtrl.TxMinVal));
+   2849          	rlen += GenAidData(Aid_EcIo,				(INT8U *)&dptr[rlen], (INT8U *)&(Sts->WaveCtrl.EcIo), sizeof(Sts->WaveCtrl.EcIo));
+   2850          	rlen += GenAidData(Aid_ARMode,				(INT8U *)&dptr[rlen], (INT8U *)&(Sts->WaveCtrl.AR_Mode), sizeof(Sts->WaveCtrl.AR_Mode));
+   2851          
+   2852          	rlen += GenAidData(Aid_RadioReportTime,		(INT8U *)&dptr[rlen], (INT8U *)&(Sts->WaveCtrl.Radio_ReportTime), sizeof(Sts->WaveCtrl.Radio_ReportTime));
+   2853          
+   2854          	rlen += GenAidData(Aid_RadioReportPeriod, 	(INT8U *)&dptr[rlen], (INT8U *)&(Sts->WaveCtrl.Radio_ReportPeriod), sizeof(Sts->WaveCtrl.Radio_ReportPeriod));
+   2855          	rlen += GenAidData(Aid_TestStn, 			(INT8U *)&dptr[rlen], (INT8U *)&(Sts->TestStn), sizeof(Sts->TestStn));
+   2856          
+   2857          	return rlen;
+   2858          }
+   2859          
+   2860          void SmsAlarmRptFunc(INT8U Index, INT8U Comm ,INT8U Code, __ProtocolPtr *nPtr)
+   2861          {
+   2862           	INT16U rlen = 0;
+   2863          	INT8U tid[3] = {0xff, 0xff, 0xff};
+   2864          	INT8U	DnrAlarmBuff[20] = {0,};
+   2865          
+   2866          	if(Index == Index_ResetAlarm)
+   2867          	{
+   2868          		DnrAlarmBuff[rlen++] = hibyte(Aid_RCUReset);		// A_ID
+   2869          		DnrAlarmBuff[rlen++] = lobyte(Aid_RCUReset);
+   2870          		DnrAlarmBuff[rlen++] = 0x01;						// 발생
+   2871          		DnrAlarmBuff[rlen++] = 0x01;						// Lenght
+   2872          		DnrAlarmBuff[rlen++] = tDnrSts->ResetCase;			// Reason
+   2873          	}
+   2874          
+   2875          	if(Index == Index_BootAlarm)
+   2876          	{
+   2877          		DnrAlarmBuff[rlen++] = hibyte(Aid_BootAlarm);		// A_ID
+   2878          		DnrAlarmBuff[rlen++] = lobyte(Aid_BootAlarm);
+   2879          		DnrAlarmBuff[rlen++] = 0x01;						// 발생
+   2880          		DnrAlarmBuff[rlen++] = 0x00;						// Lenght
+   2881          	}
+   2882          
+   2883          	if(Index == Index_ACAlarm)
+   2884          	{
+   2885          		DnrAlarmBuff[rlen++] = hibyte(Aid_PowerAlarm);		// A_ID
+   2886          		DnrAlarmBuff[rlen++] = lobyte(Aid_PowerAlarm);
+   2887          		DnrAlarmBuff[rlen++] = PwrAlarm.ACFail; 			// 발생
+   2888          		DnrAlarmBuff[rlen++] = 0x00;						// Lenght
+   2889          	}
+   2890          
+   2891          	if(Index == Index_ErrRsp)
+   2892          	{
+   2893          		DnrAlarmBuff[rlen++] = Code;	
+   2894          	}
+   2895          
+   2896          	SmsDataAckTx(tid, (INT8U *)DnrAlarmBuff, rlen, Comm,SmsSer);
+   2897          }
+   2898          
+   2899          
+   2900          INT16U DnrAlarmReport(INT8U *dptr, __ProtocolPtr *nPtr )
+   2901          {
+   2902              INT8U DataCnt = 0;
+   2903          
+   2904          	__Dnr_Sts  *Sts = tDnrSts;	
+   2905          
+   2906          	
+   2907          	if((PwrAlarm.ACFail)||(SetAcRecovery))	chkAlarmMaskReport = SET;
+   2908          	else									chkAlarmMaskReport = RESET;
+   2909          
+   2910          
+   2911          	if((PwrAlarmChange.ACFail)||PwrAlarmFlag )
+   2912          	{
+   2913          		dptr[DataCnt++] = hibyte(Aid_PowerAlarm);	// A_ID
+   2914          		dptr[DataCnt++] = lobyte(Aid_PowerAlarm);
+   2915          		dptr[DataCnt++] = PwrAlarm.ACFail; 			// 발생
+   2916          		dptr[DataCnt++] = 0x00; 					// Lenght
+   2917          
+   2918          		if( InitPwrAlarm ) 
+   2919          		{
+   2920          			InitPwrAlarm = 0;
+   2921          			PwrAlarmFlag = SET;
+   2922          		}
+   2923          		else
+   2924          		{
+   2925          			PwrAlarmFlag = RESET;
+   2926          		}
+   2927          	
+   2928          		if(SetAcRecovery)	SetAcRecovery = RESET;
+   2929          	}
+   2930          
+   2931          	if( chkAlarmMaskReport == RESET)
+   2932          	{
+   2933          		if(PwrAlarmChange.FwdOutLowerLmtFail_3G)
+   2934          		{
+   2935          			dptr[DataCnt++] = hibyte(Aid_FwdOutLowerLmt_3G);
+   2936          			dptr[DataCnt++] = lobyte(Aid_FwdOutLowerLmt_3G);
+   2937          			dptr[DataCnt++] = PwrAlarm.FwdOutLowerLmtFail_3G;
+   2938          			dptr[DataCnt++] = 0x00;
+   2939          			PwrAlarmChange.FwdOutLowerLmtFail_3G = RESET;
+   2940          		}
+   2941          
+   2942          		if(PwrAlarmChange.OverInAlarm_3G)
+   2943          		{
+   2944          			dptr[DataCnt++] = hibyte(Aid_FwdOtherOverIn_3G);
+   2945          			dptr[DataCnt++] = lobyte(Aid_FwdOtherOverIn_3G);
+   2946          			dptr[DataCnt++] = PwrAlarm.OverInAlarm_3G;
+   2947          			dptr[DataCnt++] = 0x00;
+   2948          			
+   2949          			PwrAlarmChange.OverInAlarm_3G = RESET;
+   2950          		}
+   2951          
+   2952          		///////////////////////////// Fwd 2G
+   2953          
+   2954          		if(PwrAlarmChange.FwdInUpperLmtFail_2G)
+   2955          		{
+   2956          			dptr[DataCnt++] = hibyte(Aid_OverIn_2G);
+   2957          			dptr[DataCnt++] = lobyte(Aid_OverIn_2G);
+   2958          			dptr[DataCnt++] = PwrAlarm.FwdInUpperLmtFail_2G;
+   2959          			dptr[DataCnt++] = 0x00;
+   2960          			
+   2961          			PwrAlarmChange.FwdInUpperLmtFail_2G = RESET;
+   2962          		}
+   2963          #if 0
+   2964          		
+   2965           		if(PwrAlarmChange.FwdOutUpperLmtFail_2G)
+   2966          		{
+   2967          			dptr[DataCnt++] = hibyte(Aid_FwdOutUpperLmt_2G);
+   2968          			dptr[DataCnt++] = lobyte(Aid_FwdOutUpperLmt_2G);
+   2969          			dptr[DataCnt++] = PwrAlarm.FwdOutUpperLmtFail_2G;
+   2970          			dptr[DataCnt++] = 0x00;
+   2971          		}
+   2972          #endif
+   2973          		if(PwrAlarmChange.FwdOutLowerLmtFail_2G)
+   2974          		{
+   2975          			dptr[DataCnt++] = hibyte(Aid_FwdOutLowerLmt_2G);
+   2976          			dptr[DataCnt++] = lobyte(Aid_FwdOutLowerLmt_2G);
+   2977          			dptr[DataCnt++] = PwrAlarm.FwdOutLowerLmtFail_2G;
+   2978          			dptr[DataCnt++] = 0x00;
+   2979          			
+   2980          			PwrAlarmChange.FwdOutLowerLmtFail_2G = RESET;
+   2981          		}
+   2982          
+   2983          		///////////////////////////////////LTE
+   2984          		if(PwrAlarmChange.FwdInUpperLmtFail_LTE)
+   2985          		{
+   2986          			dptr[DataCnt++] = hibyte(Aid_OverIn_LTE);
+   2987          			dptr[DataCnt++] = lobyte(Aid_OverIn_LTE);
+   2988          			dptr[DataCnt++] = PwrAlarm.FwdInUpperLmtFail_LTE;
+   2989          			dptr[DataCnt++] = 0x00;
+   2990          			
+   2991          			PwrAlarmChange.FwdInUpperLmtFail_LTE = RESET;
+   2992          		}
+   2993          
+   2994           
+   2995          		if(PwrAlarmChange.FwdOutLowerLmtFail_LTE)
+   2996          		{
+   2997          			dptr[DataCnt++] = hibyte(Aid_FwdOutLowerLmt_LTE);
+   2998          			dptr[DataCnt++] = lobyte(Aid_FwdOutLowerLmt_LTE);
+   2999          
+   3000          			dptr[DataCnt++] = PwrAlarm.FwdOutLowerLmtFail_LTE;
+   3001          			dptr[DataCnt++] = 0x00;
+   3002          			
+   3003          			PwrAlarmChange.FwdOutLowerLmtFail_LTE = RESET;
+   3004          		}
+   3005          
+   3006          		if(PwrAlarmChange.OverInAlarm_CDMALTE)
+   3007          		{
+   3008          			dptr[DataCnt++] = hibyte(Aid_FwdOtherOverIn_Common);
+   3009          			dptr[DataCnt++] = lobyte(Aid_FwdOtherOverIn_Common);
+   3010          			dptr[DataCnt++] = PwrAlarm.OverInAlarm_CDMALTE;
+   3011          			dptr[DataCnt++] = 0x00;
+   3012          				
+   3013          			PwrAlarmChange.OverInAlarm_CDMALTE = RESET;
+   3014          		}
+   3015          
+   3016          		///////////////////////////////////LTE_A1
+   3017          		if(PwrAlarmChange.FwdOutLowerLmtFail_LTE_A1)
+   3018          		{
+   3019          			dptr[DataCnt++] = hibyte(Aid_FwdOutLowerLmt_LTE_A1);
+   3020          			dptr[DataCnt++] = lobyte(Aid_FwdOutLowerLmt_LTE_A1);
+   3021          
+   3022          			dptr[DataCnt++] = PwrAlarm.FwdOutLowerLmtFail_LTE_A1;
+   3023          			dptr[DataCnt++] = 0x00;
+   3024          			
+   3025          			PwrAlarmChange.FwdOutLowerLmtFail_LTE_A1 = RESET;
+   3026          		}
+   3027          
+   3028          		if(PwrAlarmChange.OverInAlarm_LTE_A1)
+   3029          		{
+   3030          			dptr[DataCnt++] = hibyte(Aid_FwdOtherOverIn_LTE_A);
+   3031          			dptr[DataCnt++] = lobyte(Aid_FwdOtherOverIn_LTE_A);
+   3032          
+   3033          			dptr[DataCnt++] = PwrAlarm.OverInAlarm_LTE_A1;
+   3034          			dptr[DataCnt++] = 0x00;
+   3035          
+   3036          			
+   3037          			PwrAlarmChange.OverInAlarm_LTE_A1 = RESET;
+   3038          		}
+   3039          
+   3040          		///////////////////////////////////LTE_A2
+   3041          		if(PwrAlarmChange.FwdOutLowerLmtFail_LTE_A2)
+   3042          		{
+   3043          			dptr[DataCnt++] = hibyte(Aid_FwdOutLowerLmt_LTE_A2);
+   3044          			dptr[DataCnt++] = lobyte(Aid_FwdOutLowerLmt_LTE_A2);
+   3045          			dptr[DataCnt++] = PwrAlarm.FwdOutLowerLmtFail_LTE_A2;
+   3046          			dptr[DataCnt++] = 0x00;
+   3047          			
+   3048          			PwrAlarmChange.FwdOutLowerLmtFail_LTE_A2 = RESET;
+   3049          		}
+   3050          
+   3051          
+   3052          		////////////
+   3053          		if((PwrAlarmChange.LocalFail_CDMALTE))
+   3054          		{
+   3055          			dptr[DataCnt++] = hibyte(Aid_LocalFail_CDMALTE);
+   3056          			dptr[DataCnt++] = lobyte(Aid_LocalFail_CDMALTE);
+   3057          			dptr[DataCnt++] = PwrAlarm.LocalFail_CDMALTE;
+   3058          			dptr[DataCnt++] = 0x00;
+   3059          			
+   3060          			PwrAlarmChange.LocalFail_CDMALTE = RESET;
+   3061          		}
+   3062          
+   3063          		if((PwrAlarmChange.LocalFail_LTE_A1))
+   3064          		{
+   3065          			dptr[DataCnt++] = hibyte(Aid_LocalFail_LTE_A1);
+   3066          			dptr[DataCnt++] = lobyte(Aid_LocalFail_LTE_A1);
+   3067          			dptr[DataCnt++] = PwrAlarm.LocalFail_LTE_A1;
+   3068          			dptr[DataCnt++] = 0x00;
+   3069          			
+   3070          			PwrAlarmChange.LocalFail_LTE_A1 = RESET;
+   3071          		}
+   3072          
+   3073          		if((PwrAlarmChange.LocalFail_LTE_A2))
+   3074          		{
+   3075          			dptr[DataCnt++] = hibyte(Aid_LocalFail_LTE_A2);
+   3076          			dptr[DataCnt++] = lobyte(Aid_LocalFail_LTE_A2);
+   3077          			dptr[DataCnt++] = PwrAlarm.LocalFail_LTE_A2;
+   3078          			dptr[DataCnt++] = 0x00;
+   3079          			
+   3080          			PwrAlarmChange.LocalFail_LTE_A2 = RESET;
+   3081          		}
+   3082          
+   3083          		if((PwrAlarmChange.LocalFail_3G))
+   3084          		{
+   3085          			dptr[DataCnt++] = hibyte(Aid_LocalFail_3G);
+   3086          			dptr[DataCnt++] = lobyte(Aid_LocalFail_3G);
+   3087          			dptr[DataCnt++] = PwrAlarm.LocalFail_3G;
+   3088          			dptr[DataCnt++] = 0x00;
+   3089          			
+   3090          			PwrAlarmChange.LocalFail_3G = RESET;
+   3091          		}
+   3092          
+   3093          
+   3094          		if((PwrAlarmChange.LocalFail_LTE_1))
+   3095          		{
+   3096          			dptr[DataCnt++] = hibyte(Aid_LocalFail_LTE_1);
+   3097          			dptr[DataCnt++] = lobyte(Aid_LocalFail_LTE_1);
+   3098          			dptr[DataCnt++] = PwrAlarm.LocalFail_LTE_1;
+   3099          			dptr[DataCnt++] = 0x00;
+   3100          			
+   3101          			PwrAlarmChange.LocalFail_LTE_1 = RESET;
+   3102          		}
+   3103          
+   3104          		if((PwrAlarmChange.LocalFail_LTE_A1_1))
+   3105          		{
+   3106          			dptr[DataCnt++] = hibyte(Aid_LocalFail_LTE_A1_1);
+   3107          			dptr[DataCnt++] = lobyte(Aid_LocalFail_LTE_A1_1);
+   3108          			dptr[DataCnt++] = PwrAlarm.LocalFail_LTE_A1_1;
+   3109          			dptr[DataCnt++] = 0x00;
+   3110          			
+   3111          			PwrAlarmChange.LocalFail_LTE_A1_1 = RESET;
+   3112          		}
+   3113          
+   3114          		if((PwrAlarmChange.LocalFail_LTE_A2_1))
+   3115          		{
+   3116          			dptr[DataCnt++] = hibyte(Aid_LocalFail_LTE_A2_1);
+   3117          			dptr[DataCnt++] = lobyte(Aid_LocalFail_LTE_A2_1);
+   3118          			dptr[DataCnt++] = PwrAlarm.LocalFail_LTE_A2_1;
+   3119          			dptr[DataCnt++] = 0x00;
+   3120          			
+   3121          			PwrAlarmChange.LocalFail_LTE_A2_1 = RESET;
+   3122          		}
+   3123          
+   3124          #if 1
+   3125          		if((PwrAlarmChange.FwdAmpOnOff_2G))
+   3126          		{
+   3127          			PwrAlarmChange.FwdAmpOnOff_2G = RESET;
+   3128          
+   3129          			if(PwrAlarmChange.RvsOutUpperLmtFail_2G)
+   3130          			{
+   3131          				dptr[DataCnt++] = hibyte(Aid_RvsOscilation_2G);
+   3132          				dptr[DataCnt++] = lobyte(Aid_RvsOscilation_2G);
+   3133          				
+   3134          				dptr[DataCnt++] = PwrAlarm.RvsOutUpperLmtFail_2G;
+   3135          				dptr[DataCnt++] = 0x00;
+   3136          				PwrAlarmChange.RvsOutUpperLmtFail_2G = RESET;
+   3137          			}
+   3138          			if(PwrAlarmChange.FwdOutUpperLmtFail_2G)
+   3139          			{
+   3140          				dptr[DataCnt++] = hibyte(Aid_FwdOutUpperLmt_2G);
+   3141          				dptr[DataCnt++] = lobyte(Aid_FwdOutUpperLmt_2G);
+   3142          				dptr[DataCnt++] = PwrAlarm.FwdOutUpperLmtFail_2G;
+   3143          				dptr[DataCnt++] = 0x00;
+   3144          				
+   3145          				PwrAlarmChange.FwdOutUpperLmtFail_2G = RESET;
+   3146          			}
+   3147          
+   3148          			{
+   3149          				dptr[DataCnt++] = hibyte(Aid_FwdAmpOnOff_2G);
+   3150          				dptr[DataCnt++] = lobyte(Aid_FwdAmpOnOff_2G);
+   3151          				if(PwrAlarm.FwdAmpOnOff_2G) dptr[DataCnt++] = 0x01;
+   3152          				else						dptr[DataCnt++] = 0x00;
+   3153          				
+   3154          				dptr[DataCnt++] = 0x01;
+   3155          				dptr[DataCnt++] = tDnrSts->AmpOffCase_2G;
+   3156          
+   3157          			}				
+   3158          		}
+   3159          
+   3160          		if((PwrAlarmChange.FwdAmpOnOff_LTE))
+   3161          		{
+   3162          			PwrAlarmChange.FwdAmpOnOff_LTE = RESET;
+   3163          
+   3164          			if(PwrAlarmChange.RvsOutUpperLmtFail_LTE)
+   3165          			{
+   3166          				dptr[DataCnt++] = hibyte(Aid_RvsOscilation_LTE);
+   3167          				dptr[DataCnt++] = lobyte(Aid_RvsOscilation_LTE);
+   3168          				
+   3169          				dptr[DataCnt++] = PwrAlarm.RvsOutUpperLmtFail_LTE;
+   3170          				dptr[DataCnt++] = 0x00;
+   3171          				PwrAlarmChange.RvsOutUpperLmtFail_LTE = RESET;
+   3172          			}
+   3173          
+   3174          			if(PwrAlarmChange.FwdOutUpperLmtFail_LTE)
+   3175          			{
+   3176          				dptr[DataCnt++] = hibyte(Aid_FwdOutUpperLmt_LTE);
+   3177          				dptr[DataCnt++] = lobyte(Aid_FwdOutUpperLmt_LTE);
+   3178          				dptr[DataCnt++] = PwrAlarm.FwdOutUpperLmtFail_LTE;
+   3179          				dptr[DataCnt++] = 0x00;
+   3180          				
+   3181          				PwrAlarmChange.FwdOutUpperLmtFail_LTE = RESET;
+   3182          			}
+   3183          
+   3184          
+   3185          			{
+   3186          				dptr[DataCnt++] = hibyte(Aid_FwdAmpOnOff_LTE);
+   3187          				dptr[DataCnt++] = lobyte(Aid_FwdAmpOnOff_LTE);
+   3188          				if(PwrAlarm.FwdAmpOnOff_2G) dptr[DataCnt++] = 0x01;
+   3189          				else						dptr[DataCnt++] = 0x00;
+   3190          				
+   3191          				dptr[DataCnt++] = 0x01;
+   3192          				dptr[DataCnt++] = tDnrSts->AmpOffCase_LTE;
+   3193          			}				
+   3194          		}
+   3195          
+   3196          		if((PwrAlarmChange.FwdAmpOnOff_LTE_A1))
+   3197          		{
+   3198          			PwrAlarmChange.FwdAmpOnOff_LTE_A1 = RESET;
+   3199          
+   3200          			if(PwrAlarmChange.RvsOutUpperLmtFail_LTE_A1)
+   3201          			{
+   3202          				dptr[DataCnt++] = hibyte(Aid_RvsOscilation_LTE_A1);
+   3203          				dptr[DataCnt++] = lobyte(Aid_RvsOscilation_LTE_A1);
+   3204          				
+   3205          				dptr[DataCnt++] = PwrAlarm.RvsOutUpperLmtFail_LTE_A1;
+   3206          				dptr[DataCnt++] = 0x00;
+   3207          				PwrAlarmChange.RvsOutUpperLmtFail_LTE_A1 = RESET;
+   3208          			}
+   3209          
+   3210          			if(PwrAlarmChange.FwdOutUpperLmtFail_LTE_A1)
+   3211          			{
+   3212          				dptr[DataCnt++] = hibyte(Aid_FwdOutUpperLmt_LTE_A1);
+   3213          				dptr[DataCnt++] = lobyte(Aid_FwdOutUpperLmt_LTE_A1);
+   3214          				dptr[DataCnt++] = PwrAlarm.FwdOutUpperLmtFail_LTE_A1;
+   3215          				dptr[DataCnt++] = 0x00;
+   3216          				
+   3217          				PwrAlarmChange.FwdOutUpperLmtFail_LTE_A1 = RESET;
+   3218          			}
+   3219          
+   3220          			if(PwrAlarmChange.FwdInUpperLmtFail_LTE_A1)
+   3221          			{
+   3222          				dptr[DataCnt++] = hibyte(Aid_OverIn_LTE_A1);
+   3223          				dptr[DataCnt++] = lobyte(Aid_OverIn_LTE_A1);
+   3224          			
+   3225          				dptr[DataCnt++] = PwrAlarm.FwdInUpperLmtFail_LTE_A1;
+   3226          				dptr[DataCnt++] = 0x00;
+   3227          				PwrAlarmChange.FwdInUpperLmtFail_LTE_A1 = RESET;
+   3228          			}
+   3229          
+   3230          			{
+   3231          				dptr[DataCnt++] = hibyte(Aid_FwdAmpOnOff_LTE_A1);
+   3232          				dptr[DataCnt++] = lobyte(Aid_FwdAmpOnOff_LTE_A1);
+   3233          				if(PwrAlarm.FwdAmpOnOff_LTE_A1) dptr[DataCnt++] = 0x01;
+   3234          				else						dptr[DataCnt++] = 0x00;
+   3235          				
+   3236          				dptr[DataCnt++] = 0x01;
+   3237          				dptr[DataCnt++] = tDnrSts->AmpOffCase_LTE_A1;
+   3238          			}				
+   3239          		}
+   3240          
+   3241          		
+   3242          		if((PwrAlarmChange.FwdAmpOnOff_LTE_A2))
+   3243          		{
+   3244          			PwrAlarmChange.FwdAmpOnOff_LTE_A2 = RESET;
+   3245          
+   3246          			if(PwrAlarmChange.RvsOutUpperLmtFail_LTE_A2)
+   3247          			{
+   3248          				dptr[DataCnt++] = hibyte(Aid_RvsOscilation_LTE_A2);
+   3249          				dptr[DataCnt++] = lobyte(Aid_RvsOscilation_LTE_A2);
+   3250          				
+   3251          				dptr[DataCnt++] = PwrAlarm.RvsOutUpperLmtFail_LTE_A2;
+   3252          				dptr[DataCnt++] = 0x00;
+   3253          				
+   3254          				PwrAlarmChange.RvsOutUpperLmtFail_LTE_A2 = RESET;
+   3255          			}
+   3256          			
+   3257          			if(PwrAlarmChange.FwdOutUpperLmtFail_LTE_A2)
+   3258          			{
+   3259          				dptr[DataCnt++] = hibyte(Aid_FwdOutUpperLmt_LTE_A2);
+   3260          				dptr[DataCnt++] = lobyte(Aid_FwdOutUpperLmt_LTE_A2);
+   3261          				dptr[DataCnt++] = PwrAlarm.FwdOutUpperLmtFail_LTE_A2;
+   3262          				dptr[DataCnt++] = 0x00;
+   3263          				
+   3264          				PwrAlarmChange.FwdOutUpperLmtFail_LTE_A2 = RESET;
+   3265          			}
+   3266          
+   3267          			if(PwrAlarmChange.FwdInUpperLmtFail_LTE_A2)
+   3268          			{
+   3269          				dptr[DataCnt++] = hibyte(Aid_OverIn_LTE_A2);
+   3270          				dptr[DataCnt++] = lobyte(Aid_OverIn_LTE_A2);
+   3271          			
+   3272          				dptr[DataCnt++] = PwrAlarm.FwdInUpperLmtFail_LTE_A2;
+   3273          				dptr[DataCnt++] = 0x00;
+   3274          				
+   3275          				PwrAlarmChange.FwdInUpperLmtFail_LTE_A2 = RESET;
+   3276          			}
+   3277          
+   3278          			{
+   3279          				dptr[DataCnt++] = hibyte(Aid_FwdAmpOnOff_LTE_A2);
+   3280          				dptr[DataCnt++] = lobyte(Aid_FwdAmpOnOff_LTE_A2);
+   3281          				if(PwrAlarm.FwdAmpOnOff_LTE_A2) dptr[DataCnt++] = 0x01;
+   3282          				else							dptr[DataCnt++] = 0x00;
+   3283          				
+   3284          				dptr[DataCnt++] = 0x01;
+   3285          				dptr[DataCnt++] = tDnrSts->AmpOffCase_LTE_A2;
+   3286          			}				
+   3287          		}
+   3288          
+   3289          		if((PwrAlarmChange.FwdAmpOnOff_3G))
+   3290          		{
+   3291          			PwrAlarmChange.FwdAmpOnOff_3G = RESET;
+   3292          
+   3293          			if(PwrAlarmChange.RvsOutUpperLmtFail_3G)
+   3294          			{
+   3295          				dptr[DataCnt++] = hibyte(Aid_RvsOscilation_3G);
+   3296          				dptr[DataCnt++] = lobyte(Aid_RvsOscilation_3G);
+   3297          				
+   3298          				dptr[DataCnt++] = PwrAlarm.RvsOutUpperLmtFail_3G;
+   3299          				dptr[DataCnt++] = 0x00;
+   3300          				
+   3301          				PwrAlarmChange.RvsOutUpperLmtFail_3G = RESET;
+   3302          			}
+   3303          			
+   3304          			if(PwrAlarmChange.FwdOutUpperLmtFail_3G)
+   3305          			{
+   3306          				dptr[DataCnt++] = hibyte(Aid_FwdOutUpperLmt_3G);
+   3307          				dptr[DataCnt++] = lobyte(Aid_FwdOutUpperLmt_3G);
+   3308          				dptr[DataCnt++] = PwrAlarm.FwdOutUpperLmtFail_3G;
+   3309          				dptr[DataCnt++] = 0x00;
+   3310          				
+   3311          				PwrAlarmChange.FwdOutUpperLmtFail_3G = RESET;
+   3312          			}
+   3313          
+   3314          			if(PwrAlarmChange.FwdInUpperLmtFail_3G)
+   3315          			{
+   3316          				dptr[DataCnt++] = hibyte(Aid_OverIn_3G);
+   3317          				dptr[DataCnt++] = lobyte(Aid_OverIn_3G);
+   3318          			
+   3319          				dptr[DataCnt++] = PwrAlarm.FwdInUpperLmtFail_3G;
+   3320          				dptr[DataCnt++] = 0x00;
+   3321          				
+   3322          				PwrAlarmChange.FwdInUpperLmtFail_3G = RESET;
+   3323          			}
+   3324          
+   3325          			{
+   3326          				dptr[DataCnt++] = hibyte(Aid_FwdAmpOnOff_3G);
+   3327          				dptr[DataCnt++] = lobyte(Aid_FwdAmpOnOff_3G);
+   3328          				if(PwrAlarm.FwdAmpOnOff_3G) dptr[DataCnt++] = 0x01;
+   3329          				else						dptr[DataCnt++] = 0x00;
+   3330          				
+   3331          				dptr[DataCnt++] = 0x01;
+   3332          				dptr[DataCnt++] = tDnrSts->AmpOffCase_3G;
+   3333          			}				
+   3334          		}
+   3335          
+   3336          		
+   3337          
+   3338          #endif
+   3339          
+   3340          
+   3341          		///////////////////////////////////LTE
+   3342          		if(iRepeaterType == _TRIO_MM)
+   3343          		{
+   3344          
+   3345          			if(PwrAlarmChange.Fwd1OutLowerLmtFail_LTE)
+   3346          			{
+   3347          				dptr[DataCnt++] = hibyte(Aid_Fwd1OutLowerLmt_LTE);
+   3348          				dptr[DataCnt++] = lobyte(Aid_Fwd1OutLowerLmt_LTE);
+   3349          
+   3350          				dptr[DataCnt++] = PwrAlarm.Fwd1OutLowerLmtFail_LTE;
+   3351          				dptr[DataCnt++] = 0x00;
+   3352          				
+   3353          				PwrAlarmChange.Fwd1OutLowerLmtFail_LTE = RESET;
+   3354          			}
+   3355          
+   3356          			///////////////////////////////////LTE_A1
+   3357          			if(PwrAlarmChange.Fwd1OutLowerLmtFail_LTE_A1)
+   3358          			{
+   3359          				dptr[DataCnt++] = hibyte(Aid_Fwd1OutLowerLmt_LTE_A1);
+   3360          				dptr[DataCnt++] = lobyte(Aid_Fwd1OutLowerLmt_LTE_A1);
+   3361          
+   3362          				dptr[DataCnt++] = PwrAlarm.Fwd1OutLowerLmtFail_LTE_A1;
+   3363          				dptr[DataCnt++] = 0x00;
+   3364          				
+   3365          				PwrAlarmChange.Fwd1OutLowerLmtFail_LTE_A1 = RESET;
+   3366          			}
+   3367          			///////////////////////////////////LTE_A2
+   3368          			if(PwrAlarmChange.Fwd1OutLowerLmtFail_LTE_A2)
+   3369          			{
+   3370          				dptr[DataCnt++] = hibyte(Aid_Fwd1OutLowerLmt_LTE_A2);
+   3371          				dptr[DataCnt++] = lobyte(Aid_Fwd1OutLowerLmt_LTE_A2);
+   3372          
+   3373          				dptr[DataCnt++] = PwrAlarm.Fwd1OutLowerLmtFail_LTE_A2;
+   3374          				dptr[DataCnt++] = 0x00;
+   3375          					
+   3376          				PwrAlarmChange.Fwd1OutLowerLmtFail_LTE_A2 = RESET;
+   3377          			}
+   3378          ////////////////
+   3379          			if((PwrAlarmChange.FwdAmp1OnOff_LTE))
+   3380          			{
+   3381          				PwrAlarmChange.FwdAmp1OnOff_LTE = RESET;
+   3382          
+   3383          				if(PwrAlarmChange.Rvs1OutUpperLmtFail_LTE)
+   3384          				{
+   3385          					dptr[DataCnt++] = hibyte(Aid_Rvs1Oscilation_LTE_A1);
+   3386          					dptr[DataCnt++] = lobyte(Aid_Rvs1Oscilation_LTE_A1);
+   3387          					
+   3388          					dptr[DataCnt++] = PwrAlarm.Rvs1OutUpperLmtFail_LTE;
+   3389          					dptr[DataCnt++] = 0x00;
+   3390          					PwrAlarmChange.Rvs1OutUpperLmtFail_LTE = RESET;
+   3391          				}
+   3392          
+   3393          				if(PwrAlarmChange.Fwd1OutUpperLmtFail_LTE)
+   3394          				{
+   3395          					dptr[DataCnt++] = hibyte(Aid_Fwd1OutUpperLmt_LTE);
+   3396          					dptr[DataCnt++] = lobyte(Aid_Fwd1OutUpperLmt_LTE);
+   3397          					dptr[DataCnt++] = PwrAlarm.Fwd1OutUpperLmtFail_LTE;
+   3398          					dptr[DataCnt++] = 0x00;
+   3399          					
+   3400          					PwrAlarmChange.Fwd1OutUpperLmtFail_LTE = RESET;
+   3401          				}
+   3402          
+   3403          				if(PwrAlarmChange.Fwd1InUpperLmtFail_LTE)
+   3404          				{
+   3405          					dptr[DataCnt++] = hibyte(Aid_OverIn_LTE_A1_1);
+   3406          					dptr[DataCnt++] = lobyte(Aid_OverIn_LTE_A1_1);
+   3407          				
+   3408          					dptr[DataCnt++] = PwrAlarm.Fwd1InUpperLmtFail_LTE;
+   3409          					dptr[DataCnt++] = 0x00;
+   3410          					
+   3411          					PwrAlarmChange.Fwd1InUpperLmtFail_LTE = RESET;
+   3412          				}
+   3413          #if 0
+   3414          				{
+   3415          					dptr[DataCnt++] = hibyte(Aid_FwdAmp1OnOff_LTE_A1);
+   3416          					dptr[DataCnt++] = lobyte(Aid_FwdAmp1OnOff_LTE_A1);
+   3417          					if(PwrAlarm.FwdAmp1OnOff_LTE) 	dptr[DataCnt++] = 0x01;
+   3418          					else							dptr[DataCnt++] = 0x00;
+   3419          					
+   3420          					dptr[DataCnt++] = 0x01;
+   3421          					dptr[DataCnt++] = tDnrSts->Amp1OffCase_LTE;
+   3422          				}
+   3423          #endif
+   3424          ///////20150104 수정 
+   3425          				{
+   3426          					dptr[DataCnt++] = hibyte(Aid_FwdAmp1OnOff_LTE);
+   3427          					dptr[DataCnt++] = lobyte(Aid_FwdAmp1OnOff_LTE);
+   3428          					if(PwrAlarm.FwdAmp1OnOff_LTE)	dptr[DataCnt++] = 0x01;
+   3429          					else							dptr[DataCnt++] = 0x00;
+   3430          					
+   3431          					dptr[DataCnt++] = 0x01;
+   3432          					dptr[DataCnt++] = tDnrSts->Amp1OffCase_LTE;
+   3433          				}
+   3434          
+   3435          				
+   3436          			}
+   3437          
+   3438          
+   3439          			if((PwrAlarmChange.FwdAmp1OnOff_LTE_A1))
+   3440          			{
+   3441          				PwrAlarmChange.FwdAmp1OnOff_LTE_A1 = RESET;
+   3442          
+   3443          				if(PwrAlarmChange.Rvs1OutUpperLmtFail_LTE_A1)
+   3444          				{
+   3445          					dptr[DataCnt++] = hibyte(Aid_Rvs1Oscilation_LTE_A1);
+   3446          					dptr[DataCnt++] = lobyte(Aid_Rvs1Oscilation_LTE_A1);
+   3447          					
+   3448          					dptr[DataCnt++] = PwrAlarm.Rvs1OutUpperLmtFail_LTE_A1;
+   3449          					dptr[DataCnt++] = 0x00;
+   3450          					PwrAlarmChange.Rvs1OutUpperLmtFail_LTE_A1 = RESET;
+   3451          				}
+   3452          
+   3453          				if(PwrAlarmChange.Fwd1OutUpperLmtFail_LTE_A1)
+   3454          				{
+   3455          					dptr[DataCnt++] = hibyte(Aid_Fwd1OutUpperLmt_LTE_A1);
+   3456          					dptr[DataCnt++] = lobyte(Aid_Fwd1OutUpperLmt_LTE_A1);
+   3457          					dptr[DataCnt++] = PwrAlarm.Fwd1OutUpperLmtFail_LTE_A1;
+   3458          					dptr[DataCnt++] = 0x00;
+   3459          					PwrAlarmChange.Fwd1OutUpperLmtFail_LTE_A1 = RESET;
+   3460          				}
+   3461          
+   3462          				if(PwrAlarmChange.Fwd1InUpperLmtFail_LTE_A1)
+   3463          				{
+   3464          					dptr[DataCnt++] = hibyte(Aid_OverIn_LTE_A1_1);
+   3465          					dptr[DataCnt++] = lobyte(Aid_OverIn_LTE_A1_1);
+   3466          				
+   3467          					dptr[DataCnt++] = PwrAlarm.Fwd1InUpperLmtFail_LTE_A1;
+   3468          					dptr[DataCnt++] = 0x00;
+   3469          					
+   3470          					PwrAlarmChange.Fwd1InUpperLmtFail_LTE_A1 = RESET;
+   3471          				}
+   3472          
+   3473          				{
+   3474          					dptr[DataCnt++] = hibyte(Aid_FwdAmp1OnOff_LTE_A1);
+   3475          					dptr[DataCnt++] = lobyte(Aid_FwdAmp1OnOff_LTE_A1);
+   3476          					if(PwrAlarm.FwdAmp1OnOff_LTE_A1) 	dptr[DataCnt++] = 0x01;
+   3477          					else								dptr[DataCnt++] = 0x00;
+   3478          					
+   3479          					dptr[DataCnt++] = 0x01;
+   3480          					dptr[DataCnt++] = tDnrSts->Amp1OffCase_LTE_A1;
+   3481          				}				
+   3482          			}
+   3483          
+   3484          			
+   3485          			if((PwrAlarmChange.FwdAmp1OnOff_LTE_A2))
+   3486          			{
+   3487          				PwrAlarmChange.FwdAmp1OnOff_LTE_A2 = RESET;
+   3488          
+   3489          				if(PwrAlarmChange.Rvs1OutUpperLmtFail_LTE_A2)
+   3490          				{
+   3491          					dptr[DataCnt++] = hibyte(Aid_Rvs1Oscilation_LTE_A2);
+   3492          					dptr[DataCnt++] = lobyte(Aid_Rvs1Oscilation_LTE_A2);
+   3493          					
+   3494          					dptr[DataCnt++] = PwrAlarm.Rvs1OutUpperLmtFail_LTE_A2;
+   3495          					dptr[DataCnt++] = 0x00;
+   3496          					PwrAlarmChange.Rvs1OutUpperLmtFail_LTE_A2 = RESET;
+   3497          				}
+   3498          
+   3499          				if(PwrAlarmChange.Fwd1OutUpperLmtFail_LTE_A2)
+   3500          				{
+   3501          					dptr[DataCnt++] = hibyte(Aid_FwdOutUpperLmt_LTE_A2);
+   3502          					dptr[DataCnt++] = lobyte(Aid_FwdOutUpperLmt_LTE_A2);
+   3503          					dptr[DataCnt++] = PwrAlarm.Fwd1OutUpperLmtFail_LTE_A2;
+   3504          					dptr[DataCnt++] = 0x00;
+   3505          					
+   3506          					PwrAlarmChange.Fwd1OutUpperLmtFail_LTE_A2 = RESET;
+   3507          				}
+   3508          
+   3509          				if(PwrAlarmChange.Fwd1InUpperLmtFail_LTE_A2)
+   3510          				{
+   3511          					dptr[DataCnt++] = hibyte(Aid_OverIn_LTE_A2);
+   3512          					dptr[DataCnt++] = lobyte(Aid_OverIn_LTE_A2);
+   3513          				
+   3514          					dptr[DataCnt++] = PwrAlarm.Fwd1InUpperLmtFail_LTE_A2;
+   3515          					dptr[DataCnt++] = 0x00;
+   3516          					
+   3517          					PwrAlarmChange.Fwd1InUpperLmtFail_LTE_A2 = RESET;
+   3518          				}
+   3519          
+   3520          				{
+   3521          					dptr[DataCnt++] = hibyte(Aid_FwdAmp1OnOff_LTE_A2);
+   3522          					dptr[DataCnt++] = lobyte(Aid_FwdAmp1OnOff_LTE_A2);
+   3523          					if(PwrAlarm.FwdAmp1OnOff_LTE_A2) dptr[DataCnt++] = 0x01;
+   3524          					else							dptr[DataCnt++] = 0x00;
+   3525          					
+   3526          					dptr[DataCnt++] = 0x01;
+   3527          					dptr[DataCnt++] = tDnrSts->Amp1OffCase_LTE_A2;
+   3528          				}				
+   3529          			}
+   3530          		}
+   3531          	}
+   3532          
+   3533          	/////////////////// 필수 항목 /////////////////////////////////////
+   3534          	if(DataCnt)
+   3535          	{
+   3536          		dptr[DataCnt++] = 0xff; 				// A_ID
+   3537          		dptr[DataCnt++] = 0xff;
+   3538          		
+   3539          		if(iRepeaterType == _TRIO_M)
+   3540          		{
+   3541          			dptr[DataCnt++] = 10;					// len
+   3542          		}
+   3543          		else
+   3544          		{
+   3545          			dptr[DataCnt++] = 16;					// len
+   3546          		}
+   3547          
+   3548          		dptr[DataCnt++] = RetNormaltoSMSData(Sts->FwdOutPwr_2G[0]);
+   3549          		dptr[DataCnt++] = RetNormaltoSMSData(Sts->FwdOutPwr_2G[1]);
+   3550          		dptr[DataCnt++] = RetNormaltoSMSData(Sts->FwdOutPwr_3G[0]);
+   3551          		dptr[DataCnt++] = RetNormaltoSMSData(Sts->FwdOutPwr_3G[1]);
+   3552          
+   3553          		dptr[DataCnt++] = RetNormaltoSMSData(Sts->FwdOutPwr_LTE[0]);
+   3554          		dptr[DataCnt++] = RetNormaltoSMSData(Sts->FwdOutPwr_LTE[1]);
+   3555          
+   3556          		dptr[DataCnt++] = RetNormaltoSMSData(Sts->FwdOutPwr_LTE_A1[0]);
+   3557          		dptr[DataCnt++] = RetNormaltoSMSData(Sts->FwdOutPwr_LTE_A1[1]);
+   3558          
+   3559          		dptr[DataCnt++] = RetNormaltoSMSData(Sts->FwdOutPwr_LTE_A2[0]);
+   3560          		dptr[DataCnt++] = RetNormaltoSMSData(Sts->FwdOutPwr_LTE_A2[1]);
+   3561          
+   3562          
+   3563          		if(iRepeaterType == _TRIO_MM)
+   3564          		{
+   3565          			dptr[DataCnt++] = RetNormaltoSMSData(Sts->Fwd1OutPwr_LTE[0]);
+   3566          			dptr[DataCnt++] = RetNormaltoSMSData(Sts->Fwd1OutPwr_LTE[1]);
+   3567          
+   3568          			dptr[DataCnt++] = RetNormaltoSMSData(Sts->Fwd1OutPwr_LTE_A1[0]);
+   3569          			dptr[DataCnt++] = RetNormaltoSMSData(Sts->Fwd1OutPwr_LTE_A1[1]);
+   3570          
+   3571          			dptr[DataCnt++] = RetNormaltoSMSData(Sts->Fwd1OutPwr_LTE_A2[0]);
+   3572          			dptr[DataCnt++] = RetNormaltoSMSData(Sts->Fwd1OutPwr_LTE_A2[1]);
+   3573          		}
+   3574          	}
+   3575          	return(DataCnt);
+   3576          }
+   3577          
+   3578          INT16S Rfatoi( INT8U *str, INT8U Len )
+   3579          {
+   3580          	INT8U	St = 0, i;
+   3581          	INT32S	value = 0; 
+   3582          	// 20100317: value 값이 3G에서는 채널 값등이,  아래 x10 하는데서 오버플로 날 수 있으므로, 32비트로 변경.
+   3583          
+   3584          	for( i=0; i<Len; i++ )
+   3585          	{
+   3586          		if( str[i] == '-' ) St = 1;
+   3587          		else
+   3588          		{
+   3589          			value += (str[i] -'0');
+   3590          			value = value * 10;
+   3591          		}
+   3592          	}
+   3593          	
+   3594          	value = value / 10;
+   3595          	
+   3596          	if( St ) value *= (-1);
+   3597          	
+   3598          	return value;
+   3599          }
+   3600          
+   3601          
+   3602          #if 0
+   3603          
+   3604          01071065483
+   3605          
+   3606          void TxDataToSMS ( UINT8 *NmsData,UINT8 DataLen,UINT8 *Dest,UINT8 *Sour )
+   3607          {
+   3608              UINT16  i, DataCnt=0, Txtry=0;
+   3609              const char  *Command = "AT*SKTR*SMSMO=";
+   3610              char HtoA[16] = { '0', '1', '2', '3', '4', '5', '6', '7', 
+   3611                                '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
+   3612          
+   3613              for ( i=0; i<14; i++ )
+   3614                  Tx2Buff[DataCnt++] = Command[i];
+   3615              for ( i=0; i<11; i++ )
+   3616              {
+   3617                  if ( (Dest[i]<'0')||(Dest[i]>'9') ) break;
+   3618                  Tx2Buff[DataCnt++] = Dest[i];
+   3619              }
+   3620              Tx2Buff[DataCnt++] = ',';
+   3621              for ( i=0; i<11; i++ )
+   3622              {
+   3623                  if ( (Sour[i]<'0')||(Sour[i]>'9') ) break;
+   3624                  Tx2Buff[DataCnt++] = Sour[i];
+   3625              }
+   3626              Tx2Buff[DataCnt++] = ',';
+   3627              if(RhuData(0, 0, RH_PhoneModel, 0 ) != 0x0C)//KST WCDMA Modem
+   3628              {
+   3629                  Tx2Buff[DataCnt++] = '4';
+   3630                  Tx2Buff[DataCnt++] = '0';
+   3631                  Tx2Buff[DataCnt++] = '9';
+   3632                  Tx2Buff[DataCnt++] = '8';
+   3633              }
+   3634              Tx2Buff[DataCnt++] = ',';
+   3635              
+   3636              Tx2Buff[DataCnt++] = '0';//encoding
+   3637              Tx2Buff[DataCnt++] = ',';
+   3638           
+   3639              if(RhuData(0, 0, RH_PhoneModel, 0 ) != 0x0C)//KST WCDMA Modem
+   3640              {
+   3641                  Tx2Buff[DataCnt++] = '1';//bearer_rply
+   3642              }
+   3643              Tx2Buff[DataCnt++] = ',';
+   3644           
+   3645              if(RhuData(0, 0, RH_PhoneModel, 0 ) != 0x0C)//KST WCDMA Modem
+   3646              {
+   3647                   Tx2Buff[DataCnt++] = '0';//priority
+   3648              }
+   3649              Tx2Buff[DataCnt++] = ',';
+   3650          
+   3651              for ( i=0; i<DataLen; i++ )
+   3652              {
+   3653                   if( i < (DataLen-2) )   NmsData[i]          = NmsData[i] | 0x80;
+   3654                  Tx2Buff[DataCnt++]  = HtoA[(NmsData[i]>>4)&0x0F];
+   3655                  Tx2Buff[DataCnt++]  = HtoA[(NmsData[i]>>0)&0x0F];
+   3656              }
+   3657              Tx2Buff[DataCnt++] = 0x0d;
+   3658              Tx2Buff[DataCnt++] = 0x0a;
+   3659           
+   3660              while(1)
+   3661              {
+   3662                  if ( ++Txtry > 3 ) {
+   3663                      Booting = 0xff; 
+   3664                      return; 
+   3665                  }
+   3666                  TransmitUart(UART_16c550_0, (UINT8 *)Tx2Buff, DataCnt );
+   3667                  
+   3668                  OSTimeDlyHMSM(0, 0, 1, 0);
+   3669                  if ( !RecieveACK() ) continue;
+   3670                  if ( !((DataBuff[0] == 'O')&&(DataBuff[1] == 'K')) ) continue;
+   3671                  for ( i=0; i<5; i++ )
+   3672                  {   
+   3673                      if ( !RecieveACK() ) continue;
+   3674                      if( (DataBuff[0] == '$') )
+   3675                      {
+   3676                          //$006-->success, $007-->fail
+   3677                          if      ( (DataBuff[0] == '$')&&(DataBuff[1] == '0')&&(DataBuff[2] == '0')&&(DataBuff[3] == '6') )
+   3678                                  return;
+   3679                          else    break;
+   3680                      }
+   3681                      else if( (DataBuff[11] == 'A')&&(DataBuff[12] == 'C')&&(DataBuff[13] == 'K') )
+   3682                      {
+   3683                          //*SKTR*SMSMOACK:1-->success, 0-->fail
+   3684                          if      ( (DataBuff[11] == 'A')&&(DataBuff[12] == 'C')&&(DataBuff[13] == 'K')&&(DataBuff[15] == '1') )
+   3685                          {
+   3686                              OSTimeDlyHMSM(0, 0, 1, 0);
+   3687                              return;
+   3688                          }
+   3689                          else    break;
+   3690                      }
+   3691                  }
+   3692                  OSTimeDlyHMSM(0, 0, 1, 0);
+   3693              }
+   3694          }
+   3695          
+   3696          Boot Alarm
+   3697          	
+   3698          AT*SKTR*SMSMO=01071065483,01021468701,,0,,,FFFFFF82B580848C958180B5C1           
+   3699                                                                                          
+   3700                                  
+   3701          
+   3702          118.67.190.46
+   3703          
+   3704          118.67.190.47번 이걸로 쓰시면 됩니다,~
+   3705          서브넷 255.255.255.0
+   3706          게이트 118.67.190.1
+   3707          
+   3708          
+   3709          *SKTR*RFSTS:10737,4,10664,10689,10713,10738,1,8(-5),0,-83,-16,-19               
+   3710          
+   3711          *SKTR*PILOT:8,-5.0,0,0.0,0,0.0,0,0.0
+   3712          
+   3713          ///////////////////////////////////
+   3714          *SKTR*RFSTS:29,3,111,29,70,1,402(-9),0,-84,-4,-15                               
+   3715                                                                                          
+   3716          OK                
+   3717          
+   3718          *SKTR*RFSTS:10713,4,10664,10689,10713,10738,1,8(-7),0,-88,0,0                   
+   3719                                                                                          
+   3720          OK 
+   3721          
+   3722          
+   3723          
+   3724          10713,4,10664,10689,10713,10738,1,8(-7),0,-88,0,0  
+   3725          
+   3726          10737,4,10664,10689,10713,10738,1      ,8(-5),0  ,-83,-16,-19   
+   3727             29,3,111  ,29   ,70   ,1    ,402(-9),0    ,-84,-4,-15 
+   3728          
+   3729          
+   3730          Download 5'52'' 80kbyte
+   3731          #endif
+   3732          
+   3733          #if 0 ///kst wcdma
+   3734          
+   3735           TRIO-M VER:1.3.0-->Type[0]                                                     
+   3736          ATE0                                                                            
+   3737                                                                                          
+   3738                                                                                          
+   3739          OK                                                                              
+   3740            AT*SKT*REL                                                                    
+   3741                                                                                          
+   3742                                                                                          
+   3743          *SKT*REL:1                                                                      
+   3744                    AT+GMR                                                                
+   3745                                                                                          
+   3746                                                                                          
+   3747          +GMR:x05,0x0C,112                                                               
+   3748                                                                                          
+   3749          OK                                                                              
+   3750            AT*SKT*DIAL                                                                   
+   3751                                                                                          
+   3752                                                                                          
+   3753          *SKT*DIAL:010-2148-9797                                                         
+   3754                                 AT*SKTR*ICCID                                            
+   3755                                                                                          
+   3756                                                                                          
+   3757          *SKTR*ICCID:8982051008148287933                                                 
+   3758                                                                                          
+   3759          OK                                                                              
+   3760            AT*SKT*PING                                                                   
+   3761                                                                                          
+   3762                                                                                          
+   3763          *SKT*PONG:0,20130215121441                                                      
+   3764                                                                                          
+   3765          OK                                                                              
+   3766            AT+CGREG?                                                                     
+   3767                                                                                          
+   3768                                                                                          
+   3769          +CGREG: 0,1
+   3770          
+   3771          AT*SKTR*SMSMO=01071065483,01020357112											
+   3772          										 ,,0,,,FFFFFF82B480858994818183B5C1
+   3773          
+   3774          
+   3775          
+   3776          AT*SKTR*SMSMO=01071065483,01021489797,,0,,,FFFFFF82B480858994818183B5C1       
+   3777                                                                                          
+   3778                                                                                          
+   3779          OK                                                                              
+   3780                                                                                          
+   3781          *SKTR*SMSMOACK:1
+   3782          
+   3783          
+   3784          #endif
+
+   Maximum stack usage in bytes:
+
+     Function              .cstack
+     --------              -------
+     AutoResetCheck             8
+     AutoRptChk                24
+     AutoTimeChk                0
+     Auto_ResetCheckInit        8
+     CalcARTime                24
+     CdmaFuncselect             0
+     CheckARTime               24
+     CheckTime                  0
+     DataConv                   0
+     DnrAlarmReport            32
+     DnrIpAddressAck           24
+     DnrPacketReadyFunc        24
+     DnrSMS2Data               24
+     DnrSmsTask                48
+     FreqAlarmCheckRpt         16
+     FreqAlarmRptFunc          24
+     GenEtc1StsAid             12
+     GenEtcStsAid               0
+     GenSmsStsAidSts_1St       24
+     GenSmsStsAidSts_2St       24
+     GenWaveStsAid             16
+     GetPeriod                  0
+     ModemEsnCheck             40
+     ResetPeriodSet             8
+     Rfatoi                     8
+     Sms1_Protocol_Check       24
+     SmsAlarm                  32
+     SmsAlarmRptFunc           56
+     SmsAutoReportCheck        16
+     SmsComCheck               32
+     SmsDataAckTx              40
+     SmsEtcTransmitData        24
+     SmsInit                   16
+     SmsStsTransmitData        32
+     Sms_DataAckTx             32
+     Sms_Response_Control      88
+     SpecFreqStateUpdate       32
+     SpecFreqState_RspFunc     40
+     SwHistroyRspFunc          24
+     TCPComCheck               16
+     TCPProDataAckTx           40
+     TCPProtocolCheck          24
+     TcpExit                    8
+     TrafficCheck              16
+     TwoAsciDeciNum2OneHex      0
+     TwoAsciNum2OneHex         16
+     WavThrAutoRptChk          32
+     WavTwoAutoRptChk          32
+     WhatRxSms                  0
+     WhatRxTCP                  0
+     WhatTime                  16
+     dtoh                       0
+     htod                       0
+
+
+   Section sizes:
+
+     Function/Label                          Bytes
+     --------------                          -----
+     SmsSerB                                 9344
+     CdmaSem
+     Swrcssms
+     Rwrcssms
+     Stcpsms
+     Rtcpsms
+     CDMATaskStk
+     HostStation                               16
+     TestStation                               16
+     SmsInit                                  110
+     ResetPeriodSet                            30
+     CdmaFuncselect                            56
+     DnrSMS2Data                              146
+     iPNVal_Old                               112
+     PnChangeCnt
+     PnAlarm
+     PnAlarmOld
+     PnAlarmNew
+     PnAlarmFlag
+     RxTxAlarmNew
+     RxTxAlarmFlag
+     RxTxAlarmOld
+     EcIoNew
+     EcIoFlag
+     EcIoOld
+     iMasterPNH
+     iMasterPNL
+     iTxValH
+     iTxValL
+     Rf_sts
+     Pilot_Sts
+     BootAlarmFlag                             12
+     SmsResetPeriodFlag
+     TcpDnLoadFlag
+     FirstFlag
+     LockOrderCnt
+     chkLockOrder
+     sms_len
+     ACAlarmFlag                                1
+     EsnChecksumH                               2
+     EsnChecksumL
+     tcp_buff                                 700
+     chkDnrAlarmReport                          1
+     chkPwrAlarmReport                          1
+     SET_ULAlarmCnt                             1
+     tTimeElapse                                4
+     RptReset                                   1
+     m_sms                                    152
+     iMobileESN                                 2
+     t1SndData                                512
+     chkReport                                  1
+     iSecCnt                                    1
+     sms_buff                                 256
+     sms_time                                  84
+     TimeStart
+     iSMS_Debug_Mode
+     PeriodStart
+     PresentDay
+     PresentHour
+     PresentMin
+     PresentSec
+     PresentMonth
+     AutoResetFlg
+     PcFreqStsRqstFlag
+     SmsTxFailFlag
+     iPresentHourCnt
+     iPresentMinCnt
+     PastHour
+     PastMin
+     SmsSer
+     TimeElapse
+     AutoResetCnt
+     OneDayResetCnt
+     OneDayPeriod
+     tPeriod
+     tcp_port
+     sentTel
+     DnrVerString                               4
+     WTwoTimeStart                             12
+     WTwoPeriodStart
+     WTwoPastHour
+     WTwoPastMin
+     WTwoTimeElapse
+     WThreeTimeStart                           12
+     WThreePeriodStart
+     WThreePastHour
+     WThreePastMin
+     WThreeTimeElapse
+     PwrAlarmFlag                               3
+     InitPwrAlarm
+     chkAlarmMaskReport
+     tcp_len                                    4
+     DnrSmsTask                               798
+     Auto_ResetCheckInit                       76
+     CheckTime                                 32
+     AutoResetCheck                            94
+     cur_10s_time                              20
+     ArRemainTime
+     Init_ar_time
+     AutoTime                                  20
+     GetPeriod                                 26
+     CalcARTime                               116
+     CheckARTime                              106
+     SmsAlarm                                 124
+     SmsAutoReportCheck                       136
+     Sms1_Protocol_Check                      244
+     WhatRxSms                                 18
+     SmsComCheck                              270
+     SmsStsTransmitData                       120
+     Sms_Response_Control                     186
+     SmsDataAckTx                             162
+     Sms_DataAckTx                            462
+     AutoTimeChk                              120
+     AutoRptChk                               214
+     WavTwoAutoRptChk                         180
+     WavThrAutoRptChk                         180
+     ModemEsnCheck                            194
+     WhatTime                                 160
+     SwHistroyRspFunc                         134
+     ??Subroutine2_0                            8
+     DnrIpAddressAck                          146
+     ?Subroutine1                              16
+     DnrPacketReadyFunc                        82
+     TcpExit                                   26
+     SpecFreqState_RspFunc                   1100
+     TrafficCheck                              50
+     SpecFreqStateUpdate                      888
+     FreqAlarmCheckRpt                         74
+     FreqAlarmRptFunc                         508
+     TCPProtocolCheck                         312
+     WhatRxTCP                                 18
+     TCPComCheck                               54
+     TCPProDataAckTx                          342
+     DataConv                                  50
+     TwoAsciNum2OneHex                         28
+     TwoAsciDeciNum2OneHex                     14
+     htod                                      18
+     dtoh                                      18
+     GenSmsStsAidSts_1St                      726
+     ?Subroutine0                               6
+     GenSmsStsAidSts_2St                      788
+     GenEtcStsAid                              50
+     SmsEtcTransmitData                        42
+     GenEtc1StsAid                            172
+     GenWaveStsAid                            186
+     SmsAlarmRptFunc                          154
+     DnrAlarmReport                          2620
+     Rfatoi                                    46
+     ??DataTable14                              4
+     ??DataTable14_1                            4
+     ??DataTable14_2                            4
+     ??DataTable15                              4
+     ??DataTable15_1                            4
+     ??DataTable15_2                            4
+     ??DataTable15_3                            4
+     ??DataTable15_4                            4
+     ??DataTable15_5                            4
+     ??DataTable15_6                            4
+     ??DataTable15_7                            4
+     ??DataTable15_8                            4
+     ??DataTable15_9                            4
+     ??DataTable15_10                           4
+     ??DataTable15_11                           4
+     ??DataTable15_12                           4
+     ??DataTable16                              4
+     ??DataTable16_1                            4
+     ??DataTable16_2                            4
+     ??DataTable16_3                            4
+     ??DataTable16_4                            4
+     ??DataTable16_5                            4
+     ??DataTable17                              4
+     ??DataTable17_1                            4
+     ??DataTable18                              4
+     ??DataTable20                              4
+     ??DataTable20_1                            4
+     ??DataTable20_2                            4
+     ??DataTable20_3                            4
+     ??DataTable20_4                            4
+     ??DataTable21                              4
+     ??DataTable21_1                            4
+     ??DataTable21_2                            4
+     ??DataTable21_3                            4
+     ??DataTable22                              4
+     ??DataTable22_1                            4
+     ??DataTable22_2                            4
+     ??DataTable22_3                            4
+     ??DataTable22_4                            4
+     ??DataTable22_5                            4
+     ??DataTable24                              4
+     ??DataTable24_1                            4
+     ??DataTable24_2                            4
+     ??DataTable24_3                            4
+     ??DataTable24_4                            4
+     ??DataTable26                              4
+     ??DataTable26_1                            4
+     ??DataTable26_2                            4
+     ??DataTable26_3                            4
+     ??DataTable26_4                            4
+     ??DataTable26_5                            4
+     ??DataTable26_6                            4
+     ??DataTable26_7                            4
+     ??DataTable28                              4
+     ??DataTable28_1                            4
+     ??DataTable29                              4
+     ??DataTable29_1                            4
+     ??DataTable30                              4
+     ??DataTable31                              4
+     ??DataTable32                              4
+     ??DataTable32_1                            4
+     ??DataTable32_2                            4
+     ??DataTable32_3                            4
+     ??DataTable32_4                            4
+     ??DataTable32_5                            4
+     ??DataTable32_6                            4
+     ??DataTable32_7                            4
+     ??DataTable32_8                            4
+     ??DataTable32_9                            4
+     ??DataTable32_10                           4
+     ??DataTable33                              4
+     ??DataTable33_1                            4
+     ??DataTable33_2                            4
+     ??DataTable33_3                            4
+     ??DataTable33_4                            4
+     ??DataTable33_5                            4
+     ??DataTable33_6                            4
+     ??DataTable33_7                            4
+     ?<Constant "Ver0.4:Dnr Center TEST\t ">   28
+     ?<Constant {255, 255, 255}>               36
+     ?<Constant {255, 255, 255}>_1              4
+     ?<Constant {255, 255, 255}>_2              4
+     ?<Constant "TimeElapse [%d][%d]\n">       24
+     ?<Constant "IP Not Connect \n">           20
+     ?<Constant {255, 255, 255}>_3             24
+
+ 
+ 11 139 bytes in section .bss
+    135 bytes in section .data
+    160 bytes in section .rodata
+ 13 348 bytes in section .text
+ 
+ 13 348 bytes of CODE  memory
+    160 bytes of CONST memory
+ 11 274 bytes of DATA  memory
+
+Errors: none
+Warnings: none

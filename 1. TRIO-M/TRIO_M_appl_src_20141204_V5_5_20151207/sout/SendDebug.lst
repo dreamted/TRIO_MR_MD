@@ -1,0 +1,243 @@
+###############################################################################
+#                                                                             #
+# IAR ANSI C/C++ Compiler V5.30.2.51295/W32 for ARM     20/Apr/2012  09:35:50 #
+# Copyright 1999-2009 IAR Systems AB.                                         #
+#                                                                             #
+#    Cpu mode     =  thumb                                                    #
+#    Endian       =  little                                                   #
+#    Source file  =  D:\Project\TRIO\3.F_W\TRIO_appl_src_20120419\code\SendDe #
+#                    bug.c                                                    #
+#    Command line =  D:\Project\TRIO\3.F_W\TRIO_appl_src_20120419\code\SendDe #
+#                    bug.c -D _MIMO_Type -lcN D:\Project\TRIO\3.F_W\TRIO_appl #
+#                    _src_20120419\sout\ -o D:\Project\TRIO\3.F_W\TRIO_appl_s #
+#                    rc_20120419\sout\ --endian=little --cpu=Cortex-M3 -e     #
+#                    --require_prototypes --warnings_are_errors --fpu=None    #
+#                    --dlib_config "C:\Program Files\IAR Systems\Embedded     #
+#                    Workbench 5.4\arm\INC\DLib_Config_Normal.h" -I           #
+#                    D:\Project\TRIO\3.F_W\TRIO_appl_src_20120419\include\    #
+#                    -I D:\Project\TRIO\3.F_W\TRIO_appl_src_20120419\lib_stm3 #
+#                    2\inc\ -I D:\Project\TRIO\3.F_W\TRIO_appl_src_20120419\l #
+#                    ib_stm32\src\ -I D:\Project\TRIO\3.F_W\TRIO_appl_src_201 #
+#                    20419\uC-CPU\ -I D:\Project\TRIO\3.F_W\TRIO_appl_src_201 #
+#                    20419\uC-LIB\ -I D:\Project\TRIO\3.F_W\TRIO_appl_src_201 #
+#                    20419\uCOS-II\Ports\ -I D:\Project\TRIO\3.F_W\TRIO_appl_ #
+#                    src_20120419\uCOS-II\Source\ -I                          #
+#                    D:\Project\TRIO\3.F_W\TRIO_appl_src_20120419\uC-Probe\   #
+#                    -I "C:\Program Files\IAR Systems\Embedded Workbench      #
+#                    5.4\arm\INC\" -Oh                                        #
+#    List file    =  D:\Project\TRIO\3.F_W\TRIO_appl_src_20120419\sout\SendDe #
+#                    bug.lst                                                  #
+#    Object file  =  D:\Project\TRIO\3.F_W\TRIO_appl_src_20120419\sout\SendDe #
+#                    bug.o                                                    #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\Project\TRIO\3.F_W\TRIO_appl_src_20120419\code\SendDebug.c
+      1          #define SEND_DEBUG_C
+      2          
+      3          #include "../include/main.h"
+      4          
+      5          void Debug_PutChar( INT8U ch )
+      6          {
+      7              OS_CPU_SR  cpu_sr;
+      8              
+      9              while(1)
+     10              {
+     11          	    OS_ENTER_CRITICAL();
+     12          	    if( tx_que_cnt < (DEBU_TX_QUE_SIZE-1) )
+     13          	    {
+     14          			debug_tx_que[tx_que_st++] = ch;
+     15          			tx_que_cnt++;
+     16          			tx_que_st %= DEBU_TX_QUE_SIZE;
+     17          			OS_EXIT_CRITICAL();
+     18          			break;
+     19          		}
+     20          		OS_EXIT_CRITICAL();
+     21          		OSTimeDly( 10L );
+     22          	}
+     23          }
+     24          
+     25          void ADD_CR( void )
+     26          {
+     27          	Debug_PutChar( '\r' );
+     28          	Debug_PutChar( '\n' );
+     29          }
+     30          
+     31          INT8U MakeACS_HEX( INT8U v )
+     32          {
+     33          	v &= 0x0F;
+     34          	if( v<10 ) return (v+'0');
+     35          	
+     36          	v-=10;
+     37          	return (v+'A');
+     38          }
+     39          
+     40          void Debug_Tx_Data(INT8U*data, INT16U len ,__ProtocolPtr *nPtr)
+     41          {
+     42          	INT32U i;
+     43          	INT8U port;
+     44          
+     45          	if		( nPtr == PcSer) 	port = COMM_Pcser;
+     46          	else if	( nPtr == SmsSer) 	port = COMM_FskSer;
+     47          
+     48          	if(( tDnrSts->Comm_Debug_Mode._Tx == 0x1 )||( tDnrSts->Comm_Debug_Mode.Data == 0x03 ))
+     49          	{
+     50          		if( port == tDnrSts->TestMode )
+     51          		{
+     52          			INT8U err;
+     53          		
+     54          			OSSemPend(Debug_Send_Sem, OS_DELAY_1sec*10, &err );
+     55          			if(err != OS_NO_ERR ) return ;
+     56          		
+     57          			
+     58          			ADD_CR();
+     59          			ADD_CR();
+     60          			
+     61          			Debug_PutChar( 'T' );
+     62          			Debug_PutChar( 'x' );
+     63          			Debug_PutChar( ':' );
+     64          
+     65          			for( i=0; i<len; i++ )
+     66          			{
+     67          				Debug_PutChar( MakeACS_HEX( (INT8U)(data[i]>>4) ) );
+     68          				Debug_PutChar( MakeACS_HEX( (INT8U)(data[i]&0x0F) ) );
+     69          				Debug_PutChar( ' ' );
+     70          				if( (i%30)==29 ) ADD_CR();
+     71          			}
+     72          
+     73          			ADD_CR();
+     74          			Debug_PutChar( 0 );
+     75          			ADD_CR();
+     76          			Debug_PutChar( 0 );
+     77          
+     78          			OSSemPost( Debug_Send_Sem );
+     79          		}
+     80          	}
+     81          }
+     82          
+     83          
+     84          
+     85          void Debug_Rx_Data(INT8U*data, INT16U len,__ProtocolPtr *nPtr)
+     86          {
+     87          	INT32U i = 0;
+     88          	INT8U port;
+     89          
+     90          	if		( nPtr == PcSer) 	port = COMM_Pcser;
+     91          	else if	( nPtr == SmsSer) 	port = COMM_FskSer;
+     92          
+     93          	if(( tDnrSts->Comm_Debug_Mode._Rx == 0x1 )||( tDnrSts->Comm_Debug_Mode.Data == 0x03 ))
+     94          	{
+     95          		if( port == tDnrSts->Comm_Debug_Port )
+     96          		{
+     97          			INT8U err;
+     98          		
+     99          			OSSemPend(Debug_Send_Sem, OS_DELAY_1sec*10, &err );
+    100          			if(err != OS_NO_ERR ) return ;
+    101          			rx_data_count=0;
+    102          
+    103          			ADD_CR();
+    104          			ADD_CR();
+    105          			Debug_PutChar( 'R' );
+    106          			Debug_PutChar( 'x' );
+    107          			Debug_PutChar( ':' );
+    108          			for( i = 0; i < len; i++ )
+    109          			{
+    110          				Debug_PutChar( MakeACS_HEX( (INT8U)(data[i]>>4) ) );
+    111          				Debug_PutChar( MakeACS_HEX( (INT8U)(data[i]&0x0F) ) );
+    112          				Debug_PutChar( ' ' );
+    113          				rx_data_count++;
+    114          				if( rx_data_count >= 30 )
+    115          				{
+    116          					rx_data_count = 0;
+    117          					Debug_PutChar( 0 );
+    118          				}
+    119          
+    120          			}
+    121          			ADD_CR();
+    122          			Debug_PutChar( 0 );
+    123          
+    124          			OSSemPost( Debug_Send_Sem );
+    125          
+    126          		}
+    127          	}
+    128          }
+    129          
+    130          
+    131          void DebugInit(void)
+    132          {
+    133          #if 1
+    134          	OSTaskCreate(Debug_Uart_Task, (void *)0, (OS_STK *)&DebugTaskStk[Debug_START_STK_SIZE - 1], Debug_PRIO);
+    135          #endif	
+    136          }
+    137          
+    138          void Debug_Uart_Task( void *p_arg )
+    139          {
+    140          
+    141          	INT8U ch;
+    142              OS_CPU_SR  cpu_sr;
+    143          	
+    144              (void)p_arg;
+    145          
+    146          	Debug_Send_Sem = OSSemCreate(1);
+    147          
+    148          	while (1)
+    149          	{
+    150          	    OS_ENTER_CRITICAL();
+    151          		while( tx_que_st != tx_que_ed )
+    152          		{
+    153          			ch = debug_tx_que[tx_que_ed++];
+    154          			tx_que_cnt--;
+    155          			tx_que_ed %= DEBU_TX_QUE_SIZE;
+    156          			OS_EXIT_CRITICAL();
+    157          			
+    158          			if( ch )dubug_txf.BodyFrame[0].SubData[tx_buff_co++] = ch;
+    159          			
+    160          			if( (tx_buff_co == DEBU_TX_BUF_SIZE) || (ch==0) )
+    161          			{
+    162          
+    163          				INT8U tid[3] = {0x00, 0xff, 0xff};
+    164          				GenBodyFrame(tid, (INT8U *)dubug_txf.BodyFrame[0].SubData, tx_buff_co, 0x2A, PcSer, 0);
+    165          				WRCS_ProDataAckTx(PcSer);
+    166          
+    167          				tx_buff_co = 0;
+    168          				OSTimeDly( OS_DELAY_10msec*10 );
+    169          
+    170          			}
+    171          		    OS_ENTER_CRITICAL();
+    172          		}
+    173          		OS_EXIT_CRITICAL();
+    174          		tx_que_st = 0;
+    175          		tx_que_ed = 0;
+    176          
+    177          		OSTimeDly( OS_DELAY_10msec*10 );
+    178          		
+    179          	}
+    180          }
+    181          
+    182          #if 0
+    183          unsigned long int pPrintf( const char *format, ...)
+    184          {
+    185          	INT8U tmpData[512];
+    186              OS_CPU_SR  cpu_sr;
+    187          
+    188          	OS_ENTER_CRITICAL();
+    189          	va_list argptr;	
+    190          	va_start(argptr, format);
+    191          	vsprintf((char *)tmpData, format, argptr);
+    192          	va_end( argptr );
+    193          
+    194          	{
+    195          		INT8U tid[3] = {0x00, 0xff, 0xff};
+    196          		GenBodyFrame(tid[0], tid[1], tid[2], (INT8U *)tmpData, strlen((const char *)tmpData), 0x2A, PcSer, 0);
+    197          		WRCS_ProDataAckTx(PcSer);
+    198          	}
+    199          
+    200          	OS_EXIT_CRITICAL();
+    201          	return FALSE;
+    202          }
+    203          
+    204          #endif
+
+Errors: 30
+Warnings: none

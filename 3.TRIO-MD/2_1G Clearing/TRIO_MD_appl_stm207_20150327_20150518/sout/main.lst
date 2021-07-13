@@ -1,0 +1,310 @@
+###############################################################################
+#                                                                             #
+# IAR ANSI C/C++ Compiler V6.21.1.52794/W32 for ARM     30/Aug/2012  21:29:30 #
+# Copyright 1999-2011 IAR Systems AB.                                         #
+#                                                                             #
+#    Cpu mode     =  thumb                                                    #
+#    Endian       =  little                                                   #
+#    Source file  =  D:\Work\Project\2012\NL_INBUILD\FW\MU\code\main.c        #
+#    Command line =  D:\Work\Project\2012\NL_INBUILD\FW\MU\code\main.c -D     #
+#                    OS_INCLUDED -D APPL_SRC -lcN                             #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\sout\ -lB          #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\sout\ -o           #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\sout\              #
+#                    --endian=little --cpu=Cortex-M3 -e --fpu=None            #
+#                    --dlib_config "C:\Programming\IAR Systems\Embedded       #
+#                    Workbench 6.0\arm\INC\c\DLib_Config_Normal.h" -I         #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\include\ -I        #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\..\..\STM32F2xx_St #
+#                    dPeriph_Driver\ -I D:\Work\Project\2012\NL_INBUILD\FW\MU #
+#                    \..\..\STM32F2xx_StdPeriph_Driver\inc\ -I                #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\uC-CPU\ -I         #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\uC-LIB\ -I         #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\uCOS-II\Ports\ -I  #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\uCOS-II\Source\    #
+#                    -I D:\Work\Project\2012\NL_INBUILD\FW\MU\uC-Probe\ -Oh   #
+#                    --use_c++_inline --require_prototypes                    #
+#    List file    =  D:\Work\Project\2012\NL_INBUILD\FW\MU\sout\main.lst      #
+#    Object file  =  D:\Work\Project\2012\NL_INBUILD\FW\MU\sout\main.o        #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\Work\Project\2012\NL_INBUILD\FW\MU\code\main.c
+      1          /*
+      2          *********************************************************************************************************
+      3          *                                              EXAMPLE CODE
+      4          *
+      5          *                          (c) Copyright 2003-2007; Micrium, Inc.; Weston, FL
+      6          *
+      7          *               All rights reserved.  Protected by international copyright laws.
+      8          *               Knowledge of the source code may NOT be used to develop a similar product.
+      9          *               Please help us continue to provide the Embedded community with the finest
+     10          *               software available.  Your honesty is greatly appreciated.
+     11          *********************************************************************************************************
+     12          */
+     13          #define MAIN_C
+     14          
+     15          #include "../include/main.h"
+     16          
+     17          
+     18          /*******************************************************************************
+     19          * Function Name  : InitStm32f103
+     20          * Description    : Initializes the stm32_x application.
+     21          * Input          : None
+     22          * Output         : None
+     23          * Return         : None
+     24          *******************************************************************************/
+     25          
+     26          void InitStm32f103(void)
+     27          {
+     28          //	NVIC_DeInit();
+     29          //	InitRCC();
+     30          //	SystemInit();
+     31          
+     32          	InitAFIO();
+     33          	InitGPIO();
+     34          	//#ifdef __FSMC_SRAM_H
+     35          	//	FSMC_SRAM_Init();
+     36          	SRAM_Init();
+     37          	//#endif
+     38          	// Set the Vector Table base location at 0x08000000
+     39          	InitSysTick(1L);	// timer init!!(1: 1ms)
+     40          }
+     41          
+     42          /*******************************************************************************
+     43          * Function Name  : InitRCC
+     44          * Description    : Initializes the stm32_x afio application.
+     45          * Input          : None
+     46          * Output         : None
+     47          * Return         : None
+     48          *******************************************************************************/
+     49          void InitAFIO(void)
+     50          {
+     51          	// AHB1 BUS RELATED
+     52          	// GPIOA, GPIOB, GPIOC, GPIOD, GPIOE, GPIOF, GPIOG, GPIOH
+     53          	// TIM1, SPI1, USART1, ADC
+     54              RCC->__B.AHB1ENR.IOPAEN = ENABLE;
+     55              RCC->__B.AHB1ENR.IOPBEN = ENABLE;
+     56              RCC->__B.AHB1ENR.IOPEEN = ENABLE;
+     57              RCC->__B.AHB1ENR.IOPGEN = ENABLE;
+     58          
+     59          }
+     60          
+     61          /*******************************************************************************
+     62          * Function Name  : InitGPIO
+     63          * Description    : Initializes the stm32_x gpio application.
+     64          * Input          : None
+     65          * Output         : None
+     66          * Return         : None
+     67          *******************************************************************************/
+     68          
+     69          void InitGPIO(void)
+     70          {
+     71          	//--------------------------------------------------------------//
+     72          	// CPU - LEFT
+     73          	__PE2_PP_PP();				// S_DATA
+     74          	__PE3_IN_PU();				// INSERT_25
+     75          	__PE4_IN_PU();				// INSERT_21
+     76          	__PE5_IN_PU();				// INSERT_900
+     77          	__PE6_PP_PP();				// EX1_CTRL
+     78          	
+     79          	__PF6_IN_FL();				// SYNC_A_CPU
+     80          	__PF7_IN_FL();				// SYNC_B_CPU
+     81          
+     82          	__ADC_IN10();
+     83          	__ADC_IN11();
+     84          	__ADC_IN12();
+     85          	__ADC_IN13();
+     86          	
+     87          	__ADC_IN0();
+     88          	__ADC_IN1();
+     89          	__PA2_U2_TX();				// USART2_TX
+     90          	__PA3_U2_RX();				// USART2_RX
+     91          	
+     92          	__ADC_IN4();
+     93          	__ADC_IN5();
+     94          	__ADC_IN6();
+     95          	__ADC_IN7();
+     96          	__ADC_IN14();
+     97          	__ADC_IN15();
+     98          	__ADC_IN8();
+     99          	__ADC_IN9();
+    100          
+    101          	__PE12_PP_PP(); 			// ATTN_DATA
+    102          	__PE13_PP_PP(); 			// ATTN_CLK
+    103          		
+    104          	__PE14_IN_PD(); 			// PLL_TX_25
+    105          	__PB10_U3_TX(); 			// USART3_TX
+    106          	__PB11_U3_RX(); 			// USART3_RX
+    107          
+    108          	__PB12_IN_PD(); 			// PLL_RX_21
+    109          	__PB13_IN_PD(); 			// PLL_TX_21
+    110          	__PB14_IN_PD(); 			// PLL_RX_900
+    111          	__PB15_IN_PD(); 			// PLL_TX_900
+    112          	__PD8_IN_PD();				// PLL_RX_25
+    113          	
+    114          	
+    115          	//--------------------------------------------------------------//
+    116          	// CPU - RIGHT
+    117          	__PD9_IN_PD();				// nLINKLED
+    118          	__PD10_PP_PP(); 			// W3150RST
+    119          
+    120          	__PG6_IN_PU();				// FAN1_ALM
+    121          	__PG7_IN_PU();				// DC_IN_FAIL
+    122          	__PG8_IN_PU();				// DC_OUT_FAIL
+    123          	
+    124          	__PC8_PP_PP();				// PWR_ON_21G
+    125          	__PC9_PP_PP();				// PWR_ON_900M
+    126          	__PA8_PP_PP();				// PWR_ON_25G
+    127          		
+    128          	__PA9_U1_TX();				// USART1_TX
+    129          	__PA10_U1_RX(); 			// USART1_RX
+    130          
+    131          	__PA11_IN_PU(); 			// DC_FAIL_21
+    132          	__PA12_IN_PU(); 			// DC_FAIL_900
+    133          	__PA13_IN_PU(); 			// DC_FAIL_25
+    134          
+    135          	__PA14_PP_PU(); 			// SCK
+    136          	__PA15_PP_PP(); 			// W3150_nSS
+    137          
+    138          	__PC10_U4_TX(); 			// USART4_TX
+    139          	__PC11_U4_RX(); 			// USART4_RX
+    140          	__PC12_U5_TX(); 			// USART5_TX
+    141          	__PD2_U5_RX();				// USART5_RX
+    142          	
+    143          	__PD3_PP_PP();				// DTU_RESET
+    144          	__PG10_IN_PU(); 			// DTU_BD
+    145          
+    146          	__PG11_PP_PP(); 			// DCC_SEL01
+    147          	__PG12_PP_PP(); 			// DCC_SEL23
+    148          	__PG13_PP_PP(); 			// DCC_SEL45
+    149          	__PG14_PP_PP(); 			// DCC_SEL67
+    150          	__PG15_IN_PU(); 			// EXT1_ALM
+    151          
+    152          	__PB7_PP_PP();				// EXT2
+    153          	__PB8_PP_PP();				// EXT1
+    154          
+    155          	__PB8_PP_PP();				// EXT2_ALM_IN
+    156          	
+    157          	__PB2_PP_PP();				// RUN LED
+    158          
+    159          }
+    160          
+    161          
+    162          
+    163          void PheripheralInit(void)
+    164          {
+    165          	TimerInit();
+    166          //	WatchdogInit();
+    167          //	WatchdogClear();
+    168          	
+    169          	SerPtr = &pUSART1;
+    170          	SerPtr->init(38400L, (_DATA8BIT | _1_STOP | _NONPARITY));
+    171          
+    172          	//pUSART2.init(38400L, (_DATA8BIT | _1_STOP | _NONPARITY));	// iRems 2G(LTE)
+    173          	//pUSART3.init(38400L, (_DATA8BIT | _1_STOP | _NONPARITY));	// iRems 3G(LTE)
+    174          	//pUSART4.init(38400L, (_DATA8BIT | _1_STOP | _NONPARITY));	// EXT
+    175          	//pUSART5.init(38400L, (_DATA8BIT | _1_STOP | _NONPARITY));
+    176          	//Ser6Init(Ser6Bps, Ser6LCR, (INT32U)&nGM16C550CS6);
+    177          	//KeyBuzInit (KEYSEL);
+    178          	EEpromInit();
+    179          	/////////////////////////////////////////////////////////
+    180          	// Function Task recursion
+    181          	//CalendarInit();
+    182              //	DAC1Init();
+    183              //	DAC2Init();
+    184          	Ser1Init();
+    185          	//iAPDInit();
+    186          	//RCSSerInit();
+    187          	ExpioInit();
+    188          	//AlcInit();
+    189          	//iRemsInit();
+    190          	//FmmiInit();
+    191          	//DnrInit();
+    192          	//Ethenet0Init();		// WRCS
+    193          	//Ethenet1Init();
+    194          	//Lis03lv02init();
+    195          	//TestInit();
+    196          	//ADCInit(TRUE);
+    197          	//ADCInit(FALSE);
+    198          	//EXTI0_Init();
+    199          	//EXTI12_Init();
+    200          }
+    201          
+    202          void LedDisplay(void)
+    203          {
+    204          	if(TimeOverCheck(TimerLed))
+    205          	{
+    206          		TimerRegist(TimerLed, Time100mSec*5L);
+    207          		RUNLEDSEL ^= 1;
+    208          		//if(!RUNLEDSEL)iDebugCnt = 0;
+    209                  //WatchdogClear();
+    210          	}
+    211          }
+    212          
+    213          void  mainTask (void *p_arg)
+    214          {
+    215              (void)p_arg;
+    216          
+    217          	InitStm32f103();
+    218          	PheripheralInit();
+    219          
+    220          	TimerRegist(TimerLed, Time100mSec);
+    221          
+    222              while(1)
+    223          	{
+    224          		CheckSoftTimer();
+    225          		//ADC1_SWStart();
+    226          		OSTimeDly(1L);
+    227              }
+    228          }
+    229           
+
+   Maximum stack usage in bytes:
+
+     Function        .cstack
+     --------        -------
+     InitAFIO             0
+     InitGPIO            24
+     InitStm32f103        8
+     LedDisplay           8
+     PheripheralInit      8
+     mainTask             8
+
+
+   Section sizes:
+
+     Function/Label  Bytes
+     --------------  -----
+     SerPtr             4
+     convinfo          52
+     InitStm32f103     24
+     InitAFIO          36
+     InitGPIO         780
+     PheripheralInit   38
+     LedDisplay        32
+     mainTask          30
+     ??DataTable4       4
+     ??DataTable4_1     4
+     ??DataTable4_2     4
+     ??DataTable4_3     4
+     ??DataTable4_4     4
+     ??DataTable4_5     4
+     ??DataTable4_6     4
+     ??DataTable4_7     4
+     ??DataTable4_8     4
+     ??DataTable4_9     4
+     ??DataTable4_10    4
+
+ 
+   4 bytes in section .bss
+  52 bytes in section .rodata
+ 984 bytes in section .text
+ 
+ 984 bytes of CODE  memory
+  52 bytes of CONST memory
+   4 bytes of DATA  memory
+
+Errors: none
+Warnings: none

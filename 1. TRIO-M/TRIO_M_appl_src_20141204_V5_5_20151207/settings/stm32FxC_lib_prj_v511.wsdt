@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<Workspace>
+  <ConfigDictionary>
+    
+  <CurrentConfigs><Project>stm32FxC_lib_prj_v511/Release</Project><Project>stm32FxC_cpulib_prj_v511/Debug</Project><Project>stm32FxC_ucos_prj_v511/Release</Project></CurrentConfigs><CurrentProj>stm32FxC_ucos_prj_v511</CurrentProj><OverviewSelected>0</OverviewSelected></ConfigDictionary>
+  <Desktop>
+    <Static>
+      <Workspace>
+        <ColumnWidths>
+          
+          
+          
+          
+        <Column0>237</Column0><Column1>5</Column1><Column2>27</Column2><Column3>14611604</Column3></ColumnWidths>
+      <PreferedWindows><Position>1</Position><ScreenPosX>0</ScreenPosX><ScreenPosY>0</ScreenPosY><Windows/></PreferedWindows></Workspace>
+      <Build>
+        
+        
+        
+        
+      <PreferedWindows><Position>3</Position><ScreenPosX>0</ScreenPosX><ScreenPosY>0</ScreenPosY><Windows/></PreferedWindows><ColumnWidth0>20</ColumnWidth0><ColumnWidth1>719</ColumnWidth1><ColumnWidth2>191</ColumnWidth2><ColumnWidth3>47</ColumnWidth3></Build>
+    <Debug-Log><PreferedWindows><Position>3</Position><ScreenPosX>0</ScreenPosX><ScreenPosY>0</ScreenPosY><Windows><Window><Factory>Build</Factory></Window></Windows></PreferedWindows></Debug-Log></Static>
+    <Windows>
+      
+      
+    <Wnd0><Tabs><Tab><Identity>TabID-2109-18105</Identity><TabName>Workspace</TabName><Factory>Workspace</Factory><Session><NodeDict><ExpandedNode>&lt;ws></ExpandedNode><ExpandedNode>stm32FxC_cpulib_prj_v511</ExpandedNode><ExpandedNode>stm32FxC_lib_prj_v511</ExpandedNode><ExpandedNode>stm32FxC_ucos_prj_v511</ExpandedNode><ExpandedNode>stm32FxC_ucos_prj_v511/Output</ExpandedNode><ExpandedNode>stm32FxC_ucos_prj_v511/WRCS</ExpandedNode><ExpandedNode>stm32FxC_ucos_prj_v511/dev</ExpandedNode><ExpandedNode>stm32FxC_ucos_prj_v511/lib</ExpandedNode><ExpandedNode>stm32FxC_ucos_prj_v511/lib_stm32</ExpandedNode><ExpandedNode>stm32FxC_ucos_prj_v511/source</ExpandedNode></NodeDict></Session></Tab></Tabs><SelectedTab>0</SelectedTab></Wnd0><Wnd2><Tabs><Tab><Identity>TabID-3065-20206</Identity><TabName>Build</TabName><Factory>Build</Factory><Session/></Tab></Tabs><SelectedTab>0</SelectedTab></Wnd2></Windows>
+    <Editor>
+      
+      
+      
+      
+    <Pane/><ActivePane>0</ActivePane><Sizes><Pane><X>1000000</X><Y>1000000</Y></Pane></Sizes><SplitMode>1</SplitMode></Editor>
+    <Positions>
+      
+      
+      
+      
+      
+    <Top><Row0><Sizes><Toolbar-01009b20><key>iaridepm.enu1</key></Toolbar-01009b20></Sizes></Row0></Top><Left><Row0><Sizes><Wnd0><Rect><Top>-2</Top><Left>-2</Left><Bottom>500</Bottom><Right>306</Right><x>-2</x><y>-2</y><xscreen>-3060113</xscreen><yscreen>-1249453</yscreen><sizeHorzCX>-2136950418</sizeHorzCX><sizeHorzCY>-1824018977</sizeHorzCY><sizeVertCX>215084</sizeVertCX><sizeVertCY>732847</sizeVertCY></Rect></Wnd0></Sizes></Row0></Left><Right><Row0><Sizes/></Row0></Right><Bottom><Row0><Sizes><Wnd2><Rect><Top>-2</Top><Left>-2</Left><Bottom>140</Bottom><Right>1434</Right><x>-2</x><y>-2</y><xscreen>1436</xscreen><yscreen>142</yscreen><sizeHorzCX>1002793</sizeHorzCX><sizeHorzCY>207299</sizeHorzCY><sizeVertCX>162709</sizeVertCX><sizeVertCY>207299</sizeVertCY></Rect></Wnd2></Sizes></Row0></Bottom><Float><Sizes/></Float></Positions>
+  </Desktop>
+</Workspace>
+
+

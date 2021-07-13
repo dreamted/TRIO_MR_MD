@@ -1,0 +1,569 @@
+###############################################################################
+#                                                                             #
+#                                                       19/May/2017  23:29:23 #
+# IAR ANSI C/C++ Compiler V5.50.5.21995/W32 EVALUATION for ARM                #
+# Copyright (C) 1999-2010 IAR Systems AB.                                     #
+#                                                                             #
+#    Cpu mode     =  thumb                                                    #
+#    Endian       =  little                                                   #
+#    Source file  =  D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V5_5_ #
+#                    20151207\code\adcFunc.c                                  #
+#    Command line =  "D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V5_5 #
+#                    _20151207\code\adcFunc.c" -D _MIMO_Type -D __2rd -D      #
+#                    __PLLEnToggle -lcN "D:\Project\TRIO\1.                   #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\sout\" -o  #
+#                    "D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V5_5 #
+#                    _20151207\sout\" --endian=little --cpu=Cortex-M3 -e      #
+#                    --require_prototypes --warnings_are_errors --fpu=None    #
+#                    --dlib_config "D:\Program Files (x86)\IAR                #
+#                    Systems\Embedded Workbench 5.4                           #
+#                    Evaluation\arm\INC\DLib_Config_Normal.h" -I              #
+#                    "D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V5_5 #
+#                    _20151207\include\" -I "D:\Project\TRIO\1.               #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\lib_stm32\ #
+#                    inc\" -I "D:\Project\TRIO\1.                             #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\lib_stm32\ #
+#                    src\" -I "D:\Project\TRIO\1.                             #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\uC-CPU\"   #
+#                    -I "D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V #
+#                    5_5_20151207\uC-LIB\" -I "D:\Project\TRIO\1.             #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\uCOS-II\Po #
+#                    rts\" -I "D:\Project\TRIO\1.                             #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\uCOS-II\So #
+#                    urce\" -I "D:\Project\TRIO\1.                            #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\uC-Probe\" #
+#                     -I "D:\Program Files (x86)\IAR Systems\Embedded         #
+#                    Workbench 5.4 Evaluation\arm\INC\" -Oh                   #
+#    List file    =  D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V5_5_ #
+#                    20151207\sout\adcFunc.lst                                #
+#    Object file  =  D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V5_5_ #
+#                    20151207\sout\adcFunc.o                                  #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\code\adcFunc.c
+      1          /******************** (C) COPYRIGHT 2007 STMicroelectronics ********************
+      2          * File Name          : stm32f10x_adc.c
+      3          * Author             : MCD Application Team
+      4          * Version            : V1.0
+      5          * Date               : 10/08/2007
+      6          * Description        : This file provides all the ADC firmware functions.
+      7          ********************************************************************************/
+      8          #define ADC_C
+      9          
+     10          // Includes ////////////////////////////////////////////////////////////////////
+     11          #include "../include/main.h"
+     12          /// AD 1 Sample  당 20uSEC  50개 1mSec
+     13          #define ADC_AUTO_SCAN_ONE_TIME
+     14          //#define ADC_AVER
+     15          
+     16          
+     17          void ADCInit(int INT_EN)
+     18          {
+     19          	INT32U cpu_sr;
+     20          	
+     21          	ADC_TypeDef *ADCx = ADC1;
+     22          
+     23          	OS_ENTER_CRITICAL();
+     24          
+     25          //	AdcEn.Data = 0;
+     26          	ADCIndex = 0;
+     27          	ASTART = 0;
+     28          	ADCx->SQR1.L = 0;	// 1EA
+     29          	ADCx->SQR3.SQ1 = 0; // Start Zer0
+     30          
+     31          	NVIC_Init(ADC_IRQChannel, INT_EN);
+     32          	
+     33          	// ADC1 regular channel14 configuration
+     34          	ADCx->SMPR1.Data = 0x00FFFFFF;		// ADC_SampleTime_239Cycles5
+     35          	ADCx->SMPR2.Data = 0x3FFFFFFF;		// ADC_SampleTime_239Cycles5
+     36          
+     37          	// ADC1 configuration
+     38          	ADCx->CR1.DUALMOD = __dMODE_INDEPENDENT;
+     39          	ADCx->CR1.SCAN = DISABLE;
+     40          	ADCx->CR1.EOCIE = INT_EN;		// interrupt enable
+     41          	ADCx->CR2.CONT = DISABLE;
+     42          	ADCx->CR2.ALIGN = __ALI_Right;
+     43          	ADCx->CR2.EXTSEL = __SWSTART;
+     44          	ADCx->CR2.DMAMODE = DISABLE;
+     45          	ADCx->CR2.EXTTRIG = ENABLE;
+     46          	ADCx->CR2.TSVREFE = ENABLE; 	// temperature sensor enable
+     47          	ADCx->CR2.ADON = ENABLE;		// Enable ADC1
+     48          
+     49          	// Enable ADC1 reset calibaration register
+     50          	{
+     51          		INT16U rtry = 0xffff;
+     52          	
+     53          		ADCx->CR2.RSTCAL = SET;
+     54          		while((rtry--) && ADCx->CR2.RSTCAL);
+     55          	}
+     56          	// Start ADC1 calibaration
+     57          	{
+     58          		INT16U rtry = 0xffff;
+     59          	
+     60          		ADCx->CR2.CAL = SET;
+     61          		while((rtry--) && ADCx->CR2.CAL);
+     62          	}
+     63          	// Start ADC1 Software Conversion
+     64          	//ADCx->CR2.Bit.SWSTART = INT_EN;//INT_EN;		// ADC1->CONVERTER START
+     65          
+     66          	OS_EXIT_CRITICAL();
+     67          }
+     68          
+     69          
+     70          INT8U ADC_CheckFinish(INT8U channel)
+     71          {
+     72          //	SerPtr->printf("c111[%d]: %d, ADCSTART = %d\n", iAdcIndex ,channel, ADCSTART[channel]);
+     73          	if(ADCSTART[channel] == ADCFINISH) return TRUE;
+     74          	return FALSE;
+     75          }
+     76          
+     77          void ADC_ChannelEnable(INT8U channel)
+     78          {
+     79          	ADCSTART[channel] = ADCIDLE;
+     80          }
+     81          
+     82          void ADCChannelSEL(void)
+     83          {
+     84          	ADC_ChannelEnable(ADC_Channel_0);
+     85          //	ADC_ChannelEnable(ADC_Channel_1);
+     86          	ADC_ChannelEnable(ADC_Channel_2);
+     87          	ADC_ChannelEnable(ADC_Channel_3);
+     88          //	ADC_ChannelEnable(ADC_Channel_4);
+     89          	ADC_ChannelEnable(ADC_Channel_5);
+     90          	ADC_ChannelEnable(ADC_Channel_6);
+     91          	ADC_ChannelEnable(ADC_Channel_7);
+     92          	ADC_ChannelEnable(ADC_Channel_8);
+     93          	ADC_ChannelEnable(ADC_Channel_9);
+     94          	ADC_ChannelEnable(ADC_Channel_10);
+     95          	ADC_ChannelEnable(ADC_Channel_11);
+     96          	ADC_ChannelEnable(ADC_Channel_12);
+     97          	ADC_ChannelEnable(ADC_Channel_13);
+     98          	ADC_ChannelEnable(ADC_Channel_14);	
+     99          	ADC_ChannelEnable(ADC_Channel_15);
+    100          }
+    101          
+    102          /*******************************************************************************
+    103          * Function Name  : GetAdcValue
+    104          * Description    : get ADC Value directly(only case no_interrupt mode
+    105          *                  group channel.
+    106          * Input          : - channel: where x can be 1 or 2 to select the ADC channel
+    107          * Output         : None
+    108          * Return         : - direct ADCx channel 12 bit value
+    109          *******************************************************************************/
+    110          void ADC1_SWStart(void)
+    111          {
+    112          #ifdef ADC_AUTO_SCAN_ONE_TIME
+    113          	int i;
+    114          
+    115          	if(ADC1->CR1.EOCIE && ASTART == RESET)
+    116          	{
+    117          		for(i = 0; i < __ADCMAX ; i++)
+    118          		{
+    119          			ADCIndex++;
+    120          			ADCIndex %= __ADCMAX;
+    121          
+    122          			if(((AdcEn >> ADCIndex) & 0x01) && ADCSTART[ADCIndex] == ADCIDLE)
+    123          			{
+    124          				ADC_WRCNT[ADCIndex] = 0;
+    125          				ASTART = SET;
+    126          
+    127          				ADCSTART[ADCIndex] = ADCING;
+    128          				ADC1->SQR3.SQ1 = ADCIndex;
+    129          				ADC1->CR2.SWSTART = ENABLE;
+    130          				break;
+    131          			}
+    132          		}
+    133          	}
+    134          
+    135          ///////////////////////////////////////////////////////////////////////////////
+    136          #else    /////////////////////////////////////// #else(ADC_AUTO_SCAN_ONE_TIME)
+    137          	int i = 0;
+    138          
+    139          #ifndef ADC_AVER
+    140          	while(ASTART){ ForDelay(1); }
+    141          #endif
+    142          	if(ADC1->CR1.EOCIE)
+    143          	{
+    144          		for(i = 0; i < __ADCMAX ; i++)
+    145          		{
+    146          			ADCIndex++;
+    147          			ADCIndex %= __ADCMAX;
+    148          
+    149          			if((AdcEn.Data >> ADCIndex) & 0x01 )
+    150          			{
+    151          #ifndef ADC_AVER
+    152          				ADC_WRCNT[ADCIndex]++;
+    153          				ADC_WRCNT[ADCIndex] %= __ADCAVR;
+    154          #endif
+    155          				break;
+    156          			}
+    157          		}
+    158          		ADC1->SQR3.SQ1 = ADCIndex;
+    159          		ADC1->CR2.SWSTART = ENABLE;
+    160          	}
+    161          #endif	/////////////////////////////////////// #endif(ADC_AUTO_SCAN_ONE_TIME)
+    162          	
+    163          }
+    164          
+    165          
+    166          
+    167          /*******************************************************************************
+    168          * Function Name  : GetAdcValue
+    169          * Description    : get ADC Value directly(only case no_interrupt mode
+    170          *                  group channel.
+    171          * Input          : - channel: where x can be 1 or 2 to select the ADC channel
+    172          * Output         : None
+    173          * Return         : - direct ADCx channel 12 bit value
+    174          *******************************************************************************/
+    175          INT16U GetAdcValue(INT8U channel)
+    176          {
+    177          	if(!ADC1->CR2.ADON) return 0;
+    178          	if(!ADC1->CR1.EOCIE)
+    179          	{
+    180          		ADC1->SQR3.SQ1 = channel;
+    181          		ADC1->CR2.SWSTART = ENABLE;		// ADC1->CONVERTER START
+    182          		
+    183          		while(!ADC1->SR.EOC);
+    184          		ADC_DATA[channel] = ADC1->DR;
+    185          		return ADC_DATA[channel];
+    186          	}
+    187          	return 0;
+    188          }
+    189          
+    190          INT16S Get_AdcValue(INT8U channel)
+    191          {
+    192          	//if(!ADC1->CR2.ADON) return 0;
+    193          	if(!ADC1->CR1.EOCIE)
+    194          	{
+    195          		ADC1->SQR3.SQ1 = channel;
+    196          		ADC1->CR2.SWSTART = ENABLE;		// ADC1->CONVERTER START
+    197          		
+    198          		while(!ADC1->SR.EOC);
+    199          		ADC1->SR.EOC = 0;
+    200          		return ADC1->DR;
+    201          	}
+    202          	return -1;
+    203          }
+    204          
+    205          
+    206          
+    207          void GetAdcValueInt(INT8U channel)
+    208          {
+    209          	while(ASTART){ForDelay(1);}
+    210          	ForDelay(1);
+    211          	ASTART = 1;
+    212          	ADC1->SQR3.SQ1 = channel;
+    213          	ADC1->CR2.SWSTART = ENABLE;		// ADC1->CONVERTER START
+    214          }
+    215          
+    216          
+    217          INT16U AdctoVolt33V(INT16U Data)
+    218          {
+    219          	double RetVal;
+    220          
+    221          	RetVal = ((((double)Data)*3300.0) / (1 << 12));
+    222              return (INT16U)RetVal;
+    223          }
+    224          
+    225          INT16U AdctoVolt5opamp(INT16U Data)
+    226          {
+    227          	double RetVal;
+    228          
+    229          	RetVal = (((((double)Data)*33*(665 + 340)) / (1 << 12))/(665.0));
+    230          
+    231          	if((int)(RetVal*100) >= 5) RetVal += 1;
+    232              return (INT16U)RetVal;
+    233          }
+    234          
+    235          
+    236          void SwapData(INT16U *a, INT16U *b)
+    237          {
+    238          	INT16U temp = *a;
+    239          
+    240          	*a = *b;
+    241          	
+    242          	*b = temp;
+    243          }
+    244          
+    245          //#define GARBAGENO	2		// 버리는 값...
+    246          //#define GARBAGENO	10		// 버리는 값...
+    247          #define GARBAGENO	2		// 버리는 값...
+    248          // 
+    249          /*******************************************************************************
+    250          * Function Name  : ADC_IRQHandler
+    251          * Description    : 각 ADC값들을내림차순으로 정리하여, 낮은수치 몇개를 정리하여 높은수로만 평균값함..
+    252          *				   GARBAGENO: 버리는 낮은 값들.. 1이면 낮은값 1개를 버린다.
+    253          *
+    254          *					이 함수는 인터럽트 내에서 average를 취하지 않을 때,
+    255          *					메인 호출 함수 내에서 호출하여 사용한다.
+    256          * Input          : - aptr: 각 Channel의 ADC DATA들...(ADC_AVR)
+    257          * Output         : None
+    258          * Return         : 높은수 값들의 평균값.
+    259          * Example		 : ADC_DATA[ADC_Channel_0] = SelectSort(ADC_AVR[ADC_Channel_0]);
+    260          *******************************************************************************/
+    261          INT16U SelectSortMinMax(INT16U *aptr, INT16U *minvalue, INT16U *Maxvalue, INT16U nlen)
+    262          {
+    263          	INT16U i = 0, j = 0;
+    264          
+    265          
+    266          	for(i = 0 ; i < nlen - 1; i++)
+    267          	{
+    268          
+    269          		for(j = i+1; j < nlen; j++ )
+    270          		{
+    271          			if(aptr[i] > aptr[j])
+    272          			{
+    273          				SwapData( &aptr[i] , &aptr[j]) ;
+    274          			}
+    275          		}
+    276          	}
+    277          
+    278          	*minvalue = aptr[0];
+    279          	*Maxvalue = aptr[nlen - 1];
+    280          	
+    281          
+    282          	return TRUE;
+    283          }
+    284          
+    285          
+    286          INT16U SelectSort(INT16U *aptr, INT16U MAXGARBAGENO, INT16U MINGARBAGENO, INT16U nlen)
+    287          {
+    288          	int sum = 0;
+    289          	int i , j ;
+    290          	INT32U sumtotal;
+    291          	INT16U tbuf[__ADCAVR];
+    292          
+    293          	if(nlen > __ADCAVR) nlen = __ADCAVR;
+    294          
+    295          	for(i = 0; i < nlen; i++)
+    296          	{
+    297          		tbuf[i] = aptr[i];
+    298          		sumtotal += aptr[i]; 
+    299          	}
+    300          
+    301          	for(i = 0 ; i < nlen - 1; i++)
+    302          	{
+    303          
+    304          		for(j = i+1; j < nlen; j++ )
+    305          		{
+    306          			if(tbuf[i] > tbuf[j])
+    307          			{
+    308          				SwapData( &tbuf[i] , &tbuf[j]) ;
+    309          			}
+    310          		}
+    311           	}
+    312          
+    313          	for(i = MINGARBAGENO; i < nlen - MAXGARBAGENO; i++)
+    314          	{
+    315          		sum += tbuf[i];
+    316          	}
+    317          
+    318          	return (INT16U)(sum/(nlen-MAXGARBAGENO-MINGARBAGENO));
+    319          }
+    320          
+    321          
+    322          INT16U SelectSort_1(INT16U *aptr,INT16U *minvalue, INT16U *Maxvalue, INT16U MAXGARBAGENO, INT16U MINGARBAGENO, INT16U MAXGARBAGENO_1, INT16U MINGARBAGENO_1, INT16U nlen)
+    323          {
+    324          	int sum = 0;
+    325          	int sum1 = 0;
+    326          	
+    327          	int i , j ;
+    328          	INT32U sumtotal;
+    329          	INT16U tbuf[__ADCAVR];
+    330          
+    331          	if(nlen > __ADCAVR) nlen = __ADCAVR;
+    332          
+    333          	for(i = 0; i < nlen; i++)
+    334          	{
+    335          		tbuf[i] = aptr[i];
+    336          		sumtotal += aptr[i]; 
+    337          	}
+    338          
+    339          	for(i = 0 ; i < nlen - 1; i++)
+    340          	{
+    341          		for(j = i+1; j < nlen; j++ )
+    342          		{
+    343          			if(tbuf[i] > tbuf[j])
+    344          			{
+    345          				SwapData( &tbuf[i] , &tbuf[j]) ;
+    346          			}
+    347          		}
+    348           	}
+    349          	//	SelectSort_1(ADC_AVR[ADC_Channel_8],&min, &max, 5, 80, 20, 10, __ADCAVR);
+    350          
+    351          	for(i = MINGARBAGENO; i < nlen - MAXGARBAGENO; i++)
+    352          	{
+    353          		sum += tbuf[i];
+    354          	}
+    355          
+    356          	for(i = MINGARBAGENO_1; i < nlen - MAXGARBAGENO_1; i++)
+    357          	{
+    358          		sum1 += tbuf[i];
+    359          	}
+    360          
+    361          	*minvalue = AdctoVolt33V((INT16U)(sum/(nlen-MAXGARBAGENO-MINGARBAGENO)));
+    362          	*Maxvalue = AdctoVolt33V((INT16U)(sum1/(nlen-MAXGARBAGENO_1-MINGARBAGENO_1)));
+    363          
+    364          	return (INT16U)(sum/(nlen-MAXGARBAGENO-MINGARBAGENO));
+    365          }
+    366          
+    367          
+    368          INT16U Detect_SUM(INT16U *aptr,INT16U MAXGARBAGENO, INT16U MINGARBAGENO, INT16U nlen)
+    369          {
+    370          	int sum = 0;
+    371          	int i ;
+    372          
+    373          	for(i = MINGARBAGENO; i < nlen - MAXGARBAGENO; i++)
+    374          	{
+    375          		sum += aptr[i];
+    376          	}
+    377          	return (INT16U)(sum/(nlen-MAXGARBAGENO-MINGARBAGENO));
+    378          }
+    379          
+    380          
+    381          /*******************************************************************************
+    382          * Function Name  : ADC_IRQHandler
+    383          * Description    : Enables or disables the selected ADC software start conversion .
+    384          * Input          : - ADCx: where x can be 1, 2 or 3 to select the ADC peripheral.
+    385          *                  - NewState: new state of the selected ADC software start conversion.
+    386          *                    This parameter can be: ENABLE or DISABLE.
+    387          * Output         : None
+    388          * Return         : None
+    389          *******************************************************************************/
+    390          void ADC_IRQHandler(void)
+    391          {
+    392          
+    393          	INT32U cpu_sr;
+    394          
+    395          	CPU_CRITICAL_ENTER();										// Tell uC/OS-II that we are starting an ISR
+    396          	OSIntNesting++;
+    397          	CPU_CRITICAL_EXIT();
+    398          #ifdef ADC_AUTO_SCAN_ONE_TIME
+    399          
+    400          	ADC_AVR[ADCIndex][ ADC_WRCNT[ADCIndex] ] = ADC1->DR;
+    401          
+    402          	if(++ADC_WRCNT[ADCIndex] >= __ADCAVR)
+    403          	{
+    404          		ADC_WRCNT[ADCIndex] = 0;
+    405          		ADCSTART[ADCIndex] = ADCFINISH;
+    406          		ASTART = FALSE;
+    407          	}
+    408          	else{
+    409          		ADC1->CR2.SWSTART = ENABLE;
+    410          	}
+    411          
+    412          #else /////////////////////////////////////// #else(ADC_AUTO_SCAN_ONE_TIME)
+    413          
+    414          	
+    415          #ifdef ADC_AVER
+    416          	// Get injected channel10 and channel11 converted value
+    417          	ADC_SUM[ADCIndex] -= ADC_DATA[ADCIndex];
+    418          	ADC_SUM[ADCIndex] += ADC1->DR;
+    419              ADC_DATA[ADCIndex] = ADC_SUM[ADCIndex]/__ADCAVR;
+    420          #else
+    421          	ADC_AVR[ADCIndex][ ADC_WRCNT[ADCIndex] ] = ADC1->DR;
+    422          	ASTART = 0;
+    423          #endif
+    424          
+    425          #endif /////////////////////////////////////// #endif(ADC_AUTO_SCAN_ONE_TIME)
+    426          
+    427          	OSIntExit();											// Tell uC/OS-II that we are leaving the ISR
+    428          }
+    429          
+    430          
+    431          int ReadEnvTempTable(int channel)
+    432          {
+    433          #ifdef ADC_AVER
+    434          	INT32S tmpx10 = AdctoVolt33V(ADC_DATA[channel]);
+    435          #else
+    436          	INT32S tmpx10 = AdctoVolt33V(ADC_AVR[channel][0]);
+    437          #endif
+    438          	tmpx10 = (tmpx10 - 500);
+    439          
+    440          	return tmpx10;	// 10배 값이 return 된다. 
+    441          }
+    442          
+    443          /******************* (C) COPYRIGHT 2007 STMicroelectronics *****END OF FILE****/
+
+   Maximum stack usage in bytes:
+
+     Function          .cstack
+     --------          -------
+     ADC1_SWStart          16
+     ADCChannelSEL          0
+     ADCInit               16
+     ADC_ChannelEnable      0
+     ADC_CheckFinish        0
+     ADC_IRQHandler        16
+     AdctoVolt33V           4
+     AdctoVolt5opamp       12
+     Detect_SUM             8
+     GetAdcValue            0
+     GetAdcValueInt        16
+     Get_AdcValue           0
+     ReadEnvTempTable       4
+     SelectSort           240
+     SelectSortMinMax      48
+     SelectSort_1         256
+     SwapData               0
+
+
+   Section sizes:
+
+     Function/Label    Bytes
+     --------------    -----
+     AdcEn1               4
+     ADC_DATA            92
+     ADC_SUM            184
+     ADC_AVR           3400
+     ADCSTART            60
+     ASTART
+     ADCIndex
+     ADC_WRCNT
+     ADCSubIndex          1
+     AdcEn                4
+     ADCInit            198
+     ADC_CheckFinish     18
+     ADC_ChannelEnable   10
+     ADCChannelSEL       20
+     ADC1_SWStart        98
+     GetAdcValue         58
+     Get_AdcValue        52
+     GetAdcValueInt      52
+     AdctoVolt33V        30
+     AdctoVolt5opamp     90
+     SwapData            10
+     SelectSortMinMax   108
+     SelectSort         146
+     SelectSort_1       268
+     Detect_SUM          40
+     ADC_IRQHandler      82
+     ReadEnvTempTable    44
+     ??DataTable12        4
+     ??DataTable12_1      4
+     ??DataTable12_2      4
+     ??DataTable12_3      4
+     ??DataTable12_4      4
+     ??DataTable12_5      4
+     ??DataTable12_6      4
+     ??DataTable12_7      4
+     ??DataTable12_8      4
+     ??DataTable12_9      4
+     ??DataTable12_10     4
+     ??DataTable12_11     4
+     ??DataTable12_12     4
+     ??DataTable12_13     4
+
+ 
+ 3 741 bytes in section .bss
+     4 bytes in section .rodata
+ 1 380 bytes in section .text
+ 
+ 1 380 bytes of CODE  memory
+     4 bytes of CONST memory
+ 3 741 bytes of DATA  memory
+
+Errors: none
+Warnings: none

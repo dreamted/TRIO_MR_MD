@@ -1,0 +1,356 @@
+###############################################################################
+#                                                                             #
+# IAR ANSI C/C++ Compiler V5.50.0.51878/W32 for ARM     11/Aug/2012  17:25:07 #
+# Copyright (C) 1999-2010 IAR Systems AB.                                     #
+#                                                                             #
+#    Cpu mode     =  thumb                                                    #
+#    Endian       =  little                                                   #
+#    Source file  =  C:\user\project\FR-SSR\fw\appl_ssr_20120717\lib\uart4\us #
+#                    art4_v0.1.c                                              #
+#    Command line =  C:\user\project\FR-SSR\fw\appl_ssr_20120717\lib\uart4\us #
+#                    art4_v0.1.c -D NDEBUG -lcN C:\user\project\FR-SSR\fw\app #
+#                    l_ssr_20120717\sout\ -o C:\user\project\FR-SSR\fw\appl_s #
+#                    sr_20120717\sout\ --endian=little --cpu=Cortex-M3 -e     #
+#                    --warnings_are_errors --fpu=None --dlib_config           #
+#                    "C:\compiler\ewarm 5.5\arm\INC\DLib_Config_Normal.h" -I  #
+#                    C:\user\project\FR-SSR\fw\appl_ssr_20120717\include\ -I  #
+#                    C:\user\project\FR-SSR\fw\appl_ssr_20120717\lib_stm32\in #
+#                    c\ -I C:\user\project\FR-SSR\fw\appl_ssr_20120717\lib_st #
+#                    m32\src\ -I C:\user\project\FR-SSR\fw\appl_ssr_20120717\ #
+#                    uC-CPU\ -I C:\user\project\FR-SSR\fw\appl_ssr_20120717\u #
+#                    C-LIB\ -I C:\user\project\FR-SSR\fw\appl_ssr_20120717\uC #
+#                    OS-II\Ports\ -I C:\user\project\FR-SSR\fw\appl_ssr_20120 #
+#                    717\uCOS-II\Source\ -I C:\user\project\FR-SSR\fw\appl_ss #
+#                    r_20120717\uC-Probe\ -I "C:\compiler\ewarm               #
+#                    5.5\arm\INC\" -Oh                                        #
+#    List file    =  C:\user\project\FR-SSR\fw\appl_ssr_20120717\sout\usart4_ #
+#                    v0.1.lst                                                 #
+#    Object file  =  C:\user\project\FR-SSR\fw\appl_ssr_20120717\sout\usart4_ #
+#                    v0.1.o                                                   #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+C:\user\project\FR-SSR\fw\appl_ssr_20120717\lib\uart4\usart4_v0.1.c
+      1          
+      2          /******************** (C) COPYRIGHT 2008 PILOG, NSINFO *************************
+      3          * File Name          : USART4_vx.x.c
+      4          * Author             : Yoon Byong-Gyu(bgyoon@naver.com)
+      5          * Date First Issued  : 06/05/2008
+      6          * Description        : This file provides all the USART4 firmware functions.
+      7          * $Revision: 0.1 $
+      8          * $Revision date: 2008.06.__
+      9          ********************************************************************************/
+     10          
+     11          #include "stm32f10x_conf.h"
+     12          #include "../include/USART4ext.h"
+     13          #include "usart4_v0.1.h"
+     14          
+     15          
+     16          void InitUSART4(INT32U nBps, INT8U nLCR)
+     17          {
+     18          	// Enable GPIOA and AFIO clocks */
+     19          	RCC->APB1ENR.UART4EN = ENABLE;
+     20          
+     21          	//USART4 Configuration
+     22          	Write_USART_BaudRate(USART4, nBps);	//Set BaudRate
+     23          	USART4->CR1.Bit.TXEIE = ENABLE;	
+     24          
+     25          	if(     ((nLCR >> 0) & 0x03) == (_NONPARITY >> 0))
+     26          	{
+     27          		USART4->CR1.Bit.PCE = 0;	//parity control disable
+     28          
+     29          		     if(((nLCR >> 4) & 0x03) ==  (_DATA8BIT >> 4))
+     30          		{
+     31          			USART4->CR1.Bit.M = 0;		//word length = 8
+     32          			USART4->CR2.Bit.STOP = ((nLCR >> 2) & 0x03);	//stop bit = 1
+     33          		}
+     34          		else //if( ((nLCR >> 4) & 0x03) ==  _DATA9BIT )
+     35          		{
+     36          			USART4->CR1.Bit.M = 1;		//word length = 9
+     37          			//USART4->CR2.Bit.STOP = ((nLCR >> 2) & 0x03);	//stop bit = 1
+     38          		}
+     39          	}
+     40          	else if(((nLCR >> 0) & 0x03) == (_ODDPARITY >> 0))
+     41          	{
+     42          		USART4->CR1.Bit.PCE = 1;	//parity control disable
+     43          		USART4->CR1.Bit.PS = 1;
+     44          		USART4->CR2.Bit.STOP = ((nLCR >> 2) & 0x03);	//stop bit = 1
+     45          
+     46          		 if( ((nLCR >> 4) & 0x03) ==  (_DATA7BIT >> 4)) 	USART4->CR1.Bit.M = 0;
+     47          		 else										        USART4->CR1.Bit.M = 1;
+     48          	}
+     49          	else //if(((nLCR >> 0) & 0x03) == _EVNPARITY)
+     50          	{
+     51          		USART4->CR1.Bit.PCE = 1;	//parity control disable
+     52          		USART4->CR1.Bit.PS = 0;
+     53          		USART4->CR2.Bit.STOP = ((nLCR >> 2) & 0x03);	//stop bit = 1		
+     54          
+     55          		if( ((nLCR >> 4) & 0x03) ==  (_DATA7BIT >> 4))   USART4->CR1.Bit.M = 0;
+     56          		else									         USART4->CR1.Bit.M = 1;
+     57          	}
+     58          	/**/
+     59          	USART4->CR3.Bit.RTSE = 0;	//RTS hardware flow control disabled
+     60          	USART4->CR3.Bit.CTSE = 0;	//CTS hardware flow control disabled
+     61          	USART4->CR1.Bit.TE = ENABLE;//Transmitter is enable
+     62          	USART4->CR1.Bit.RE = ENABLE;//Receiver is Enalbe
+     63          	USART4->CR2.Bit.CLKEN = 0;	//SCLK pin disabled
+     64          	USART4->CR2.Bit.CPOL = 0;	//Steady low value on SCLK pin outside transmission window
+     65          	USART4->CR2.Bit.CPHA = 1;	//The second clock transition is the first data capture edge
+     66          	USART4->CR2.Bit.LBCL = 0;	//The clock pulse of the last data bit is not output to the SCLK pin
+     67          
+     68          	USART_ITConfig(USART4, USART_IT_RXNE, ENABLE);
+     69          
+     70          	// Enable the USART4
+     71          	USART_Cmd(USART4, ENABLE);
+     72          	// Enable the USART4 Interrupt
+     73           	NVIC_Init(UART4_IRQChannel, ENABLE);	
+     74          
+     75          	pUSART4.sem = OSSemCreate(1);
+     76          	USART4Printf("\n");
+     77          
+     78          }
+     79          
+     80          /*******************************************************************************
+     81          * Function Name  : USART4_IRQHandler
+     82          * Description    : This function handles USART4 global interrupt request.
+     83          * Input          : None
+     84          * Output         : None
+     85          * Return         : None
+     86          *******************************************************************************/
+     87          
+     88          void USART4_IRQHandler(void)
+     89          {
+     90          
+     91          	INT16U tmp = USART4->SR.Data;
+     92          	INT32U cpu_sr;
+     93          
+     94              CPU_CRITICAL_ENTER();                                       // Tell uC/OS-II that we are starting an ISR
+     95              OSIntNesting++;
+     96              CPU_CRITICAL_EXIT();
+     97          
+     98          	// Rx Data Received
+     99          	if(tmp & ( 1 << __RXNE))
+    100          	{
+    101          		Rx4Buff[Rx4WrCnt++] = USART4->DR.Bit.DR;		// When the receive register is read, the RDR bit is automatically cleared.
+    102          		Rx4WrCnt %= Rx4BuffLen;
+    103          	}
+    104          	else if(tmp & ( 1 << __TXE))
+    105          	{
+    106          		if(Tx4RdCnt != Tx4WrCnt)
+    107          		{
+    108          			USART4->DR.Bit.DR = Tx4Buff[Tx4RdCnt++];
+    109          			Tx4RdCnt %= Tx4BuffLen;
+    110          		}
+    111          		else USART4->CR1.Bit.TXEIE = DISABLE;
+    112          	}
+    113          	else // error, dummy read
+    114          	{
+    115          		tmp =  USART4->DR.Bit.DR;
+    116          	}
+    117          
+    118          	OSIntExit();												// Tell uC/OS-II that we are leaving the ISR
+    119          
+    120          }
+    121          
+    122          unsigned char USART4PutToBuffer(unsigned char Data)
+    123          {
+    124          	INT8U err;
+    125          	//////////////////////////////////////////////////
+    126          
+    127          	OSSemPend(pUSART4.sem, 0, &err);
+    128          	
+    129          	//////////////////////////////////////////////////
+    130          	Tx4Buff[Tx4WrCnt++] = Data;
+    131          	Tx4WrCnt %= Tx4BuffLen;
+    132          	
+    133          	USART4->CR1.Bit.TXEIE = ENABLE;			
+    134          	///////////////////////////////////////////////////
+    135          	OSSemPost(pUSART4.sem);
+    136          	return 0;
+    137          }
+    138          
+    139          unsigned char USART4PutChar(unsigned char Data)
+    140          {
+    141          
+    142          
+    143          	USART4->DR.Bit.DR = Data;
+    144          	while(!USART4->SR.Bit.TXE);
+    145              
+    146              return Data;
+    147          }
+    148          
+    149          unsigned long int USART4Printf( const char *format, ... )
+    150          {
+    151              unsigned long int i, cnt;
+    152              char buf[128];
+    153           	va_list argptr;
+    154          
+    155              va_start(argptr, format);
+    156          	cnt = vsprintf(buf, format, argptr);
+    157          	va_end( argptr );
+    158          
+    159          	for(i = 0;;i++)
+    160          	{
+    161          		if(buf[i] == 0) break;
+    162          		if(buf[i] == '\n') USART4PutToBuffer('\r');
+    163          		USART4PutToBuffer(buf[i]);
+    164          	}
+    165          	while(!USART4TxCheckByte()) OSTimeDly(1);
+    166          	return cnt;
+    167          }
+    168          
+    169          void USART4PutStr(unsigned char *Str, unsigned short int Length, int iEn)
+    170          {
+    171          
+    172          	INT8U err;
+    173          	unsigned long int i;
+    174          
+    175          	OSSemPend(pUSART4.sem, 0, &err);
+    176          	
+    177          	for(i = 0; i < Length; i++)
+    178          	{
+    179          		Tx4Buff[Tx4WrCnt++] = Str[i];
+    180          		Tx4WrCnt %= Tx4BuffLen;
+    181          	}
+    182          
+    183          	if(iEn)
+    184          	{
+    185          		USART4->CR1.Bit.TXEIE = ENABLE;
+    186          	}	
+    187          
+    188          	OSSemPost(pUSART4.sem);
+    189          }
+    190          
+    191          
+    192          signed short int USART4RxGetByte( void )
+    193          {
+    194          	s16 RetVal = 0;
+    195          
+    196          #if (APPOFFSET == 0)
+    197          	while(Rx4RdCnt == Rx4WrCnt);
+    198          #else
+    199          	if(Rx4RdCnt == Rx4WrCnt) return -1;
+    200          #endif
+    201          	RetVal = Rx4Buff[Rx4RdCnt++];
+    202          	Rx4RdCnt %= Rx4BuffLen;
+    203          
+    204          	return (RetVal & 0xff);
+    205          }
+    206          
+    207          unsigned char USART4CheckByte(unsigned short int ByteCnt, unsigned short int *Recv)
+    208          {
+    209          	u32	i = 0, j = 0;
+    210          	u8	RetVal = TRUE;
+    211          
+    212          	*Recv = 0;
+    213          	i = (u32) Rx4RdCnt;
+    214          	j = (u32) Rx4WrCnt;
+    215          
+    216          	if		(i == j) RetVal = FALSE;
+    217          	else if (i < j)
+    218          	{
+    219          		*Recv = j - i;
+    220          		i = i + ByteCnt;
+    221          		if(i > j)	RetVal = FALSE;
+    222          	}
+    223          	else if (i > j)
+    224          	{
+    225          		*Recv = (Rx4BuffLen + j) - i;
+    226          		i = i + ByteCnt;
+    227          		j = j + Rx4BuffLen;
+    228          		if(i > j)	RetVal = FALSE;
+    229          	}
+    230          	return(RetVal);
+    231          }
+    232          
+    233          void USART4BuffClear( void )
+    234          {
+    235          	Rx4RdCnt = 0;
+    236          	Rx4WrCnt = 0;
+    237          	Tx4RdCnt = 0;
+    238          	Tx4WrCnt = 0;
+    239          }
+    240          
+    241          void USART4TxClear(void)
+    242          {
+    243          	Tx4RdCnt = 0;
+    244          	Tx4WrCnt = 0;
+    245          }
+    246          
+    247          
+    248          signed short int USART4TxCheckByte(void)
+    249          {
+    250          	if(!USART4->CR1.Bit.TXEIE) return TRUE;
+    251          	return FALSE;
+    252          }
+    253          
+    254          ////////////////////////////////////////////////////////////////////////////////
+    255          // End of Source File
+    256          /////////////////////
+    257          
+    258          
+
+   Maximum stack usage in bytes:
+
+     Function          .cstack
+     --------          -------
+     InitUSART4            16
+     USART4BuffClear        0
+     USART4CheckByte        8
+     USART4Printf         152
+     USART4PutChar          0
+     USART4PutStr          24
+     USART4PutToBuffer     16
+     USART4RxGetByte        0
+     USART4TxCheckByte      0
+     USART4TxClear          0
+     USART4_IRQHandler     16
+
+
+   Section sizes:
+
+     Function/Label    Bytes
+     --------------    -----
+     Rx4Buff           1024
+     Tx4Buff           1024
+     Rx4RdCnt             8
+     Rx4WrCnt
+     Tx4RdCnt
+     Tx4WrCnt
+     pUSART4             44
+     InitUSART4         300
+     USART4_IRQHandler  106
+     USART4PutToBuffer   52
+     USART4PutChar       18
+     USART4Printf        70
+     USART4PutStr        70
+     USART4RxGetByte     32
+     USART4CheckByte     58
+     USART4BuffClear     10
+     ?Subroutine0         6
+     USART4TxClear        4
+     USART4TxCheckByte   16
+     ??DataTable8         4
+     ??DataTable8_1       4
+     ??DataTable8_2       4
+     ??DataTable8_3       4
+     ??DataTable8_4       4
+     ??DataTable8_5       4
+     ??DataTable8_6       4
+     ??DataTable8_7       4
+     ??DataTable8_8       4
+     ?<Constant "\n">     2
+
+ 
+    44 bytes in section .data
+     2 bytes in section .rodata
+   778 bytes in section .text
+ 2 056 bytes in section iram
+ 
+   778 bytes of CODE  memory
+     2 bytes of CONST memory
+ 2 100 bytes of DATA  memory
+
+Errors: none
+Warnings: none

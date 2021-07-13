@@ -1,0 +1,1515 @@
+###############################################################################
+#                                                                             #
+# IAR ANSI C/C++ Compiler V5.50.0.51878/W32 for ARM     23/Aug/2012  00:33:40 #
+# Copyright (C) 1999-2010 IAR Systems AB.                                     #
+#                                                                             #
+#    Cpu mode     =  thumb                                                    #
+#    Endian       =  little                                                   #
+#    Source file  =  C:\user\project\FR-SSR\fw\appl_ssr_20120717\code\aa_alc. #
+#                    c                                                        #
+#    Command line =  C:\user\project\FR-SSR\fw\appl_ssr_20120717\code\aa_alc. #
+#                    c -lcN C:\user\project\FR-SSR\fw\appl_ssr_20120717\sout\ #
+#                     -lB C:\user\project\FR-SSR\fw\appl_ssr_20120717\sout\   #
+#                    -o C:\user\project\FR-SSR\fw\appl_ssr_20120717\sout\     #
+#                    --endian=little --cpu=Cortex-M3 -e --require_prototypes  #
+#                    --fpu=None --dlib_config "C:\compiler\ewarm              #
+#                    5.5\arm\INC\DLib_Config_Normal.h" -I                     #
+#                    C:\user\project\FR-SSR\fw\appl_ssr_20120717\include\ -I  #
+#                    C:\user\project\FR-SSR\fw\appl_ssr_20120717\lib_stm32\in #
+#                    c\ -I C:\user\project\FR-SSR\fw\appl_ssr_20120717\lib_st #
+#                    m32\src\ -I C:\user\project\FR-SSR\fw\appl_ssr_20120717\ #
+#                    uC-CPU\ -I C:\user\project\FR-SSR\fw\appl_ssr_20120717\u #
+#                    C-LIB\ -I C:\user\project\FR-SSR\fw\appl_ssr_20120717\uC #
+#                    OS-II\Ports\ -I C:\user\project\FR-SSR\fw\appl_ssr_20120 #
+#                    717\uCOS-II\Source\ -I C:\user\project\FR-SSR\fw\appl_ss #
+#                    r_20120717\uC-Probe\ -I "C:\compiler\ewarm               #
+#                    5.5\arm\INC\" -Oh                                        #
+#    List file    =  C:\user\project\FR-SSR\fw\appl_ssr_20120717\sout\aa_alc. #
+#                    lst                                                      #
+#    Object file  =  C:\user\project\FR-SSR\fw\appl_ssr_20120717\sout\aa_alc. #
+#                    o                                                        #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+C:\user\project\FR-SSR\fw\appl_ssr_20120717\code\aa_alc.c
+      1          
+      2          /******************** (C) COPYRIGHT 2008 PILOG, NSINFO *************************
+      3          * File Name          : exlib.c
+      4          * Author             : Yoon Byong-Gyu(bgyoon@naver.com)
+      5          * Date First Issued  : 02/01/2008
+      6          * Description        : This file provides all the port/input/update firmware functions.
+      7          * $Revision: 0.1 $
+      8          * $Revision date: 2008.01.__
+      9          ********************************************************************************/
+     10          
+     11          #define ALC_C
+     12          
+     13          #include "../include/main.h"
+     14          
+     15          #include <stdlib.h>
+     16          
+     17          void AlcInit(void)
+     18          {
+     19          	{
+     20          		INT32U *s = (INT32U *)(__pBOOTAddr + 36);
+     21          
+     22          		if(*s == _pilog){
+     23          			OSTaskCreate(AlcTask, (void *)NULL, (OS_STK *)&AlcTaskStk[ALC_START_STK_SIZE - 1], ALC_START_PRIO);
+     24          		}
+     25          	}
+     26          }
+     27          
+     28          
+     29          void AlcTask(void *p_arg)
+     30          {
+     31          	(void)p_arg;
+     32          
+     33          	TimerRegist(TimerLEDBlink, Time100mSec*5L);
+     34          	TimerRegist(TimerSleepOn, Time1Sec);
+     35          
+     36          	OSTimeDly(10L*ALC_START_PRIO);
+     37          	
+     38              while(1)
+     39          	{
+     40          		if(!tTestFlag) FrontLEDDisplay();
+     41          		
+     42          		while(!DownLoadGiveupTimerSet(NULL) && !tTestFlag)
+     43          		{
+     44          			while(!IsItiFPGAInit()){
+     45          				OSTimeDly(1000L);
+     46          			}
+     47          
+     48          			ReadAdcValue();
+     49          			FrontLEDStausUpdate(); 	//
+     50          			FrontLEDDisplay();
+     51          			SleepLogFunc();
+     52          			
+     53          			OSTimeDly(40L);
+     54          		}
+     55          		OSTimeDly(250L);
+     56          	}
+     57          }
+     58          
+     59          void ReadAdcValue (void)
+     60          {
+     61          	INT8U isminval = FALSE;
+     62          	INT8S tmp = (ReadEnvTempTable(ADC_DATA[adcEnvTemp])/10);
+     63          
+     64          	INT16S tmpDect;
+     65          
+     66          
+     67          	if(ADC_CheckFinish(adcEnvTemp)){
+     68          		
+     69          		ADC_DATA[adcEnvTemp] =  ADC_AVR[adcEnvTemp][0];
+     70          		ADC_ChannelEnable(adcEnvTemp);
+     71          	}
+     72          
+     73          	if(ADC_CheckFinish(adcFWDPWRdect1))
+     74          	{
+     75          		ADC_DATA[adcFWDPWRdect1] = SelectSort(ADC_AVR[adcFWDPWRdect1], 40, 40, __ADCAVR);
+     76          		ADC_ChannelEnable(adcFWDPWRdect1);
+     77          	}
+     78          
+     79          	if(ADC_CheckFinish(adcFWDPWRdect2))
+     80          	{
+     81          		ADC_DATA[adcFWDPWRdect2] = SelectSort(ADC_AVR[adcFWDPWRdect2], 40, 40, __ADCAVR);
+     82          		ADC_ChannelEnable(adcFWDPWRdect2);
+     83          	}
+     84          
+     85          	if(ADC_CheckFinish(adcRVSPWRdect1))
+     86          	{
+     87          		ADC_DATA[adcRVSPWRdect1] = SelectSort(ADC_AVR[adcRVSPWRdect1], 40, 40, __ADCAVR);
+     88          		ADC_ChannelEnable(adcRVSPWRdect1);
+     89          	}
+     90          
+     91          	if(ADC_CheckFinish(adcRVSPWRdect2))
+     92          	{
+     93          		ADC_DATA[adcRVSPWRdect2] = SelectSort(ADC_AVR[adcRVSPWRdect2], 40, 40, __ADCAVR);
+     94          		ADC_ChannelEnable(adcRVSPWRdect2);
+     95          	}
+     96          
+     97          	MainStatus->TxRssidBFSSts_3G = AD9362GetRssi(SPI_3G_TX_CH, (MainStatus->RFPathSelTx_3G & 0x01));
+     98          	MainStatus->RxRssidBFSSts_3G = AD9362GetRssi(SPI_3G_RX_CH, (MainStatus->RFPathSelRx_3G & 0x01));
+     99          
+    100          	MainStatus->TxRssidBFSSts_4G = AD9362GetRssi(SPI_4G_TX_CH, (MainStatus->RFPathSelTx_4G & 0x01));
+    101          	MainStatus->RxRssidBFSSts_4G = AD9362GetRssi(SPI_4G_RX_CH, (MainStatus->RFPathSelRx_4G & 0x01));
+    102          
+    103          	MainStatus->ENVTemp = tmp;
+    104          
+    105          	tmpDect = MainStatus->TxRssidBFSSts_3G - MainStatus->TxRssidBFSSet_3G;
+    106          	tmpDect = -35 - (tmpDect/4);
+    107          	if(tmpDect > -30) tmpDect = -30;
+    108          	MainStatus->FwdRssi_3G	= tmpDect;
+    109          
+    110          	tmpDect = MainStatus->RxRssidBFSSts_3G - MainStatus->RxRssidBFSSet_3G;
+    111          	tmpDect = -35 - (tmpDect/4);
+    112          	if(tmpDect > -30) tmpDect = -30;
+    113          	MainStatus->RvsRssi_3G	= tmpDect;
+    114          
+    115          	tmpDect = MainStatus->TxRssidBFSSts_4G - MainStatus->TxRssidBFSSet_4G;
+    116          	tmpDect = -35 - (tmpDect/4);
+    117          	if(tmpDect > -30) tmpDect = -30;
+    118          	MainStatus->FwdRssi_4G	= tmpDect;
+    119          
+    120          	tmpDect = MainStatus->RxRssidBFSSts_4G - MainStatus->RxRssidBFSSet_4G;
+    121          	tmpDect = -35 - (tmpDect/4);
+    122          	if(tmpDect > -30) tmpDect = -30;
+    123          	MainStatus->RvsRssi_4G	= tmpDect;
+    124          	
+    125          
+    126          	MainStatus->PCSRvsPower     = ReadPwrTableAscending( (ADC_DATA[adcRVSPWRdect1] >> 2), 1, TRUE, &isminval)/10L;
+    127          	MainStatus->WCDMARvsPower   = ReadPwrTableAscending( (ADC_DATA[adcRVSPWRdect2] >> 2), 3, TRUE, &isminval)/10L;
+    128          
+    129          	tmpDect 					= (ReadPwrTableAscending( (ADC_DATA[adcFWDPWRdect1] >> 2), 0, FALSE, &isminval)*5L)/10L;
+    130          	if(isminval) 	MainStatus->PCSFwdPower = -20 * 5L;
+    131          	else			MainStatus->PCSFwdPower = tmpDect;
+    132          
+    133          
+    134          	tmpDect						= (ReadPwrTableAscending( (ADC_DATA[adcFWDPWRdect2] >> 2), 2, FALSE, &isminval)*5L)/10L;
+    135          	if(isminval) 	MainStatus->WCDMAFwdPower = -20 * 5L;
+    136          	else			MainStatus->WCDMAFwdPower = tmpDect;
+    137          	
+    138          }
+    139          
+    140          INT8U AgcOperation(INT8U IsIt3G, INT8U IsItOSC)
+    141          {
+    142            	INT8U rval = FALSE;
+    143          
+    144          	INT8S *iFWDAttn;
+    145          	INT8S *iRVSAttn;
+    146          	INT8S *iFwdPower;
+    147          	INT8S *iFwdLmt;
+    148          	INT8S *iRvsLmt;
+    149          	INT8U *iAGCTimeUpper;
+    150          	INT8U *iAGCTimeLower;
+    151          	INT8U *iFWDSWOnOff;
+    152          
+    153          	INT8U iMinAttn;
+    154          	INT8U iAgcTimer;
+    155          	if(!IsIt3G)
+    156          	{
+    157          		iFWDAttn = &MainStatus->FwdAttn_4G;
+    158          		iRVSAttn = &MainStatus->RvsAttn_4G;
+    159          		iFwdPower = &MainStatus->PCSFwdPower;
+    160          		iAGCTimeUpper = &MainStatus->AGCTimeUpper1;
+    161          		iAGCTimeLower = &MainStatus->AGCTimeLower1;
+    162          		iFwdLmt = &MainStatus->AGCLimit1;
+    163          		iRvsLmt = &MainStatus->AGCLimit2;
+    164          		iFWDSWOnOff = &MainStatus->TxSWOnOff_4G;
+    165          		iMinAttn = MinAttn4G;
+    166          		iAgcTimer = AgcChkTimer1;
+    167          	}
+    168          	else
+    169          	{
+    170          		iFWDAttn = &MainStatus->FwdAttn_3G;
+    171          		iRVSAttn = &MainStatus->RvsAttn_3G;
+    172          		iFwdPower = &MainStatus->WCDMAFwdPower;
+    173          		iAGCTimeUpper = &MainStatus->AGCTimeUpper2;
+    174          		iAGCTimeLower = &MainStatus->AGCTimeLower2;
+    175          		iFwdLmt = &MainStatus->AGCLimit3;
+    176          		iRvsLmt = &MainStatus->AGCLimit4;
+    177          		iFWDSWOnOff = &MainStatus->TxSWOnOff_3G;
+    178          		iMinAttn = MinAttn3G;
+    179          		iAgcTimer = AgcChkTimer2;
+    180          	}
+    181          	
+    182          	{
+    183          		INT32S gap;
+    184          		INT32S tmpAttn;
+    185          		INT16U tval;
+    186                  
+    187          		if(MainStatus->ALCOnOff == '1' ) return FALSE;
+    188          		if(MainStatus->AGCOnOff != '1' ) return FALSE;
+    189          		if(*iFWDSWOnOff == '0') return FALSE;
+    190          		if(IsItOSC){
+    191          			//tval = ((INT16U)(*iAGCTimeUpper) << 8) | ((INT16U)(*iAGCTimeLower));
+    192          			//TimerRegist(iAgcTimer, (tval*Time1Sec));
+    193          			return FALSE;
+    194          		}
+    195          //SerPtr->printf("%d, %d, %d \n", IsIt3G, *iAGCTimeUpper, *iAGCTimeLower);
+    196          		if(TimeOverCheck(iAgcTimer))
+    197          		{
+    198          			gap = RetFWDPower(*iFwdPower) - (*iFwdLmt);
+    199          
+    200          			//SerPtr->printf("CHECK %d,  %d, %d, gap = %d, (*iFWDAttn) %d\n", (*iFwdPower), RetFWDPower((*iFwdPower)), (*iFwdLmt), gap, (*iFWDAttn));
+    201          			{
+    202          				tmpAttn = (*iFWDAttn) + gap;
+    203          				
+    204          				if(tmpAttn > ATTN_MAX30) 	tmpAttn = ATTN_MAX30;
+    205          				if(tmpAttn < iMinAttn) 	    tmpAttn = iMinAttn;
+    206          
+    207          				*iFWDAttn = tmpAttn;
+    208          
+    209          				// pcs reverse //
+    210          				tmpAttn = *iFWDAttn - (*iRvsLmt);
+    211          				
+    212          				if(tmpAttn > ATTN_MAX30) 	tmpAttn = ATTN_MAX30;
+    213          				if(tmpAttn < iMinAttn) 	    tmpAttn = iMinAttn;
+    214          
+    215          				*iRVSAttn = tmpAttn;
+    216          			}
+    217          
+    218          			//	AGC TIME CALCULATION  //
+    219          			tval = ((INT16U)(*iAGCTimeUpper) << 8) | ((INT16U)(*iAGCTimeLower));
+    220          			TimerRegist(iAgcTimer, (tval*Time1Sec));
+    221          		}		
+    222          	}
+    223          	return rval;
+    224          }
+    225          
+    226          INT8S RetFWDPower(INT8S tmp)
+    227          {
+    228          	INT16S rval = (INT16S)tmp*2;
+    229          
+    230          	tmp = rval%10;
+    231          
+    232          	if     (tmp > 5) rval += 10;
+    233          	else if(tmp <-5) rval -= 10;
+    234          
+    235          	return (rval/10);
+    236          }
+    237          
+    238          INT8U AlcOperation(INT8U IsIt3G, INT8U IsItOSC)
+    239          {
+    240          
+    241          	INT8U rval = FALSE;
+    242          	INT8S *iFWDAttn;
+    243          	INT8S *iRVSAttn;
+    244          	INT8U *iFWDSWOnOff;
+    245          	INT8S *iFwdPower;
+    246          	INT8S *iALCUpperLmt;
+    247          	INT8S *iALCOffset;
+    248          	INT8S *iRvsLmt;
+    249          
+    250          	INT8U iMinAttn;
+    251          
+    252          	if(!IsIt3G)
+    253          	{
+    254          		iFWDAttn = &MainStatus->FwdAttn_4G;
+    255          		iRVSAttn = &MainStatus->RvsAttn_4G;
+    256          		iFWDSWOnOff = &MainStatus->TxSWOnOff_4G;
+    257          		iFwdPower = &MainStatus->PCSFwdPower;
+    258          		iALCUpperLmt = &MainStatus->ALC_Phigh;
+    259          		iALCOffset = &MainStatus->ALC_Plow;
+    260          		iRvsLmt = &MainStatus->AGCLimit2;
+    261          		iMinAttn = MinAttn4G;
+    262          	}
+    263          	else
+    264          	{
+    265          		iFWDAttn = &MainStatus->FwdAttn_3G;
+    266          		iRVSAttn = &MainStatus->RvsAttn_3G;
+    267          		iFWDSWOnOff = &MainStatus->TxSWOnOff_3G;
+    268          		iFwdPower = &MainStatus->WCDMAFwdPower;
+    269          		iALCUpperLmt = &MainStatus->ALC_Whigh;
+    270          		iALCOffset = &MainStatus->ALC_Wlow;
+    271          		iRvsLmt = &MainStatus->AGCLimit4;
+    272          		iMinAttn = MinAttn3G;
+    273          	}
+    274          	
+    275          	{
+    276          		INT8S tmpPwr;
+    277          		INT32S	gap = 0, tmpAttn;
+    278          
+    279          		
+    280          		if(!(MainStatus->ALCOnOff & 0x01)) return FALSE;
+    281          		if(!(*iFWDSWOnOff & 0x01) )	return FALSE;
+    282          		if(IsItOSC) return FALSE;
+    283          
+    284          		tmpPwr = RetFWDPower(*iFwdPower);
+    285          
+    286          		if ( tmpPwr > *iALCUpperLmt )
+    287          		{
+    288          			gap = tmpPwr - *iALCUpperLmt;
+    289          
+    290          		}
+    291          		else if ( tmpPwr < (*iALCUpperLmt + *iALCOffset) )
+    292          		{
+    293          			gap = tmpPwr - (*iALCUpperLmt + *iALCOffset);
+    294          
+    295          		}
+    296          
+    297          		// FWD
+    298          		tmpAttn = *iFWDAttn + gap;
+    299          		
+    300          		if(tmpAttn > ATTN_MAX30) 	tmpAttn = ATTN_MAX30;
+    301          		if(tmpAttn < iMinAttn) 		tmpAttn = iMinAttn;
+    302          
+    303          		*iFWDAttn = tmpAttn;
+    304          
+    305          		// RVS
+    306          		tmpAttn = *iFWDAttn - *iRvsLmt;
+    307          
+    308          		if(tmpAttn > ATTN_MAX30) 	tmpAttn = ATTN_MAX30;
+    309          		if(tmpAttn < iMinAttn) 		tmpAttn = iMinAttn;
+    310          
+    311          		*iRVSAttn = tmpAttn;
+    312          	}
+    313          	return rval;
+    314          }
+    315          
+    316          void SleepLogFunc(void)
+    317          {
+    318          	if ( !TimeOverCheck(TimerSleepOn) ) return;
+    319          	TimerRegist(TimerSleepOn, Time1Sec);
+    320          
+    321          	if(!MainStatus->AlarmFlag.SLP_ALM1_BIT){
+    322          		if(++tmpSleepTimeOn[0] >= 60){
+    323          			tmpSleepTimeOn[0] = 0;
+    324          			if(MainStatus->NoSleepTime1 >= 89)  MainStatus->NoSleepTime1 = 89;
+    325          			else								MainStatus->NoSleepTime1++;
+    326          		}
+    327          	}
+    328          	
+    329          	if(!MainStatus->AlarmFlag.SLP_ALM2_BIT){
+    330          		if(++tmpSleepTimeOn[1] >= 60){
+    331          			tmpSleepTimeOn[1] = 0;
+    332          			if(MainStatus->NoSleepTime2 >= 89)  MainStatus->NoSleepTime2 = 89;
+    333          			else								MainStatus->NoSleepTime2++;
+    334          		}
+    335          	}
+    336          }
+    337          
+    338          void SleepCheckFunc(__SleepStr *SleepCheck, INT8U IsItOSC, INT8U IsItSD)
+    339          {
+    340          	INT8S *iRvsAttn;
+    341          	INT8U *iRvsSWOnOff;
+    342          	INT16U *iADCrawDATA;
+    343          	INT16U *iSleepTable;
+    344          	INT8U *iSleepMode;
+    345          	INT8U *iRvsSWOnOffBp;
+    346          	INT8U *iSleepTime = &MainStatus->SleepChkTime;
+    347          
+    348          	if(SleepCheck == &mSleep_4G)
+    349          	{
+    350          		iRvsAttn = &MainStatus->RvsAttn_4G;
+    351          		iSleepMode = &MainStatus->SleepMode;
+    352          		iADCrawDATA = &ADC_DATA[adcRVSPWRdect1];
+    353          		iSleepTable = &vEE_TABLE->Table.SleepLimitTable1[2];
+    354          		iRvsSWOnOff = &MainStatus->RxSWOnOff_4G;
+    355          		iRvsSWOnOffBp = &vEE_BACK1->BackUp.SWOnOff2; 
+    356          	}
+    357          	else
+    358          	{
+    359          		iRvsAttn = &MainStatus->RvsAttn_3G;
+    360          		iSleepMode = &MainStatus->SleepMode2;
+    361          		iADCrawDATA = &ADC_DATA[adcRVSPWRdect2];
+    362          		iSleepTable = &vEE_TABLE->Table.SleepLimitTable2[2];
+    363          		iRvsSWOnOff = &MainStatus->RxSWOnOff_3G;
+    364          		iRvsSWOnOffBp = &vEE_BACK1->BackUp.RxSWOnOff_3G; 
+    365          	}
+    366          ////////////////////////////////////////////////////////////////////////////////
+    367          	if(IsItOSC || IsItSD ) {
+    368          		SleepCheck->SleepStep = 0;
+    369          		SleepCheck->IsItSLP = FALSE;
+    370          		
+    371          		return;
+    372          	}
+    373          
+    374          
+    375          	if(!( (*iSleepMode) & 0x01) ){
+    376          
+    377          		SleepCheck->SleepStep = 0;
+    378          		SleepCheck->IsItSLP = FALSE;
+    379          
+    380          		if(SleepCheck == &mSleep_4G) MainStatus->AlarmFlag.SLP_ALM1_BIT = RESET;
+    381          		else						MainStatus->AlarmFlag.SLP_ALM2_BIT = RESET;
+    382          
+    383          		if(!SleepCheck->SleepRecovery)
+    384          		{
+    385          			*iRvsSWOnOff = *iRvsSWOnOffBp;
+    386          		}
+    387          		SleepCheck->SleepRecovery = TRUE;
+    388          		return;
+    389          	}
+    390          	SleepCheck->SleepRecovery = FALSE;
+    391          
+    392          	switch(SleepCheck->SleepStep)
+    393          	{
+    394          		case 0:
+    395          		{
+    396          			if(((*iADCrawDATA) >> 2) > (iSleepTable[ATTN_MAX30 - (*iRvsAttn)] + AWAKE_LIMIT))
+    397          			{
+    398          				SleepCheck->SleepStep = 0;
+    399          				SleepCheck->IsItSLP = FALSE;
+    400          				
+    401          				if(SleepCheck == &mSleep_4G) MainStatus->AlarmFlag.SLP_ALM1_BIT = RESET;
+    402          				else						MainStatus->AlarmFlag.SLP_ALM2_BIT = RESET;
+    403          			}
+    404          			else
+    405          			{
+    406          				SleepCheck->SleepStep = 1;
+    407          				SleepCheck->SleepTimeCnt = 0;
+    408          			}
+    409          		}
+    410          		break;
+    411          
+    412          		case 1:
+    413          			if( ((*iADCrawDATA) >> 2) > (iSleepTable[ATTN_MAX30 - (*iRvsAttn)]+ AWAKE_LIMIT)) SleepCheck->SleepStep = 1;
+    414          
+    415          			if(++SleepCheck->SleepTimeCnt >= (*iSleepTime)*2L ) SleepCheck->SleepStep = 2;
+    416          		break;
+    417          
+    418          		case 2:
+    419          			if(SleepCheck == &mSleep_4G) MainStatus->AlarmFlag.SLP_ALM1_BIT = SET;
+    420          			else						MainStatus->AlarmFlag.SLP_ALM2_BIT = SET;
+    421          
+    422          			*iRvsSWOnOff = '0';
+    423          
+    424          			if( ((*iADCrawDATA) >> 2) > (iSleepTable[ATTN_MAX30 - (*iRvsAttn)] + AWAKE_LIMIT))
+    425          			{
+    426          				SleepCheck->SleepStep = 0;
+    427          
+    428          				*iRvsSWOnOff = *iRvsSWOnOffBp;
+    429          			}
+    430          			SleepCheck->IsItSLP = TRUE;
+    431          		break;
+    432          	}
+    433          }
+    434          
+    435          
+    436          INT8U ShutDnCheckFunc(__ShutDnStr *SDCheck, INT8U IsItOSC, INT8U IsItSLP)
+    437          {
+    438          	// FWD LimitOperation
+    439          	INT8U rval = 0;
+    440          
+    441          	INT8S *iALCOnOff = &MainStatus->ALCOnOff;
+    442          	INT8U *iAGCOnOff = &MainStatus->AGCOnOff;
+    443          	INT8S *iFwdAttn;
+    444          	INT8S *iRvsAttn;
+    445          	INT8S *FwdPower;
+    446          	INT8S *RvsPower;
+    447          	INT8S *FwdUpperLmt;
+    448          	INT8S *RvsUpperLmt;
+    449          	INT8U *iFwdSWOnOff;
+    450          	INT8U *iRvsSWOnOff; 
+    451          
+    452          	if(SDCheck == &mSDCheck_4G)
+    453          	{
+    454          		iFwdAttn = &MainStatus->FwdAttn_4G;
+    455          		iRvsAttn = &MainStatus->RvsAttn_4G;
+    456          		FwdPower = &MainStatus->PCSFwdPower;
+    457          		RvsPower = &MainStatus->PCSRvsPower;
+    458          		FwdUpperLmt = &MainStatus->ALCLimit1;
+    459          		RvsUpperLmt = &MainStatus->ALCLimit3;
+    460          		iFwdSWOnOff = &MainStatus->TxSWOnOff_4G;
+    461          		iRvsSWOnOff = &MainStatus->RxSWOnOff_4G;
+    462          	}
+    463          	else
+    464          	{
+    465          		iFwdAttn = &MainStatus->FwdAttn_3G;
+    466          		iRvsAttn = &MainStatus->RvsAttn_3G;
+    467          		FwdPower = &MainStatus->WCDMAFwdPower;
+    468          		RvsPower = &MainStatus->WCDMARvsPower;
+    469          		FwdUpperLmt = &MainStatus->ALCLimit2;
+    470          		RvsUpperLmt = &MainStatus->ALCLimit4;
+    471          		iFwdSWOnOff = &MainStatus->TxSWOnOff_3G;
+    472          		iRvsSWOnOff = &MainStatus->RxSWOnOff_3G;
+    473          	}
+    474          ////////////////////////////////////////////////////////////////////////////////
+    475          	if(IsItOSC || IsItSLP)
+    476              {
+    477              	if(IsItOSC) SDCheck->FwdSDStep = 0;
+    478          		SDCheck->RvsSDStep = 0;
+    479              }
+    480          
+    481          	if((MainStatus->SDNOnOff & 0x01) )	//
+    482          	{
+    483          		INT8U tmp = ((*iALCOnOff) & 0x01) | ((*iAGCOnOff) & 0x01);
+    484          
+    485          		if( (tmp && (*iFwdAttn == ATTN_MAX30)) || !tmp)
+    486          		{
+    487          			switch(SDCheck->FwdSDStep)
+    488          			{
+    489          				case 0:
+    490          					if( RetFWDPower(*FwdPower) > *FwdUpperLmt) SDCheck->FwdSDStep = 1;
+    491          					else {
+    492          						if(SDCheck == &mSDCheck_4G)	MainStatus->AlarmFlag.OverPCSFwdPower = RESET;
+    493          						else						MainStatus->AlarmFlag.OverWCDMAFwdPower = RESET;
+    494          					}
+    495          				break;
+    496          
+    497          				case 1:
+    498          					if( RetFWDPower(*FwdPower) > *FwdUpperLmt) 	SDCheck->FwdSDStep = 2;
+    499          					else 										SDCheck->FwdSDStep = 0;
+    500          				break;
+    501          
+    502          				case 2:
+    503          					if( RetFWDPower(*FwdPower) > *FwdUpperLmt){
+    504          
+    505          						
+    506          						*iFwdAttn = ATTN_MAX30;
+    507          						*iRvsAttn = ATTN_MAX30;
+    508          						*iFwdSWOnOff = '0';
+    509          						*iRvsSWOnOff = '0'; // LMJ110803
+    510          						
+    511          						
+    512          						if(SDCheck == &mSDCheck_4G)	MainStatus->AlarmFlag.OverPCSFwdPower = SET;
+    513          						else						MainStatus->AlarmFlag.OverWCDMAFwdPower = SET;
+    514          					
+    515          						SDCheck->FwdSDStep = 3;
+    516          					}
+    517          					else{
+    518          						SDCheck->FwdSDStep = 0;
+    519          					}
+    520          				break;
+    521          
+    522          				default:
+    523          					SDCheck->IsItSHD = TRUE;
+    524          				break;
+    525          			}
+    526          		}
+    527          		else SDCheck->FwdSDStep = 0;
+    528          
+    529          		
+    530          		switch(SDCheck->RvsSDStep)
+    531          		{
+    532          			case 0:
+    533          				if(*RvsPower > *RvsUpperLmt) SDCheck->RvsSDStep = 1;
+    534          				else{
+    535          					if(SDCheck == &mSDCheck_4G)	MainStatus->AlarmFlag.OverPCSRvsPower = RESET;
+    536          					else						MainStatus->AlarmFlag.OverWCDMARvsPower = RESET;
+    537          				}
+    538          			break;
+    539          			
+    540          			case 1:
+    541          				if(*RvsPower > *RvsUpperLmt) SDCheck->RvsSDStep = 2;
+    542          				else						 SDCheck->RvsSDStep = 0;
+    543          			break;
+    544          
+    545          			case 2:
+    546          				if(*RvsPower > *RvsUpperLmt){
+    547          			
+    548          					
+    549          					*iFwdAttn = ATTN_MAX30;
+    550          					*iRvsAttn = ATTN_MAX30;
+    551          					*iFwdSWOnOff = '0';
+    552          					*iRvsSWOnOff = '0'; // LMJ110803
+    553          					
+    554          					
+    555          					if(SDCheck == &mSDCheck_4G)	MainStatus->AlarmFlag.OverPCSRvsPower = SET;
+    556          					else						MainStatus->AlarmFlag.OverWCDMARvsPower = SET;
+    557          				
+    558          					SDCheck->RvsSDStep = 3;
+    559          				}
+    560          				else{
+    561          					SDCheck->RvsSDStep = 0;
+    562          				}
+    563          			break;
+    564          
+    565          			default:
+    566          				SDCheck->IsItSHD = TRUE;
+    567          			break;
+    568          		
+    569          		}
+    570          	////////////////////////////////////////////////////////////////////////////
+    571          	}
+    572          	else
+    573          	{
+    574          		SDCheck->FwdSDStep = 0;
+    575          		SDCheck->RvsSDStep = 0;
+    576          ////////////////////////////////////////////////////////////////////////////////
+    577          
+    578          		if(SDCheck == &mSDCheck_4G)	MainStatus->AlarmFlag.OverPCSRvsPower = RESET;
+    579          		else						MainStatus->AlarmFlag.OverWCDMARvsPower = RESET;
+    580          
+    581          		if(SDCheck == &mSDCheck_4G)	MainStatus->AlarmFlag.OverPCSFwdPower = RESET;
+    582          		else						MainStatus->AlarmFlag.OverWCDMAFwdPower = RESET;
+    583          
+    584          		SDCheck->IsItSHD = FALSE;
+    585          	}
+    586          	return rval;
+    587          }
+    588          
+    589          INT8U IsolationCheckFunc(__IsoStr *ISOCheck)
+    590          {
+    591          	INT8S *iFWDAttn;
+    592          	INT8S *iRVSAttn;
+    593          	INT8S *iRvsAttnISO;
+    594          	INT8S *iIsolationLevel;
+    595          
+    596          	INT8S *iFWDAttnBp;
+    597          	INT8S *iRvsAttnBp;
+    598          	INT8S *iRvsAttnISOBp;
+    599          	INT8U *iFwdSWOnOffBp;
+    600          	INT8U *iRvsSWOnOffBp;
+    601          	
+    602          	INT8S *iRvsPower;
+    603          
+    604          	INT8S *iOSCLimit;
+    605          
+    606          	INT8U *iFwdSWOnOff;
+    607          	INT8U *iRvsSWOnOff; 
+    608          
+    609          	INT16U *iADCrawDATA;
+    610          	INT16U *iSleepTable;
+    611          	INT8U *iMinAttn;
+    612          
+    613          	INT8S *iALCOnOff;
+    614          	INT8U *iAGCOnOff;
+    615          	INT8U *iISOOnOff;
+    616          	INT8U  tmpoffset;
+    617          	INT16U tmpTimer;
+    618          
+    619          	INT8U *RstCnt;
+    620          	INT8S tmpGainOffset = 0;
+    621          	
+    622          ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    623          //	BUFFER INIT!!
+    624          	if(ISOCheck == &mISOCheck_4G)
+    625          	{
+    626          		iFWDAttn = &MainStatus->FwdAttn_4G;
+    627          		iRVSAttn = &MainStatus->RvsAttn_4G;
+    628          		iRvsAttnISO = &MainStatus->RvsAttnISO_4G;
+    629          		iIsolationLevel = &MainStatus->IsolationLevel1;
+    630          
+    631          		iRvsPower = &MainStatus->PCSRvsPower;
+    632          		iOSCLimit = &MainStatus->OSCLimit1;
+    633          
+    634          		iFwdSWOnOff = &MainStatus->TxSWOnOff_4G;
+    635          		iRvsSWOnOff = &MainStatus->RxSWOnOff_4G; 
+    636          		iADCrawDATA = &ADC_DATA[adcRVSPWRdect1];
+    637          		iSleepTable = &vEE_TABLE->Table.SleepLimitTable1[2];
+    638          		iMinAttn = &MinAttn4G;
+    639          
+    640          		iFWDAttnBp = &vEE_BACK1->BackUp.FwdAttn_4G;
+    641          		iRvsAttnBp = &vEE_BACK1->BackUp.RvsAttn_4G;
+    642          		iRvsAttnISOBp = &vEE_BACK1->BackUp.RvsAttnISO_4G;
+    643          		iFwdSWOnOffBp = &vEE_BACK1->BackUp.SWOnOff1;
+    644          		iRvsSWOnOffBp = &vEE_BACK1->BackUp.SWOnOff2; 
+    645          
+    646          		iALCOnOff = &MainStatus->ALCOnOff;
+    647          		iAGCOnOff = &MainStatus->AGCOnOff;
+    648          		iISOOnOff = &MainStatus->ISOOnOff1;
+    649          
+    650          		RstCnt = &rambackup[ResetCountBp1];
+    651          		tmpTimer = TimerISO2G;
+    652          		tmpoffset = SleepTempOffset*4;
+    653          	}
+    654          	else // 3G
+    655          	{
+    656          		iFWDAttn = &MainStatus->FwdAttn_3G;
+    657          		iRVSAttn = &MainStatus->RvsAttn_3G;
+    658          		iRvsAttnISO = &MainStatus->RvsAttnISO_3G;
+    659          		iIsolationLevel = &MainStatus->IsolationLevel2;
+    660          
+    661          		iRvsPower = &MainStatus->WCDMARvsPower;
+    662          		iOSCLimit = &MainStatus->OSCLimit2;
+    663          
+    664          		iFwdSWOnOff = &MainStatus->TxSWOnOff_3G;
+    665          		iRvsSWOnOff = &MainStatus->RxSWOnOff_3G; 
+    666          		iADCrawDATA = &ADC_DATA[adcRVSPWRdect2];
+    667          		iSleepTable = &vEE_TABLE->Table.SleepLimitTable2[2];
+    668          		iMinAttn = &MinAttn3G;
+    669          
+    670          		iFWDAttnBp = &vEE_BACK1->BackUp.FwdAttn_3G;
+    671          		iRvsAttnBp = &vEE_BACK1->BackUp.RvsAttn_3G;
+    672          		iFwdSWOnOffBp = &vEE_BACK1->BackUp.TxSWOnOff_3G;
+    673          		iRvsAttnISOBp = &vEE_BACK1->BackUp.RvsAttnISO_3G;
+    674          		iRvsSWOnOffBp = &vEE_BACK1->BackUp.RxSWOnOff_3G; 
+    675          
+    676          		iALCOnOff = &MainStatus->ALCOnOff;
+    677          		iAGCOnOff = &MainStatus->AGCOnOff;
+    678          		iISOOnOff = &MainStatus->ISOOnOff2;
+    679          
+    680          		RstCnt = &rambackup[ResetCountBp1];
+    681          		tmpTimer = TimerISO3G;
+    682          		tmpoffset = SleepTempOffset*2;
+    683          	}
+    684          
+    685          	switch(ISOCheck->ISOStep)
+    686          	{
+    687          		case __ISOINIT:
+    688          			*iFWDAttn = ATTN_MAX30;
+    689          			*iRVSAttn = ATTN_MAX30;
+    690          			*iRvsAttnISO = *iRvsAttnISOBp;
+    691          
+    692          			*iFwdSWOnOff = '0';
+    693          			*iRvsSWOnOff = '0';	
+    694          
+    695          			////////////////////////////////////////////////////////////////////
+    696          			ISOCheck->ISO_ALM_BIT = 0;
+    697          			ISOCheck->ISO_RALM_BIT = 0;
+    698          			ISOCheck->ISO_WAITING = 1;
+    699          			ISOCheck->ISOStep++;
+    700          			ISOCheck->ISOFail = FALSE;
+    701          			TimerRegist(tmpTimer, Time10mSec*30L);
+    702          
+    703          		break;
+    704          
+    705          		case __ISOINIT + 1:
+    706          		{
+    707          			if ( ((*iADCrawDATA) >> 2) <= (iSleepTable[ATTN_MAX30 - (*iRVSAttn)] + AWAKE_LIMIT + tmpoffset))
+    708          			{
+    709          				ISOCheck->ISOStep = __ISORXPWR;
+    710          			}
+    711          		}
+    712          		break;
+    713          		//////////////////////////////////////////////////////////////////////////////////////
+    714          		case __ISORXPWR:
+    715          		{
+    716          			if ( ((*iADCrawDATA) >> 2) <= (iSleepTable[ATTN_MAX30 - (*iRVSAttn)] + AWAKE_LIMIT + tmpoffset))
+    717          			// 복원해야함..
+    718          			{
+    719          				*iIsolationLevel = (ISO_START_GAIN + tmpGainOffset);
+    720          				*iFWDAttn = ATTN_MAX30;
+    721          	
+    722          				*iRVSAttn = (ISO_MAX_GAIN + tmpGainOffset)  - (ISO_START_GAIN + tmpGainOffset) - *iRvsAttnISOBp;		// 58. 48
+    723          				*iRvsAttnISO = *iRvsAttnISOBp;
+    724          
+    725          				////////////////////////////////////////////////////////////////
+    726          
+    727          				*iFwdSWOnOff = '0';
+    728          				*iRvsSWOnOff = '1'; 
+    729          				//*iRvsSWOnOff = *iRvsSWOnOffBp;	// Rvs Path On!!
+    730          				ISOCheck->ISOStep = __ISOCHECK;
+    731          
+    732          				TimerRegist(tmpTimer, Time10mSec*70L);
+    733          			}
+    734          			else
+    735          			{
+    736          				ISOCheck->ISOStep = (__ISOINIT + 1);
+    737          				
+    738          			}
+    739          		}
+    740          		break;
+    741          
+    742          		case __ISOCHECK:
+    743          
+    744          			ISOCheck->PowerPre = *iRvsPower;
+    745          			if(ISOCheck->PowerPre > (*iOSCLimit) )
+    746          			{
+    747          				if( (*iIsolationLevel) < (ISO_LMT_GAIN + tmpGainOffset) )
+    748          				{
+    749          					// shutdown or Reset!!
+    750          					*RstCnt = *RstCnt + 1;
+    751          					if(*RstCnt > 3){
+    752          						// SHUTDOWNCASE !!(완전): FAIL!!
+    753          						*iMinAttn = ATTN_MAX30;
+    754          						*iIsolationLevel = (ISO_MIN_GAIN + tmpGainOffset);
+    755          						ISOCheck->ISO_ALM_BIT = 1;
+    756          						ISOCheck->ISO_RALM_BIT = 1;
+    757          						ISOCheck->ISO_WAITING = 0;
+    758          						
+    759          						ISOCheck->ISOFail = TRUE;
+    760          						ISOCheck->ISOStep = __ISOENDFAIL;
+    761          						*RstCnt = 3;
+    762          
+    763          						if(rambackup[ResetOSC] == 0x15){
+    764          							Booting[L_PATH] = 0xff;
+    765          							Booting[W_PATH] = 0xff;
+    766          							rambackup[ResetOSC] = 0;
+    767          						}
+    768          					}
+    769          					else {
+    770          						rambackup[ResetOSC] = 0x15;
+    771          						OSTimeDly(Time100mSec*5L);
+    772          						DownLoadBootingJump();
+    773          					}
+    774          				}
+    775          				else
+    776          				{
+    777          					// Attn 1dB stop // 제한~~확보.~~~~
+    778          					////////////////////////////////////////////////////////////
+    779          					if( (*iIsolationLevel) < (ISO_MAX_GAIN + tmpGainOffset) )
+    780          					{
+    781          						ISOCheck->ISO_ALM_BIT = 0;
+    782          						ISOCheck->ISO_RALM_BIT = 0;
+    783          					}
+    784          					else	// 확보!!!!!
+    785          					{
+    786          						ISOCheck->ISO_ALM_BIT = 0;
+    787          						ISOCheck->ISO_RALM_BIT = 0;
+    788          					}
+    789          					ISOCheck->ISO_WAITING = 0;					
+    790          					////////////////////////////////////////////////////////////
+    791          					ISOCheck->ISOStep = __ISOENDSUCC;
+    792          				}
+    793          			}
+    794          			else 
+    795          			{
+    796          				if(*iRVSAttn > 0)
+    797          				{
+    798          					(*iRVSAttn)--;
+    799          					(*iIsolationLevel)++;
+    800          					ISOCheck->ISOStep = (__ISOCHECK);
+    801          				}
+    802          				else if(*iRvsAttnISO > 0)
+    803          				{
+    804          					(*iRvsAttnISO)--;
+    805          					(*iIsolationLevel)++;
+    806          					ISOCheck->ISOStep = (__ISOCHECK);
+    807          				}
+    808          				else
+    809          				{
+    810          					// success end!!
+    811          					*iMinAttn = 0;
+    812          					*iIsolationLevel = (ISO_MAX_GAIN + tmpGainOffset);
+    813          					ISOCheck->ISO_ALM_BIT = 0;
+    814          					ISOCheck->ISO_RALM_BIT = 0;
+    815          					ISOCheck->ISO_WAITING = 0; 
+    816          					
+    817          					ISOCheck->ISOStep = __ISOENDSUCC;
+    818          				}
+    819          			}
+    820          
+    821          		break;
+    822          ////////////////////////////////////////////////////////////////////////////////////////
+    823          		case __ISOENDSUCC:
+    824          			{
+    825          				INT32U tmpAttn = 0;
+    826          				
+    827          				if( *iIsolationLevel == (ISO_MAX_GAIN + tmpGainOffset)){
+    828          					*iMinAttn = 0;
+    829          				}
+    830          				else{
+    831          					tmpAttn = *iIsolationLevel - 22;
+    832          					*iMinAttn = (SYSTEM_GAIN + tmpGainOffset) - tmpAttn;
+    833          				}
+    834          			}
+    835          			// ATTN REPAIR !!
+    836          			if( (*iALCOnOff & 0x01) || (*iAGCOnOff & 0x01) ) {
+    837          				*iFWDAttn = ATTN_MAX30;
+    838          			}
+    839          			else {
+    840          				*iFWDAttn = *iFWDAttnBp;
+    841          				if(*iFWDAttn < *iMinAttn) *iFWDAttn = *iMinAttn;
+    842          			}
+    843          ////////////////////////////////////////////////////////////////////////////////
+    844          			*iRVSAttn = *iRvsAttnBp;
+    845          			if(*iRVSAttn < *iMinAttn) *iRVSAttn = *iMinAttn;
+    846          
+    847          			*iRvsAttnISO = *iRvsAttnISOBp;
+    848          			
+    849          			*iFwdSWOnOff = *iFwdSWOnOffBp;
+    850          			*iRvsSWOnOff = *iRvsSWOnOffBp;
+    851          
+    852          			*RstCnt = 0;
+    853          			// RESET!! CLEAR
+    854          			ISOCheck->ISOStep = __ISORESULT;
+    855          		break;
+    856          
+    857          		case __ISOENDFAIL:
+    858          			*iFWDAttn = ATTN_MAX30;
+    859          			*iRVSAttn = ATTN_MAX30;
+    860          			*iRvsAttnISO = *iRvsAttnISOBp;
+    861          
+    862          			*iFwdSWOnOff = '0';
+    863          			*iRvsSWOnOff = '0';
+    864          
+    865          			ISOCheck->ISOStep = __ISORESULT;
+    866          		break;
+    867          
+    868          		case __ISORESULT:
+    869          			{
+    870                       	INT32U cpu_sr;
+    871          				INT8U rval = 0;
+    872          
+    873          				// ALARM BACKUP!!
+    874          				OS_ENTER_CRITICAL();
+    875          				{
+    876          					EE_TABLE1 *tptr = (EE_TABLE1 *)RoadBackuptobuffer(vEE_TABLE1Addr); // Load 1st Area
+    877          					
+    878          					if(ISOCheck == &mISOCheck_4G)
+    879          					{
+    880          						if(tptr->BackUp.AlarmFlag.PCS_ISO_ALM_BIT != MainStatus->AlarmFlag.PCS_ISO_ALM_BIT) rval = 1;
+    881          						tptr->BackUp.AlarmFlag.PCS_ISO_ALM_BIT = MainStatus->AlarmFlag.PCS_ISO_ALM_BIT;
+    882          
+    883          						if(!MainStatus->AlarmFlag.PCS_ISO_ALM_BIT){
+    884          							MainStatus->AlarmFlag.PCSOSCAlarm = 0;
+    885          							rambackup[OSCAlarm_2G] = 0;
+    886          						}
+    887          					}
+    888          					else
+    889          					{
+    890          						if(tptr->BackUp.AlarmFlag.WCDMA_ISO_ALM_BIT != MainStatus->AlarmFlag.WCDMA_ISO_ALM_BIT) rval = 1;
+    891          						tptr->BackUp.AlarmFlag.WCDMA_ISO_ALM_BIT = MainStatus->AlarmFlag.WCDMA_ISO_ALM_BIT;
+    892          
+    893          						if(!MainStatus->AlarmFlag.WCDMA_ISO_ALM_BIT){
+    894          							MainStatus->AlarmFlag.WCDMAOSCAlarm = 0;
+    895          							rambackup[OSCAlarm_3G] = 0;
+    896          						}
+    897          					}
+    898          
+    899          					if(rval) WriteBuffertoBackup(vEE_TABLE1Addr, sizeof(EE_TABLE1));
+    900          				}
+    901          				OS_EXIT_CRITICAL();
+    902          				if(rval) SerPtr->printf("ISO ALARM BACUPED\n");
+    903          		    }
+    904          			*iISOOnOff = '0';
+    905          			ISOCheck->ISOStep = __ISOEND;
+    906          		break;
+    907          		
+    908          		case __ISOEND:
+    909          			
+    910          		break;
+    911          	}
+    912          
+    913          	// ALARM Backup!!
+    914          	if(ISOCheck == &mISOCheck_4G)
+    915          	{
+    916          		MainStatus->AlarmFlag.PCS_ISO_ALM_BIT = ISOCheck->ISO_ALM_BIT;
+    917          		MainStatus->AlarmFlag.PCS_ISO_RALM1_BIT = ISOCheck->ISO_RALM_BIT;
+    918          		MainStatus->AlarmFlag.PCS_ISO_WAITING = ISOCheck->ISO_WAITING; 
+    919          	}
+    920          	else
+    921          	{
+    922          		MainStatus->AlarmFlag.WCDMA_ISO_ALM_BIT = ISOCheck->ISO_ALM_BIT;
+    923          		MainStatus->AlarmFlag.WCDMA_ISO_RALM2_BIT = ISOCheck->ISO_RALM_BIT;
+    924          		MainStatus->AlarmFlag.WCDMA_ISO_WAITING = ISOCheck->ISO_WAITING; 
+    925          	}
+    926              
+    927              return (ISOCheck->ISOFail);
+    928          }
+    929          
+    930          INT8U OSCCheckFunc (__OscStr *OSCCheck, INT8U IsItSHD, INT8U IsItSLP)
+    931          { 
+    932          	INT8U rval = 0;
+    933          
+    934          	INT8S *iRvsPower;
+    935          	INT8S *iOSCLimit;
+    936          	INT8U *iRstCnt;
+    937          	INT8U *iRvsSWOnOffBp; 
+    938          	INT8U *iRvsOSCAttn;
+    939          
+    940          	if(OSCCheck == &mOSCCheck_4G)
+    941          	{
+    942          		iRvsPower = &MainStatus->PCSRvsPower;
+    943          		iOSCLimit = &MainStatus->OSCLimit1;
+    944          		iRvsSWOnOffBp = &vEE_BACK1->BackUp.SWOnOff2; 
+    945          		iRvsOSCAttn = &MainStatus->OSCAttn_2G;
+    946          
+    947          		iRstCnt = &rambackup[ResetCountBp1];
+    948          	}
+    949          	else
+    950          	{
+    951          		iRvsPower = &MainStatus->WCDMARvsPower;
+    952          		iOSCLimit = &MainStatus->OSCLimit2;
+    953          		iRvsSWOnOffBp = &vEE_BACK1->BackUp.RxSWOnOff_3G; 
+    954          		iRvsOSCAttn = &MainStatus->OSCAttn_3G;
+    955          
+    956          		iRstCnt = &rambackup[ResetCountBp1];
+    957          	}
+    958          
+    959          	if(IsItSHD || IsItSLP) 				OSCCheck->OSCStep = 0;
+    960          	if(!(MainStatus->OSCOnOff & 0x01)) 	OSCCheck->OSCStep = 0;
+    961          	if(!(*iRvsSWOnOffBp & 0x01)) 		OSCCheck->OSCStep = 0;
+    962          
+    963          ////////////////////////////////////////////////////////////////////////////////
+    964          	//if(OSCCheck == &mOSCCheck_4G) SerPtr->printf("step: %d\n", OSCCheck->OSCStep);
+    965          	//SerPtr->printf("STEP: %d Power: %d\n", OSCCheck->OSCStep, *iRvsPower);
+    966          
+    967          	switch (OSCCheck->OSCStep)
+    968          	{
+    969          		case 0:
+    970          			if(*iRvsPower <= *iOSCLimit){
+    971          				OSCCheck->OSCAlarm = 0;
+    972          				*iRvsOSCAttn = 0;
+    973          				break;
+    974          			}
+    975          			OSCCheck->OSCStep = 1;
+    976          			OSCCheck->OSCCnt = 0;
+    977          			rval = TRUE;
+    978          		break;
+    979          
+    980          		case 1:
+    981          			////////////////////////////////////////////////////////////////////
+    982          			//if(OSCCheck == &mOSCCheck_4G) SerPtr->printf("iRvsPower: %d \n", *iRvsPower);
+    983          			if(*iRvsPower <= *iOSCLimit) {
+    984          				OSCCheck->OSCAlarm = 0;
+    985          				//OSCCheck->OSCTimeCnt++;
+    986          				//if(OSCCheck->OSCTimeCnt >= 5)
+    987          				OSCCheck->OSCStep = 0;
+    988          				break;
+    989          			}
+    990          			OSCCheck->OSCPowerRef = *iRvsPower;		// FirStart Lvl!!
+    991          			OSCCheck->OSCStep = 2;
+    992          			*iRvsOSCAttn = 15*2L;
+    993          			rval = TRUE;
+    994          		break;
+    995          
+    996          		case 2:
+    997          			{
+    998          				INT8S tmp = (OSCCheck->OSCPowerRef - *iRvsPower);
+    999          
+   1000          				//if(OSCCheck == &mOSCCheck_4G) SerPtr->printf("difference: %d, %d, %d\n", tmp, OSCCheck->OSCPowerRef, *iRvsPower);
+   1001          				//if(OSCCheck == &mOSCCheck_4G) SerPtr->printf("CNT: %d\n", OSCCheck->OSCCnt);
+   1002          
+   1003          				*iRvsOSCAttn = 0;
+   1004          				if(tmp > 17)
+   1005          				{
+   1006          					if(++OSCCheck->OSCCnt < 3){
+   1007          						OSCCheck->OSCStep = 1;	//
+   1008          						//OSCCheck->OSCTimeCnt = 0;
+   1009          					}
+   1010          					else{
+   1011          						OSCCheck->OSCStep = 3;		// go to shut down~~~
+   1012          					}
+   1013          				}
+   1014          				else
+   1015          				{
+   1016          					OSCCheck->OSCStep = 4;
+   1017          					OSCCheck->OSCTimeCnt = 0;
+   1018          				}
+   1019          				rval = TRUE;
+   1020          			}
+   1021          		break;
+   1022          
+   1023          		case 3:
+   1024          			{	// shutdown
+   1025          				if( (*iRstCnt) < 3 )
+   1026          				{
+   1027          					(*iRstCnt)++;
+   1028          					OSCCheck->OSCAlarm = 1;
+   1029          					{
+   1030          						if(OSCCheck == &mOSCCheck_4G)
+   1031          						{
+   1032          							rambackup[OSCAlarm_2G] = OSCCheck->OSCAlarm;
+   1033          						}
+   1034          						else
+   1035          						{
+   1036          							rambackup[OSCAlarm_3G] = OSCCheck->OSCAlarm;
+   1037          						}
+   1038          					}
+   1039          					rambackup[ResetOSC] = 0x15;
+   1040          					OSTimeDly(Time100mSec*5);
+   1041          					DownLoadBootingJump();
+   1042          				}
+   1043          				else
+   1044          				{
+   1045          					// 완전 SHUTDOWN!!!
+   1046          					*iRstCnt = 3;
+   1047          				}
+   1048          			}
+   1049          			rval = TRUE;
+   1050          		break;
+   1051          
+   1052          		case 4:
+   1053          			//if(OSCCheck == &mOSCCheck_4G) SerPtr->printf("OSCTimeCnt: %d, %d\n", OSCCheck->OSCTimeCnt, *iRvsPower);
+   1054          
+   1055          			if(++OSCCheck->OSCTimeCnt < 30*2L)
+   1056          			{
+   1057          				if(*iRvsPower <= *iOSCLimit) {
+   1058          					OSCCheck->OSCStep = 0;
+   1059          				}
+   1060          			}
+   1061          			else
+   1062          			{
+   1063          				OSCCheck->OSCStep = 0;
+   1064          			}
+   1065          			rval = FALSE;
+   1066          		break;
+   1067          
+   1068          		case 5:
+   1069          			// BACUP ALARM!!
+   1070          			OSCCheck->OSCStep = 100;
+   1071          			rval = TRUE;
+   1072          		break;
+   1073          		default:
+   1074          			rval = TRUE;
+   1075          		break;
+   1076          	}
+   1077          
+   1078          ///////////////////////////////////////////////////////////////////////////////
+   1079          	// Alarm copy!!
+   1080          	if(OSCCheck == &mOSCCheck_4G) 	MainStatus->AlarmFlag.PCSOSCAlarm = OSCCheck->OSCAlarm;
+   1081          	else							MainStatus->AlarmFlag.WCDMAOSCAlarm = OSCCheck->OSCAlarm;
+   1082          
+   1083          	OSCCheck->IsItOSC = rval;
+   1084          
+   1085          	return rval;	// normal
+   1086          }
+   1087          
+   1088          void ResetStart(INT32U tms)
+   1089          {
+   1090          	TimerRegist(TimerReset, tms);
+   1091          }
+   1092          
+   1093          
+   1094          INT32S ConvLevelOneByte(INT8S *lvl)
+   1095          {
+   1096          	INT32S tmpPwr = lvl[1];
+   1097          
+   1098          	     if(tmpPwr >  7) 	tmpPwr = 10;
+   1099          	else if(tmpPwr >  2) 	tmpPwr = 5;
+   1100          	else if(tmpPwr > -3)	tmpPwr = 0;
+   1101          	else if(tmpPwr > -8)	tmpPwr = -5;
+   1102          	else					tmpPwr = -10;
+   1103          
+   1104          	tmpPwr = (lvl[0]*10 + tmpPwr);
+   1105          	return (INT32S)((tmpPwr*2L)/10L);
+   1106          }
+   1107          
+   1108          
+   1109          void ChangeLvltoValue(INT16S CurLvl, INT16S *PreLvl, INT16S *Cnt, INT16S *Value, INT8S MaxCnt)
+   1110          {
+   1111          	if(*Value != CurLvl)
+   1112          	{
+   1113          		if(*PreLvl == CurLvl)
+   1114          		{
+   1115          			*Cnt = *Cnt + 1;
+   1116          			if(*Cnt >= MaxCnt)
+   1117          			{
+   1118          				*Value = CurLvl;
+   1119          				*Cnt = 0;
+   1120          			}
+   1121          		}
+   1122          		else
+   1123          		{
+   1124          			*PreLvl = CurLvl;
+   1125          			*Cnt = 0;
+   1126          		}
+   1127          	}
+   1128          	else *Cnt = 0;
+   1129          }
+   1130          
+   1131          INT8U TemptoIndex(INT8S temp)
+   1132          {
+   1133          	INT32U i = 0;
+   1134          	INT8S toffset = (-10);
+   1135          
+   1136          	for(i = 0; toffset <= 80; i++, toffset += 2)
+   1137          	{
+   1138          		if(temp <= toffset) return i;
+   1139          	}
+   1140              return i;
+   1141          }
+   1142          
+   1143          INT8U TemptoSleepOffset(INT8S temp)
+   1144          {
+   1145          		INT32U i = 0;
+   1146          		INT8S toffset = 25;
+   1147          
+   1148          		for(i = 0; toffset >= -10; i++, toffset -= 5)
+   1149          		{
+   1150          			if(temp > toffset) return i;
+   1151          		}
+   1152          		return (i);
+   1153          }
+   1154          
+   1155          
+   1156          INT8U UPdateAlarm(INT8U *CurSts, INT8U *PreSts, INT8U *ChangeFlag, INT8U *AlarmTimer, INT8U AlarmCnt)
+   1157          {
+   1158          	*ChangeFlag = 0;
+   1159          
+   1160          	if( (*CurSts) ==  (*PreSts) )
+   1161          	{
+   1162          		*AlarmTimer = AlarmCnt;
+   1163          	}
+   1164          	else
+   1165          	{
+   1166          		if(*AlarmTimer == 0)
+   1167          		{
+   1168          			*PreSts = *CurSts;
+   1169          			*AlarmTimer = AlarmCnt;			// 2010.07.02 수정.
+   1170          			*ChangeFlag = 1;
+   1171          			return TRUE;
+   1172          		}
+   1173          		else *AlarmTimer = *AlarmTimer - 1;
+   1174          	}
+   1175          	return FALSE;
+   1176          }
+   1177          
+   1178          
+   1179          INT8S AgcLimitOperation(INT8S gap, INT8U tmpAlcAttn, INT8U AttMax, INT8U AttMin, INT8U Mode)
+   1180          {
+   1181          	INT8S tmp = 0;
+   1182          #ifdef _ALC_Debug_2G		
+   1183           	SerPtr->printf("gap[%d]:tmpAlcAttn[%d]AttMax[%d]AttMin[%d]->[%d]\n",gap,tmpAlcAttn,AttMax,AttMin,Mode);
+   1184          #endif
+   1185          	if( Mode == _AGC_Mode )
+   1186          	{
+   1187          		if(gap > 0)
+   1188          		{
+   1189          			if		(gap >  10L) 	tmp =  10L;
+   1190          			else if	(gap >  6L)  	tmp =  6L;
+   1191          			else if	(gap >  4L) 	tmp =  4L;
+   1192          			else 					tmp = 1;
+   1193          		}
+   1194          		else if(gap < 0 && tmpAlcAttn != 0)
+   1195          		{
+   1196          			if	(gap < -10L) tmp = -10L;
+   1197          			else			 tmp = -1;
+   1198          		}
+   1199          		else tmp = 0;
+   1200          	}
+   1201          	else if ( Mode == _ALC_Mode )
+   1202          	{
+   1203          		if(gap > 0)
+   1204          		{
+   1205          			if		(gap >  10L)  	tmp =  10L;
+   1206          			else if	(gap >  6L)  	tmp =  6L;
+   1207          			else if	(gap >  4L)  	tmp =  4L;
+   1208          			else 					tmp = 1;
+   1209          		}
+   1210          		else tmp = 0;
+   1211          	}
+   1212          	
+   1213          	return tmp;
+   1214          }
+   1215          
+   1216          
+   1217          void ResetCaseBackup(INT8U Cause)
+   1218          {
+   1219          	rambackup[NMS_RESET_Bp] = Cause;
+   1220          	rambackup[ResetCountBp] = 0;
+   1221          	rambackup[ResetCountBp1] = 0;
+   1222          	rambackup[ResetOSC] = 0;
+   1223          }
+   1224          
+   1225          
+   1226          #define LimitAlmMax   5
+   1227          INT8U LimitAlarmCnt[LimitAlmMax];
+   1228          
+   1229          INT8U LimitAlarmUpdate( INT8U CurrAlarm, INT8U PreAlarm, INT16U AlarmIndex)
+   1230          {
+   1231          	#define AlarmCheckTime		40L
+   1232          	
+   1233          	if(CurrAlarm != PreAlarm)
+   1234          	{
+   1235          		LimitAlarmCnt[AlarmIndex]++;
+   1236          		
+   1237          		if(LimitAlarmCnt[AlarmIndex] > AlarmCheckTime)
+   1238          		{
+   1239          			LimitAlarmCnt[AlarmIndex] = 0;
+   1240          			
+   1241          			return CurrAlarm;
+   1242          		}
+   1243          	}
+   1244          	else LimitAlarmCnt[AlarmIndex] = 0;
+   1245          
+   1246          	return PreAlarm;
+   1247          }
+   1248          
+   1249          void FrontLEDSet(INT8U tindex, INT8U tstatus)
+   1250          {
+   1251          	LEDStatus[tindex%LED_SelMax] = tstatus;
+   1252          
+   1253          }
+   1254          void FrontLEDDisplay(void)
+   1255          {
+   1256          	INT16U i = 0;
+   1257          
+   1258          	if(!TimeOverCheck(TimerLEDBlink)) return;
+   1259          	TimerRegist(TimerLEDBlink, Time100mSec*5L);
+   1260          	BlinkFlag ^= 1;
+   1261          
+   1262          	for(i = 0; i < LED_SelMax; i++)
+   1263          	{
+   1264          		switch(LEDStatus[i])
+   1265          		{
+   1266          			case LEDON:
+   1267          				switch(i)
+   1268          				{
+   1269                              default:
+   1270          					case LED_2G_NorSel:
+   1271          						_4G_NORLED = 1;
+   1272          					break;
+   1273          					
+   1274          					case LED_2G_SleepSel:
+   1275          						_4G_SLPLED = 1;
+   1276          					break;
+   1277          					
+   1278          					case LED_2G_OscSel:
+   1279          						_4G_OSCLED = 1;
+   1280          					break;
+   1281          					
+   1282          					case LED_3G_NorSel:
+   1283          						_3G_NORLED = 1;
+   1284          					break;
+   1285          					
+   1286          					case LED_3G_SleepSel:
+   1287          						_3G_SLPLED = 1;
+   1288          					break;
+   1289          					
+   1290          					case LED_3G_OscSel:
+   1291          						_3G_OSCLED = 1;
+   1292          					break;					
+   1293          
+   1294          				}
+   1295          			break;
+   1296          
+   1297          			case LEDONOFF:
+   1298          				switch(i)
+   1299          				{
+   1300                              default:
+   1301          					case LED_2G_NorSel:
+   1302          						_4G_NORLED ^= 1;
+   1303          					break;
+   1304          					case LED_2G_SleepSel:
+   1305          						_4G_SLPLED ^= 1;
+   1306          					break;
+   1307          					case LED_2G_OscSel:
+   1308          						_4G_OSCLED ^= 1;
+   1309          					break;
+   1310          					case LED_3G_NorSel:
+   1311          						_3G_NORLED ^= 1;
+   1312          					break;
+   1313          					case LED_3G_SleepSel:
+   1314          						_3G_SLPLED ^= 1;
+   1315          					break;
+   1316          					case LED_3G_OscSel:
+   1317          						_3G_OSCLED ^= 1;
+   1318          					break;
+   1319          				}
+   1320          			break;
+   1321          			
+   1322          		
+   1323          			default:
+   1324          			case LEDOFF:
+   1325          				switch(i)
+   1326          				{
+   1327                              default:
+   1328          					case LED_2G_NorSel:
+   1329          						_4G_NORLED = 0;
+   1330          					break;
+   1331          
+   1332          					case LED_2G_SleepSel:
+   1333          						_4G_SLPLED = 0;
+   1334          					break;
+   1335          
+   1336          					case LED_2G_OscSel:
+   1337          						_4G_OSCLED = 0;
+   1338          					break;
+   1339          
+   1340          					case LED_3G_NorSel:
+   1341          						_3G_NORLED = 0;
+   1342          					break;
+   1343          
+   1344          					case LED_3G_SleepSel:
+   1345          						_3G_SLPLED = 0;
+   1346          					break;
+   1347          
+   1348          					case LED_3G_OscSel:
+   1349          						_3G_OSCLED = 0;
+   1350          					break;
+   1351          				}
+   1352          			break;
+   1353          		}
+   1354          	}
+   1355          }
+   1356          
+   1357          ///////////////////////////////////////////////////////////////////////////////
+   1358          // End of Source File
+   1359          ////////////////////////
+
+   Maximum stack usage in bytes:
+
+     Function           .cstack
+     --------           -------
+     AgcLimitOperation       0
+     AgcOperation           40
+     AlcInit                 8
+     AlcOperation           32
+     AlcTask                 8
+     ChangeLvltoValue        8
+     ConvLevelOneByte        0
+     FrontLEDDisplay         8
+     FrontLEDSet             0
+     IsolationCheckFunc     88
+     LimitAlarmUpdate        4
+     OSCCheckFunc           32
+     ReadAdcValue           24
+     ResetCaseBackup         0
+     ResetStart              8
+     RetFWDPower             0
+     ShutDnCheckFunc        48
+     SleepCheckFunc         28
+     SleepLogFunc            8
+     TemptoIndex             0
+     TemptoSleepOffset       0
+     UPdateAlarm             8
+
+
+   Section sizes:
+
+     Function/Label                    Bytes
+     --------------                    -----
+     AlcTaskStk                        1024
+     MinAttn4G                           12
+     MinAttn3G
+     mISOCheck_4G
+     mISOCheck_3G                         8
+     mOSCCheck_4G                         8
+     mOSCCheck_3G                         8
+     mSDCheck_4G                          4
+     mSDCheck_3G                          4
+     mSleep_4G                            4
+     mSleep_3G                            4
+     InitLedDisplay                       1
+     InitLedStep                          1
+     BlinkFlag                           12
+     LEDStatus
+     ISORvsAttn1                          1
+     ISORvsAttn2                          1
+     ISORvsAttn3                          1
+     ISORvsAttn4                          1
+     SDNOffFlag                           1
+     tmpSleepTimeOn                       8
+     AlcInit                             34
+     AlcTask                            104
+     ReadAdcValue                       552
+     AgcOperation                       220
+     RetFWDPower                         44
+     AlcOperation                       182
+     SleepLogFunc                       114
+     SleepCheckFunc                     334
+     ShutDnCheckFunc                    510
+     IsolationCheckFunc                1132
+     OSCCheckFunc                       332
+     ResetStart                           8
+     ConvLevelOneByte                    62
+     ChangeLvltoValue                    48
+     TemptoIndex                         24
+     TemptoSleepOffset                   26
+     UPdateAlarm                         44
+     AgcLimitOperation                   74
+     ResetCaseBackup                     22
+     LimitAlarmCnt                        8
+     LimitAlarmUpdate                    36
+     FrontLEDSet                         18
+     FrontLEDDisplay                    262
+     ??DataTable8                         4
+     ??DataTable8_1                       4
+     ??DataTable8_2                       4
+     ??DataTable8_3                       4
+     ??DataTable8_4                       4
+     ??DataTable9                         4
+     ??DataTable9_1                       4
+     ??DataTable9_2                       4
+     ??DataTable12                        4
+     ??DataTable13                        4
+     ??DataTable13_1                      4
+     ??DataTable13_2                      4
+     ??DataTable13_3                      4
+     ??DataTable13_4                      4
+     ??DataTable13_5                      4
+     ??DataTable13_6                      4
+     ??DataTable13_7                      4
+     ??DataTable13_8                      4
+     ??DataTable13_9                      4
+     ??DataTable13_10                     4
+     ??DataTable13_11                     4
+     ??DataTable13_12                     4
+     ??DataTable13_13                     4
+     ??DataTable13_14                     4
+     ??DataTable13_15                     4
+     ??DataTable13_16                     4
+     ??DataTable13_17                     4
+     ??DataTable13_18                     4
+     ??DataTable13_19                     4
+     ??DataTable13_20                     4
+     ?<Constant "ISO ALARM BACUPED\n">   20
+
+ 
+    87 bytes in section .bss
+    20 bytes in section .rodata
+ 4 302 bytes in section .text
+ 1 024 bytes in section iram
+ 
+ 4 302 bytes of CODE  memory
+    20 bytes of CONST memory
+ 1 111 bytes of DATA  memory
+
+Errors: none
+Warnings: none

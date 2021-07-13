@@ -1,0 +1,4 @@
+---- St Matches (3 in 1 files) ----
+Cdma.c (d:\project\trio\2.trio-mr\appl_stm207_20141204_rvsalc_20151223\code):	INT8U	St = 0, i;
+Cdma.c (d:\project\trio\2.trio-mr\appl_stm207_20141204_rvsalc_20151223\code):		if( str[i] == '-' ) St = 1;
+Cdma.c (d:\project\trio\2.trio-mr\appl_stm207_20141204_rvsalc_20151223\code):	if( St ) value *= (-1);

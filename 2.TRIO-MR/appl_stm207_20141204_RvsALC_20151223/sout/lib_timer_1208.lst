@@ -1,0 +1,218 @@
+###############################################################################
+#                                                                             #
+# IAR ANSI C/C++ Compiler V6.21.1.52794/W32 for ARM     30/Aug/2012  21:21:48 #
+# Copyright 1999-2011 IAR Systems AB.                                         #
+#                                                                             #
+#    Cpu mode     =  thumb                                                    #
+#    Endian       =  little                                                   #
+#    Source file  =  D:\Work\Project\2012\NL_INBUILD\FW\MU\lib\timer\lib_time #
+#                    r_1208.c                                                 #
+#    Command line =  D:\Work\Project\2012\NL_INBUILD\FW\MU\lib\timer\lib_time #
+#                    r_1208.c -D OS_INCLUDED -D APPL_SRC -lcN                 #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\sout\ -o           #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\sout\              #
+#                    --endian=little --cpu=Cortex-M3 -e                       #
+#                    --warnings_are_errors --fpu=None --dlib_config           #
+#                    "C:\Programming\IAR Systems\Embedded Workbench           #
+#                    6.0\arm\INC\c\DLib_Config_Normal.h" -I                   #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\include\ -I        #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\..\..\STM32F2xx_St #
+#                    dPeriph_Driver\ -I D:\Work\Project\2012\NL_INBUILD\FW\MU #
+#                    \..\..\STM32F2xx_StdPeriph_Driver\inc\ -I                #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\uC-CPU\ -I         #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\uC-LIB\ -I         #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\uCOS-II\Ports\ -I  #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\uCOS-II\Source\    #
+#                    -I D:\Work\Project\2012\NL_INBUILD\FW\MU\uC-Probe\ -Oh   #
+#                    --use_c++_inline                                         #
+#    List file    =  D:\Work\Project\2012\NL_INBUILD\FW\MU\sout\lib_timer_120 #
+#                    8.lst                                                    #
+#    Object file  =  D:\Work\Project\2012\NL_INBUILD\FW\MU\sout\lib_timer_120 #
+#                    8.o                                                      #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\Work\Project\2012\NL_INBUILD\FW\MU\lib\timer\lib_timer_1208.c
+      1          
+      2          /******************** (C) COPYRIGHT 2008 PILOG, NSINFO *************************
+      3          * File Name          : timer_vx.x.c
+      4          * Author             : Yoon Byong-Gyu(bgyoon@naver.com)
+      5          * Date First Issued  : 01/17/2008
+      6          * Description        : This file provides all the USART0 firmware functions.
+      7          * $Revision: 0.1 $
+      8          * $Revision date: 2008.01.__
+      9          ********************************************************************************/
+     10          #include "stm32f2xx_1208.h"
+     11          #include "../include/lib_timerext.h"
+     12          #include "lib_timer_1208.h"
+     13          
+     14          
+     15          
+     16          /*******************************************************************************
+     17          * Function Name  : TimerInit
+     18          * Description    : This function software timer initialize
+     19          * Input          : None
+     20          * Output         : None
+     21          * Return         : None
+     22          *******************************************************************************/
+     23          void TimerInit(void)
+     24          {
+     25          	INT8U i = 0;
+     26          
+     27          	for(i = 0; i < TIMERmax; i++)
+     28          	{
+     29          		LongTimer[i].TimerID = 0;
+     30          		LongTimer[i].Count = 0;
+     31          	}
+     32          }
+     33          void CheckSoftTimer(void)
+     34          {
+     35          	INT8U i = 0;
+     36          
+     37          	for(i = 0; i < TIMERmax; i++ )
+     38          	{
+     39          		if(LongTimer[i].Count != 0L ) LongTimer[i].Count--;
+     40          	}
+     41          }
+     42          
+     43          INT8U TimerRegist ( INT8U TimeId, INT32U TimeCnt)
+     44          {
+     45          
+     46              INT8U i;
+     47          
+     48              for( i = 0; i < TIMERmax; i++ )
+     49          		if ( LongTimer[i].TimerID == TimeId )
+     50          		{	LongTimer[i].Count = TimeCnt;	// TimeCnt/2 Down Fail
+     51          			return( TRUE );
+     52          		}
+     53              for( i = 0; i < TIMERmax; i++ )
+     54          		if ( LongTimer[i].TimerID == 0 )
+     55          		{	LongTimer[i].TimerID = TimeId;
+     56          			LongTimer[i].Count = TimeCnt;	// TimeCnt/2 Down Fail
+     57          			return( TRUE );
+     58          		}
+     59          	return( FALSE );
+     60          }
+     61          
+     62          INT32U TimeRemainCheck(INT8U TimeId)
+     63          {
+     64          	INT32U i;
+     65          
+     66          	for( i = 0; i < TIMERmax; i++ )
+     67          	{	if ( LongTimer[i].TimerID == TimeId )
+     68          		{
+     69          			i = LongTimer[i].Count;
+     70          			return(i);
+     71          		}
+     72          	}
+     73          	return( FALSE );
+     74          }
+     75          
+     76          INT8U TimeOverCheck ( INT8U TimeId )
+     77          {
+     78              INT8U i;
+     79          
+     80              for( i = 0; i < TIMERmax; i++ )
+     81          	{	if ( LongTimer[i].TimerID == TimeId )
+     82          		{	if ( LongTimer[i].Count == 0 )
+     83          			{	LongTimer[i].TimerID = 0;
+     84          				return( TRUE );
+     85          			}
+     86          		}
+     87          	}
+     88          	return( FALSE );
+     89          }
+     90          INT8U TimerCancel ( INT16U TimeId )
+     91          {
+     92          	INT16U	i;
+     93          
+     94              for( i = 0; i < TIMERmax; i++ )
+     95          		if ( LongTimer[i].TimerID == TimeId )
+     96          		{	LongTimer[i].TimerID = 0;
+     97          			LongTimer[i].Count = 0;
+     98          			return( TRUE );
+     99          		}
+    100          	return( FALSE );
+    101          }
+    102          
+    103          
+    104          void ForDelay(unsigned long int count)
+    105          {
+    106              while(count--){WatchdogClear();}
+    107          }
+    108          
+    109          ////////////////////////////////////////////////////////////////////////////////
+    110          void WatchdogInit(void)
+    111          {
+    112          	// IWDG timeout equal to 280 ms (the timeout may varies due to LSI frequency dispersion)
+    113          	// Enable write access to IWDG_PR and IWDG_RLR registers
+    114          	//IWDG_WriteAccessCmd(IWDG_WriteAccess_Enable);
+    115          	
+    116          	// IWDG counter clock: 40KHz(LSI) / 32 = 1.25 KHz
+    117          	//IWDG_SetPrescaler(IWDG_CLK64);
+    118          	
+    119          	// Set counter reload value to 349
+    120          	//IWDG_SetReload(1000L);
+    121          	
+    122          	// Reload IWDG counter
+    123          	//IWDG_ReloadCounter();
+    124          	
+    125          	// Enable IWDG (the LSI oscillator will be enabled by hardware)
+    126          	//IWDG_Enable();
+    127          
+    128          
+    129          }
+    130          
+    131          void WatchdogClear(void)
+    132          {
+    133          	// Reload IWDG counter
+    134          	//IWDG_ReloadCounter();
+    135          	//GPIOB->ODR.B2 ^= 1;
+    136          }
+    137          ////////////////////////////////////////////////////////////////////////////////
+    138          // End of Source File
+    139          /////////////////////
+    140          
+
+   Maximum stack usage in bytes:
+
+     Function        .cstack
+     --------        -------
+     CheckSoftTimer       0
+     ForDelay             0
+     TimeOverCheck        4
+     TimeRemainCheck      4
+     TimerCancel          4
+     TimerInit            0
+     TimerRegist          8
+     WatchdogClear        0
+     WatchdogInit         0
+
+
+   Section sizes:
+
+     Function/Label  Bytes
+     --------------  -----
+     LongTimer        240
+     TimerInit         60
+     CheckSoftTimer    74
+     TimerRegist      160
+     TimeRemainCheck   86
+     TimeOverCheck    118
+     TimerCancel       96
+     ForDelay           8
+     WatchdogInit       2
+     WatchdogClear      2
+     ??DataTable5       4
+     ??DataTable5_1     4
+
+ 
+ 240 bytes in section .bss
+ 614 bytes in section .text
+ 
+ 614 bytes of CODE memory
+ 240 bytes of DATA memory
+
+Errors: none
+Warnings: none

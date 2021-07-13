@@ -1,0 +1,1718 @@
+###############################################################################
+#                                                                             #
+# IAR ANSI C/C++ Compiler V5.30.2.51295/W32 for ARM     12/Jan/2012  00:18:29 #
+# Copyright 1999-2009 IAR Systems AB.                                         #
+#                                                                             #
+#    Cpu mode     =  thumb                                                    #
+#    Endian       =  little                                                   #
+#    Source file  =  D:\Project\TRIO\3.F_W\TRIO_appl_src_20120109\lib\bellwav #
+#                    e860\bell860s.c                                          #
+#    Command line =  D:\Project\TRIO\3.F_W\TRIO_appl_src_20120109\lib\bellwav #
+#                    e860\bell860s.c -D NDEBUG -lcN                           #
+#                    D:\Project\TRIO\3.F_W\TRIO_appl_src_20120109\sout\ -o    #
+#                    D:\Project\TRIO\3.F_W\TRIO_appl_src_20120109\sout\       #
+#                    --endian=little --cpu=Cortex-M3 -e                       #
+#                    --warnings_are_errors --fpu=None --dlib_config           #
+#                    "C:\Program Files\IAR Systems\Embedded Workbench         #
+#                    5.4\arm\INC\DLib_Config_Normal.h" -I                     #
+#                    D:\Project\TRIO\3.F_W\TRIO_appl_src_20120109\include\    #
+#                    -I D:\Project\TRIO\3.F_W\TRIO_appl_src_20120109\lib_stm3 #
+#                    2\inc\ -I D:\Project\TRIO\3.F_W\TRIO_appl_src_20120109\l #
+#                    ib_stm32\src\ -I D:\Project\TRIO\3.F_W\TRIO_appl_src_201 #
+#                    20109\uC-CPU\ -I D:\Project\TRIO\3.F_W\TRIO_appl_src_201 #
+#                    20109\uC-LIB\ -I D:\Project\TRIO\3.F_W\TRIO_appl_src_201 #
+#                    20109\uCOS-II\Ports\ -I D:\Project\TRIO\3.F_W\TRIO_appl_ #
+#                    src_20120109\uCOS-II\Source\ -I                          #
+#                    D:\Project\TRIO\3.F_W\TRIO_appl_src_20120109\uC-Probe\   #
+#                    -I "C:\Program Files\IAR Systems\Embedded Workbench      #
+#                    5.4\arm\INC\" -Oh                                        #
+#    List file    =  D:\Project\TRIO\3.F_W\TRIO_appl_src_20120109\sout\bell86 #
+#                    0s.lst                                                   #
+#    Object file  =  D:\Project\TRIO\3.F_W\TRIO_appl_src_20120109\sout\bell86 #
+#                    0s.o                                                     #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\Project\TRIO\3.F_W\TRIO_appl_src_20120109\lib\bellwave860\bell860s.c
+      1          /*******************************************************************************
+      2           *
+      3           * This module contains the function 7092 original header file, a function
+      4           * whole things  initializations - global, include function and so on
+      5           *
+      6           *
+      7           * Note that this function is called before the data segments are
+      8           * initialized, this means that this function cannot rely on the
+      9           * values of global or static variables.
+     10           *
+     11           *
+     12           * Copyright 2006- bizistyle(bgyoon@hanafos.com) All rights reserved.
+     13           *
+     14           * $Revision: 0.1 $
+     15           * $Revision date: 2006.03.__
+     16           * &Revision: 0.2 &
+     17           * &Revision date: 2006.06.14: bgyoon, BcMdemMSGTx(): buffer size
+     18           ******************************************************************************/
+     19          
+     20          
+     21           #include <stdarg.h>
+     22           #include <stdlib.h>
+     23           #include <stdio.h>
+     24           #include <string.h>
+     25           /*
+     26           #include "stm32f10x_conf.h"
+     27           #include "../include/Telitext.h"
+     28           
+     29           
+     30           #include "Telit864s.h"
+     31           */
+     32          
+     33           #include "stm32f10x_conf.h"
+     34           #include "../include/bellext.h"
+     35          #include "../include/Timerext.h"
+     36           #include "../include/Usart1ext.h"
+     37           #include "Bell860s.h"
+     38          
+     39          
+     40          void BcMdemDebug(INT32U nDebug, INT32S *DebugPtr)
+     41          {
+     42          	BcMdebug = nDebug;
+     43          	if(DebugPtr != NULL) dUartPtr = (__SerStrPtr *)(DebugPtr);
+     44          //	else				 dUartPtr = (__SerStrPtr *)(&pUSART1);
+     45          }
+     46          
+     47          INT8S BcMdemInit(__SerStrPtr *uPtr, INT16U TimerRx)
+     48          {
+     49              INT8U CmdStep = RstCmd;
+     50          	INT8U result = 0;
+     51          	INT16U i = 0;
+     52          	INT8U Ptr[100];
+     53          	
+     54          
+     55          	// memory Allocation
+     56          	if(dUartPtr == NULL)				return -1;			// error: debuguart not allocated --> BcMDebug excuted befor
+     57          	if( (eUartPtr = uPtr) == NULL)		return -2;			// error: Excution Ptr not allocated --> 
+     58          	
+     59          	if( (BcMTimerRx = TimerRx) == NULL)	return -3;			// error: TimerValue Error
+     60          	
+     61          INIT_SEQUENCE : 
+     62          
+     63          	USART1Printf("\n\n CmdStep[%d] \n\n",CmdStep);
+     64          
+     65          	switch(CmdStep)
+     66          	{
+     67          		case RstCmd: 				BcMdemXmit(CdmaRstCmd); 			result = 0; break;
+     68          		case ModemHangUpCmd : 		BcMdemXmit(CdmaModemHangUpCmd); 	result = 3; break;
+     69          //LEW		case ModemRptModeSetCmd :	BcMdemXmit(CdmaRptModeSetCmd); 		result = 1; break;
+     70          		case VersionCmd : 			BcMdemXmit(CdmaVersionCmd); 		result = 2; break;
+     71          		case ModemMinNumCmd : 		BcMdemXmit(CdmaModemMinNumCmd); 	result = 2; break;
+     72          		case ModemEsnCmd :			BcMdemXmit(CdmaModemEsnCmd); 		result = 2; break;
+     73          		case ModemTimeCmd : 		BcMdemXmit(CdmaModemTimeCmd); 		result = 2; break;
+     74          	}
+     75          		
+     76          	switch(result)
+     77          	{
+     78          		case 0:
+     79          			if(BcMdemSyncProtocolCheck())
+     80          			{
+     81          				if(BcMdemSyncCheck((char *)RxCdmaData) == 14) break;
+     82          			}	
+     83          			else return FALSE;
+     84          			
+     85          			if(BcMdemSyncProtocolCheck())
+     86          			{
+     87          				if(BcMdemSyncCheck((char *)RxCdmaData) != 14) return FALSE;
+     88          			}
+     89          			else return FALSE;
+     90          		break;
+     91          
+     92          		case 1:
+     93          			if(BcMdemSyncProtocolCheck())
+     94          			{
+     95          				if(BcMdemSyncCheck((char *)RxCdmaData) != 14) return FALSE;
+     96          			}
+     97          			else return FALSE;
+     98          		break;
+     99          
+    100          		case 2:
+    101          			if(BcMdemSyncProtocolCheck())
+    102          			{
+    103          				if(!BcMdemDataProtocolCheck(CmdStep))return FALSE;
+    104          
+    105          				if(CmdStep == ModemMinNumCmd)break;
+    106          				
+    107          				if(!BcMdemSyncProtocolCheck())							 return FALSE;
+    108          				if(BcMdemSyncCheck((char *)RxCdmaData) != 14)			 return FALSE;
+    109          			}
+    110          			else return FALSE;
+    111          		break;
+    112          
+    113          		case 3:
+    114          			if(BcMdemSyncProtocolCheck())
+    115          			{
+    116          				for(i = 0; i < strlen(RspmsgHangup);i++)Ptr[i] = RxCdmaData[i];
+    117          				Ptr[i] = 0;
+    118          				if(BcMdemSyncCheck((char *)Ptr) != 30)return FALSE;
+    119          				
+    120          //				if(RxCdmaData[i] != '1')return FALSE;
+    121          				
+    122          //				if(RxCdmaData[i] != '1')return TRUE;
+    123          			}
+    124          			else return FALSE;
+    125          		break;
+    126          		
+    127          	}
+    128          
+    129          	if(CmdStep++ == ModemTimeCmd)	return TRUE;
+    130          	goto INIT_SEQUENCE;
+    131          }
+    132          
+    133          void BcMdemXmit(INT8U *dataPtr)
+    134          {	
+    135          	if(!eUartPtr) return;
+    136          	
+    137          	eUartPtr->BuffClear();
+    138          	eUartPtr->printf("%s\n", (char *)dataPtr);
+    139          	
+    140          	if(BcMdebug) dUartPtr->printf("%s\n", (char *)dataPtr);
+    141          }
+    142          
+    143          INT32S BcMdemMSGTx(char *DstTel, char *dataPtr, INT16U nlen)
+    144          {
+    145          	INT16U i = 0;
+    146          	INT8U Ptr[100];
+    147          	INT32S nRet = TRUE;
+    148          
+    149          	if(nlen > SmsMaxLen) return -3;
+    150          	if(nlen > SmsWanLen) nRet = 3;	
+    151          
+    152          	sprintf((char *)TxCdmaData, "%s%s,%s,4098,,,,", CdmaTxDataToSMSCmd, DstTel, BcMSrcTel);
+    153          
+    154          	//Ptr[0] = '"';
+    155          	//Ptr[1] = 0x00;
+    156          	//strcat((char *)TxCdmaData, (const char *)Ptr);
+    157          	
+    158          	for(i = 0; i < nlen; i++)
+    159          	{
+    160          		sprintf((char *)Ptr, "%02x", dataPtr[i]);
+    161          		strcat((char *)TxCdmaData, (const char *)Ptr);
+    162          	}
+    163          #if 0
+    164          	{
+    165          		sprintf((char *)Ptr, "%02x", 0x0d);
+    166          		strcat((char *)TxCdmaData, (const char *)Ptr);
+    167          
+    168          		sprintf((char *)Ptr, "%02x", 0x0a);
+    169          		strcat((char *)TxCdmaData, (const char *)Ptr);
+    170          	}
+    171          #endif
+    172          	//Ptr[0] = '"';
+    173          	//Ptr[1] = 0x00;
+    174          	//strcat((char *)TxCdmaData, (const char *)Ptr);
+    175          	
+    176          	BcMdemXmit((INT8U *)TxCdmaData);
+    177          
+    178          	if(BcMdemSyncProtocolCheck())
+    179          	{
+    180              	if(BcMdemSyncCheck((char *)RxCdmaData) == 14)
+    181              	{
+    182              	    if(nRet == 3) nRet = 4;
+    183              	    else          nRet = 2;
+    184              	} 
+    185          		else  nRet = -2;
+    186          		
+    187          	}	
+    188          	else return FALSE;
+    189          
+    190          	OSTimeDly(Time100mSec);
+    191          
+    192          	for(i = 0 ;i < 4; i++)
+    193          		{
+    194          			if(BcMdemSyncProtocolCheck())
+    195          			{
+    196          				if(BcMdemSyncCheck((char *)RxCdmaData) == 10)
+    197          				{
+    198          				         if(nRet == 4) nRet = 5;
+    199          				    else if(nRet == 2) nRet = 6;
+    200          				    else nRet = TRUE;
+    201          				}
+    202          				else  nRet = -1;
+    203          			}
+    204          
+    205          //LEWD			if(BcMdebug) dUartPtr->printf("nRet: %d,%d\n", nRet,i);
+    206          
+    207          			if( nRet != 2) break;
+    208          			OSTimeDly(Time100mSec*2L);
+    209          		}
+    210          	
+    211          	//  6: Sms Len Over 80 Bytes(Waringin), But Success, 1st Response OK, but 1st resonse data error, 2nd Response Data NOK
+    212              //  5: Sms Len Over 80 Bytes(Waringin), But Success, 1st Response OK, but 1st resonse data error, 2nd Response Data OK
+    213          	//  4: Sms Len over 80 Bytes(Warning) But Success, 1st Response OK, but 1st resonse data error, 2nd Rsponse No response
+    214          	//  2: 1st Response OK, but 1st resonse data error, 2nd Rsponse No response
+    215          	//  1: Modem Send Success
+    216          	//  0: Modem No Response
+    217          	// -1: 2nd Response Data Error
+    218          	// -2: 1st Response Data Error, 2nd Response No response
+    219          	// -3: Max Buffer Error
+    220          	return nRet;
+    221          }
+    222          
+    223          INT32S BcMdemTCPTx(char *dataPtr, INT16U nlen)
+    224          {
+    225          	INT16U i;
+    226          	INT8U Ptr[200];
+    227          	INT32S nRet = TRUE;
+    228          	
+    229          	nlen = nlen;
+    230          	
+    231          	sprintf((char *)TxCdmaData, "%s", CdmaModemTcpWrCmd);
+    232          
+    233          	for(i = 0; i < nlen; i++)
+    234          	{
+    235          		sprintf((char *)Ptr, "%02x", dataPtr[i]);
+    236          		strcat((char *)TxCdmaData, (const char *)Ptr);
+    237          	}
+    238          	BcMdemXmit((INT8U *)TxCdmaData);
+    239          
+    240          	if(BcMdemSyncProtocolCheck())
+    241          	{
+    242          		if(BcMdemSyncCheck((char *)RxCdmaData) != 14) return FALSE;
+    243          	}	
+    244          	else return FALSE;
+    245          
+    246          	if(BcMdemSyncProtocolCheck())
+    247          	{
+    248          		if(BcMdemSyncCheck((char *)RxCdmaData) != 24) return FALSE;
+    249          	}
+    250          	else return FALSE;
+    251          
+    252          	return nRet;
+    253          
+    254          }
+    255          
+    256          INT32S BcMdemTCPRxCheck(INT8U *rbuf)
+    257          {	
+    258          	INT32S nRet = 0;
+    259          	INT32U i = 0, j = 0, len = 0;
+    260          	INT8S CheckDataBuff[20];
+    261          	INT8U *tPtr = RxCdmaData;
+    262          
+    263          
+    264          	if(BcMdemSyncProtocolCheck())
+    265          	{
+    266          		eUartPtr->BuffClear();
+    267          		
+    268          		for(i = 0; i < strlen(CdmaModemTcpRdCmd); i++)CheckDataBuff[i] = *tPtr++;
+    269          
+    270          		CheckDataBuff[i] = 0;
+    271          
+    272          		if(BcMdemSyncCheck((char *)CheckDataBuff) != 25)return FALSE;
+    273          		
+    274          		for(j = 0; *tPtr != 0; j++)
+    275          		{
+    276          			INT8U temp;
+    277          
+    278          			//if((*tPtr == 0x0D)||(*tPtr == 0x0A)) break;
+    279          			
+    280          			temp = atoh(*tPtr++);
+    281          			temp = atoh(*tPtr++) + ( temp << 4 );
+    282          			
+    283          			rbuf[len++] = temp;
+    284          		}
+    285          				
+    286          		nRet = len;
+    287          		rbuf[len++] = 0;	// null data insert
+    288          				
+    289          	}	
+    290          	else
+    291          	{
+    292          		nRet = FALSE;
+    293          		eUartPtr->BuffClear();
+    294          	}
+    295          	
+    296          	return nRet;
+    297          
+    298          }
+    299          
+    300          INT32S BcMdemSyncProtocolCheck(void)
+    301          {
+    302          	INT16U	Recv;
+    303          	INT32S  DataCnt = 0;
+    304          
+    305          	TimerRegist(BcMTimerRx, Time1Sec * 15L);
+    306          	//TimerRegist(BcMTimerRx, 600L*100L); // 1분
+    307          
+    308          	while(1)
+    309          	{
+    310          		if(TimeOverCheck(BcMTimerRx)) return FALSE;
+    311          		/*
+    312          		if(eUartPtr->CheckByte(1, &Recv))
+    313          		{
+    314          			RxCdmaData[DataCnt] = eUartPtr->RxGetByte();
+    315          
+    316          			if(BcMdebug) dUartPtr->PutChar(RxCdmaData[DataCnt]);	// debug
+    317          
+    318          			if ((DataCnt == 0)&&((RxCdmaData[DataCnt] == 0x0d)||(RxCdmaData[DataCnt] == 0x0a))) continue;
+    319          		
+    320          			if ( RxCdmaData[DataCnt++] == 0x0d )
+    321          			{
+    322          				RxCdmaData[DataCnt++] = 0x0a;
+    323          				RxCdmaData[DataCnt++] = 0;		// insert null point
+    324          
+    325          				//if(RxCdmaData[0] == '$')
+    326          				//{
+    327          				//	Ret = BcMdemSyncCheck((char *)RxCdmaData);
+    328          					
+    329          				//	if((Ret == 15)||(Ret == 16))
+    330          				//	{
+    331          				//		DataCnt = 0;
+    332          				//		continue;
+    333          				//	}
+    334          				//}
+    335          				//Ser0Printf("DataCnt: %d, DataCnt - 3, %d \n", DataCnt, DataCnt-3);
+    336          				return(DataCnt - 3);	// received length(2005.05.17 by bgyoon)
+    337          			}
+    338          			if(DataCnt > CdmaBuffLen ) return FALSE;
+    339          		
+    340          		}
+    341          		else OSTimeDly(_OS_1ms);
+    342          		*/
+    343          
+    344          		while(eUartPtr->CheckByte(1, &Recv))
+    345          		{
+    346          			RxCdmaData[DataCnt] = eUartPtr->RxGetByte();
+    347          
+    348          			if(BcMdebug) dUartPtr->PutChar(RxCdmaData[DataCnt]);	// debug
+    349          
+    350          			if ((DataCnt == 0)&&((RxCdmaData[DataCnt] == 0x0d)||(RxCdmaData[DataCnt] == 0x0a))) continue;
+    351          		
+    352          			if ( RxCdmaData[DataCnt++] == 0x0d )
+    353          			{
+    354          				RxCdmaData[DataCnt++] = 0x0a;
+    355          				RxCdmaData[DataCnt++] = 0;		// insert null point
+    356          
+    357          				//if(RxCdmaData[0] == '$')
+    358          				//{
+    359          				//	Ret = BcMdemSyncCheck((char *)RxCdmaData);
+    360          					
+    361          				//	if((Ret == 15)||(Ret == 16))
+    362          				//	{
+    363          				//		DataCnt = 0;
+    364          				//		continue;
+    365          				//	}
+    366          				//}
+    367          				//Ser0Printf("DataCnt: %d, DataCnt - 3, %d \n", DataCnt, DataCnt-3);
+    368          				return(DataCnt - 3);	// received length(2005.05.17 by bgyoon)
+    369          			}
+    370          			if(DataCnt >= CdmaBuffLen ) return FALSE;
+    371          
+    372          		}
+    373          		
+    374          		OSTimeDly(1);
+    375          		
+    376          	}
+    377          }
+    378          
+    379          INT32S BcMdemSyncCheck(char *Ptr)
+    380          {
+    381          
+    382          	if(Ptr == NULL || strlen(Ptr) == 0) 						return 0;
+    383          
+    384          	if(!strncmp(Ptr, RspTxAckmsg, strlen(RspTxAckmsg))) 		return 10;
+    385          	if(!strncmp(Ptr, Rspconnect, strlen(Rspconnect))) 			return 11;
+    386          	if(!strncmp(Ptr, Rspnocarr, strlen(Rspnocarr))) 			return 12;
+    387          
+    388          	if(!strncmp(Ptr, CdmaErr, strlen(CdmaErr))) 				return 13;
+    389          	if(!strncmp(Ptr, CdmaOk, strlen(CdmaOk))) 					return 14;
+    390          
+    391          	if(!strncmp(Ptr, Rspmsg0Rx, strlen(Rspmsg0Rx))) 			return 15;
+    392          	if(!strncmp(Ptr, Rspmsg1Rx, strlen(Rspmsg1Rx))) 			return 16;
+    393          
+    394          	if(!strncmp(Ptr, RspTxmsg, strlen(RspTxmsg))) 				return 17;
+    395          
+    396          	if(!strncmp(Ptr, RspTcpOpenOk, strlen(RspTcpOpenOk))) 		return 18;
+    397          	if(!strncmp(Ptr, RspmsgRxCnt,  strlen(RspmsgRxCnt))) 		return 19;
+    398          	if(!strncmp(Ptr, RspmsgRxMsg,  strlen(RspmsgRxMsg))) 		return 20;
+    399          	if(!strncmp(Ptr, RspmsgRxEsn,  strlen(RspmsgRxEsn))) 		return 21;
+    400          	if(!strncmp(Ptr, RspmsgRxRfSts,  strlen(RspmsgRxRfSts))) 	return 22;
+    401          	if(!strncmp(Ptr, RspmsgTraffic,  strlen(RspmsgTraffic)))	return 23;
+    402          	
+    403          	if(!strncmp(Ptr, CdmaModemTcpSendDone, strlen(CdmaModemTcpSendDone)))return 24;
+    404          	if(!strncmp(Ptr, CdmaModemTcpRdCmd,  strlen(CdmaModemTcpRdCmd)))	return 25;
+    405          	if(!strncmp(Ptr, RspTcpCloseOk,  strlen(RspTcpCloseOk)))			return 26;
+    406          	if(!strncmp(Ptr, RspmsgSwRst,  strlen(RspmsgSwRst)))				return 27;
+    407          	if(!strncmp(Ptr, RspmsgCallAck,  strlen(RspmsgCallAck)))			return 28;
+    408          	if(!strncmp(Ptr, RspmsgCallConnect,  strlen(RspmsgCallConnect)))	return 29;
+    409          	if(!strncmp(Ptr, RspmsgHangup,  strlen(RspmsgHangup)))				return 30;
+    410          	if(!strncmp(Ptr, RspmsgPilot,  strlen(RspmsgPilot)))				return 31;
+    411          	if(!strncmp(Ptr, RspmsgMinNum,  strlen(RspmsgMinNum)))				return 32;
+    412          	if(!strncmp(Ptr, RspmsgCallingCmd,  strlen(RspmsgCallingCmd)))		return 33;
+    413          
+    414          
+    415          		
+    416          			
+    417          	return -1;	// Normal Data
+    418          }
+    419          
+    420          	
+    421          INT8S  BcMdemDataProtocolCheck(INT8S Command)
+    422          {
+    423          	INT8S nRet = 0;
+    424          	INT8U i = 0, j = 0 ;
+    425          	INT8S CheckDataBuff[20];
+    426          	INT8U DataCnt=0, DataCnt2=0 ;
+    427          
+    428          	switch(Command)
+    429          	{
+    430          		case VersionCmd:
+    431          
+    432          			for(i = 0; RxCdmaData[i] != 0x0d; i++) {}
+    433          
+    434          			if(i < 6)return FALSE;
+    435          
+    436          			//////////////////////////////////////////////////////////////////////////
+    437          			 // 단말기 제조사
+    438          			 if( (strstr(((char*)RxCdmaData), ((char*)"SAT"))) != NULL )
+    439          			 {
+    440          			  BcMMaker = 0x04;
+    441          			 }
+    442          			 else if( (strstr(((char*)RxCdmaData), ((char*)"KST"))) != NULL )
+    443          			 {
+    444          			  BcMMaker = 0x02;
+    445          			 }
+    446          			 else if( (strstr(((char*)RxCdmaData), ((char*)"ATS"))) != NULL )
+    447          			 {
+    448          			  BcMMaker = 0x03;
+    449          			 }
+    450          		 
+    451          			 //////////////////////////////////////////////////////////////////////////
+    452          			 // 단말기 Type
+    453          			 if( (strstr(((char*)RxCdmaData), ((char*)"ZZB3"))) != NULL )
+    454          			 {
+    455          			  BcMType = 0x05;
+    456          			 }
+    457          			 else if( (strstr(((char*)RxCdmaData), ((char*)"ZZB4"))) != NULL )
+    458          			 {
+    459          			  //SXC-2080
+    460          			  BcMType = 0x04;
+    461          			 }
+    462          			 else if( (strstr(((char*)RxCdmaData), ((char*)"ZZB5"))) != NULL )
+    463          			 {
+    464          			  BcMType = 0x06;
+    465          			 }
+    466          
+    467          			BcMVerNum[0] = RxCdmaData[i-3];
+    468          			BcMVerNum[1] = RxCdmaData[i-2];
+    469          			BcMVerNum[2] = RxCdmaData[i-1];
+    470          
+    471          
+    472          			nRet = TRUE;
+    473          		break;
+    474          		
+    475          		case ModemMinNumCmd:
+    476          			for(i = 0; i < strlen(RspmsgMinNum);i++)
+    477          				{
+    478          			CheckDataBuff[i] = RxCdmaData[i];
+    479          				}
+    480          			CheckDataBuff[i] = 0;
+    481          
+    482          			if(BcMdemSyncCheck((char *)CheckDataBuff) != 32)return FALSE;
+    483          		
+    484          			nRet = TRUE;
+    485          
+    486          			for ( i=0; i<TelNo; i++ ) if ( RxCdmaData[strlen(RspmsgMinNum)+ (DataCnt++)] == '-' ) break;
+    487          
+    488          
+    489          			for ( j=0; j<(DataCnt-1); j++ )
+    490          			{
+    491          				BcMSrcTel[j] = RxCdmaData[strlen(RspmsgMinNum)+ j];
+    492          			}
+    493          			DataCnt2 = DataCnt;
+    494          
+    495          			for ( i=0; i<TelNo; i++ ) if ( RxCdmaData[strlen(RspmsgMinNum)+ (DataCnt++)] == '-' ) break;
+    496          
+    497          
+    498          			for ( j = (DataCnt2); j<(DataCnt-1); j++ )
+    499          			{
+    500          				BcMSrcTel[j-1] = RxCdmaData[strlen(RspmsgMinNum)+ j];
+    501          			}
+    502          			
+    503          			DataCnt2 = DataCnt;
+    504          
+    505          			for ( i=0; i<TelNo; i++ ) if ( RxCdmaData[strlen(RspmsgMinNum)+ DataCnt++] == 0x0d ) break;
+    506          
+    507          			for ( j=DataCnt2; j<(DataCnt-1); j++ )
+    508          			{
+    509          				BcMSrcTel[j-2] = RxCdmaData[strlen(RspmsgMinNum)+ j];
+    510          			}
+    511          			
+    512          		break;
+    513          
+    514          		case ModemEsnCmd:
+    515          
+    516          			for(i = 0; i < strlen(RspmsgRxEsn);i++)CheckDataBuff[i] = RxCdmaData[i];
+    517          
+    518          			CheckDataBuff[i] = 0;
+    519          			
+    520          			if(BcMdemSyncCheck((char *)CheckDataBuff) != 21)return FALSE;
+    521          			
+    522          			for(j = 0; j < 8; j++, i++)BcMEsnNum[j] = RxCdmaData[i];
+    523          		
+    524          			nRet = TRUE;
+    525          							
+    526          		break;
+    527          		case MsgCheckCmd:
+    528          
+    529          			for(i = 0; i < strlen(RspmsgRxCnt);i++)CheckDataBuff[i] = RxCdmaData[i];
+    530          			
+    531          			CheckDataBuff[i] = 0;
+    532          			
+    533          			if(BcMdemSyncCheck((char *)CheckDataBuff) != 19)return FALSE;
+    534          			
+    535          			if((RxCdmaData[i] < '0')||(RxCdmaData[i] > '9'))nRet = FALSE;
+    536          			else if(RxCdmaData[i] == '0')	nRet = NOT_DATA;
+    537          			else nRet = TRUE;
+    538          		break;
+    539          		
+    540          		case MsgReciveCmd:
+    541          			for(i = 0; i < strlen(RspmsgRxMsg);i++)CheckDataBuff[i] = RxCdmaData[i];
+    542          
+    543          			CheckDataBuff[i] = 0;
+    544          
+    545          			if(BcMdemSyncCheck((char *)CheckDataBuff) != 20)return FALSE;
+    546          			
+    547          			if((RxCdmaData[i] < '0')||(RxCdmaData[i] > '9'))nRet = FALSE;
+    548          			//else if(RxCdmaData[i] == '0')	nRet = NOT_DATA;			
+    549          			else nRet = TRUE;
+    550          
+    551          			//if(RxCdmaData[i] == 0x22)i++;
+    552          							
+    553          			for(j = 0; RxCdmaData[i] != 0; j++,i++) RxBcMData[j] = RxCdmaData[i];
+    554          			RxBcMData[j] = 0;
+    555          
+    556          		break;
+    557          		
+    558          		case ModemTimeCmd:
+    559          
+    560          			for(i = 0; i < strlen(RspmsgTraffic);i++)CheckDataBuff[i] = RxCdmaData[i];
+    561          
+    562          			CheckDataBuff[i] = 0;
+    563          
+    564          			if(BcMdemSyncCheck((char *)CheckDataBuff) != 23)return FALSE;
+    565          
+    566          			
+    567          			i += 2; // Traffic Status skip
+    568          
+    569          			// Init
+    570          			for(j = 0; j < sizeof(BcMTimeStr); j++) *((INT8U *)BcMpresentTime + j) = 0;
+    571          
+    572          			for(j = 0; j < 14; j++, i++) *((char *)BcMpresentTime + j) = RxCdmaData[i];
+    573          			
+    574          			nRet = TRUE;
+    575          			
+    576          		break;
+    577          
+    578          		case ModemRfStsCmd:
+    579          			
+    580          			for(i = 0; i < strlen(RspmsgRxRfSts);i++)CheckDataBuff[i] = RxCdmaData[i];
+    581          
+    582          			CheckDataBuff[i] = 0;
+    583          
+    584          			if(BcMdemSyncCheck((char *)CheckDataBuff) != 22)return FALSE;
+    585          			
+    586          			if((RxCdmaData[i] < '0')||(RxCdmaData[i] > '9'))return FALSE;
+    587          
+    588          			nRet = BcMFreqStateCheck( (INT8U *)&RxCdmaData[i] );
+    589          			
+    590          		break;
+    591          
+    592          		case ModemTrafficCmd:
+    593          			
+    594          			for(i = 0; i < strlen(RspmsgTraffic);i++)CheckDataBuff[i] = RxCdmaData[i];
+    595          
+    596          			CheckDataBuff[i] = 0;
+    597          
+    598          			if(BcMdemSyncCheck((char *)CheckDataBuff) != 23)return FALSE;
+    599          
+    600          			nRet = RxCdmaData[i];
+    601          									
+    602          		break;
+    603          
+    604          		case ModemPilotCmd:
+    605          			
+    606          			for(i = 0; i < strlen(RspmsgPilot);i++)CheckDataBuff[i] = RxCdmaData[i];
+    607          
+    608          			CheckDataBuff[i] = 0;
+    609          
+    610          			if(BcMdemSyncCheck((char *)CheckDataBuff) != 31)return FALSE;
+    611          			nRet = BcMPilotStateCheck( (INT8U *)&RxCdmaData[i]);
+    612          
+    613          
+    614          #if 0
+    615          			for(j = 0 ;j < 3; j++)
+    616          			{
+    617          				if(( nRet = BcMPilotStateCheck( (INT8U *)&RxCdmaData[i] ))>4)
+    618          				{
+    619          				Ser0Printf("Tx True: nRet: %d\n", nRet);
+    620          				break;
+    621          				}
+    622          				else Ser0Printf("Tx FALSE: Max SMS Buffer Error, cnt \n");
+    623          			}
+    624          			
+    625          #endif
+    626          			
+    627          		break;
+    628          		
+    629          		default : return FALSE;
+    630          	}	
+    631          
+    632          	return nRet;
+    633          	
+    634          }
+    635          
+    636          INT8S BcMFreqStateCheck ( INT8U *DataBuff )
+    637          {
+    638          	INT8U	i, j, k, DataCnt=0, DataCnt2=0, pw;
+    639          	INT16S		TempCopy, Power, Actch, chlist;
+    640          	//================//
+    641          	// Active Channel //
+    642          	//========================================================================//
+    643          	DataCnt2 = DataCnt;
+    644          	TempCopy = 0;
+    645          	for ( i=0; i<10; i++ ) if ( DataBuff[DataCnt++] == ',' ) break;
+    646          	for ( j=0; j<i; j++ )
+    647          	{
+    648          		if ( (DataBuff[DataCnt2] < 0x30)||(DataBuff[DataCnt2] > 0x39) ) return(FALSE);
+    649          		for ( Power=1,pw=j; pw<i-1; pw++ ) Power *= 10;
+    650          		TempCopy = TempCopy + (DataBuff[DataCnt2++]-'0')*Power;
+    651          	}
+    652          	Actch = TempCopy;
+    653          	BcMRfStatus->ActChannel = TempCopy;
+    654          	
+    655          	//SWaveStatus->OneFAStatus = 0x03;		// Current FA
+    656          	//========================================================================//
+    657          
+    658          	//=====================//
+    659          	// Number Of Channel //
+    660          	//========================================================================//
+    661          	DataCnt2 = DataCnt;
+    662          	TempCopy = 0;
+    663          	for ( i=0; i<10; i++ ) if ( DataBuff[DataCnt++] == ',' ) break;
+    664          	for ( j=0; j<i; j++ )
+    665          	{
+    666          		if ( (DataBuff[DataCnt2] < 0x30)||(DataBuff[DataCnt2] > 0x39) ) return(FALSE);
+    667          		for ( Power=1,pw=j; pw<i-1; pw++ ) Power *= 10;
+    668          		TempCopy = TempCopy + (DataBuff[DataCnt2++]-'0')*Power;
+    669          	}
+    670          
+    671          	BcMRfStatus->NumberOfChannel = TempCopy;
+    672          	
+    673          	if ( TempCopy == 0 ) return(FALSE);
+    674          
+    675          	//SWaveStatus->ChannelList = ( ((TempCopy/10)<<4) + (TempCopy%10) );
+    676          	chlist = TempCopy;
+    677          
+    678          	//==============//
+    679          	// Channel List //
+    680          	//========================================================================//
+    681          	for ( k=0; k<chlist; k++ )
+    682          	{
+    683          		DataCnt2 = DataCnt;
+    684          		TempCopy = 0;
+    685          		for ( i=0; i<10; i++ ) if ( DataBuff[DataCnt++] == ',' ) break;
+    686          		if ( i > 4 ) return(FALSE);
+    687          		for ( j=0; j<i; j++ )
+    688          		{
+    689          			if ( (DataBuff[DataCnt2] < 0x30)||(DataBuff[DataCnt2] > 0x39) ) return(FALSE);
+    690          			for ( Power=1,pw=j; pw<i-1; pw++ ) Power *= 10;
+    691          			TempCopy = TempCopy + (DataBuff[DataCnt2++]-'0')*Power;
+    692          		}
+    693          		
+    694          		BcMRfStatus->PN_Vaule[k] = TempCopy;
+    695          		if ( Actch == TempCopy ){}
+    696          			
+    697          	}
+    698          	//========================================================================//
+    699          
+    700          	//=======================//
+    701          	// Number Of Active PN	//
+    702          	//========================================================================//
+    703          	DataCnt2 = DataCnt;
+    704          	TempCopy = 0;
+    705          	for ( i=0; i<10; i++ ) if ( DataBuff[DataCnt++] == ',' ) break;
+    706          	if ( i > 1 ) return(FALSE);
+    707          	
+    708          	if(DataBuff[DataCnt2]  == '0')goto FER_VAULE;
+    709          	
+    710          	for ( j=0; j<i; j++ )
+    711          	{
+    712          		if ( (DataBuff[DataCnt2] < 0x30)||(DataBuff[DataCnt2] > 0x39) ) return(FALSE);
+    713          		for ( Power=1,pw=j; pw<i-1; pw++ ) Power *= 10;
+    714          		TempCopy = TempCopy + (DataBuff[DataCnt2++]-'0')*Power;
+    715          	}
+    716          	BcMRfStatus->ActPN = TempCopy;
+    717          //	Ser0Printf("ActPN : %d	\n", Rf_sts.ActPN);
+    718          
+    719          	if ( (TempCopy > 6)||(TempCopy < 1 ) ) return(FALSE);
+    720          	chlist = TempCopy;
+    721          	//========================================================================//
+    722          
+    723          
+    724          	//============================//
+    725          	// Active Channel Ec/Io Value //
+    726          	//========================================================================//
+    727          	for ( k=0; k<chlist; k++ )
+    728          	{
+    729          		DataCnt2 = DataCnt;
+    730          		TempCopy = 0;
+    731          
+    732          		for ( i=0; i<10; i++ ) if ( DataBuff[DataCnt++] == '(' ) break;
+    733          		if ( i > 4 ) return(FALSE);
+    734          		for ( j=0; j<i; j++ )
+    735          		{
+    736          			if ( (DataBuff[DataCnt2] < 0x30)||(DataBuff[DataCnt2] > 0x39) ) return(FALSE);
+    737          			for ( Power=1,pw=j; pw<i-1; pw++ ) Power *= 10;
+    738          			TempCopy = TempCopy + (DataBuff[DataCnt2++]-'0')*Power;
+    739          		}
+    740          		
+    741          		BcMRfStatus->PN_Vaule[k] = TempCopy;
+    742          		
+    743          		DataCnt2 = DataCnt;
+    744          		TempCopy = 0;
+    745          		for ( i=0; i<10; i++ ) if ( DataBuff[DataCnt++] == ')' ) break;
+    746          		DataCnt++;		// Remove ','
+    747          		if ( DataBuff[DataCnt2] == '-' )
+    748          		{
+    749          			DataCnt2++;
+    750          			for ( j=0; j<i-1; j++ )
+    751          			{
+    752          				if ( (DataBuff[DataCnt2] < 0x30)||(DataBuff[DataCnt2] > 0x39) ) return(FALSE);
+    753          				for ( Power=1,pw=j; pw<i-2; pw++ ) Power *= 10;
+    754          				TempCopy = TempCopy + (DataBuff[DataCnt2++]-'0')*Power;
+    755          			}
+    756          			TempCopy = -TempCopy;
+    757          			BcMRfStatus->EcIo[k] = TempCopy;
+    758          		}
+    759          		else
+    760          		{
+    761          			for ( j=0; j<i; j++ )
+    762          			{
+    763          				if ( (DataBuff[DataCnt2] < 0x30)||(DataBuff[DataCnt2] > 0x39) ) return(FALSE);
+    764          				for ( Power=1,pw=j; pw<i-1; pw++ ) Power *= 10;
+    765          				TempCopy = TempCopy + (DataBuff[DataCnt2++]-'0')*Power;
+    766          			}
+    767          			BcMRfStatus->EcIo[k] = TempCopy;
+    768          		}
+    769          	}
+    770          ///////
+    771          
+    772          	for ( k=chlist; k<6; k++ )
+    773          	{
+    774          		BcMRfStatus->PN_Vaule[k] = 0;
+    775          		BcMRfStatus->EcIo[k]	 = 0;
+    776          	}
+    777          	//========================================================================//
+    778          
+    779          FER_VAULE:
+    780          	//===========//
+    781          	// FER Value //
+    782          	//========================================================================//
+    783          	DataCnt2 = DataCnt;
+    784          	TempCopy = 0;
+    785          	for ( i=0; i<10; i++ ) if ( DataBuff[DataCnt++] == ',' ) break;
+    786          	for ( j=0; j<i; j++ )
+    787          	{
+    788          		if ( (DataBuff[DataCnt2] < 0x30)||(DataBuff[DataCnt2] > 0x39) ) return(FALSE);
+    789          		for ( Power=1,pw=j; pw<i-1; pw++ ) Power *= 10;
+    790          		TempCopy = TempCopy + (DataBuff[DataCnt2++]-'0')*Power;
+    791          	}
+    792          	
+    793          	BcMRfStatus->FerValue = TempCopy;
+    794          	//========================================================================//
+    795          
+    796          	//==========//
+    797          	// RX Value //
+    798          	//========================================================================//
+    799          	DataCnt2 = DataCnt;
+    800          	TempCopy = 0;
+    801          	for ( i=0; i<10; i++ ) if ( DataBuff[DataCnt++] == ',' ) break;
+    802          	if ( DataBuff[DataCnt2] == '-' )
+    803          	{
+    804          		DataCnt2++;
+    805          		for ( j=0; j<i-1; j++ )
+    806          		{
+    807          			if ( (DataBuff[DataCnt2] < 0x30)||(DataBuff[DataCnt2] > 0x39) ) return(FALSE);
+    808          			for ( Power=1,pw=j; pw<i-2; pw++ ) Power *= 10;
+    809          			TempCopy = TempCopy + (DataBuff[DataCnt2++]-'0')*Power;
+    810          		}
+    811          		TempCopy = -TempCopy;
+    812          		BcMRfStatus->RxValue = TempCopy;
+    813          	}
+    814          	else
+    815          	{
+    816          		for ( j=0; j<i; j++ )
+    817          		{
+    818          			if ( (DataBuff[DataCnt2] < 0x30)||(DataBuff[DataCnt2] > 0x39) ) return(FALSE);
+    819          			for ( Power=1,pw=j; pw<i-1; pw++ ) Power *= 10;
+    820          			TempCopy = TempCopy + (DataBuff[DataCnt2++]-'0')*Power;
+    821          		}
+    822          		BcMRfStatus->RxValue = TempCopy;
+    823          	}
+    824          	
+    825          	//========================================================================//
+    826          if ( TempCopy > 0 ) return(FALSE);
+    827          
+    828          	//==========//
+    829          	// TX Value //
+    830          	//========================================================================//
+    831          	DataCnt2 = DataCnt;
+    832          	TempCopy = 0;
+    833          	for ( i=0; i<10; i++ ) if ( DataBuff[DataCnt++] == ',' ) break;
+    834          	if ( DataBuff[DataCnt2] == '-' )
+    835          	{
+    836          		DataCnt2++;
+    837          		for ( j=0; j<i-1; j++ )
+    838          		{
+    839          			if ( (DataBuff[DataCnt2] < 0x30)||(DataBuff[DataCnt2] > 0x39) ) return(FALSE);
+    840          			for ( Power=1,pw=j; pw<i-2; pw++ ) Power *= 10;
+    841          			TempCopy = TempCopy + (DataBuff[DataCnt2++]-'0')*Power;
+    842          		}
+    843          		TempCopy = -TempCopy;
+    844          		BcMRfStatus->TxValue = TempCopy;
+    845          	}
+    846          	else
+    847          	{
+    848          		for ( j=0; j<i; j++ )
+    849          		{
+    850          			if ( (DataBuff[DataCnt2] < 0x30)||(DataBuff[DataCnt2] > 0x39) ) return(FALSE);
+    851          			for ( Power=1,pw=j; pw<i-1; pw++ ) Power *= 10;
+    852          			TempCopy = TempCopy + (DataBuff[DataCnt2++]-'0')*Power;
+    853          		}
+    854          		BcMRfStatus->TxValue = TempCopy;
+    855          	}
+    856          
+    857          	//===========//
+    858          	// ADJ Value //
+    859          	//========================================================================//
+    860          	DataCnt2 = DataCnt;
+    861          	TempCopy = 0;
+    862          	for ( i=0; i<10; i++ ) if ( DataBuff[DataCnt++] == 0x0d ) break;
+    863          	if ( DataBuff[DataCnt2] == '-' )
+    864          	{
+    865          		DataCnt2++;
+    866          		for ( j=0; j<i-1; j++ )
+    867          		{
+    868          			if ( (DataBuff[DataCnt2] < 0x30)||(DataBuff[DataCnt2] > 0x39) ) return(FALSE);
+    869          			for ( Power=1,pw=j; pw<i-2; pw++ ) Power *= 10;
+    870          			TempCopy = TempCopy + (DataBuff[DataCnt2++]-'0')*Power;
+    871          		}
+    872          		TempCopy = -TempCopy;
+    873          		BcMRfStatus->AdjValue = TempCopy;
+    874          		
+    875          	}
+    876          	else
+    877          	{
+    878          		for ( j=0; j<i; j++ )
+    879          		{
+    880          			if ( (DataBuff[DataCnt2] < 0x30)||(DataBuff[DataCnt2] > 0x39) ) return(FALSE);
+    881          			for ( Power=1,pw=j; pw<i-1; pw++ ) Power *= 10;
+    882          			TempCopy = TempCopy + (DataBuff[DataCnt2++]-'0')*Power;
+    883          		}
+    884          		BcMRfStatus->AdjValue = TempCopy;
+    885          	}
+    886          	//========================================================================//
+    887          	
+    888          	return(TRUE);
+    889          }
+    890          
+    891          
+    892          INT8S BcMPilotStateCheck ( INT8U *DataBuff )
+    893          {
+    894          	INT8U 	i, j, DataCnt=0, DataCnt2=0, pw;
+    895          	INT8U   k;
+    896          	INT16S		TempCopy, Power;
+    897          
+    898          	//============================//
+    899          	// Active Channel Ec/Io Value //
+    900          	//========================================================================//
+    901          
+    902          
+    903          #if 1
+    904          		DataCnt = 0;
+    905          		TempCopy = 0;
+    906          
+    907          		for ( i=0; i<10; i++ ) if ( DataBuff[DataCnt++] == ',' ) break;
+    908          
+    909          		for ( j=0; j<(DataCnt-1); j++ )
+    910          		{
+    911          			for ( Power=1,pw=j; pw<i-1; pw++ ) Power *= 10;
+    912          			TempCopy = TempCopy + (DataBuff[j]-'0')*Power;
+    913          		}
+    914          		BcMPilotStatus->PN_Vaule[0] = TempCopy;
+    915          //		Ser0Printf("BcMPilotStatus->PN_Vaule0:[%d] \n ",BcMPilotStatus->PN_Vaule[0]);
+    916          
+    917          		DataBuff[DataCnt++];
+    918          
+    919          		DataCnt2 = DataCnt;
+    920          		TempCopy = 0;
+    921          		k = DataCnt;		
+    922          
+    923          		for ( i=0; i<10; i++ ) if ( DataBuff[DataCnt++] == ',' ) break;
+    924          		for ( i=0; i<10; i++ ) if ( DataBuff[k++] == '.' ) break;
+    925          
+    926          		for ( j = DataCnt2; j < (k-1); j++ )
+    927          		{
+    928          			for ( Power=1,pw = (j - DataCnt2) ; pw < (i - 1); pw++ ) Power =  Power * 10;
+    929          			TempCopy = TempCopy + (DataBuff[j]-'0')*Power;
+    930          		}
+    931          		BcMPilotStatus->EcIo[0] = TempCopy;
+    932          		
+    933          //		Ser0Printf("BcMPilotStatus->EcIo:[%d] \n",BcMPilotStatus->EcIo[0]);
+    934          
+    935          
+    936          		DataCnt2 = DataCnt;
+    937          		TempCopy = 0;
+    938          
+    939          		for ( i=0; i<10; i++ ) if ( DataBuff[DataCnt++] == ',' ) break;
+    940          
+    941          		for ( j=DataCnt2; j<(DataCnt-1); j++ )
+    942          		{
+    943          			for ( Power=1,pw = (j - DataCnt2) ; pw < (i - 1); pw++ ) Power =  Power * 10;
+    944          			TempCopy = TempCopy + (DataBuff[j]-'0')*Power;
+    945          		}
+    946          		BcMPilotStatus->PN_Vaule[1] = TempCopy;
+    947          //		Ser0Printf("BcMPilotStatus->PN_Vaule1:[%d]\n ",BcMPilotStatus->PN_Vaule[1]);
+    948          
+    949          		{
+    950          			
+    951           		DataBuff[DataCnt++];
+    952          		DataCnt2 = DataCnt;
+    953          		TempCopy = 0;
+    954          		k = DataCnt;		
+    955          
+    956          		for ( i=0; i<10; i++ ) if ( DataBuff[DataCnt++] == ',' ) break;
+    957          		for ( i=0; i<10; i++ ) if ( DataBuff[k++] == '.' ) break;
+    958          
+    959          		for ( j = DataCnt2; j < (k-1); j++ )
+    960          		{
+    961          			for ( Power=1,pw = (j - DataCnt2) ; pw < (i - 1); pw++ ) Power =  Power * 10;
+    962          			TempCopy = TempCopy + (DataBuff[j]-'0')*Power;
+    963          		}
+    964          		BcMPilotStatus->EcIo[1] = TempCopy;
+    965          		
+    966          //		Ser0Printf("BcMPilotStatus->EcIo1:[%d] \n",BcMPilotStatus->EcIo[1]);
+    967          
+    968          
+    969          		DataCnt2 = DataCnt;
+    970          		TempCopy = 0;
+    971          
+    972          		for ( i=0; i<10; i++ ) if ( DataBuff[DataCnt++] == ',' ) break;
+    973          		for ( j=DataCnt2; j<(DataCnt-1); j++ )
+    974          		{
+    975          			for ( Power=1,pw = (j - DataCnt2) ; pw < (i - 1); pw++ ) Power =  Power * 10;
+    976          
+    977          			TempCopy = TempCopy + (DataBuff[j]-'0')*Power;
+    978          			
+    979          		}
+    980          		BcMPilotStatus->PN_Vaule[2] = TempCopy;
+    981          //		Ser0Printf("BcMPilotStatus->PN_Vaule2:[%d] \n",BcMPilotStatus->PN_Vaule[2]);
+    982          
+    983          		}
+    984          
+    985          		
+    986          		DataBuff[DataCnt++];
+    987          
+    988          		DataCnt2 = DataCnt;
+    989          		TempCopy = 0;
+    990          		k = DataCnt;		
+    991          
+    992          		for ( i=0; i<10; i++ ) if ( DataBuff[DataCnt++] == ',' ) break;
+    993          		for ( i=0; i<10; i++ ) if ( DataBuff[k++] == '.' ) break;
+    994          
+    995          		for ( j = DataCnt2; j < (k-1); j++ )
+    996          		{
+    997          			for ( Power=1,pw = (j - DataCnt2) ; pw < (i - 1); pw++ ) Power =  Power * 10;
+    998          			TempCopy = TempCopy + (DataBuff[j]-'0')*Power;
+    999          		}
+   1000          		BcMPilotStatus->EcIo[2] = TempCopy;
+   1001          		
+   1002          //		Ser0Printf("BcMPilotStatus->EcIo2:[%d] \n",BcMPilotStatus->EcIo[2]);
+   1003          
+   1004          
+   1005          		DataCnt2 = DataCnt;
+   1006          		TempCopy = 0;
+   1007          
+   1008          		for ( i=0; i<10; i++ ) if ( DataBuff[DataCnt++] == ',' ) break;
+   1009          
+   1010          		for ( j=DataCnt2; j<(DataCnt-1); j++ )
+   1011          		{
+   1012          			for ( Power=1,pw = (j - DataCnt2) ; pw < (i - 1); pw++ ) Power =  Power * 10;
+   1013          			TempCopy = TempCopy + (DataBuff[j]-'0')*Power;
+   1014          		}
+   1015          
+   1016          		BcMPilotStatus->PN_Vaule[3] = TempCopy;
+   1017          //		Ser0Printf("BcMPilotStatus->PN_Vaule3:[%d]\n  ",BcMPilotStatus->PN_Vaule[3]);
+   1018          
+   1019          		
+   1020          		DataBuff[DataCnt++];
+   1021          
+   1022          		DataCnt2 = DataCnt;
+   1023          		TempCopy = 0;
+   1024          		k = DataCnt;		
+   1025          
+   1026          		for ( i=0; i<10; i++ ) if ( DataBuff[DataCnt++] == ',' ) break;
+   1027          		for ( i=0; i<10; i++ ) if ( DataBuff[k++] == '.' ) break;
+   1028          
+   1029          		for ( j = DataCnt2; j < (k-1); j++ )
+   1030          		{
+   1031          			for ( Power=1,pw = (j - DataCnt2) ; pw < (i - 1); pw++ ) Power =  Power * 10;
+   1032          			TempCopy = TempCopy + (DataBuff[j]-'0')*Power;
+   1033          		}
+   1034          		BcMPilotStatus->EcIo[3] = TempCopy;
+   1035          		
+   1036          //		Ser0Printf("BcMPilotStatus->EcIo3:[%d] \n",BcMPilotStatus->EcIo[3]);
+   1037          #endif
+   1038          	return(TRUE);
+   1039          
+   1040          }
+   1041          
+   1042          
+   1043          INT32S BcMdemTcpConnect(INT8U *ConnectIP, INT8U IPLen, INT32U PortNum)
+   1044          {
+   1045              INT8U CmdStep = 0,result = 0;
+   1046          
+   1047          	CmdStep = ModemTcpModeCmd;
+   1048          	
+   1049          TCP_INIT_SEQUENCE : 
+   1050          
+   1051          	switch(CmdStep)
+   1052          	{
+   1053          		case ModemTcpModeCmd: 	BcMdemXmit(CdmaModemTcpModeCmd); 	result = 0; break;
+   1054          		case ModemTcpIdCmd: 	BcMdemXmit(CdmaModemTcpIdCmd); 		result = 0; break;
+   1055          		case ModemTcpPwCmd: 	BcMdemXmit(CdmaModemTcpPwCmd); 		result = 0; break;
+   1056          		case ModemTcpConnect: 	BcMdemXmit(CdmaModemTcpConnect); 	result = 1; break;
+   1057          		case ModemTcpOpenCmd: 	
+   1058          
+   1059          			ConnectIP[IPLen] = 0; //Insert Null
+   1060          			sprintf((char *)TxCdmaData, "%s%s,%d", CdmaModemTcpOpenCmd,ConnectIP, PortNum);
+   1061          
+   1062          			BcMdemXmit((INT8U *)TxCdmaData);
+   1063          			result = 2; 
+   1064          		break;
+   1065          	}
+   1066          		
+   1067          	switch(result)
+   1068          	{
+   1069          		case 0:
+   1070          			if(BcMdemSyncProtocolCheck())
+   1071          			{
+   1072          				if(BcMdemSyncCheck((char *)RxCdmaData) != 14)return FALSE;
+   1073          			}
+   1074          			else return FALSE;
+   1075          		break;
+   1076          
+   1077          		case 1:
+   1078          
+   1079          			if(BcMdemSyncProtocolCheck())
+   1080          			{	
+   1081          				if(BcMdemSyncCheck((char *)RxCdmaData) == 11)break;
+   1082          				
+   1083          				if(BcMdemSyncCheck((char *)RxCdmaData) != 14)return FALSE;
+   1084          
+   1085          			}
+   1086          			else return FALSE;
+   1087          			
+   1088          			if(BcMdemSyncProtocolCheck())
+   1089          			{
+   1090          				if(BcMdemSyncCheck((char *)RxCdmaData) != 11)return FALSE;
+   1091          			}
+   1092          			else return FALSE;
+   1093          		break;
+   1094          
+   1095          		case 2:
+   1096          			if(BcMdemSyncProtocolCheck())
+   1097          			{
+   1098          				if(BcMdemSyncCheck((char *)RxCdmaData) != 14)return FALSE;
+   1099          			}
+   1100          			else return FALSE;
+   1101          			
+   1102          			if(BcMdemSyncProtocolCheck())
+   1103          			{	
+   1104          				if(BcMdemSyncCheck((char *)RxCdmaData) != 18)return FALSE;
+   1105          			}
+   1106          			else return FALSE;
+   1107          		break;
+   1108          		
+   1109          	}
+   1110          
+   1111          	if(CmdStep == ModemTcpOpenCmd)return TRUE;
+   1112          
+   1113          	CmdStep++;
+   1114          	
+   1115          	goto TCP_INIT_SEQUENCE;
+   1116          	
+   1117          }
+   1118          
+   1119          INT32S BcMdemTcpExit(void)
+   1120          { 
+   1121          	INT8U nRet = TRUE;
+   1122          	
+   1123          	BcMdemXmit(CdmaModemTcpCloseCmd);
+   1124          
+   1125          	if(BcMdemSyncProtocolCheck())
+   1126          	{
+   1127          //		if(BcMdemSyncCheck((char *)RxCdmaData) != 14)return FALSE;
+   1128          		if(BcMdemSyncCheck((char *)RxCdmaData) != 14)return 1;
+   1129          
+   1130          	}
+   1131          	else return FALSE;
+   1132          	
+   1133          	OSTimeDly(Time10mSec);
+   1134          
+   1135          	if(BcMdemSyncProtocolCheck())
+   1136          	{
+   1137          //		if(BcMdemSyncCheck((char *)RxCdmaData) != 26)return FALSE;
+   1138          		if(BcMdemSyncCheck((char *)RxCdmaData) != 26)return 2;
+   1139          		
+   1140          	}
+   1141          	else return FALSE;
+   1142          
+   1143          	OSTimeDly(Time10mSec);
+   1144          	
+   1145          	BcMdemXmit(CdmaModemTcpExitCmd);
+   1146          
+   1147          	if(BcMdemSyncProtocolCheck())
+   1148          	{
+   1149          //		if(BcMdemSyncCheck((char *)RxCdmaData) != 14)return FALSE;
+   1150          		
+   1151          		if(BcMdemSyncCheck((char *)RxCdmaData) != 14)return 3;
+   1152          	}
+   1153          	else return FALSE;
+   1154          
+   1155          	OSTimeDly(Time10mSec);
+   1156          
+   1157          	if(BcMdemSyncProtocolCheck())
+   1158          	{
+   1159          //		if(BcMdemSyncCheck((char *)RxCdmaData) != 12)return FALSE;
+   1160          	if(BcMdemSyncCheck((char *)RxCdmaData) != 12)return 4;
+   1161          	}
+   1162          	else return FALSE;
+   1163          
+   1164          	return nRet;
+   1165          }	
+   1166          
+   1167          INT32S BcMdemSwReset(void)
+   1168          { 
+   1169          	INT8U nRet = TRUE;
+   1170          	
+   1171          	BcMdemXmit(CdmaModemSwRstCmd);
+   1172          
+   1173          	if(BcMdemSyncProtocolCheck())
+   1174          	{
+   1175          		if(BcMdemSyncCheck((char *)RxCdmaData) != 27)return FALSE;
+   1176          	}
+   1177          	else return FALSE;
+   1178          
+   1179          	OSTimeDly(Time10mSec);
+   1180          
+   1181          	if(BcMdemSyncProtocolCheck())
+   1182          	{
+   1183          		if(BcMdemSyncCheck((char *)RxCdmaData) != 14)return FALSE;
+   1184          	}
+   1185          	else return FALSE;
+   1186          
+   1187          	return nRet;
+   1188          }	
+   1189          
+   1190          // RETRUN DEFINE
+   1191          // -1 : *SKT*ORI Error
+   1192          // -2 : OK Error
+   1193          // -3 : *SKT*VCALL Error
+   1194          // -4 : *SKT*VOICECONNECT Error
+   1195          
+   1196          INT32S BcMdemCalling(char *DstTel)
+   1197          { 
+   1198          	INT16U i = 0, j = 0;
+   1199          	INT8U Ptr[100];
+   1200          	INT32S nRet = TRUE;
+   1201          	
+   1202          	sprintf((char *)TxCdmaData, "%s%s", CdmaCallingCmd, DstTel);
+   1203          
+   1204          	BcMdemXmit((INT8U *)TxCdmaData);
+   1205          
+   1206          	if(BcMdemSyncProtocolCheck()) // *SKT*ORI=
+   1207          	{
+   1208          		if(BcMdemSyncCheck((char *)RxCdmaData) != 33)return -1; 
+   1209          	}
+   1210          	else return -1;
+   1211          
+   1212          	if(BcMdemSyncProtocolCheck()) // OK
+   1213          	{
+   1214          		if(BcMdemSyncCheck((char *)RxCdmaData) != 14)return -2; 
+   1215          	}
+   1216          	else return -2;
+   1217          	
+   1218          	if(BcMdemSyncProtocolCheck()) // *SKT*VCALL:
+   1219          	{
+   1220          		for(i = 0; i < strlen(RspmsgCallAck);i++)Ptr[i] = RxCdmaData[i];
+   1221          		Ptr[i] = 0;
+   1222          		if(BcMdemSyncCheck((char *)Ptr) != 28)return -3;
+   1223          		
+   1224          		for(j = 0; j < strlen(DstTel); j++, i++)
+   1225          		{
+   1226          			if(DstTel[j] != RxCdmaData[i])return -3;
+   1227          		}
+   1228          	}
+   1229          	else return -3;
+   1230          
+   1231          	if(BcMdemSyncProtocolCheck()) // *SKT*VOICECONNECT
+   1232          	{
+   1233          		if(BcMdemSyncCheck((char *)RxCdmaData) != 29)return -4; 
+   1234          	}
+   1235          	else return -4;
+   1236          	
+   1237          	return nRet;
+   1238          }
+   1239          
+   1240          
+   1241          INT32S CdmaModemTrafficCheck(void)
+   1242          { 
+   1243          	INT8U nRet = TRUE;
+   1244          	
+   1245          	nRet = BcMdemCommad(ModemTrafficCmd);
+   1246          
+   1247          	return nRet;
+   1248          }
+   1249          
+   1250          INT32S CdmaModemHangUp(void)
+   1251          { 
+   1252          	INT8U nRet = TRUE;
+   1253          	
+   1254          	nRet = BcMdemCommad(ModemHangUpCmd);
+   1255          
+   1256          	return nRet;
+   1257          }
+   1258          
+   1259          INT32S BcMdemCommad(INT8U Commad)
+   1260          {
+   1261          	INT16U i = 0;
+   1262          	INT32S nlen = 0;
+   1263          	INT32S nRet = 0;
+   1264          	INT8U Ptr[100];
+   1265          	
+   1266          	
+   1267          	switch(Commad)
+   1268          	{
+   1269          		case MsgReciveCmd: 		BcMdemXmit(CdmaMsgReciveCmd); 	break;
+   1270          		case MsgCheckCmd: 		BcMdemXmit(CdmaMsgCheckCmd); 	break;
+   1271          		case ModemTimeCmd: 		BcMdemXmit(CdmaModemTimeCmd); 	break;
+   1272          		case ModemRfStsCmd: 	BcMdemXmit(CdmaModemRfStsCmd); 	break;
+   1273          		case ModemHangUpCmd: 	BcMdemXmit(CdmaModemHangUpCmd); break;
+   1274          		case ModemTrafficCmd:	BcMdemXmit(CdmaModemTrafficCmd);break;
+   1275          		case ModemPilotCmd: 	BcMdemXmit(CdmaModemPilotCmd); 	break; 
+   1276          		default : return FALSE;
+   1277          	}
+   1278          
+   1279          	switch(Commad)
+   1280          	{
+   1281          		case MsgReciveCmd:
+   1282          		
+   1283          			if((nlen = BcMdemSyncProtocolCheck()) != FALSE)
+   1284          			{
+   1285          				nRet = BcMdemDataProtocolCheck(Commad);
+   1286          				if(!nRet)return FALSE;
+   1287          				if(nRet > 0) nRet = nlen;	// normal case 이면.. len을 return한다.
+   1288          			}
+   1289          			else return FALSE;
+   1290          		break;	
+   1291          
+   1292          		case ModemPilotCmd:
+   1293          		case MsgCheckCmd: 	
+   1294          		case ModemTimeCmd:
+   1295          		case ModemRfStsCmd:
+   1296          		case ModemTrafficCmd:	
+   1297          			if((nlen = BcMdemSyncProtocolCheck()) != FALSE)
+   1298          			{
+   1299          				nRet = BcMdemDataProtocolCheck(Commad);
+   1300          				if(!nRet)return FALSE;
+   1301          				if(!BcMdemSyncProtocolCheck())return FALSE;
+   1302          				if(BcMdemSyncCheck((char *)RxCdmaData) != 14)return FALSE;
+   1303          
+   1304          				if(Commad != ModemTrafficCmd)
+   1305          				{
+   1306          					if(nRet > 0) nRet = nlen;	// normal case 이면.. len을 return한다.
+   1307          				}	
+   1308          			}
+   1309          			else return FALSE;
+   1310          		break;	
+   1311          
+   1312          		case ModemHangUpCmd:
+   1313          			if(BcMdemSyncProtocolCheck())
+   1314          			{
+   1315          				for(i = 0; i < strlen(RspmsgHangup);i++)Ptr[i] = RxCdmaData[i];
+   1316          				Ptr[i] = 0;
+   1317          				if(BcMdemSyncCheck((char *)Ptr) != 30)return FALSE;
+   1318          				
+   1319          				if(RxCdmaData[i] != '1')return FALSE;
+   1320          			}
+   1321          			else return FALSE;
+   1322          			
+   1323          		break; 
+   1324          
+   1325          		
+   1326          
+   1327          	}
+   1328          
+   1329          	
+   1330          	return nRet;
+   1331          
+   1332          }
+   1333          
+   1334          INT32S BcdemTimeGet(BcMTimeStr *nPtr)
+   1335          {
+   1336          	INT8U i = 0;
+   1337          	INT8U *tPtr = (INT8U *)nPtr;
+   1338          	INT32S nRet = TRUE;
+   1339          		
+   1340          S_START:
+   1341          
+   1342          	if(BcMRtryNo >= MaxTryNo) return FALSE;	// Max Try Error
+   1343          
+   1344          	nRet = BcMdemCommad(ModemTimeCmd);
+   1345          
+   1346          	if(nRet == FALSE)
+   1347          	{
+   1348          		BcMRtryNo++;
+   1349          		OSTimeDly(1500);
+   1350          		goto S_START;
+   1351          	}
+   1352          	// mem init
+   1353          	for(i = 0; i < sizeof(BcMTimeStr); i++)  *tPtr++ = 0;
+   1354          	
+   1355          	for(i = 0; i < 4; i++) nPtr->Year[i] = BcMpresentTime->Year[i];
+   1356          	for(i = 0; i < 2; i++)
+   1357          	{
+   1358          		nPtr->Month[i]	= BcMpresentTime->Month[i];
+   1359          		nPtr->Day[i]	= BcMpresentTime->Day[i];
+   1360          		nPtr->Hour[i]	= BcMpresentTime->Hour[i];
+   1361          		nPtr->Min[i]	= BcMpresentTime->Min[i];
+   1362          		nPtr->Sec[i]	= BcMpresentTime->Sec[i];
+   1363          	}	
+   1364          	//for(i = 0; i < 3; i++) nPtr->Week[i] = BcMpresentTime->Week[i];
+   1365          
+   1366          	OSTimeDly(1500);
+   1367          	return nRet;
+   1368          }
+   1369          
+   1370          INT32S BcdemRfStsGet(BcMRfStsStr *nPtr)
+   1371          {
+   1372          	INT8U i = 0;
+   1373          	INT16S *tPtr = (INT16S *)nPtr;
+   1374          	INT32S nRet = TRUE;
+   1375          		
+   1376          RF_START:
+   1377          
+   1378          	if(BcMRtryNo >= MaxTryNo) return FALSE;	// Max Try Error
+   1379          
+   1380          	nRet = BcMdemCommad(ModemRfStsCmd);
+   1381          
+   1382          	if(nRet == FALSE)
+   1383          	{
+   1384          		BcMRtryNo++;
+   1385          		OSTimeDly(1000);
+   1386          		goto RF_START;
+   1387          	}
+   1388          	// mem init
+   1389          	for(i = 0; i < sizeof(BcMRfStsStr); i++)  *tPtr++ = 0;
+   1390          
+   1391          	nPtr->ActChannel =	BcMRfStatus->ActChannel;
+   1392          	for(i = 0; i < 6; i++)
+   1393          	{
+   1394          		nPtr->PN_Vaule[i] = BcMRfStatus->PN_Vaule[i];
+   1395          		nPtr->EcIo[i] 	  = BcMRfStatus->EcIo[i];
+   1396          	}
+   1397          
+   1398          	nPtr->FerValue 	=	BcMRfStatus->FerValue;
+   1399          	nPtr->RxValue 	=	BcMRfStatus->RxValue;
+   1400          	nPtr->TxValue 	=	BcMRfStatus->TxValue;
+   1401          	nPtr->AdjValue 	=	BcMRfStatus->AdjValue;
+   1402          
+   1403          	nPtr->NumberOfChannel = BcMRfStatus->NumberOfChannel;
+   1404          	nPtr->ActPN = BcMRfStatus->ActPN;	
+   1405          	
+   1406          	return nRet;
+   1407          }
+   1408          
+   1409          INT32S BcMdemFuncselect(void)
+   1410          {
+   1411          	// Modem Status Check.
+   1412          ////////////////////////////////////////////////////////////////////////////////////////	
+   1413          	// error Case
+   1414          	if(BcMRtryNo >= MaxTryNo)
+   1415          	{
+   1416          		TimeReqCnt = 0;
+   1417          		BcMRtryNo = 0;
+   1418          		return  MAX_TRY;
+   1419          	}
+   1420          
+   1421          	if(++TimeReqCnt > 5)
+   1422          	{
+   1423          		TimeReqCnt = 0;
+   1424          		return SELF_TIME;
+   1425          	}
+   1426          	else if(TimeReqCnt%2)	return SELF_RECV;
+   1427          	else					return SELF_SEND;
+   1428          }
+   1429          
+   1430          INT32S BcMdemRecv(INT8U *rbuf, INT8U *sTel, BcMTimeStr *rtime)
+   1431          {
+   1432          	INT32S len = 0;
+   1433          	INT32S nRet = 0;
+   1434          	// 0: Fail
+   1435          	// -1: Not Data
+   1436          	//
+   1437          	
+   1438          
+   1439          S_START:
+   1440          
+   1441          	if(BcMRtryNo >= MaxTryNo) return  FALSE;
+   1442          	
+   1443          	nRet = BcMdemCommad(MsgCheckCmd);
+   1444          
+   1445          	if(nRet == FALSE)
+   1446          	{
+   1447          		BcMRtryNo++;
+   1448          		OSTimeDly(1500);
+   1449          		goto S_START;
+   1450          	}
+   1451          	else if(nRet == NOT_DATA)
+   1452          	{
+   1453          		nRet = NOT_DATA;
+   1454          	}
+   1455          	else if(nRet > 0)//(nRet == TRUE)										// protocol ok --> data read
+   1456          	{
+   1457          		nRet = BcMdemCommad(MsgReciveCmd);
+   1458          		if(nRet == FALSE)
+   1459          		{
+   1460          			BcMRtryNo++;
+   1461          			OSTimeDly(1500);
+   1462          			goto S_START;
+   1463          		}
+   1464          		//else if(nRet < 0)
+   1465          		//{
+   1466          		//	nRet = len;
+   1467          		//}
+   1468          		else if(nRet > 0)
+   1469          		{
+   1470          			//len = len;
+   1471          			// RxCdmaData
+   1472          			{
+   1473          				INT16U i = 0, cnt = 0, tcnt = 0;
+   1474          				INT8U *tPtr = RxBcMData;
+   1475          
+   1476          				////////////////////////////////////////////////////////////////
+   1477          				for(i = 0; i < sizeof(BcMTimeStr); i++) *((INT8U *)rtime + i) = 0;
+   1478          				//////////////////////////////////////////////////////////////////////
+   1479          				for(i = 0; i < 4; i++, cnt++) rtime->Year[i] = *tPtr++;
+   1480          				for(i = 0; i < 2; i++, cnt++) rtime->Month[i]= *tPtr++;
+   1481          				for(i = 0; i < 2; i++, cnt++) rtime->Day[i]= *tPtr++;
+   1482          				for(i = 0; i < 2; i++, cnt++) rtime->Hour[i]= *tPtr++;
+   1483          				for(i = 0; i < 2; i++, cnt++) rtime->Min[i]= *tPtr++;
+   1484          				for(i = 0; i < 2; i++, cnt++) rtime->Sec[i]= *tPtr++;
+   1485          
+   1486          				*tPtr++; cnt++;		// ','
+   1487          				
+   1488          				for(; cnt < nRet; cnt++)
+   1489          				{
+   1490          					if(*tPtr != ',')
+   1491          					{	
+   1492          						if(tcnt == 0)
+   1493          						{
+   1494          							*sTel++ = *tPtr++;
+   1495          						}
+   1496          						else if(tcnt == 1) tPtr++;
+   1497          						else if(tcnt == 2) tPtr++;
+   1498          						else if(tcnt == 3) tPtr++;
+   1499          						else
+   1500          						{
+   1501          							INT8U temp;
+   1502          							temp = atoh(*tPtr++);
+   1503          							temp = atoh(*tPtr++) + ( temp << 4 );
+   1504          							rbuf[len++] = temp;
+   1505          							cnt++;
+   1506          						}
+   1507          					}
+   1508          					else
+   1509          					{
+   1510          						tPtr++;
+   1511          						tcnt++;
+   1512          					}
+   1513          				}				
+   1514          				nRet = len;
+   1515          				rbuf[len++] = 0;	// null data insert
+   1516          				*sTel++ = 0;		// null data insert
+   1517          
+   1518          			//Ser0Printf(" rDATA: %s", RxBcMData);
+   1519          			//Ser0Printf(" DATA: %s", rbuf);
+   1520          			//Ser0Printf(" len: %d \n", nRet);
+   1521          			}
+   1522          		}
+   1523          	}
+   1524          	OSTimeDly(1500);
+   1525          
+   1526          	return nRet;
+   1527          }
+   1528          
+   1529          INT32S BcdemPilotGet(BcMPilotStsStr *nPtr)
+   1530          {
+   1531          	INT8U i = 0;
+   1532          	INT16S *tPtr = (INT16S *)nPtr;
+   1533          	INT32S nRet = TRUE;
+   1534          		
+   1535          
+   1536          	nRet = BcMdemCommad(ModemPilotCmd);
+   1537          
+   1538           
+   1539          	// mem init
+   1540          	for(i = 0; i < sizeof(BcMPilotStsStr); i++)  *tPtr++ = 0;
+   1541          
+   1542          
+   1543          	
+   1544          	for(i = 0; i < 4; i++)
+   1545          	{
+   1546          		nPtr->PN_Vaule[i] = BcMPilotStatus->PN_Vaule[i];
+   1547          		nPtr->EcIo[i] 	  = BcMPilotStatus->EcIo[i];
+   1548          
+   1549          	}
+   1550          	return nRet;
+   1551          }
+   1552          
+   1553          
+   1554          ////////////////////////////////////////////////////////////////////////////////
+   1555          // End of Source File
+   1556          /////////////////////
+   1557          
+
+   Maximum stack usage in bytes:
+
+     Function                .cstack
+     --------                -------
+     BcMFreqStateCheck           48
+     BcMPilotStateCheck          32
+     BcMdemCalling              120
+     BcMdemCommad               120
+     BcMdemDataProtocolCheck     40
+     BcMdemDebug                  0
+     BcMdemFuncselect             0
+     BcMdemInit                 120
+     BcMdemMSGTx                144
+     BcMdemRecv                  40
+     BcMdemSwReset                8
+     BcMdemSyncCheck             16
+     BcMdemSyncProtocolCheck     24
+     BcMdemTCPRxCheck            40
+     BcMdemTCPTx                224
+     BcMdemTcpConnect            40
+     BcMdemTcpExit               16
+     BcMdemXmit                  16
+     BcdemPilotGet               16
+     BcdemRfStsGet               16
+     BcdemTimeGet                24
+     CdmaModemHangUp              8
+     CdmaModemTrafficCheck        8
+
+
+   Section sizes:
+
+     Function/Label                      Bytes
+     --------------                      -----
+     RxCdmaData                          2056
+     TxCdmaData
+     RxBcMData                           1028
+     BcMdebug                              12
+     BcMTimerRx
+     dUartPtr
+     eUartPtr
+     PN0_Vaule                              4
+     PN1_Vaule                              4
+     PN2_Vaule                              4
+     PN3_Vaule                              4
+     EcIo0_Vaule                            4
+     EcIo1_Vaule                            4
+     EcIo2_Vaule                            4
+     EcIo3_Vaule                            4
+     ModemVersion                          52
+     BcMpresentTimeB                       20
+     BcMRfStatusB                          52
+     BcMVerNum                             40
+     TimeReqCnt
+     BcMRtryNo
+     BcMMaker
+     BcMType
+     BcMSrcTel
+     BcMEsnNum
+     BcMpresentTime
+     BcMRfStatus
+     BcMPilotStatusB                       16
+     BcMPilotStatus                         4
+     BcMdemDebug                           12
+     BcMdemInit                           292
+     ?Subroutine0                           6
+     BcMdemXmit                            48
+     BcMdemMSGTx                          208
+     ?Subroutine1                           6
+     BcMdemTCPTx                          112
+     ?Subroutine2                          12
+     BcMdemTCPRxCheck                     102
+     BcMdemSyncProtocolCheck              124
+     BcMdemSyncCheck                      512
+     BcMdemDataProtocolCheck              808
+     BcMFreqStateCheck                   1852
+     ?Subroutine3                           6
+     BcMPilotStateCheck                   824
+     BcMdemTcpConnect                     260
+     BcMdemTcpExit                        140
+     BcMdemSwReset                         72
+     BcMdemCalling                        200
+     CdmaModemTrafficCheck                  4
+     ?Subroutine4                           8
+     CdmaModemHangUp                        6
+     BcMdemCommad                         228
+     BcdemTimeGet                         140
+     BcdemRfStsGet                        132
+     BcMdemFuncselect                      60
+     BcMdemRecv                           360
+     BcdemPilotGet                         60
+     ??DataTable11                          4
+     ??DataTable14                          4
+     ??DataTable25                          4
+     ??DataTable31                          4
+     ??DataTable36                          4
+     ??DataTable48                          4
+     ?<Constant "\n\n CmdStep[%d] \n\n">  152
+     ?<Constant "*SKT*REL:">              300
+     ?<Constant "%s\n">                     4
+     ?<Constant "%s%s,%s,4098,,,,">        60
+     ?<Constant "%s">                       4
+     ?<Constant "OK">                       4
+     ?<Constant "ATS">                      4
+     ?<Constant "KST">                      4
+     ?<Constant "SAT">                      4
+     ?<Constant "ZZB5">                    24
+     ?<Constant "AT+CRM=251">              84
+     ?<Constant "AT$TCPCLOSE">             24
+     ?<Constant "AT*SKT*RESET">            16
+     ?<Constant "%s%s">                    20
+
+ 
+ 3 268 bytes in section .bss
+    44 bytes in section .data
+   704 bytes in section .rodata
+ 6 618 bytes in section .text
+ 
+ 6 618 bytes of CODE  memory
+   704 bytes of CONST memory
+ 3 312 bytes of DATA  memory
+
+Errors: none
+Warnings: none

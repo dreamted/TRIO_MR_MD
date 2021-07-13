@@ -1,0 +1,1479 @@
+###############################################################################
+#                                                                             #
+# IAR ELF Linker V5.50.5.51995/W32 for ARM              19/May/2017  23:29:55 #
+# Copyright (C) 2007-2010 IAR Systems AB.                                     #
+#                                                                             #
+#    Output file  =  D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V5_5_ #
+#                    20151207\stm32FxC_ucos_prj_v511.out                      #
+#    Map file     =  D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V5_5_ #
+#                    20151207\sout\stm32FxC_ucos_prj_v511.map                 #
+#    Command line =  "D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V5_5 #
+#                    _20151207\sout\ALC.o" "D:\Project\TRIO\1.                #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\sout\Alarm #
+#                    .o" "D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_ #
+#                    V5_5_20151207\sout\DDR_WRCS.o" "D:\Project\TRIO\1.       #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\sout\DE_Ta #
+#                    ble.o" "D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_201412 #
+#                    04_V5_5_20151207\sout\PCA9555.o" "D:\Project\TRIO\1.     #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\sout\adcFu #
+#                    nc.o" "D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_2014120 #
+#                    4_V5_5_20151207\sout\adf411x.o" "D:\Project\TRIO\1.      #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\sout\bell8 #
+#                    60s_v0112.o" "D:\Project\TRIO\1.                         #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\sout\btest #
+#                    .o" "D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_ #
+#                    V5_5_20151207\sout\cdma.o" "D:\Project\TRIO\1.           #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\sout\cpu_a #
+#                    .o" "D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_ #
+#                    V5_5_20151207\sout\de_protocol.o" "D:\Project\TRIO\1.    #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\sout\eep_2 #
+#                    4c64_v1104.o" "D:\Project\TRIO\1.                        #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\sout\exlib #
+#                    .o" "D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_ #
+#                    V5_5_20151207\sout\expio.o" "D:\Project\TRIO\1.          #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\sout\extIn #
+#                    t_vect_v0903.o" "D:\Project\TRIO\1.                      #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\sout\extin #
+#                    t_v0903.o" "D:\Project\TRIO\1.                           #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\sout\fsmc_ #
+#                    sram.o" "D:\Project\TRIO\1.                              #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\sout\lib_m #
+#                    em.o" "D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_2014120 #
+#                    4_V5_5_20151207\sout\lib_str.o" "D:\Project\TRIO\1.      #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\sout\main. #
+#                    o" "D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V #
+#                    5_5_20151207\sout\os_core.o" "D:\Project\TRIO\1.         #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\sout\os_cp #
+#                    u_a.o" "D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_201412 #
+#                    04_V5_5_20151207\sout\os_cpu_c.o" "D:\Project\TRIO\1.    #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\sout\os_db #
+#                    g.o" "D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204 #
+#                    _V5_5_20151207\sout\os_flag.o" "D:\Project\TRIO\1.       #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\sout\os_mb #
+#                    ox.o" "D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_2014120 #
+#                    4_V5_5_20151207\sout\os_mem.o" "D:\Project\TRIO\1.       #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\sout\os_mu #
+#                    tex.o" "D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_201412 #
+#                    04_V5_5_20151207\sout\os_q.o" "D:\Project\TRIO\1.        #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\sout\os_se #
+#                    m.o" "D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204 #
+#                    _V5_5_20151207\sout\os_task.o" "D:\Project\TRIO\1.       #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\sout\os_ti #
+#                    me.o" "D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_2014120 #
+#                    4_V5_5_20151207\sout\os_tmr.o" "D:\Project\TRIO\1.       #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\sout\swab. #
+#                    o" "D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V #
+#                    5_5_20151207\stm32FxC_cpulib_gsi_20100114.a"             #
+#                    "D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V5_5 #
+#                    _20151207\stm32FxC_lib_gsi_20100114.a" -o                #
+#                    "D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V5_5 #
+#                    _20151207\stm32FxC_ucos_prj_v511.out" --map              #
+#                    "D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V5_5 #
+#                    _20151207\sout\stm32FxC_ucos_prj_v511.map" --config      #
+#                    "D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V5_5 #
+#                    _20151207\init\stm32f10x_flash.icf"                      #
+#                    --warnings_are_errors --semihosting --entry              #
+#                    __iar_program_start                                      #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+*******************************************************************************
+*** RUNTIME MODEL ATTRIBUTES
+***
+
+__SystemLibrary = DLib
+
+
+*******************************************************************************
+*** PLACEMENT SUMMARY
+***
+
+"A1":  place at 0x08007000 { ro section .intvec };
+"P1":  place in [from 0x08007000 to 0x08026fff] { ro };
+"P2":  place in [from 0x20000000 to 0x2000bfff] {
+          block HEAP, block CSTACK, rw section iram };
+"P3":  place in [from 0x20000000 to 0x2000bfff] |
+                [from 0x60780000 to 0x607fffff] { rw };
+
+  Section            Kind        Address     Size  Object
+  -------            ----        -------     ----  ------
+"A1":                                       0x170
+  .intvec            const    0x08007000    0x130  extInt_vect_v0903.o [1]
+  .intvec            ro code  0x08007130     0x40  vector_table_M.o [4]
+                            - 0x08007170    0x170
+
+"P1":                                     0x1b88f
+  .text              ro code  0x08007170   0x4f60  de_protocol.o [1]
+  .text              ro code  0x0800c0d0   0x3c64  ALC.o [1]
+  .text              ro code  0x0800fd34   0x32c4  cdma.o [1]
+  .text              ro code  0x08012ff8   0x22c0  expio.o [1]
+  .text              ro code  0x080152b8   0x218c  bell860s_v0112.o [1]
+  .text              ro code  0x08017444   0x1ed6  Alarm.o [1]
+  .text              ro code  0x0801931c   0x1cd4  DE_Table.o [1]
+  .text              ro code  0x0801aff0    0xcd4  btest.o [1]
+  .text              ro code  0x0801bcc4    0xca6  xprintffull.o [3]
+  .text              ro code  0x0801c96c    0x9fc  DDR_WRCS.o [1]
+  .rodata            const    0x0801d368    0x8c0  DE_Table.o [1]
+  .text              ro code  0x0801dc28    0x87a  main.o [1]
+  .text              ro code  0x0801e4a4    0x570  os_core.o [1]
+  .rodata            const    0x0801ea14    0x500  DE_Table.o [1]
+  .text              ro code  0x0801ef14    0x31c  usart1_v0.1.o [7]
+  .text              ro code  0x0801f230    0x314  usart4_v0.1.o [7]
+  .text              ro code  0x0801f544    0x2f4  adcFunc.o [1]
+  .rodata            const    0x0801f838    0x268  btest.o [1]
+  .text              ro code  0x0801faa0    0x246  DblDiv.o [4]
+  .text              ro code  0x0801fce8    0x22a  stm32f10x_flash.o [6]
+  .text              ro code  0x0801ff14    0x21c  adf411x.o [1]
+  .text              ro code  0x08020130    0x21c  extdevlib.o [7]
+  .rodata            const    0x0802034c    0x200  extdevlib.o [7]
+  .text              ro code  0x0802054c    0x1f8  PCA9555.o [1]
+  .text              ro code  0x08020744    0x1a2  DblMul.o [4]
+  .rodata            const    0x080208e8    0x180  DE_Table.o [1]
+  .text              ro code  0x08020a68    0x17e  DblSub.o [4]
+  .rodata            const    0x08020be8    0x16c  btest.o [1]
+  .rodata            const    0x08020d54    0x150  bell860s_v0112.o [1]
+  .rodata            const    0x08020ea4    0x14c  btest.o [1]
+  .text              ro code  0x08020ff0    0x136  timer_v0.1.o [7]
+  .text              ro code  0x08021128    0x132  os_sem.o [1]
+  .text              ro code  0x0802125c    0x12e  I64DivMod.o [4]
+  .text              ro code  0x0802138c    0x12c  extint_v0903.o [1]
+  .text              ro code  0x080214b8    0x108  xdscale.o [3]
+  .text              ro code  0x080215c0     0xe6  DblAdd.o [4]
+  .text              ro code  0x080216a6     0xc6  xdnorm.o [3]
+  .rodata            const    0x0802176c     0xc4  bell860s_v0112.o [1]
+  .text              ro code  0x08021830     0xa8  packbits_init3.o [4]
+  CODE               ro code  0x080218d8     0xa0  os_cpu_a.o [1]
+  .text              ro code  0x08021978     0x94  os_task.o [1]
+  .rodata            const    0x08021a0c     0x90  DE_Table.o [1]
+  .text              ro code  0x08021a9c     0x90  stm32f10x_usart.o [6]
+  .text              ro code  0x08021b2c     0x86  os_cpu_c.o [1]
+  .text              ro code  0x08021bb4     0x7a  cortexm3_macro_v5.o [6]
+  .text              ro code  0x08021c30     0x70  ABImemcpy.o [4]
+  .text              ro code  0x08021ca0     0x66  ABImemset.o [4]
+  .text              ro code  0x08021d08     0x62  memcmp.o [4]
+  .rodata            const    0x08021d6c     0x58  btest.o [1]
+  .text              ro code  0x08021dc4     0x58  memchr.o [4]
+  .text              ro code  0x08021e1c     0x56  DblToI32.o [4]
+  .rodata            const    0x08021e74     0x54  btest.o [1]
+  .rodata            const    0x08021ec8     0x50  bell860s_v0112.o [1]
+  .rodata            const    0x08021f18     0x50  bell860s_v0112.o [1]
+  .text              ro code  0x08021f68     0x50  os_time.o [1]
+  .text              ro code  0x08021fb8     0x4c  os_flag.o [1]
+  .rodata            const    0x08022004     0x48  adf411x.o [1]
+  .text              ro code  0x0802204c     0x48  stm32f10x_iwdg.o [6]
+  .text              ro code  0x08022094     0x44  os_mem.o [1]
+  .text              ro code  0x080220d8     0x44  stm32f10x_nvic.o [6]
+  .rodata            const    0x0802211c     0x40  btest.o [1]
+  .text              ro code  0x0802215c     0x38  ABImemset48.o [4]
+  .text              ro code  0x08022194     0x36  strlen.o [4]
+  .rodata            const    0x080221cc     0x34  main.o [1]
+  .text              ro code  0x08022200     0x34  exlib.o [1]
+  .text              ro code  0x08022234     0x30  os_q.o [1]
+  .text              ro code  0x08022264     0x30  sprintf.o [3]
+  .text              ro code  0x08022294     0x30  iarttio.o [5]
+  .text              ro code  0x080222c4     0x30  strstr.o [3]
+  .text              ro code  0x080222f4     0x2e  I32ToDbl.o [4]
+  .text              ro code  0x08022324     0x2e  DblCmpLe.o [4]
+  .text              ro code  0x08022354     0x2e  DblCmpGe.o [4]
+  .text              ro code  0x08022384     0x2c  stm32f10x_rcc.o [6]
+  .text              ro code  0x080223b0     0x2c  data_init3.o [4]
+  CODE               ro code  0x080223dc     0x2a  cpu_a.o [1]
+  .text              ro code  0x08022406     0x2a  strncmp.o [3]
+  .rodata            const    0x08022430     0x28  bell860s_v0112.o [1]
+  .text              ro code  0x08022458     0x28  vsprintf.o [3]
+  .rodata            const    0x08022480     0x24  DDR_WRCS.o [1]
+  .rodata            const    0x080224a4     0x24  DDR_WRCS.o [1]
+  .rodata            const    0x080224c8     0x24  cdma.o [1]
+  .text              ro code  0x080224ec     0x24  stm32f10x_main.o [6]
+  .text              ro code  0x08022510     0x24  zero_init3.o [4]
+  .iar.init_table    const    0x08022534     0x50  - Linker created -
+  .text              ro code  0x08022584     0x20  stm32f10x_exti_v0903.o [6]
+  .text              ro code  0x080225a4     0x1e  strcat.o [3]
+  .rodata            const    0x080225c4     0x1c  DDR_WRCS.o [1]
+  .rodata            const    0x080225e0     0x1c  cdma.o [1]
+  .rodata            const    0x080225fc     0x18  DE_Table.o [1]
+  .rodata            const    0x08022614     0x18  DE_Table.o [1]
+  .rodata            const    0x0802262c     0x18  DE_Table.o [1]
+  .rodata            const    0x08022644     0x18  DE_Table.o [1]
+  .rodata            const    0x0802265c     0x18  bell860s_v0112.o [1]
+  .rodata            const    0x08022674     0x18  btest.o [1]
+  .rodata            const    0x0802268c     0x18  cdma.o [1]
+  .rodata            const    0x080226a4     0x18  cdma.o [1]
+  .text              ro code  0x080226bc     0x16  cmain.o [4]
+  .text              ro code  0x080226d4     0x16  strchr.o [4]
+  .rodata            const    0x080226ec     0x14  bell860s_v0112.o [1]
+  .rodata            const    0x08022700     0x14  cdma.o [1]
+  .text              ro code  0x08022714     0x14  exit.o [5]
+  .rodata            const    0x08022728     0x10  btest.o [1]
+  .rodata            const    0x08022738     0x10  btest.o [1]
+  .rodata            const    0x08022748     0x10  btest.o [1]
+  .rodata            const    0x08022758     0x10  btest.o [1]
+  .rodata            const    0x08022768     0x10  btest.o [1]
+  .rodata            const    0x08022778     0x10  btest.o [1]
+  .rodata            const    0x08022788     0x10  btest.o [1]
+  .rodata            const    0x08022798     0x10  btest.o [1]
+  .rodata            const    0x080227a8     0x10  btest.o [1]
+  .rodata            const    0x080227b8     0x10  btest.o [1]
+  .text              ro code  0x080227c8      0xe  div.o [3]
+  .rodata            const    0x080227d8      0xc  btest.o [1]
+  .rodata            const    0x080227e4      0xc  btest.o [1]
+  .text              ro code  0x080227f0      0xc  cstartup_M.o [4]
+  .text              ro code  0x080227fc      0xa  swab.o [1]
+  .text              ro code  0x08022808      0xa  cexit.o [4]
+  .text              ro code  0x08022812      0xa  xsprout.o [3]
+  .rodata            const    0x0802281c      0x8  btest.o [1]
+  .rodata            const    0x08022824      0x8  xprintffull.o [3]
+  .text              ro code  0x0802282c      0x8  XShttio.o [3]
+  .text              ro code  0x08022834      0x6  ABImemclr.o [4]
+  .text              ro code  0x0802283c      0x6  ABImemclr4.o [4]
+  .text              ro code  0x08022842      0x6  extInt_vect_v0903.o [1]
+  .text              ro code  0x08022848      0x6  exit.o [3]
+  .rodata            const    0x08022850      0x4  cdma.o [1]
+  .rodata            const    0x08022854      0x4  cdma.o [1]
+  .text              ro code  0x08022858      0x2  I64DivZer.o [4]
+  .text              ro code  0x0802285a      0x4  low_level_init.o [3]
+  .rodata            const    0x0802285e      0x2  os_dbg.o [1]
+  .text              ro code  0x08022860      0x2  fsmc_sram.o [1]
+  .text              ro code  0x08022862      0x2  vector_table_M.o [4]
+  Initializer bytes  ro data  0x08022864    0x16e  <for P3 s0>
+  Initializer bytes  ro data  0x080229d2     0x2d  <for P2 s1>
+                            - 0x080229ff  0x1b88f
+
+"P2", part 1 of 3:                          0x400
+  CSTACK                      0x20000000    0x400  <Block>
+    CSTACK           uninit   0x20000000    0x400  <Block tail>
+                            - 0x20000400    0x400
+
+"P2", part 2 of 3:                           0x34
+  P2 s1                       0x20000400     0x34  <Init block>
+    iram             inited   0x20000400     0x34  usart1_v0.1.o [7]
+                            - 0x20000434     0x34
+
+"P2", part 3 of 3:                         0x1908
+  iram               zero     0x20000434    0x800  usart1_v0.1.o [7]
+  iram               zero     0x20000c34    0x800  usart1_v0.1.o [7]
+  iram               zero     0x20001434    0x400  usart4_v0.1.o [7]
+  iram               zero     0x20001834    0x400  usart4_v0.1.o [7]
+  iram               zero     0x20001c34    0x100  main.o [1]
+  iram               zero     0x20001d34      0x8  usart4_v0.1.o [7]
+                            - 0x20001d3c   0x1908
+
+"P3", part 1 of 2:                         0x1783
+  P3 s0                       0x20001d3c   0x1783  <Init block>
+    .data            inited   0x20001d3c   0x1454  DDR_WRCS.o [1]
+    .data            inited   0x20003190    0x118  Alarm.o [1]
+    .data            inited   0x200032a8     0x6e  ALC.o [1]
+    .data            inited   0x20003318     0x58  btest.o [1]
+    .data            inited   0x20003370     0x54  cdma.o [1]
+    .data            inited   0x200033c4     0x48  bell860s_v0112.o [1]
+    .data            inited   0x2000340c     0x40  btest.o [1]
+    .data            inited   0x2000344c     0x2c  usart4_v0.1.o [7]
+    .data            inited   0x20003478      0xc  cdma.o [1]
+    .data            inited   0x20003484      0xc  cdma.o [1]
+    .data            inited   0x20003490      0x8  ALC.o [1]
+    .data            inited   0x20003498      0x8  XShttio.o [3]
+    .data            inited   0x200034a0      0x4  Alarm.o [1]
+    .data            inited   0x200034a4      0x4  PCA9555.o [1]
+    .data            inited   0x200034a8      0x4  adf411x.o [1]
+    .data            inited   0x200034ac      0x4  adf411x.o [1]
+    .data            inited   0x200034b0      0x4  adf411x.o [1]
+    .data            inited   0x200034b4      0x4  bell860s_v0112.o [1]
+    .data            inited   0x200034b8      0x4  cdma.o [1]
+    .data            inited   0x200034bc      0x3  cdma.o [1]
+                            - 0x200034bf   0x1783
+
+"P3", part 2 of 2:                         0x66b8
+  .bss               zero     0x200034c0   0x2480  cdma.o [1]
+  .bss               zero     0x20005940    0xd48  adcFunc.o [1]
+  .bss               zero     0x20006688    0x808  bell860s_v0112.o [1]
+  .bss               zero     0x20006e90    0x800  extdevlib.o [7]
+  .bss               zero     0x20007690    0x5fc  os_core.o [1]
+  .bss               zero     0x20007c8c    0x414  DDR_WRCS.o [1]
+  .bss               zero     0x200080a0    0x404  bell860s_v0112.o [1]
+  .bss               zero     0x200084a4    0x400  btest.o [1]
+  .bss               zero     0x200088a4    0x400  expio.o [1]
+  .bss               zero     0x20008ca4    0x2bc  cdma.o [1]
+  .bss               zero     0x20008f60    0x200  ALC.o [1]
+  .bss               zero     0x20009160    0x200  cdma.o [1]
+  .bss               zero     0x20009360    0x100  cdma.o [1]
+  .bss               zero     0x20009460     0xf0  timer_v0.1.o [7]
+  .bss               zero     0x20009550     0xb4  os_core.o [1]
+  .bss               zero     0x20009604     0x8c  os_core.o [1]
+  .bss               zero     0x20009690     0x80  os_core.o [1]
+  .bss               zero     0x20009710     0x70  cdma.o [1]
+  .bss               zero     0x20009780     0x60  os_core.o [1]
+  .bss               zero     0x200097e0     0x5c  adcFunc.o [1]
+  .bss               zero     0x2000983c     0x44  bell860s_v0112.o [1]
+  .bss               zero     0x20009880     0x3c  ALC.o [1]
+  .bss               zero     0x200098bc     0x3c  adcFunc.o [1]
+  .bss               zero     0x200098f8     0x3c  expio.o [1]
+  .bss               zero     0x20009934     0x34  Alarm.o [1]
+  .bss               zero     0x20009968     0x34  DDR_WRCS.o [1]
+  .bss               zero     0x2000999c     0x34  btest.o [1]
+  .bss               zero     0x200099d0     0x28  os_core.o [1]
+  .bss               zero     0x200099f8     0x24  adf411x.o [1]
+  .bss               zero     0x20009a1c     0x24  adf411x.o [1]
+  .bss               zero     0x20009a40     0x24  adf411x.o [1]
+  .bss               zero     0x20009a64     0x19  Alarm.o [1]
+  .bss               zero     0x20009a80     0x18  PCA9555.o [1]
+  .bss               zero     0x20009a98     0x14  bell860s_v0112.o [1]
+  .bss               zero     0x20009aac     0x10  ALC.o [1]
+  .bss               zero     0x20009abc     0x10  bell860s_v0112.o [1]
+  .bss               zero     0x20009acc     0x10  cdma.o [1]
+  .bss               zero     0x20009adc     0x10  cdma.o [1]
+  .bss               zero     0x20009aec     0x10  expio.o [1]
+  .bss               zero     0x20009afc     0x10  expio.o [1]
+  .bss               zero     0x20009b0c      0xc  cdma.o [1]
+  .bss               zero     0x20009b18      0xc  expio.o [1]
+  .bss               zero     0x20009b24      0x8  Alarm.o [1]
+  .bss               zero     0x20009b2c      0x8  main.o [1]
+  .bss               zero     0x20009b34      0x8  ALC.o [1]
+  .bss               zero     0x20009b3c      0x4  btest.o [1]
+  .bss               zero     0x20009b40      0x4  extint_v0903.o [1]
+  .bss               zero     0x20009b44      0x4  os_core.o [1]
+  .bss               zero     0x20009b48      0x4  os_core.o [1]
+  .bss               zero     0x20009b4c      0x4  os_core.o [1]
+  .bss               zero     0x20009b50      0x3  ALC.o [1]
+  .bss               zero     0x20009b54      0x2  cdma.o [1]
+  .bss               zero     0x20009b56      0x2  bell860s_v0112.o [1]
+  .bss               zero     0x20009b58      0x2  cdma.o [1]
+  .bss               zero     0x20009b5a      0x2  expio.o [1]
+  .bss               zero     0x20009b5c      0x1  ALC.o [1]
+  .bss               zero     0x20009b5d      0x1  ALC.o [1]
+  .bss               zero     0x20009b5e      0x1  ALC.o [1]
+  .bss               zero     0x20009b5f      0x1  ALC.o [1]
+  .bss               zero     0x20009b60      0x1  ALC.o [1]
+  .bss               zero     0x20009b61      0x1  ALC.o [1]
+  .bss               zero     0x20009b62      0x1  Alarm.o [1]
+  .bss               zero     0x20009b63      0x1  Alarm.o [1]
+  .bss               zero     0x20009b64      0x1  btest.o [1]
+  .bss               zero     0x20009b65      0x1  btest.o [1]
+  .bss               zero     0x20009b66      0x1  cdma.o [1]
+  .bss               zero     0x20009b67      0x1  cdma.o [1]
+  .bss               zero     0x20009b68      0x1  cdma.o [1]
+  .bss               zero     0x20009b69      0x1  cdma.o [1]
+  .bss               zero     0x20009b6a      0x1  expio.o [1]
+  .bss               zero     0x20009b6b      0x1  expio.o [1]
+  .bss               zero     0x20009b6c      0x1  expio.o [1]
+  .bss               zero     0x20009b6d      0x1  expio.o [1]
+  .bss               zero     0x20009b6e      0x1  expio.o [1]
+  .bss               zero     0x20009b6f      0x1  expio.o [1]
+  .bss               zero     0x20009b70      0x1  expio.o [1]
+  .bss               zero     0x20009b71      0x1  expio.o [1]
+  .bss               zero     0x20009b72      0x1  expio.o [1]
+  .bss               zero     0x20009b73      0x1  expio.o [1]
+  .bss               zero     0x20009b74      0x1  expio.o [1]
+  .bss               zero     0x20009b75      0x1  main.o [1]
+                            - 0x20009b76   0x66b6
+
+
+*******************************************************************************
+*** INIT TABLE
+***
+
+          Address     Size
+          -------     ----
+Zero (__iar_zero_init3)
+    2 destination ranges, total size 0x7fbe:
+          0x20000434  0x1908
+          0x200034c0  0x66b6
+
+Copy/packbits (__iar_packbits_init3)
+    1 source range, total size 0x16e (6% of destination):
+          0x08022864   0x16e
+    1 destination range, total size 0x1783:
+          0x20001d3c  0x1783
+
+Copy/packbits (__iar_packbits_init3)
+    1 source range, total size 0x2d (86% of destination):
+          0x080229d2    0x2d
+    1 destination range, total size 0x34:
+          0x20000400    0x34
+
+
+*******************************************************************************
+*** MODULE SUMMARY
+***
+
+    Module                  ro code  ro data  rw data
+    ------                  -------  -------  -------
+D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\sout: [1]
+    ALC.o                    15 460        7      723
+    Alarm.o                   7 894       17      371
+    DDR_WRCS.o                2 556      416    6 300
+    DE_Table.o                7 380    4 144
+    PCA9555.o                   504                28
+    adcFunc.o                   756             3 552
+    adf411x.o                   540       73      120
+    bell860s_v0112.o          8 588      781    3 266
+    btest.o                   3 284    1 773    1 234
+    cdma.o                   12 996      148   11 091
+    cpu_a.o                      42
+    de_protocol.o            20 320
+    exlib.o                      52
+    expio.o                   8 896             1 141
+    extInt_vect_v0903.o           6      304
+    extint_v0903.o              300                 4
+    fsmc_sram.o                   2
+    main.o                    2 170       52      265
+    os_core.o                 1 392             2 128
+    os_cpu_a.o                  160
+    os_cpu_c.o                  134
+    os_dbg.o                               2
+    os_flag.o                    76
+    os_mem.o                     68
+    os_q.o                       48
+    os_sem.o                    306
+    os_task.o                   148
+    os_time.o                    80
+    swab.o                       10
+    -------------------------------------------------
+    Total:                   94 168    7 717   30 223
+
+command line: [2]
+    -------------------------------------------------
+    Total:
+
+dl7M_tl_in.a: [3]
+    XShttio.o                     8        1        8
+    div.o                        14
+    exit.o                        6
+    low_level_init.o              4
+    sprintf.o                    48
+    strcat.o                     30
+    strncmp.o                    42
+    strstr.o                     48
+    vsprintf.o                   40
+    xdnorm.o                    198
+    xdscale.o                   264
+    xprintffull.o             3 238        8
+    xsprout.o                    10
+    -------------------------------------------------
+    Total:                    3 950        9        8
+
+rt7M_tl.a: [4]
+    ABImemclr.o                   6
+    ABImemclr4.o                  6
+    ABImemcpy.o                 112
+    ABImemset.o                 102
+    ABImemset48.o                56
+    DblAdd.o                    230
+    DblCmpGe.o                   46
+    DblCmpLe.o                   46
+    DblDiv.o                    582
+    DblMul.o                    418
+    DblSub.o                    382
+    DblToI32.o                   86
+    I32ToDbl.o                   46
+    I64DivMod.o                 302
+    I64DivZer.o                   2
+    cexit.o                      10
+    cmain.o                      22
+    cstartup_M.o                 12
+    data_init3.o                 44
+    memchr.o                     88
+    memcmp.o                     98
+    packbits_init3.o            168
+    strchr.o                     22
+    strlen.o                     54
+    vector_table_M.o             66
+    zero_init3.o                 36
+    -------------------------------------------------
+    Total:                    3 042
+
+shb_l.a: [5]
+    exit.o                       20
+    iarttio.o                    48
+    -------------------------------------------------
+    Total:                       68
+
+stm32FxC_cpulib_gsi_20100114.a: [6]
+    cortexm3_macro_v5.o         122
+    stm32f10x_exti_v0903.o       32
+    stm32f10x_flash.o           554
+    stm32f10x_iwdg.o             72
+    stm32f10x_main.o             36
+    stm32f10x_nvic.o             68
+    stm32f10x_rcc.o              44
+    stm32f10x_usart.o           144
+    -------------------------------------------------
+    Total:                    1 072
+
+stm32FxC_lib_gsi_20100114.a: [7]
+    extdevlib.o                 540      512    2 048
+    timer_v0.1.o                310               240
+    usart1_v0.1.o               796       45    4 148
+    usart4_v0.1.o               788        2    2 100
+    -------------------------------------------------
+    Total:                    2 434      559    8 536
+
+    Gaps                         34       18        6
+    Linker created                        80    1 024
+-----------------------------------------------------
+    Grand Total:            104 768    8 383   39 797
+
+
+*******************************************************************************
+*** ENTRY LIST
+***
+
+Entry                      Address    Size  Type      Object
+-----                      -------    ----  ----      ------
+?main                   0x080226bd          Code  Gb  cmain.o [4]
+ACFailCnt               0x20009a7c     0x1  Data  Gb  Alarm.o [1]
+ACKpPCA9555             0x080206b3    0x1a  Code  Gb  PCA9555.o [1]
+ADC1_SWStart            0x0801f627    0x62  Code  Gb  adcFunc.o [1]
+ADCIndex                0x200098d1     0x1  Data  Gb  adcFunc.o [1]
+ADCInit                 0x0801f545    0xc6  Code  Gb  adcFunc.o [1]
+ADCSTART                0x200098bc    0x14  Data  Gb  adcFunc.o [1]
+ADC_AVR                 0x20005940   0xd48  Data  Gb  adcFunc.o [1]
+ADC_ChannelEnable       0x0801f61d     0xa  Code  Gb  adcFunc.o [1]
+ADC_CheckFinish         0x0801f60b    0x12  Code  Gb  adcFunc.o [1]
+ADC_DATA                0x200097e0    0x5c  Data  Gb  adcFunc.o [1]
+ADC_IRQHandler          0x0801f79f    0x52  Code  Gb  adcFunc.o [1]
+ADC_Init                0x0800c0d1    0x10  Code  Gb  ALC.o [1]
+ADC_Select              0x08013e19    0x52  Code  Gb  expio.o [1]
+ADC_Task                0x0800c0e1    0x2c  Code  Gb  ALC.o [1]
+ADC_WRCNT               0x200098d4    0x24  Data  Gb  adcFunc.o [1]
+AGCCheck                0x0800dc7d    0x90  Code  Gb  ALC.o [1]
+AGCCheckFunction        0x0800dd0d    0x34  Code  Gb  ALC.o [1]
+ASTART                  0x200098d0     0x1  Data  Gb  adcFunc.o [1]
+Ac_Sd_Flag              0x20009880     0x1  Data  Gb  ALC.o [1]
+AdInputStatus           0x0801b6bd    0xee  Code  Gb  btest.o [1]
+AdcTaskStk              0x20008f60   0x200  Data  Lc  ALC.o [1]
+AlarmCheck              0x08017491  0x18d0  Code  Gb  Alarm.o [1]
+AlarmCheck_2G           0x20009a75     0x1  Data  Gb  Alarm.o [1]
+AlarmCheck_LTE          0x20009a76     0x1  Data  Gb  Alarm.o [1]
+AlarmCheck_LTE_1        0x20009a79     0x1  Data  Gb  Alarm.o [1]
+AlarmCheck_LTE_A1       0x20009a77     0x1  Data  Gb  Alarm.o [1]
+AlarmCheck_LTE_A1_1     0x20009a7a     0x1  Data  Gb  Alarm.o [1]
+AlarmCheck_LTE_A2       0x20009a78     0x1  Data  Gb  Alarm.o [1]
+AlarmCheck_LTE_A2_1     0x20009a7b     0x1  Data  Gb  Alarm.o [1]
+AlarmInitialize         0x08017445    0x46  Code  Gb  Alarm.o [1]
+AlarmStatusUpdate       0x08018d6d   0x2c8  Code  Gb  Alarm.o [1]
+AmpBitReason            0x0800fbf5   0x112  Code  Gb  ALC.o [1]
+Amp_Step                0x20003490     0x8  Data  Gb  ALC.o [1]
+AnalyzeAidData          0x0800bfb3    0xbe  Code  Gb  de_protocol.o [1]
+AppVectTbl              0x08007000   0x130  Data  Gb  extInt_vect_v0903.o [1]
+App_Fault_ISR           0x08022847     0x2  Code  Gb  extInt_vect_v0903.o [1]
+App_NMI_ISR             0x08022845     0x2  Code  Gb  extInt_vect_v0903.o [1]
+App_Spurious_ISR        0x08022843     0x2  Code  Gb  extInt_vect_v0903.o [1]
+AttAccuChange           0x08013f11   0x544  Code  Gb  expio.o [1]
+AttnCS0Val              0x20009aec     0x4  Data  Gb  expio.o [1]
+AttnCS1Val              0x20009af0     0x4  Data  Gb  expio.o [1]
+AttnCS2Val              0x20009af4     0x4  Data  Gb  expio.o [1]
+AttnCS3Val              0x20009af8     0x4  Data  Gb  expio.o [1]
+AttnDataOutput          0x08014b01   0x6ce  Code  Gb  expio.o [1]
+AttnOutBufferInit       0x08019035   0x12e  Code  Gb  Alarm.o [1]
+AttnTableLocation       0x08019f55    0x6a  Code  Gb  DE_Table.o [1]
+AutoResetCheck          0x08010215    0x5e  Code  Gb  cdma.o [1]
+AutoResetCnt            0x200033a0     0x4  Data  Gb  cdma.o [1]
+AutoResetFlg            0x2000338c     0x1  Data  Gb  cdma.o [1]
+AutoRptChk              0x080109e5    0xd6  Code  Gb  cdma.o [1]
+AutoTimeChk             0x0801096d    0x78  Code  Gb  cdma.o [1]
+Auto_ResetCheckInit     0x080101a9    0x4c  Code  Gb  cdma.o [1]
+BcMEsnNum               0x200033dc     0x8  Data  Gb  bell860s_v0112.o [1]
+BcMFreqStateCheck       0x08015cc9   0xd4c  Code  Gb  bell860s_v0112.o [1]
+BcMMaker                0x200033cb     0x1  Data  Gb  bell860s_v0112.o [1]
+BcMPilotStateCheck      0x08016a19   0x37c  Code  Gb  bell860s_v0112.o [1]
+BcMPilotStatus          0x200034b4     0x4  Data  Gb  bell860s_v0112.o [1]
+BcMPilotStatusB         0x20009abc    0x10  Data  Gb  bell860s_v0112.o [1]
+BcMRfStatus             0x20003408     0x4  Data  Gb  bell860s_v0112.o [1]
+BcMRfStatusB            0x2000983c    0x44  Data  Gb  bell860s_v0112.o [1]
+BcMRtryNo               0x200033ca     0x1  Data  Gb  bell860s_v0112.o [1]
+BcMSrcTel               0x200033d0     0xc  Data  Gb  bell860s_v0112.o [1]
+BcMTimerRx              0x200033f8     0x2  Data  Gb  bell860s_v0112.o [1]
+BcMType                 0x200033cc     0x1  Data  Gb  bell860s_v0112.o [1]
+BcMVerNum               0x200033c4     0x4  Data  Gb  bell860s_v0112.o [1]
+BcMdebug                0x200033c8     0x1  Data  Gb  bell860s_v0112.o [1]
+BcMdemCalling           0x08016f29    0xb4  Code  Gb  bell860s_v0112.o [1]
+BcMdemCommad            0x08017005   0x174  Code  Gb  bell860s_v0112.o [1]
+BcMdemDataProtocolCheck
+                        0x08015955   0x33e  Code  Gb  bell860s_v0112.o [1]
+BcMdemDebug             0x080152b9    0x10  Code  Gb  bell860s_v0112.o [1]
+BcMdemInit              0x080152c9   0x110  Code  Gb  bell860s_v0112.o [1]
+BcMdemMSGSentTx         0x080154dd    0xd6  Code  Gb  bell860s_v0112.o [1]
+BcMdemMSGTx             0x08015405    0xd8  Code  Gb  bell860s_v0112.o [1]
+BcMdemRecv              0x0801726b   0x15c  Code  Gb  bell860s_v0112.o [1]
+BcMdemSyncCheck         0x0801571d   0x234  Code  Gb  bell860s_v0112.o [1]
+BcMdemSyncProtocolCheck
+                        0x08015695    0x7e  Code  Gb  bell860s_v0112.o [1]
+BcMdemTCPRxCheck        0x0801562b    0x6a  Code  Gb  bell860s_v0112.o [1]
+BcMdemTCPTx             0x080155b9    0x72  Code  Gb  bell860s_v0112.o [1]
+BcMdemTcpConnect        0x08016d95   0x10e  Code  Gb  bell860s_v0112.o [1]
+BcMdemTcpExit           0x08016ea3    0x86  Code  Gb  bell860s_v0112.o [1]
+BcMdemXmit              0x080153d9    0x2c  Code  Gb  bell860s_v0112.o [1]
+BcMpresentTime          0x20003404     0x4  Data  Gb  bell860s_v0112.o [1]
+BcMpresentTimeB         0x20009a98    0x14  Data  Gb  bell860s_v0112.o [1]
+BcdemPilotGet           0x080173c7    0x36  Code  Gb  bell860s_v0112.o [1]
+BcdemRfStsGet           0x080171fb    0x70  Code  Gb  bell860s_v0112.o [1]
+BcdemTimeGet            0x08017179    0x82  Code  Gb  bell860s_v0112.o [1]
+BootAlarmFlag           0x20009b0c     0x1  Data  Gb  cdma.o [1]
+BusFault_Handler        0x08022863          Code  Wk  vector_table_M.o [4]
+ByteToWord              0x0802222f     0x6  Code  Gb  exlib.o [1]
+CDMATaskStk             0x20005540   0x400  Data  Lc  cdma.o [1]
+COMTestFunc             0x0801b631    0x82  Code  Gb  btest.o [1]
+CPU_CntLeadZeros        0x080223f3          Code  Gb  cpu_a.o [1]
+CPU_IntDis              0x080223dd          Code  Gb  cpu_a.o [1]
+CPU_IntEn               0x080223e1          Code  Gb  cpu_a.o [1]
+CPU_RevBits             0x080223f9          Code  Gb  cpu_a.o [1]
+CPU_SR_Restore          0x080223ed          Code  Gb  cpu_a.o [1]
+CPU_SR_Save             0x080223e5          Code  Gb  cpu_a.o [1]
+CPU_WaitForExcept       0x08022403          Code  Gb  cpu_a.o [1]
+CPU_WaitForInt          0x080223ff          Code  Gb  cpu_a.o [1]
+CSTACK$$Base            0x20000000           --   Gb  - Linker created -
+CSTACK$$Limit           0x20000400           --   Gb  - Linker created -
+CdmaFuncselect          0x0800fdc1    0x38  Code  Gb  cdma.o [1]
+CdmaModemHangUp         0x08016fe9     0x4  Code  Gb  bell860s_v0112.o [1]
+CdmaModemTrafficCheck   0x08016fe3     0x6  Code  Gb  bell860s_v0112.o [1]
+CdmaSem                 0x200034f4     0x4  Data  Gb  cdma.o [1]
+CheckSWConf             0x08020159    0x40  Code  Gb  extdevlib.o [7]
+CheckSoftTimer          0x08021051    0x18  Code  Gb  timer_v0.1.o [7]
+CheckTime               0x080101f5    0x20  Code  Gb  cdma.o [1]
+ChkAttChange            0x20009b6a     0x1  Data  Gb  expio.o [1]
+ChkBandSelet            0x200098f9     0x1  Data  Gb  expio.o [1]
+ChkPllFregOffset_LTE    0x200098fa     0x1  Data  Gb  expio.o [1]
+ChkRvsOtherOverInAlarm  0x20009a74     0x1  Data  Gb  Alarm.o [1]
+ChkRvsOverInAlarm       0x20009a73     0x1  Data  Gb  Alarm.o [1]
+ChkTableAlarm           0x20009a70     0x1  Data  Gb  Alarm.o [1]
+Chk_Reset               0x200098f8     0x1  Data  Gb  expio.o [1]
+Chk_RvsOSCAlarmCount    0x20009b5b     0x1  Data  Gb  expio.o [1]
+Crc16Calc               0x08020199    0x58  Code  Gb  extdevlib.o [7]
+Crc_tbl                 0x0802034c   0x200  Data  Gb  extdevlib.o [7]
+CtrlSem                 0x20001d4c     0x4  Data  Gb  DDR_WRCS.o [1]
+CurrAgcAttn_2G          0x200032ba     0x1  Data  Gb  ALC.o [1]
+CurrAgcAttn_3G          0x200032b9     0x1  Data  Gb  ALC.o [1]
+CurrAgcAttn_LTE         0x200032bb     0x1  Data  Gb  ALC.o [1]
+CurrAgcAttn_LTE_1       0x20009b51     0x1  Data  Gb  ALC.o [1]
+CurrAgcAttn_LTE_A1      0x200032bc     0x1  Data  Gb  ALC.o [1]
+CurrAgcAttn_LTE_A1_1    0x200032be     0x1  Data  Gb  ALC.o [1]
+CurrAgcAttn_LTE_A2      0x200032bd     0x1  Data  Gb  ALC.o [1]
+CurrAgcAttn_LTE_A2_1    0x200032bf     0x1  Data  Gb  ALC.o [1]
+CurrAlarm               0x20009a64     0xc  Data  Gb  Alarm.o [1]
+CurrFwd1Attn1_LTE       0x2000991a     0x1  Data  Gb  expio.o [1]
+CurrFwd1Attn1_LTE_A     0x2000992a     0x1  Data  Gb  expio.o [1]
+CurrFwd1Attn1_LTE_A1    0x20009920     0x1  Data  Gb  expio.o [1]
+CurrFwd1Attn1_LTE_A2    0x20009925     0x1  Data  Gb  expio.o [1]
+CurrFwd1Attn2_LTE       0x2000991b     0x1  Data  Gb  expio.o [1]
+CurrFwd1Attn2_LTE_A1    0x20009921     0x1  Data  Gb  expio.o [1]
+CurrFwd1Attn2_LTE_A2    0x20009926     0x1  Data  Gb  expio.o [1]
+CurrFwdAttn1_2G         0x200098fc     0x1  Data  Gb  expio.o [1]
+CurrFwdAttn1_3G         0x20009914     0x1  Data  Gb  expio.o [1]
+CurrFwdAttn1_CDMALTE    0x20009906     0x1  Data  Gb  expio.o [1]
+CurrFwdAttn1_LTE        0x20009901     0x1  Data  Gb  expio.o [1]
+CurrFwdAttn1_LTE_A      0x20009912     0x1  Data  Gb  expio.o [1]
+CurrFwdAttn1_LTE_A1     0x20009908     0x1  Data  Gb  expio.o [1]
+CurrFwdAttn1_LTE_A2     0x2000990d     0x1  Data  Gb  expio.o [1]
+CurrFwdAttn2_2G         0x200098fd     0x1  Data  Gb  expio.o [1]
+CurrFwdAttn2_3G         0x20009915     0x1  Data  Gb  expio.o [1]
+CurrFwdAttn2_LTE        0x20009902     0x1  Data  Gb  expio.o [1]
+CurrFwdAttn2_LTE_A1     0x20009909     0x1  Data  Gb  expio.o [1]
+CurrFwdAttn2_LTE_A2     0x2000990e     0x1  Data  Gb  expio.o [1]
+CurrINT                 0x20009b40     0x4  Data  Gb  extint_v0903.o [1]
+CurrLTE15MUse           0x2000992c     0x1  Data  Gb  expio.o [1]
+CurrModemOnOff          0x2000992d     0x1  Data  Gb  expio.o [1]
+CurrRvs1Attn1_LTE       0x2000991c     0x1  Data  Gb  expio.o [1]
+CurrRvs1Attn1_LTE_A     0x2000992b     0x1  Data  Gb  expio.o [1]
+CurrRvs1Attn1_LTE_A1    0x20009922     0x1  Data  Gb  expio.o [1]
+CurrRvs1Attn1_LTE_A2    0x20009927     0x1  Data  Gb  expio.o [1]
+CurrRvs1Attn2_LTE       0x2000991d     0x1  Data  Gb  expio.o [1]
+CurrRvs1Attn2_LTE_A1    0x20009923     0x1  Data  Gb  expio.o [1]
+CurrRvs1Attn2_LTE_A2    0x20009928     0x1  Data  Gb  expio.o [1]
+CurrRvs1Attn3_LTE       0x2000991e     0x1  Data  Gb  expio.o [1]
+CurrRvs1Attn3_LTE_A1    0x20009924     0x1  Data  Gb  expio.o [1]
+CurrRvs1Attn3_LTE_A2    0x20009929     0x1  Data  Gb  expio.o [1]
+CurrRvs1Attn4_LTE       0x2000991f     0x1  Data  Gb  expio.o [1]
+CurrRvsAgcAttn_2G       0x200032c1     0x1  Data  Gb  ALC.o [1]
+CurrRvsAgcAttn_3G       0x200032c0     0x1  Data  Gb  ALC.o [1]
+CurrRvsAgcAttn_LTE      0x200032c2     0x1  Data  Gb  ALC.o [1]
+CurrRvsAgcAttn_LTE_1    0x200032c5     0x1  Data  Gb  ALC.o [1]
+CurrRvsAgcAttn_LTE_A1   0x200032c3     0x1  Data  Gb  ALC.o [1]
+CurrRvsAgcAttn_LTE_A1_1
+                        0x200032c6     0x1  Data  Gb  ALC.o [1]
+CurrRvsAgcAttn_LTE_A2   0x200032c4     0x1  Data  Gb  ALC.o [1]
+CurrRvsAgcAttn_LTE_A2_1
+                        0x200032c7     0x1  Data  Gb  ALC.o [1]
+CurrRvsAttn1_2G         0x200098fe     0x1  Data  Gb  expio.o [1]
+CurrRvsAttn1_3G         0x20009916     0x1  Data  Gb  expio.o [1]
+CurrRvsAttn1_CDMALTE    0x20009907     0x1  Data  Gb  expio.o [1]
+CurrRvsAttn1_LTE        0x20009903     0x1  Data  Gb  expio.o [1]
+CurrRvsAttn1_LTE_A      0x20009913     0x1  Data  Gb  expio.o [1]
+CurrRvsAttn1_LTE_A1     0x2000990a     0x1  Data  Gb  expio.o [1]
+CurrRvsAttn1_LTE_A2     0x2000990f     0x1  Data  Gb  expio.o [1]
+CurrRvsAttn2_2G         0x200098ff     0x1  Data  Gb  expio.o [1]
+CurrRvsAttn2_3G         0x20009917     0x1  Data  Gb  expio.o [1]
+CurrRvsAttn2_LTE        0x20009904     0x1  Data  Gb  expio.o [1]
+CurrRvsAttn2_LTE_A1     0x2000990b     0x1  Data  Gb  expio.o [1]
+CurrRvsAttn2_LTE_A2     0x20009910     0x1  Data  Gb  expio.o [1]
+CurrRvsAttn3_2G         0x20009900     0x1  Data  Gb  expio.o [1]
+CurrRvsAttn3_3G         0x20009918     0x1  Data  Gb  expio.o [1]
+CurrRvsAttn3_LTE        0x20009905     0x1  Data  Gb  expio.o [1]
+CurrRvsAttn3_LTE_A1     0x2000990c     0x1  Data  Gb  expio.o [1]
+CurrRvsAttn3_LTE_A2     0x20009911     0x1  Data  Gb  expio.o [1]
+CurrRvsAttn4_3G         0x20009919     0x1  Data  Gb  expio.o [1]
+CurrentInputStatus      0x0801b7b5   0x110  Code  Gb  btest.o [1]
+DataConv                0x08011cd5    0x32  Code  Gb  cdma.o [1]
+DataCount               0x20001d5c     0x4  Data  Gb  DDR_WRCS.o [1]
+DebugMon_Handler        0x08022863          Code  Wk  vector_table_M.o [4]
+DefaultAttTableInit     0x0801ae19    0x82  Code  Gb  DE_Table.o [1]
+DefaultAttTable_TRIO_M  0x0801a005   0x3f2  Code  Gb  DE_Table.o [1]
+DefaultAttTable_TRIO_MM
+                        0x0801a425   0x648  Code  Gb  DE_Table.o [1]
+DefaultPwrTableInit     0x0801aedf    0xf8  Code  Gb  DE_Table.o [1]
+DefaultTableSet         0x08019561   0x1d0  Code  Gb  DE_Table.o [1]
+DefaultTempTableInit    0x0801ae9b    0x44  Code  Gb  DE_Table.o [1]
+DefaultTempTable_TRIO_M
+                        0x0801aa99   0x150  Code  Gb  DE_Table.o [1]
+DefaultTempTable_TRIO_MM
+                        0x0801abe9   0x220  Code  Gb  DE_Table.o [1]
+DefaultValueSet         0x0801931d   0x244  Code  Gb  DE_Table.o [1]
+DefaultValueSet_Test    0x08019fbf    0x46  Code  Gb  DE_Table.o [1]
+DigitalInputDiplay      0x0801bb81    0xac  Code  Gb  btest.o [1]
+Dnr0_ReadPwrTable       0x0800d823   0x10a  Code  Gb  ALC.o [1]
+Dnr1_ReadPwrTable       0x0800d935   0x108  Code  Gb  ALC.o [1]
+DnrAlarmCheckUpdate     0x080191bb    0x3e  Code  Gb  Alarm.o [1]
+DnrAlarmReport          0x0801259d   0xa3c  Code  Gb  cdma.o [1]
+DnrAttnTblAlarm         0x20009934    0x18  Data  Gb  Alarm.o [1]
+DnrIpAddressAck         0x08010e51    0x92  Code  Gb  cdma.o [1]
+DnrPacketReadyFunc      0x08010ee3    0x52  Code  Gb  cdma.o [1]
+DnrReferToTable         0x08013e7d    0x62  Code  Gb  expio.o [1]
+DnrSMS2Data             0x0800fdf9    0x92  Code  Gb  cdma.o [1]
+DnrSmsTask              0x0800fe8b   0x31e  Code  Gb  cdma.o [1]
+DnrVerString            0x200034b8     0x4  Data  Gb  cdma.o [1]
+DownFlagSet             0x08020131    0x20  Code  Gb  extdevlib.o [7]
+DownLoadBootingJump     0x080202a1     0x8  Code  Gb  extdevlib.o [7]
+DownloadFlagClr         0x08020151     0x6  Code  Gb  extdevlib.o [7]
+DownloadFlagSet         0x08020259    0x20  Code  Gb  extdevlib.o [7]
+EXTI0_IRQHandler        0x0802138d     0x4  Code  Gb  extint_v0903.o [1]
+EXTI15_10_IRQHandler    0x0802143f    0x6e  Code  Gb  extint_v0903.o [1]
+EXTI1_IRQHandler        0x08021391     0x2  Code  Gb  extint_v0903.o [1]
+EXTI2_IRQHandler        0x080213bd     0x4  Code  Gb  extint_v0903.o [1]
+EXTI3_IRQHandler        0x080213c1     0x4  Code  Gb  extint_v0903.o [1]
+EXTI4_IRQHandler        0x080213c5     0x4  Code  Gb  extint_v0903.o [1]
+EXTI9_5_IRQHandler      0x080213c9    0x76  Code  Gb  extint_v0903.o [1]
+EXTI_GetITStatus        0x0802258d    0x14  Code  Gb  stm32f10x_exti_v0903.o [6]
+EcIoFlag                0x20009725     0x1  Data  Gb  cdma.o [1]
+EcIoNew                 0x20009724     0x1  Data  Gb  cdma.o [1]
+EcIoOld                 0x20009726     0x1  Data  Gb  cdma.o [1]
+EsnChecksumH            0x20009b58     0x1  Data  Gb  cdma.o [1]
+EsnChecksumL            0x20009b59     0x1  Data  Gb  cdma.o [1]
+ExpioInit               0x08012ff9    0x10  Code  Gb  expio.o [1]
+ExpioTask               0x08013009   0x1c2  Code  Gb  expio.o [1]
+ExpioTaskStk            0x200088a4   0x400  Data  Lc  expio.o [1]
+FLASH_ClearFlag         0x0801feb1     0x6  Code  Gb  stm32f10x_flash.o [6]
+FLASH_ErasePage         0x0801fdaf    0x3e  Code  Gb  stm32f10x_flash.o [6]
+FLASH_GetStatus         0x0801feb7    0x2a  Code  Gb  stm32f10x_flash.o [6]
+FLASH_Lock              0x0801fda1     0xe  Code  Gb  stm32f10x_flash.o [6]
+FLASH_ProgramHalfWord   0x0801fe5d    0x48  Code  Gb  stm32f10x_flash.o [6]
+FLASH_ProgramWord       0x0801fded    0x70  Code  Gb  stm32f10x_flash.o [6]
+FLASH_Unlock            0x0801fce9    0x10  Code  Gb  stm32f10x_flash.o [6]
+FLASH_WaitForLastOperation
+                        0x0801fee5    0x2e  Code  Gb  stm32f10x_flash.o [6]
+FLASH_pAPBK_Check       0x0801fcf9    0x32  Code  Gb  stm32f10x_flash.o [6]
+FLASHpAPBK_Check_Erase  0x0801fd2b    0x68  Code  Gb  stm32f10x_flash.o [6]
+FSMC_SRAM_Init          0x08022861     0x2  Code  Gb  fsmc_sram.o [1]
+F_RESET_IN_Read         0x080131d5     0x4  Code  Gb  expio.o [1]
+FirstCheckFlag          0x20009b24     0x1  Data  Gb  Alarm.o [1]
+FirstFlag               0x20009b0f     0x1  Data  Gb  cdma.o [1]
+FirstPNCheckFlag        0x20009b63     0x1  Data  Gb  Alarm.o [1]
+FlagAmp1OnOff_LTE       0x20009b39     0x1  Data  Gb  ALC.o [1]
+FlagAmp1OnOff_LTE_A1    0x20009b3a     0x1  Data  Gb  ALC.o [1]
+FlagAmp1OnOff_LTE_A2    0x20009b3b     0x1  Data  Gb  ALC.o [1]
+FlagAmpOnOff_2G         0x20009b34     0x1  Data  Gb  ALC.o [1]
+FlagAmpOnOff_3G         0x20009b35     0x1  Data  Gb  ALC.o [1]
+FlagAmpOnOff_LTE        0x20009b36     0x1  Data  Gb  ALC.o [1]
+FlagAmpOnOff_LTE_A1     0x20009b37     0x1  Data  Gb  ALC.o [1]
+FlagAmpOnOff_LTE_A2     0x20009b38     0x1  Data  Gb  ALC.o [1]
+ForDelay                0x080210ed    0x12  Code  Gb  timer_v0.1.o [7]
+FrameCnt                0x20001d40     0x2  Data  Gb  DDR_WRCS.o [1]
+FreqAlarmCheckRpt       0x0801176d    0x4a  Code  Gb  cdma.o [1]
+FreqAlarmRptFunc        0x080117d9   0x1fc  Code  Gb  cdma.o [1]
+FrontLEDDisplay         0x08013485   0x97e  Code  Gb  expio.o [1]
+FwdAGCCheck_CDMALTE     0x0800e00d   0x466  Code  Gb  ALC.o [1]
+FwdAGCCheck_CDMALTE_15M
+                        0x0800dd41   0x274  Code  Gb  ALC.o [1]
+FwdAGCCheck_LTE_1       0x0800ead1   0x1ee  Code  Gb  ALC.o [1]
+FwdAGCCheck_LTE_A_0     0x0800e65d   0x462  Code  Gb  ALC.o [1]
+FwdAGCCheck_LTE_A_1     0x0800ecbf   0x468  Code  Gb  ALC.o [1]
+FwdAGCCheck_WCDMA       0x0800e479   0x1d8  Code  Gb  ALC.o [1]
+FwdOutPwrTemp_LTE_A1    0x080225fc    0x18  Data  Gb  DE_Table.o [1]
+FwdOutPwrTemp_LTE_A2    0x0802262c    0x18  Data  Gb  DE_Table.o [1]
+GMMLockOrder            0x20009b57     0x1  Data  Gb  bell860s_v0112.o [1]
+GainAttnCalculation     0x0800dc57     0xe  Code  Gb  ALC.o [1]
+GenAidData              0x0801d2ed    0x2c  Code  Gb  DDR_WRCS.o [1]
+GenAidData16            0x0801d319    0x16  Code  Gb  DDR_WRCS.o [1]
+GenBodyFrame            0x0801d035    0x72  Code  Gb  DDR_WRCS.o [1]
+GenDnrAidSts            0x08007171  0x1cac  Code  Gb  de_protocol.o [1]
+GenEtc1StsAid           0x08012371    0xac  Code  Gb  cdma.o [1]
+GenEtcStsAid            0x0801230f    0x32  Code  Gb  cdma.o [1]
+GenSmsStsAidSts_1St     0x08011d19   0x2d6  Code  Gb  cdma.o [1]
+GenSmsStsAidSts_2St     0x08011ff5   0x314  Code  Gb  cdma.o [1]
+GenWaveStsAid           0x0801241d    0xba  Code  Gb  cdma.o [1]
+HardFault_Handler       0x08022863          Code  Wk  vector_table_M.o [4]
+HostStation             0x20009acc    0x10  Data  Gb  cdma.o [1]
+HwTestOutFunc           0x0801b8d5   0x2ac  Code  Gb  btest.o [1]
+ICCIDNum                0x200033e4    0x14  Data  Gb  bell860s_v0112.o [1]
+IWDG_Enable             0x08022087     0xa  Code  Gb  stm32f10x_iwdg.o [6]
+IWDG_ReloadCounter      0x0802207d     0xa  Code  Gb  stm32f10x_iwdg.o [6]
+IWDG_SetPrescaler       0x08022055     0xc  Code  Gb  stm32f10x_iwdg.o [6]
+IWDG_SetReload          0x08022061    0x1c  Code  Gb  stm32f10x_iwdg.o [6]
+IWDG_WriteAccessCmd     0x0802204d     0x6  Code  Gb  stm32f10x_iwdg.o [6]
+ImgKind                 0x20001d3c     0x1  Data  Lc  DDR_WRCS.o [1]
+InitAFIO                0x0801dd4b    0x2e  Code  Gb  main.o [1]
+InitGPIO                0x0801dd79   0x640  Code  Gb  main.o [1]
+InitPwrAlarm            0x200034bd     0x1  Data  Gb  cdma.o [1]
+InitRCC                 0x0801dc49   0x102  Code  Gb  main.o [1]
+InitStm32f103           0x0801dc29    0x20  Code  Gb  main.o [1]
+InitUSART1              0x0801ef15   0x118  Code  Gb  usart1_v0.1.o [7]
+InitUSART4              0x0801f231   0x118  Code  Gb  usart4_v0.1.o [7]
+Initialize              0x0800be69   0x14a  Code  Gb  de_protocol.o [1]
+KeyProc                 0x0801b081    0x84  Code  Gb  btest.o [1]
+LedDisplay              0x0801e413    0x20  Code  Gb  main.o [1]
+LimitAlarmCnt           0x20009aac    0x10  Data  Gb  ALC.o [1]
+LoadBackupData          0x0800b285   0x80a  Code  Gb  de_protocol.o [1]
+LockOrder               0x20009b56     0x1  Data  Gb  bell860s_v0112.o [1]
+LockOrderCnt            0x20009b10     0x2  Data  Gb  cdma.o [1]
+LongTimer               0x20009460    0xf0  Data  Gb  timer_v0.1.o [7]
+MainTaskStk             0x20001c34   0x100  Data  Gb  main.o [1]
+MemManage_Handler       0x08022863          Code  Wk  vector_table_M.o [4]
+MinMaxAttnCheck         0x0801342d    0x14  Code  Gb  expio.o [1]
+ModemEsnCheck           0x08010c49    0xc2  Code  Gb  cdma.o [1]
+ModemLockOrder          0x08016ff5     0x6  Code  Gb  bell860s_v0112.o [1]
+ModemPwrOFF             0x08016ffb     0x6  Code  Gb  bell860s_v0112.o [1]
+ModemType               0x200033cd     0x1  Data  Gb  bell860s_v0112.o [1]
+NMI_Handler             0x08022863          Code  Wk  vector_table_M.o [4]
+NVIC_DeInit             0x080220d9    0x20  Code  Gb  stm32f10x_nvic.o [6]
+NVIC_Init               0x080220f9    0x1c  Code  Gb  stm32f10x_nvic.o [6]
+OSCtxSw                 0x08021903          Code  Gb  os_cpu_a.o [1]
+OSCtxSwCtr              0x200099dc     0x4  Data  Gb  os_core.o [1]
+OSDebugEn               0x0802285e     0x2  Data  Gb  os_dbg.o [1]
+OSEventFreeList         0x200077d0     0x4  Data  Gb  os_core.o [1]
+OSEventTbl              0x20007690   0x140  Data  Gb  os_core.o [1]
+OSFlagFreeList          0x20009b44     0x4  Data  Gb  os_core.o [1]
+OSFlagTbl               0x20009604    0x8c  Data  Gb  os_core.o [1]
+OSIdleCtr               0x200099e0     0x4  Data  Gb  os_core.o [1]
+OSInit                  0x0801e4a5   0x136  Code  Gb  os_core.o [1]
+OSInitHookBegin         0x08021b2d     0x2  Code  Gb  os_cpu_c.o [1]
+OSInitHookEnd           0x08021b2f     0x2  Code  Gb  os_cpu_c.o [1]
+OSIntCtxSw              0x0802190b          Code  Gb  os_cpu_a.o [1]
+OSIntExit               0x0801e5db    0x50  Code  Gb  os_core.o [1]
+OSIntNesting            0x200099d0     0x1  Data  Gb  os_core.o [1]
+OSLockNesting           0x200099d1     0x1  Data  Gb  os_core.o [1]
+OSMemFreeList           0x20009b48     0x4  Data  Gb  os_core.o [1]
+OSMemTbl                0x20009550    0xb4  Data  Gb  os_core.o [1]
+OSPrioCur               0x200099d2     0x1  Data  Gb  os_core.o [1]
+OSPrioHighRdy           0x200099d3     0x1  Data  Gb  os_core.o [1]
+OSQFreeList             0x20009b4c     0x4  Data  Gb  os_core.o [1]
+OSQTbl                  0x20009780    0x60  Data  Gb  os_core.o [1]
+OSRdyGrp                0x200099d4     0x1  Data  Gb  os_core.o [1]
+OSRdyTbl                0x200099d8     0x4  Data  Gb  os_core.o [1]
+OSRunning               0x200099d5     0x1  Data  Gb  os_core.o [1]
+OSSemCreate             0x08021129    0x3c  Code  Gb  os_sem.o [1]
+OSSemPend               0x08021165    0x92  Code  Gb  os_sem.o [1]
+OSSemPost               0x08021209    0x52  Code  Gb  os_sem.o [1]
+OSStart                 0x0801e62b    0x20  Code  Gb  os_core.o [1]
+OSStartHighRdy          0x080218e7          Code  Gb  os_cpu_a.o [1]
+OSTCBCur                0x200099e4     0x4  Data  Gb  os_core.o [1]
+OSTCBFreeList           0x200099e8     0x4  Data  Gb  os_core.o [1]
+OSTCBHighRdy            0x200099ec     0x4  Data  Gb  os_core.o [1]
+OSTCBInitHook           0x08021baf     0x2  Code  Gb  os_cpu_c.o [1]
+OSTCBList               0x200099f0     0x4  Data  Gb  os_core.o [1]
+OSTCBPrioTbl            0x20009690    0x80  Data  Gb  os_core.o [1]
+OSTCBTbl                0x200078d4   0x3b8  Data  Gb  os_core.o [1]
+OSTaskCreate            0x08021979    0x86  Code  Gb  os_task.o [1]
+OSTaskCreateHook        0x08021b31     0x2  Code  Gb  os_cpu_c.o [1]
+OSTaskCtr               0x200099d6     0x1  Data  Gb  os_core.o [1]
+OSTaskIdleHook          0x08021b33     0x2  Code  Gb  os_cpu_c.o [1]
+OSTaskIdleStk           0x200077d4   0x100  Data  Gb  os_core.o [1]
+OSTaskStkInit           0x08021b35    0x78  Code  Gb  os_cpu_c.o [1]
+OSTaskSwHook            0x08021bad     0x2  Code  Gb  os_cpu_c.o [1]
+OSTickStepState         0x200099d7     0x1  Data  Gb  os_core.o [1]
+OSTime                  0x200099f4     0x4  Data  Gb  os_core.o [1]
+OSTimeDly               0x08021f69    0x3e  Code  Gb  os_time.o [1]
+OSTimeTick              0x0801e64b    0x86  Code  Gb  os_core.o [1]
+OSTimeTickHook          0x08021bb1     0x2  Code  Gb  os_cpu_c.o [1]
+OSUnMapTbl              0x0801e914   0x100  Data  Gb  os_core.o [1]
+OS_CPU_PendSVHandler    0x08021913          Code  Gb  os_cpu_a.o [1]
+OS_CPU_SR_Restore       0x080218e1          Code  Gb  os_cpu_a.o [1]
+OS_CPU_SR_Save          0x080218d9          Code  Gb  os_cpu_a.o [1]
+OS_EventTOAbort         0x0801e787    0x38  Code  Gb  os_core.o [1]
+OS_EventTaskRdy         0x0801e6d1    0x78  Code  Gb  os_core.o [1]
+OS_EventTaskWait        0x0801e749    0x3e  Code  Gb  os_core.o [1]
+OS_EventWaitListInit    0x0801e7bf     0xc  Code  Gb  os_core.o [1]
+OS_FlagInit             0x08021fb9    0x42  Code  Gb  os_flag.o [1]
+OS_MemClr               0x0801e7cb    0x12  Code  Gb  os_core.o [1]
+OS_MemInit              0x08022095    0x38  Code  Gb  os_mem.o [1]
+OS_QInit                0x08022235    0x28  Code  Gb  os_q.o [1]
+OS_Sched                0x0801e7dd    0x40  Code  Gb  os_core.o [1]
+OS_SchedNew             0x0801e81d    0x18  Code  Lc  os_core.o [1]
+OS_TCBInit              0x0801e855    0xb0  Code  Gb  os_core.o [1]
+OS_TaskIdle             0x0801e835    0x20  Code  Gb  os_core.o [1]
+OnCommand               0x0801b105   0x382  Code  Gb  btest.o [1]
+OneDayPeriod            0x200033a8     0x4  Data  Gb  cdma.o [1]
+OneDayResetCnt          0x200033a4     0x4  Data  Gb  cdma.o [1]
+OneOutPwrConv           0x0800c10d    0x2a  Code  Gb  ALC.o [1]
+PCA9555_Init            0x0802054d    0x2a  Code  Gb  PCA9555.o [1]
+PastHour                0x20003392     0x2  Data  Gb  cdma.o [1]
+PastMin                 0x20003394     0x2  Data  Gb  cdma.o [1]
+PcFreqStsRqstFlag       0x2000338d     0x1  Data  Gb  cdma.o [1]
+PcSer                   0x20001d48     0x4  Data  Gb  DDR_WRCS.o [1]
+PcSerB                  0x20009968    0x34  Data  Gb  DDR_WRCS.o [1]
+PendSV_Handler          0x08022863          Code  Wk  vector_table_M.o [4]
+PeriodCnt               0x20009b5a     0x1  Data  Gb  expio.o [1]
+PeriodReportCheck       0x0801916b    0x32  Code  Gb  Alarm.o [1]
+PeriodStart             0x20003386     0x1  Data  Gb  cdma.o [1]
+Period_Check            0x080131d9   0x108  Code  Gb  expio.o [1]
+PheripheralInit         0x0801e3b9    0x5a  Code  Gb  main.o [1]
+Pilot_Sts               0x20009770    0x10  Data  Gb  cdma.o [1]
+Pll411xCreate           0x0801ff15    0x18  Code  Gb  adf411x.o [1]
+Pll411xInit             0x0801ff97     0xe  Code  Gb  adf411x.o [1]
+Pll411x_Output          0x0801ffa5   0x174  Code  Gb  adf411x.o [1]
+PnAlarm                 0x2000971d     0x1  Data  Gb  cdma.o [1]
+PnAlarmFlag             0x20009720     0x1  Data  Gb  cdma.o [1]
+PnAlarmNew              0x2000971f     0x1  Data  Gb  cdma.o [1]
+PnAlarmOld              0x2000971e     0x1  Data  Gb  cdma.o [1]
+PnChangeCnt             0x2000971c     0x1  Data  Gb  cdma.o [1]
+Pre_AC_Sts              0x20009b6b     0x1  Data  Gb  expio.o [1]
+PresentDay              0x20003387     0x1  Data  Gb  cdma.o [1]
+PresentHour             0x20003388     0x1  Data  Gb  cdma.o [1]
+PresentMin              0x20003389     0x1  Data  Gb  cdma.o [1]
+PresentMonth            0x2000338b     0x1  Data  Gb  cdma.o [1]
+PresentSec              0x2000338a     0x1  Data  Gb  cdma.o [1]
+PrintLogo               0x0801b4ff   0x11a  Code  Gb  btest.o [1]
+PrintStar               0x0801b619     0x6  Code  Gb  btest.o [1]
+PromptOut               0x0801b61f     0x4  Code  Gb  btest.o [1]
+ProtocolCheck           0x0801ccd3   0x344  Code  Gb  DDR_WRCS.o [1]
+ProtocolComCheck        0x0801d14f   0x19e  Code  Gb  DDR_WRCS.o [1]
+PwrAlarm                0x20003190    0x38  Data  Gb  Alarm.o [1]
+PwrAlarmChange          0x20003200    0x38  Data  Gb  Alarm.o [1]
+PwrAlarmCnt             0x20003270    0x38  Data  Gb  Alarm.o [1]
+PwrAlarmFlag            0x200034bc     0x1  Data  Gb  cdma.o [1]
+PwrAlarmPre             0x200031c8    0x38  Data  Gb  Alarm.o [1]
+PwrAlarmTimer           0x20003238    0x38  Data  Gb  Alarm.o [1]
+PwrTableLocation        0x08019ebd    0x98  Code  Gb  DE_Table.o [1]
+PwrTableOffset          0x0800d749    0x5e  Code  Gb  ALC.o [1]
+RCC_WaitForHSEStartUp   0x08022385    0x26  Code  Gb  stm32f10x_rcc.o [6]
+RPcsksio                0x20002978   0x818  Data  Gb  DDR_WRCS.o [1]
+ReadAdcValue            0x0800c16d   0x80c  Code  Gb  ALC.o [1]
+ReadAdcValue_TRIO       0x0800c995   0xdb4  Code  Gb  ALC.o [1]
+ReadEnvTempTable        0x0801f7f1    0x2c  Code  Gb  adcFunc.o [1]
+ReadPwrTableDnr         0x0800d7b5    0x6e  Code  Gb  ALC.o [1]
+ReadpPCA9555SDA         0x08020723    0x12  Code  Gb  PCA9555.o [1]
+RedLEDFlag_2G           0x20009afc     0x1  Data  Gb  expio.o [1]
+RedLEDFlag_3G           0x20009b00     0x1  Data  Gb  expio.o [1]
+RedLEDFlag_LTE          0x20009afd     0x1  Data  Gb  expio.o [1]
+RedLEDFlag_LTE_1        0x20009b01     0x1  Data  Gb  expio.o [1]
+RedLEDFlag_LTE_A1       0x20009afe     0x1  Data  Gb  expio.o [1]
+RedLEDFlag_LTE_A1_1     0x20009b02     0x1  Data  Gb  expio.o [1]
+RedLEDFlag_LTE_A2       0x20009aff     0x1  Data  Gb  expio.o [1]
+RedLEDFlag_LTE_A2_1     0x20009b03     0x1  Data  Gb  expio.o [1]
+RefFwdAmp1OnOff_LTE     0x20009b72     0x1  Data  Gb  expio.o [1]
+RefFwdAmp1OnOff_LTE_A1  0x20009b73     0x1  Data  Gb  expio.o [1]
+RefFwdAmp1OnOff_LTE_A2  0x20009b74     0x1  Data  Gb  expio.o [1]
+RefFwdAmpOnOff_2G       0x20009b6d     0x1  Data  Gb  expio.o [1]
+RefFwdAmpOnOff_3G       0x20009b71     0x1  Data  Gb  expio.o [1]
+RefFwdAmpOnOff_LTE      0x20009b6e     0x1  Data  Gb  expio.o [1]
+RefFwdAmpOnOff_LTE_A1   0x20009b6f     0x1  Data  Gb  expio.o [1]
+RefFwdAmpOnOff_LTE_A2   0x20009b70     0x1  Data  Gb  expio.o [1]
+Region$$Table$$Base     0x08022534           --   Gb  - Linker created -
+Region$$Table$$Limit    0x08022584           --   Gb  - Linker created -
+ResetCaseBackup         0x08019163     0x8  Code  Gb  Alarm.o [1]
+ResetPeriodSet          0x0800fda3    0x1e  Code  Gb  cdma.o [1]
+ResetStart              0x080131cb     0xa  Code  Gb  expio.o [1]
+Response_Table_DE       0x08019765   0x5a6  Code  Gb  DE_Table.o [1]
+RetNormaltoSMSData      0x0801930d     0xe  Code  Gb  Alarm.o [1]
+Rf_sts                  0x2000972c    0x44  Data  Gb  cdma.o [1]
+RmtCode_Image           0x20001d58     0x4  Data  Gb  DDR_WRCS.o [1]
+RoadBackuptobuffer      0x080202a9    0x14  Code  Gb  extdevlib.o [7]
+RstPllClkA              0x0801ff31     0x4  Code  Gb  adf411x.o [1]
+RstPllDataA             0x0801ff41     0xc  Code  Gb  adf411x.o [1]
+RstPllEnA               0x0801ff59     0x2  Code  Gb  adf411x.o [1]
+RstPllEnB               0x0801ff71     0xc  Code  Gb  adf411x.o [1]
+RstPllEnC               0x0801ff89     0xe  Code  Gb  adf411x.o [1]
+RstpPCA9555SCL          0x08020719     0xa  Code  Gb  PCA9555.o [1]
+RstpPCA9555SDA          0x080206ff     0x8  Code  Gb  PCA9555.o [1]
+Rtcpsms                 0x20004d28   0x818  Data  Gb  cdma.o [1]
+RvsOtherOverInAlarmCnt  0x20009a72     0x1  Data  Gb  Alarm.o [1]
+RvsOutPwrTemp_LTE_A1    0x08022614    0x18  Data  Gb  DE_Table.o [1]
+RvsOutPwrTemp_LTE_A2    0x08022644    0x18  Data  Gb  DE_Table.o [1]
+RvsOverInAlarmCnt       0x20009a71     0x1  Data  Gb  Alarm.o [1]
+Rwrcssms                0x20003d04   0x80c  Data  Gb  cdma.o [1]
+Rx1Buff                 0x20000434   0x800  Data  Gb  usart1_v0.1.o [7]
+Rx1RdCnt                0x20000400     0x2  Data  Gb  usart1_v0.1.o [7]
+Rx1WrCnt                0x20000402     0x2  Data  Gb  usart1_v0.1.o [7]
+Rx4Buff                 0x20001434   0x400  Data  Gb  usart4_v0.1.o [7]
+Rx4RdCnt                0x20001d34     0x2  Data  Gb  usart4_v0.1.o [7]
+Rx4WrCnt                0x20001d36     0x2  Data  Gb  usart4_v0.1.o [7]
+RxBcMData               0x200080a0   0x404  Data  Gb  bell860s_v0112.o [1]
+RxCdmaData              0x20006688   0x404  Data  Gb  bell860s_v0112.o [1]
+RxTxAlarmFlag           0x20009722     0x1  Data  Gb  cdma.o [1]
+RxTxAlarmNew            0x20009721     0x1  Data  Gb  cdma.o [1]
+RxTxAlarmOld            0x20009723     0x1  Data  Gb  cdma.o [1]
+SET_ULAlarmCnt          0x20009b67     0x1  Data  Gb  cdma.o [1]
+SPcsksio                0x20002160   0x818  Data  Gb  DDR_WRCS.o [1]
+SVC_Handler             0x08022863          Code  Wk  vector_table_M.o [4]
+SaveBackupData          0x0800bab5   0x3aa  Code  Gb  de_protocol.o [1]
+Sd_Cnt                  0x2000989c    0x18  Data  Gb  ALC.o [1]
+Sd_Path                 0x200098b4     0x8  Data  Gb  ALC.o [1]
+Sd_Step                 0x20009884    0x18  Data  Gb  ALC.o [1]
+SelectSort_1            0x0801f693   0x10c  Code  Gb  adcFunc.o [1]
+Ser1TaskStk             0x20001d60   0x400  Data  Gb  DDR_WRCS.o [1]
+Ser4Ptr                 0x20009b30     0x4  Data  Gb  main.o [1]
+SerPtr                  0x20009b2c     0x4  Data  Gb  main.o [1]
+SetAcRecovery           0x20009b6c     0x1  Data  Gb  expio.o [1]
+SetCtrlData             0x08008e1d  0x2420  Code  Gb  de_protocol.o [1]
+SetPllClkA              0x0801ff2d     0x4  Code  Gb  adf411x.o [1]
+SetPllDataA             0x0801ff35     0xc  Code  Gb  adf411x.o [1]
+SetPllEnA               0x0801ff4d     0x2  Code  Gb  adf411x.o [1]
+SetPllEnB               0x0801ff65     0xc  Code  Gb  adf411x.o [1]
+SetPllEnC               0x0801ff7d     0xc  Code  Gb  adf411x.o [1]
+SetSMS_PWR              0x200098fb     0x1  Data  Gb  expio.o [1]
+SetpPCA9555SCL          0x0802070f     0xa  Code  Gb  PCA9555.o [1]
+SetpPCA9555SDA          0x080206f5     0xa  Code  Gb  PCA9555.o [1]
+SetpPCA9555SDAInMode    0x080206d5    0x10  Code  Gb  PCA9555.o [1]
+SetpPCA9555SDAOutMode   0x080206e5    0x10  Code  Gb  PCA9555.o [1]
+ShutDownCheck           0x080132e1   0x14c  Code  Gb  expio.o [1]
+ShutdownFunc            0x0800f4b1   0x744  Code  Gb  ALC.o [1]
+Sms1_Protocol_Check     0x08010377    0xf4  Code  Gb  cdma.o [1]
+SmsAlarm                0x08010273    0x7c  Code  Gb  cdma.o [1]
+SmsAlarmRptFunc         0x080124d7    0x9a  Code  Gb  cdma.o [1]
+SmsAutoReportCheck      0x080102ef    0x88  Code  Gb  cdma.o [1]
+SmsComCheck             0x0801047d   0x10e  Code  Gb  cdma.o [1]
+SmsDataAckTx            0x080106c9    0xa2  Code  Gb  cdma.o [1]
+SmsDnrAlarm_Check       0x0801919d    0x1e  Code  Gb  Alarm.o [1]
+SmsEtcTransmitData      0x08012341    0x2a  Code  Gb  cdma.o [1]
+SmsInit                 0x0800fd35    0x6e  Code  Gb  cdma.o [1]
+SmsResetPeriodFlag      0x20009b0d     0x1  Data  Gb  cdma.o [1]
+SmsSer                  0x20003398     0x4  Data  Gb  cdma.o [1]
+SmsSerB                 0x200034c0    0x34  Data  Gb  cdma.o [1]
+SmsStsTransmitData      0x0801058b    0x78  Code  Gb  cdma.o [1]
+SmsTxFailFlag           0x2000338e     0x1  Data  Gb  cdma.o [1]
+Sms_DataAckTx           0x0801076b   0x1ce  Code  Gb  cdma.o [1]
+Sms_Response_Control    0x08010603    0xba  Code  Gb  cdma.o [1]
+SpecFreqStateUpdate     0x080113f5   0x378  Code  Gb  cdma.o [1]
+SpecFreqState_RspFunc   0x08010f63   0x44c  Code  Gb  cdma.o [1]
+StartpPCA9555           0x08020685    0x16  Code  Gb  PCA9555.o [1]
+StatustoIO              0x08014459   0x690  Code  Gb  expio.o [1]
+Stcpsms                 0x20004510   0x818  Data  Gb  cdma.o [1]
+StoppPCA9555            0x0802069b    0x18  Code  Gb  PCA9555.o [1]
+Svr0_ReadPwrTable       0x0800da43   0x10a  Code  Gb  ALC.o [1]
+Svr1_ReadPwrTable       0x0800db4d   0x10a  Code  Gb  ALC.o [1]
+SvrAttnTblAlarm         0x2000994c    0x1c  Data  Gb  Alarm.o [1]
+SwHistroyRspFunc        0x08010dc1    0x86  Code  Gb  cdma.o [1]
+SwapData                0x0801f689     0xa  Code  Gb  adcFunc.o [1]
+Swcrc16                 0x20001d44     0x2  Data  Gb  DDR_WRCS.o [1]
+Swrcssms                0x200034f8   0x80c  Data  Gb  cdma.o [1]
+SysTick_Handler         0x08022863          Code  Wk  vector_table_M.o [4]
+TCPComCheck             0x08011b37    0x36  Code  Gb  cdma.o [1]
+TCPProDataAckTx         0x08011b75   0x156  Code  Gb  cdma.o [1]
+TCPProtocolCheck        0x080119ed   0x138  Code  Gb  cdma.o [1]
+TRIO_AlarmCheck         0x0800f127   0x37c  Code  Gb  ALC.o [1]
+TRIO_MM_FwdAttn1_2G     0x0801d368    0x40  Data  Gb  DE_Table.o [1]
+TRIO_MM_FwdAttn1_CDMALTE
+                        0x0801d5a8    0x40  Data  Gb  DE_Table.o [1]
+TRIO_MM_FwdAttn1_LTE    0x0801d468    0x40  Data  Gb  DE_Table.o [1]
+TRIO_MM_FwdAttn1_LTE_1  0x0801d8a8    0x40  Data  Gb  DE_Table.o [1]
+TRIO_MM_FwdAttn1_LTE_A1_1
+                        0x0801da28    0x40  Data  Gb  DE_Table.o [1]
+TRIO_MM_FwdAttn1_LTE_A2
+                        0x0801d6a8    0x40  Data  Gb  DE_Table.o [1]
+TRIO_MM_FwdAttn1_LTE_A2_1
+                        0x0801db68    0x40  Data  Gb  DE_Table.o [1]
+TRIO_MM_FwdAttn1_WCDMA  0x0801d7e8    0x40  Data  Gb  DE_Table.o [1]
+TRIO_MM_FwdAttn2_2G     0x0801d3a8    0x40  Data  Gb  DE_Table.o [1]
+TRIO_MM_FwdAttn2_LTE    0x0801d4a8    0x40  Data  Gb  DE_Table.o [1]
+TRIO_MM_FwdAttn2_LTE_1  0x0801d8e8    0x40  Data  Gb  DE_Table.o [1]
+TRIO_MM_FwdAttn2_LTE_A1
+                        0x0801d628    0x40  Data  Gb  DE_Table.o [1]
+TRIO_MM_FwdAttn2_LTE_A1_1
+                        0x0801da68    0x40  Data  Gb  DE_Table.o [1]
+TRIO_MM_FwdAttn2_LTE_A2
+                        0x0801d6e8    0x40  Data  Gb  DE_Table.o [1]
+TRIO_MM_FwdAttn2_LTE_A2_1
+                        0x0801dba8    0x40  Data  Gb  DE_Table.o [1]
+TRIO_MM_FwdAttn2_WCDMA  0x0801d828    0x40  Data  Gb  DE_Table.o [1]
+TRIO_MM_FwdTempAtt_CDMA
+                        0x080208e8    0x18  Data  Gb  DE_Table.o [1]
+TRIO_MM_FwdTempAtt_LTE  0x08020918    0x18  Data  Gb  DE_Table.o [1]
+TRIO_MM_FwdTempAtt_LTE_1
+                        0x080209d8    0x18  Data  Gb  DE_Table.o [1]
+TRIO_MM_FwdTempAtt_LTE_A1
+                        0x08020948    0x18  Data  Gb  DE_Table.o [1]
+TRIO_MM_FwdTempAtt_LTE_A1_1
+                        0x08020a08    0x18  Data  Gb  DE_Table.o [1]
+TRIO_MM_FwdTempAtt_LTE_A2
+                        0x08020978    0x18  Data  Gb  DE_Table.o [1]
+TRIO_MM_FwdTempAtt_LTE_A2_1
+                        0x08020a38    0x18  Data  Gb  DE_Table.o [1]
+TRIO_MM_FwdTempAtt_WCDMA
+                        0x080209a8    0x18  Data  Gb  DE_Table.o [1]
+TRIO_MM_RvsAttn1_2G     0x0801d3e8    0x40  Data  Gb  DE_Table.o [1]
+TRIO_MM_RvsAttn1_CDMALTE
+                        0x0801d5e8    0x40  Data  Gb  DE_Table.o [1]
+TRIO_MM_RvsAttn1_LTE    0x0801d4e8    0x40  Data  Gb  DE_Table.o [1]
+TRIO_MM_RvsAttn1_LTE_1  0x0801d928    0x40  Data  Gb  DE_Table.o [1]
+TRIO_MM_RvsAttn1_LTE_A1
+                        0x0801d668    0x40  Data  Gb  DE_Table.o [1]
+TRIO_MM_RvsAttn1_LTE_A1_1
+                        0x0801daa8    0x40  Data  Gb  DE_Table.o [1]
+TRIO_MM_RvsAttn1_LTE_A2
+                        0x0801d728    0x40  Data  Gb  DE_Table.o [1]
+TRIO_MM_RvsAttn1_LTE_A2_1
+                        0x0801dbe8    0x40  Data  Gb  DE_Table.o [1]
+TRIO_MM_RvsAttn2_2G     0x0801d428    0x40  Data  Gb  DE_Table.o [1]
+TRIO_MM_RvsAttn2_LTE    0x0801d528    0x40  Data  Gb  DE_Table.o [1]
+TRIO_MM_RvsAttn2_LTE_1  0x0801d968    0x40  Data  Gb  DE_Table.o [1]
+TRIO_MM_RvsAttn2_LTE_A1_1
+                        0x0801dae8    0x40  Data  Gb  DE_Table.o [1]
+TRIO_MM_RvsAttn2_LTE_A2
+                        0x0801d768    0x40  Data  Gb  DE_Table.o [1]
+TRIO_MM_RvsAttn3_LTE    0x0801d568    0x40  Data  Gb  DE_Table.o [1]
+TRIO_MM_RvsAttn3_LTE_1  0x0801d9a8    0x40  Data  Gb  DE_Table.o [1]
+TRIO_MM_RvsAttn3_LTE_A1_1
+                        0x0801db28    0x40  Data  Gb  DE_Table.o [1]
+TRIO_MM_RvsAttn3_LTE_A2
+                        0x0801d7a8    0x40  Data  Gb  DE_Table.o [1]
+TRIO_MM_RvsAttn4_LTE_1  0x0801d9e8    0x40  Data  Gb  DE_Table.o [1]
+TRIO_MM_RvsAttn4_WCDMA  0x0801d868    0x40  Data  Gb  DE_Table.o [1]
+TRIO_MM_RvsTempAtt_CDMA
+                        0x08020900    0x18  Data  Gb  DE_Table.o [1]
+TRIO_MM_RvsTempAtt_LTE  0x08020930    0x18  Data  Gb  DE_Table.o [1]
+TRIO_MM_RvsTempAtt_LTE_1
+                        0x080209f0    0x18  Data  Gb  DE_Table.o [1]
+TRIO_MM_RvsTempAtt_LTE_A1
+                        0x08020960    0x18  Data  Gb  DE_Table.o [1]
+TRIO_MM_RvsTempAtt_LTE_A1_1
+                        0x08020a20    0x18  Data  Gb  DE_Table.o [1]
+TRIO_MM_RvsTempAtt_LTE_A2
+                        0x08020990    0x18  Data  Gb  DE_Table.o [1]
+TRIO_MM_RvsTempAtt_LTE_A2_1
+                        0x08020a50    0x18  Data  Gb  DE_Table.o [1]
+TRIO_MM_RvsTempAtt_WCDMA
+                        0x080209c0    0x18  Data  Gb  DE_Table.o [1]
+TRIO_M_FwdAttn1_2G      0x0801ea14    0x40  Data  Gb  DE_Table.o [1]
+TRIO_M_FwdAttn1_CDMALTE
+                        0x0801ec94    0x40  Data  Gb  DE_Table.o [1]
+TRIO_M_FwdAttn1_LTE     0x0801eb54    0x40  Data  Gb  DE_Table.o [1]
+TRIO_M_FwdAttn1_LTE_A   0x0801ee94    0x40  Data  Gb  DE_Table.o [1]
+TRIO_M_FwdAttn1_LTE_A1  0x0801ed14    0x40  Data  Gb  DE_Table.o [1]
+TRIO_M_FwdAttn1_LTE_A2  0x0801edd4    0x40  Data  Gb  DE_Table.o [1]
+TRIO_M_FwdAttn2_2G      0x0801ea54    0x40  Data  Gb  DE_Table.o [1]
+TRIO_M_FwdAttn2_LTE     0x0801eb94    0x40  Data  Gb  DE_Table.o [1]
+TRIO_M_FwdAttn2_LTE_A1  0x0801ed54    0x40  Data  Gb  DE_Table.o [1]
+TRIO_M_FwdTempAtt_LTE_A1
+                        0x08021a0c    0x18  Data  Gb  DE_Table.o [1]
+TRIO_M_FwdTempAtt_LTE_A2
+                        0x08021a3c    0x18  Data  Gb  DE_Table.o [1]
+TRIO_M_FwdTempAtt_WCDMA
+                        0x08021a6c    0x18  Data  Gb  DE_Table.o [1]
+TRIO_M_RvsAttn1_2G      0x0801ea94    0x40  Data  Gb  DE_Table.o [1]
+TRIO_M_RvsAttn1_CDMALTE
+                        0x0801ecd4    0x40  Data  Gb  DE_Table.o [1]
+TRIO_M_RvsAttn1_LTE     0x0801ebd4    0x40  Data  Gb  DE_Table.o [1]
+TRIO_M_RvsAttn1_LTE_A1  0x0801ed94    0x40  Data  Gb  DE_Table.o [1]
+TRIO_M_RvsAttn1_WCDMA   0x0801eed4    0x40  Data  Gb  DE_Table.o [1]
+TRIO_M_RvsAttn2_2G      0x0801ead4    0x40  Data  Gb  DE_Table.o [1]
+TRIO_M_RvsAttn2_LTE     0x0801ec14    0x40  Data  Gb  DE_Table.o [1]
+TRIO_M_RvsAttn2_LTE_A2  0x0801ee14    0x40  Data  Gb  DE_Table.o [1]
+TRIO_M_RvsAttn3_2G      0x0801eb14    0x40  Data  Gb  DE_Table.o [1]
+TRIO_M_RvsAttn3_LTE     0x0801ec54    0x40  Data  Gb  DE_Table.o [1]
+TRIO_M_RvsAttn3_LTE_A2  0x0801ee54    0x40  Data  Gb  DE_Table.o [1]
+TRIO_M_RvsTempAtt_LTE_A1
+                        0x08021a24    0x18  Data  Gb  DE_Table.o [1]
+TRIO_M_RvsTempAtt_LTE_A2
+                        0x08021a54    0x18  Data  Gb  DE_Table.o [1]
+TRIO_M_RvsTempAtt_WCDMA
+                        0x08021a84    0x18  Data  Gb  DE_Table.o [1]
+TableIndex              0x08019d15   0x112  Code  Gb  DE_Table.o [1]
+TableLocation           0x08019e27    0x96  Code  Gb  DE_Table.o [1]
+TcpDnLoadFlag           0x20009b0e     0x1  Data  Gb  cdma.o [1]
+TcpExit                 0x08010f49    0x1a  Code  Gb  cdma.o [1]
+TemptoIndex             0x0800dc65    0x18  Code  Gb  ALC.o [1]
+TestInit                0x0801aff1    0x10  Code  Gb  btest.o [1]
+TestStation             0x20009adc    0x10  Data  Gb  cdma.o [1]
+TestTask                0x0801b001    0x80  Code  Gb  btest.o [1]
+TestTaskStk             0x200084a4   0x400  Data  Lc  btest.o [1]
+TimeElapse              0x2000339c     0x4  Data  Gb  cdma.o [1]
+TimeOverCheck           0x080210b7    0x2a  Code  Gb  timer_v0.1.o [7]
+TimePeriodElased        0x20009b28     0x4  Data  Gb  Alarm.o [1]
+TimeReqCnt              0x200033c9     0x1  Data  Gb  bell860s_v0112.o [1]
+TimeStart               0x20003384     0x1  Data  Gb  cdma.o [1]
+TimerRegist             0x08021069    0x48  Code  Gb  timer_v0.1.o [7]
+TimerRelatedOperation   0x080151d5    0x1c  Code  Gb  expio.o [1]
+Tmr_TickISR_Handler     0x0802102d    0x24  Code  Gb  timer_v0.1.o [7]
+Tmr_TickInit            0x08020ff1    0x3c  Code  Gb  timer_v0.1.o [7]
+TotFrame                0x20001d42     0x2  Data  Gb  DDR_WRCS.o [1]
+TrafficCheck            0x080113af    0x32  Code  Gb  cdma.o [1]
+TwoOutPwrConv           0x0800c137     0x2  Code  Gb  ALC.o [1]
+TwoOutPwrConvINT        0x0800c139     0xa  Code  Gb  ALC.o [1]
+Tx1Buff                 0x20000c34   0x800  Data  Gb  usart1_v0.1.o [7]
+Tx1RdCnt                0x20000404     0x2  Data  Gb  usart1_v0.1.o [7]
+Tx1WrCnt                0x20000406     0x2  Data  Gb  usart1_v0.1.o [7]
+Tx4Buff                 0x20001834   0x400  Data  Gb  usart4_v0.1.o [7]
+Tx4RdCnt                0x20001d38     0x2  Data  Gb  usart4_v0.1.o [7]
+Tx4WrCnt                0x20001d3a     0x2  Data  Gb  usart4_v0.1.o [7]
+TxCdmaData              0x20006a8c   0x404  Data  Gb  bell860s_v0112.o [1]
+TypeCheck               0x080151f1    0x3a  Code  Gb  expio.o [1]
+ULTwoOutPwrConvINT      0x0800c157     0xc  Code  Gb  ALC.o [1]
+UPdateAlarm             0x080191f9    0x26  Code  Gb  Alarm.o [1]
+USART1BuffClear         0x0801f201     0x8  Code  Gb  usart1_v0.1.o [7]
+USART1CheckByte         0x0801f1c5    0x3a  Code  Gb  usart1_v0.1.o [7]
+USART1Printf            0x0801f0f9    0x5a  Code  Gb  usart1_v0.1.o [7]
+USART1PutChar           0x0801f0df    0x16  Code  Gb  usart1_v0.1.o [7]
+USART1PutStr            0x0801f153    0x46  Code  Gb  usart1_v0.1.o [7]
+USART1PutToBuffer       0x0801f0a9    0x36  Code  Gb  usart1_v0.1.o [7]
+USART1RxGetByte         0x0801f19d    0x24  Code  Gb  usart1_v0.1.o [7]
+USART1TxCheckByte       0x0801f219    0x12  Code  Gb  usart1_v0.1.o [7]
+USART1TxClear           0x0801f20f     0x6  Code  Gb  usart1_v0.1.o [7]
+USART1_IRQHandler       0x0801f02d    0x7c  Code  Gb  usart1_v0.1.o [7]
+USART4BuffClear         0x0801f515     0x8  Code  Gb  usart4_v0.1.o [7]
+USART4CheckByte         0x0801f4d9    0x3a  Code  Gb  usart4_v0.1.o [7]
+USART4Printf            0x0801f419    0x48  Code  Gb  usart4_v0.1.o [7]
+USART4PutChar           0x0801f3fd    0x16  Code  Gb  usart4_v0.1.o [7]
+USART4PutStr            0x0801f461    0x48  Code  Gb  usart4_v0.1.o [7]
+USART4PutToBuffer       0x0801f3c5    0x38  Code  Gb  usart4_v0.1.o [7]
+USART4RxGetByte         0x0801f4b1    0x24  Code  Gb  usart4_v0.1.o [7]
+USART4TxCheckByte       0x0801f52d    0x12  Code  Gb  usart4_v0.1.o [7]
+USART4TxClear           0x0801f523     0x6  Code  Gb  usart4_v0.1.o [7]
+USART4_IRQHandler       0x0801f349    0x7c  Code  Gb  usart4_v0.1.o [7]
+USART_Cmd               0x08021a9d    0x14  Code  Gb  stm32f10x_usart.o [6]
+USART_ITConfig          0x08021ab1    0x32  Code  Gb  stm32f10x_usart.o [6]
+UpLoadData              0x080201f1    0x64  Code  Gb  extdevlib.o [7]
+UsageFault_Handler      0x08022863          Code  Wk  vector_table_M.o [4]
+WRCSTask                0x0801cc9f    0x34  Code  Gb  DDR_WRCS.o [1]
+WRCS_DownLoadGiveupTimerChk
+                        0x0801c985    0x22  Code  Gb  DDR_WRCS.o [1]
+WRCS_DownLoadGiveupTimerSet
+                        0x0801c96d    0x18  Code  Gb  DDR_WRCS.o [1]
+WRCS_DownloadFunc       0x0801c9a9   0x20a  Code  Gb  DDR_WRCS.o [1]
+WRCS_ProDataAckTx       0x0801d0a7    0xa8  Code  Gb  DDR_WRCS.o [1]
+WRCS_ReceiveData        0x0801cbb3    0x70  Code  Gb  DDR_WRCS.o [1]
+WRCS_SerInit            0x0801cc23    0x7c  Code  Gb  DDR_WRCS.o [1]
+WThreePastHour          0x20003486     0x2  Data  Gb  cdma.o [1]
+WThreePastMin           0x20003488     0x2  Data  Gb  cdma.o [1]
+WThreePeriodStart       0x20003485     0x1  Data  Gb  cdma.o [1]
+WThreeTimeElapse        0x2000348c     0x4  Data  Gb  cdma.o [1]
+WThreeTimeStart         0x20003484     0x1  Data  Gb  cdma.o [1]
+WTwoPastHour            0x2000347a     0x2  Data  Gb  cdma.o [1]
+WTwoPastMin             0x2000347c     0x2  Data  Gb  cdma.o [1]
+WTwoPeriodStart         0x20003479     0x1  Data  Gb  cdma.o [1]
+WTwoTimeElapse          0x20003480     0x4  Data  Gb  cdma.o [1]
+WTwoTimeStart           0x20003478     0x1  Data  Gb  cdma.o [1]
+WaringMssageReturn      0x0801b49d    0x62  Code  Gb  btest.o [1]
+WatchdogClear           0x08021123     0x4  Code  Gb  timer_v0.1.o [7]
+WatchdogInit            0x080210ff    0x24  Code  Gb  timer_v0.1.o [7]
+WavThrAutoRptChk        0x08010b91    0xb4  Code  Gb  cdma.o [1]
+WavTwoAutoRptChk        0x08010ad5    0xb4  Code  Gb  cdma.o [1]
+WhatRxComm              0x0801d017    0x1e  Code  Gb  DDR_WRCS.o [1]
+WhatRxSms               0x0801046b    0x12  Code  Gb  cdma.o [1]
+WhatRxTCP               0x08011b25    0x12  Code  Gb  cdma.o [1]
+WhatTime                0x08010d0b    0xa0  Code  Gb  cdma.o [1]
+WriteBuffertoBackup     0x080202bd    0x8a  Code  Gb  extdevlib.o [7]
+Write_USART_BaudRate    0x08021ae5    0x48  Code  Gb  stm32f10x_usart.o [6]
+Write_pPCA9555_8Addr_16Data
+                        0x080205e1    0x70  Code  Gb  PCA9555.o [1]
+WritepPCA9555Data       0x08020651    0x34  Code  Gb  PCA9555.o [1]
+YellowLEDFlag_2G        0x20009b04     0x1  Data  Gb  expio.o [1]
+YellowLEDFlag_3G        0x20009b08     0x1  Data  Gb  expio.o [1]
+YellowLEDFlag_LTE       0x20009b05     0x1  Data  Gb  expio.o [1]
+YellowLEDFlag_LTE_1     0x20009b09     0x1  Data  Gb  expio.o [1]
+YellowLEDFlag_LTE_A1    0x20009b06     0x1  Data  Gb  expio.o [1]
+YellowLEDFlag_LTE_A1_1  0x20009b0a     0x1  Data  Gb  expio.o [1]
+YellowLEDFlag_LTE_A2    0x20009b07     0x1  Data  Gb  expio.o [1]
+YellowLEDFlag_LTE_A2_1  0x20009b0b     0x1  Data  Gb  expio.o [1]
+_GenldDefault           0x0801c6d1   0x24e  Code  Lc  xprintffull.o [3]
+_LdtobDefault           0x0801c2b9   0x412  Code  Lc  xprintffull.o [3]
+_LitobDefault           0x0801c1ab   0x10e  Code  Lc  xprintffull.o [3]
+_Printf                 0x0801bcc5   0x4e6  Code  Gb  xprintffull.o [3]
+_PutcharsDefault        0x0801c939    0x32  Code  Lc  xprintffull.o [3]
+_SProut                 0x08022813     0xa  Code  Gb  xsprout.o [3]
+__BASEPRICONFIG         0x08021c1b          Code  Gb  cortexm3_macro_v5.o [6]
+__DMB                   0x08021bcd          Code  Gb  cortexm3_macro_v5.o [6]
+__DSB                   0x08021bc7          Code  Gb  cortexm3_macro_v5.o [6]
+__GetBASEPRI            0x08021c21          Code  Gb  cortexm3_macro_v5.o [6]
+__ISB                   0x08021bc1          Code  Gb  cortexm3_macro_v5.o [6]
+__MRS_CONTROL           0x08021bd7          Code  Gb  cortexm3_macro_v5.o [6]
+__MRS_MSP               0x08021bf3          Code  Gb  cortexm3_macro_v5.o [6]
+__MRS_PSP               0x08021be7          Code  Gb  cortexm3_macro_v5.o [6]
+__MSR_CONTROL           0x08021bdd          Code  Gb  cortexm3_macro_v5.o [6]
+__MSR_MSP               0x08021bf9          Code  Gb  cortexm3_macro_v5.o [6]
+__MSR_PSP               0x08021bed          Code  Gb  cortexm3_macro_v5.o [6]
+__READ_FAULTMASK        0x08021c15          Code  Gb  cortexm3_macro_v5.o [6]
+__READ_PRIMASK          0x08021c07          Code  Gb  cortexm3_macro_v5.o [6]
+__RESETFAULTMASK        0x08021c0d          Code  Gb  cortexm3_macro_v5.o [6]
+__RESETPRIMASK          0x08021bff          Code  Gb  cortexm3_macro_v5.o [6]
+__REV_HalfWord          0x08021c27          Code  Gb  cortexm3_macro_v5.o [6]
+__REV_Word              0x08021c2b          Code  Gb  cortexm3_macro_v5.o [6]
+__SETFAULTMASK          0x08021c11          Code  Gb  cortexm3_macro_v5.o [6]
+__SETPRIMASK            0x08021c03          Code  Gb  cortexm3_macro_v5.o [6]
+__SEV                   0x08021bbd          Code  Gb  cortexm3_macro_v5.o [6]
+__SVC                   0x08021bd3          Code  Gb  cortexm3_macro_v5.o [6]
+__WFE                   0x08021bb9          Code  Gb  cortexm3_macro_v5.o [6]
+__WFI                   0x08021bb5          Code  Gb  cortexm3_macro_v5.o [6]
+__aeabi_cdcmple         0x08022325          Code  Gb  DblCmpLe.o [4]
+__aeabi_cdrcmple        0x08022355          Code  Gb  DblCmpGe.o [4]
+__aeabi_d2iz            0x08021e1d          Code  Gb  DblToI32.o [4]
+__aeabi_d2uiz           0x08021e49          Code  Gb  DblToI32.o [4]
+__aeabi_dadd            0x080215c1          Code  Gb  DblAdd.o [4]
+__aeabi_ddiv            0x0801faa1          Code  Gb  DblDiv.o [4]
+__aeabi_dmul            0x08020745          Code  Gb  DblMul.o [4]
+__aeabi_dsub            0x08020a69          Code  Gb  DblSub.o [4]
+__aeabi_i2d             0x080222f5          Code  Gb  I32ToDbl.o [4]
+__aeabi_ldiv0           0x08022859          Code  Gb  I64DivZer.o [4]
+__aeabi_ldivmod         0x0802125d          Code  Gb  I64DivMod.o [4]
+__aeabi_memclr          0x08022835          Code  Gb  ABImemclr.o [4]
+__aeabi_memclr4         0x0802283d          Code  Gb  ABImemclr4.o [4]
+__aeabi_memcpy          0x08021c31          Code  Gb  ABImemcpy.o [4]
+__aeabi_memcpy4         0x08021c4b          Code  Gb  ABImemcpy.o [4]
+__aeabi_memcpy8         0x08021c4b          Code  Gb  ABImemcpy.o [4]
+__aeabi_memset          0x08021ca1          Code  Gb  ABImemset.o [4]
+__aeabi_memset4         0x0802215d          Code  Gb  ABImemset48.o [4]
+__aeabi_memset8         0x0802215d          Code  Gb  ABImemset48.o [4]
+__aeabi_ui2d            0x08022309          Code  Gb  I32ToDbl.o [4]
+__aeabi_uldivmod        0x08021271          Code  Gb  I64DivMod.o [4]
+__cmain                 0x080226bd          Code  Gb  cmain.o [4]
+__exit                  0x08022715    0x14  Code  Gb  exit.o [5]
+__fswab16               0x080227fd          Code  Gb  swab.o [1]
+__iar_Dnorm             0x080216a7    0xc6  Code  Gb  xdnorm.o [3]
+__iar_Dscale            0x080214b9   0x108  Code  Gb  xdscale.o [3]
+__iar_Memchr            0x08021dc5          Code  Gb  memchr.o [4]
+__iar_Memset            0x08021ca1          Code  Gb  ABImemset.o [4]
+__iar_Memset4_word      0x08022165          Code  Gb  ABImemset48.o [4]
+__iar_Memset8_word      0x08022165          Code  Gb  ABImemset48.o [4]
+__iar_Memset_word       0x08021ca9          Code  Gb  ABImemset.o [4]
+__iar_Strchr            0x080226d5          Code  Gb  strchr.o [4]
+__iar_Strstr            0x080222c5    0x30  Code  Gb  strstr.o [3]
+__iar_close_ttio        0x08022295    0x2e  Code  Gb  iarttio.o [5]
+__iar_d2uiz             0x08021e53          Code  Gb  DblToI32.o [4]
+__iar_dadd              0x080215d3          Code  Gb  DblAdd.o [4]
+__iar_data_init3        0x080223b1    0x2c  Code  Gb  data_init3.o [4]
+__iar_dsub              0x08020a7b          Code  Gb  DblSub.o [4]
+__iar_dsubStart         0x08020a8d          Code  Gb  DblSub.o [4]
+__iar_lookup_ttioh      0x0802282d     0x8  Code  Gb  XShttio.o [3]
+__iar_packbits_init3    0x08021831    0xa8  Code  Gb  packbits_init3.o [4]
+__iar_program_start     0x080227f1          Code  Gb  cstartup_M.o [4]
+__iar_ttio_handles      0x20003498     0x8  Data  Lc  XShttio.o [3]
+__iar_ui2d              0x0802230b          Code  Gb  I32ToDbl.o [4]
+__iar_zero_init3        0x08022511    0x24  Code  Gb  zero_init3.o [4]
+__low_level_init        0x0802285b     0x4  Code  Gb  low_level_init.o [3]
+__vector_table          0x08007130          Data  Gb  vector_table_M.o [4]
+_call_main              0x080226c9          Code  Gb  cmain.o [4]
+_exit                   0x08022809          Code  Gb  cexit.o [4]
+_main                   0x080226cf          Code  Gb  cmain.o [4]
+_pPCA9555BitSet         0x0802058d          Code  Gb  PCA9555.o [1]
+atoh                    0x08022201    0x2e  Code  Gb  exlib.o [1]
+chkAlarmMaskReport      0x200034be     0x1  Data  Gb  cdma.o [1]
+chkDnrAlarmReport       0x20009b66     0x1  Data  Gb  cdma.o [1]
+chkLockOrder            0x20009b12     0x2  Data  Gb  cdma.o [1]
+chkReport               0x20009b68     0x1  Data  Gb  cdma.o [1]
+chkSleepMode            0x200032a8     0x8  Data  Gb  ALC.o [1]
+comtstcnt               0x20009b3c     0x4  Data  Gb  btest.o [1]
+convinfo                0x080221cc    0x34  Data  Gb  main.o [1]
+dBmTomW                 0x200032cc    0x48  Data  Gb  ALC.o [1]
+dUartPtr                0x200033fc     0x4  Data  Gb  bell860s_v0112.o [1]
+div                     0x080227c9     0xe  Code  Gb  div.o [3]
+downloadFlag            0x20001d54     0x4  Data  Gb  DDR_WRCS.o [1]
+dptr                    0x20009b18     0xc  Data  Gb  expio.o [1]
+dtoh                    0x08011d07    0x12  Code  Gb  cdma.o [1]
+eUartPtr                0x20003400     0x4  Data  Gb  bell860s_v0112.o [1]
+eepBuff                 0x20006e90   0x800  Data  Gb  extdevlib.o [7]
+exit                    0x08022849     0x6  Code  Gb  exit.o [3]
+iAGCAttnMAX             0x200032b2     0x1  Data  Gb  ALC.o [1]
+iAGCOnOff               0x200032b1     0x1  Data  Gb  ALC.o [1]
+iAGCPwr                 0x200032ca     0x2  Data  Gb  ALC.o [1]
+iAGClimit               0x200032c8     0x2  Data  Gb  ALC.o [1]
+iAdcIndex               0x20009b75     0x1  Data  Gb  main.o [1]
+iBand_Freq              0x20009930     0x4  Data  Gb  expio.o [1]
+iDebugCnt               0x20001d3d     0x1  Data  Gb  DDR_WRCS.o [1]
+iMasterPNH              0x20009727     0x1  Data  Gb  cdma.o [1]
+iMasterPNL              0x20009728     0x1  Data  Gb  cdma.o [1]
+iMobileESN              0x20009b54     0x2  Data  Gb  cdma.o [1]
+iPNVal_Old              0x20009710     0xc  Data  Gb  cdma.o [1]
+iPresentHourCnt         0x2000338f     0x1  Data  Gb  cdma.o [1]
+iPresentMinCnt          0x20003390     0x1  Data  Gb  cdma.o [1]
+iRepeaterType           0x20001d3f     0x1  Data  Gb  DDR_WRCS.o [1]
+iSMS_Debug_Mode         0x20003385     0x1  Data  Gb  cdma.o [1]
+iSecCnt                 0x20009b69     0x1  Data  Gb  cdma.o [1]
+iTxValH                 0x20009729     0x1  Data  Gb  cdma.o [1]
+iTxValL                 0x2000972a     0x1  Data  Gb  cdma.o [1]
+iUser_Value2            0x20001d3e     0x1  Data  Gb  DDR_WRCS.o [1]
+main                    0x080224ed    0x24  Code  Gb  stm32f10x_main.o [6]
+mainTask                0x0801e47d    0x26  Code  Gb  main.o [1]
+memchr                  0x08021dc5          Code  Gb  memchr.o [4]
+memcmp                  0x08021d09          Code  Gb  memcmp.o [4]
+pLoApll                 0x200034a8     0x4  Data  Gb  adf411x.o [1]
+pLoApllB                0x200099f8    0x24  Data  Gb  adf411x.o [1]
+pLoBpll                 0x200034ac     0x4  Data  Gb  adf411x.o [1]
+pLoBpllB                0x20009a1c    0x24  Data  Gb  adf411x.o [1]
+pLoCpll                 0x200034b0     0x4  Data  Gb  adf411x.o [1]
+pLoCpllB                0x20009a40    0x24  Data  Gb  adf411x.o [1]
+pPCA9555BitRst          0x08020579    0x14  Code  Gb  PCA9555.o [1]
+pPCA9555BitSet          0x08020577     0x2  Code  Gb  PCA9555.o [1]
+pPCA9555Port_Init       0x0801522b    0x38  Code  Gb  expio.o [1]
+pPCA9555Str             0x200034a4     0x4  Data  Gb  PCA9555.o [1]
+pPCA9555StrB            0x20009a80    0x18  Data  Gb  PCA9555.o [1]
+pPCASetConfiguration    0x080205b7     0xe  Code  Gb  PCA9555.o [1]
+pPCASetPortData         0x080205d1     0x6  Code  Gb  PCA9555.o [1]
+pUSART1                 0x20000408    0x2c  Data  Gb  usart1_v0.1.o [7]
+pUSART4                 0x2000344c    0x2c  Data  Gb  usart4_v0.1.o [7]
+rambackup               0x200034a0     0x4  Data  Gb  Alarm.o [1]
+returnmsgTest           0x0801b487    0x16  Code  Gb  btest.o [1]
+sentTel                 0x200033b4    0x10  Data  Gb  cdma.o [1]
+sms_buff                0x20009360   0x100  Data  Gb  cdma.o [1]
+sms_len                 0x20009b14     0x4  Data  Gb  cdma.o [1]
+sms_time                0x20003370    0x14  Data  Gb  cdma.o [1]
+sprintf                 0x08022265    0x30  Code  Gb  sprintf.o [3]
+strcat                  0x080225a5    0x1e  Code  Gb  strcat.o [3]
+strchr                  0x080226d5          Code  Gb  strchr.o [4]
+strlen                  0x08022195          Code  Gb  strlen.o [4]
+strncmp                 0x08022407    0x2a  Code  Gb  strncmp.o [3]
+t1SndData               0x20009160   0x200  Data  Gb  cdma.o [1]
+tAGC10_ATTENMAX_3G      0x200032b3     0x1  Data  Gb  ALC.o [1]
+tAGC_ATTENMAX_2G        0x200032b4     0x1  Data  Gb  ALC.o [1]
+tAGC_ATTENMAX_LTE       0x200032b5     0x1  Data  Gb  ALC.o [1]
+tAGC_ATTENMAX_LTE_1     0x20009b50     0x1  Data  Gb  ALC.o [1]
+tAGC_ATTENMAX_LTE_A1    0x200032b6     0x1  Data  Gb  ALC.o [1]
+tAGC_ATTENMAX_LTE_A2    0x200032b7     0x1  Data  Gb  ALC.o [1]
+tALC_ATTENMAX_2G        0x200032b8     0x1  Data  Gb  ALC.o [1]
+tAttAccu                0x20009b62     0x1  Data  Gb  Alarm.o [1]
+tDisplay                0x2000334c    0x24  Data  Gb  btest.o [1]
+tDnrSts                 0x20001d50     0x4  Data  Gb  DDR_WRCS.o [1]
+tDnrStsB                0x20007c8c   0x414  Data  Gb  DDR_WRCS.o [1]
+tIndex                  0x20009b64     0x1  Data  Gb  btest.o [1]
+tPeriod                 0x200033ac     0x4  Data  Gb  cdma.o [1]
+tRevData                0x2000340c    0x34  Data  Gb  btest.o [1]
+tTest                   0x20003440     0x4  Data  Gb  btest.o [1]
+tTestFlag               0x20009b65     0x1  Data  Gb  btest.o [1]
+tcp_buff                0x20008ca4   0x2bc  Data  Gb  cdma.o [1]
+tcp_port                0x200033b0     0x4  Data  Gb  cdma.o [1]
+tempIndexHys            0x200032b0     0x1  Data  Gb  ALC.o [1]
+testResult              0x20003444     0x8  Data  Gb  btest.o [1]
+tinputSts               0x20003318    0x34  Data  Gb  btest.o [1]
+tinputStsOld            0x2000999c    0x34  Data  Gb  btest.o [1]
+tmpRvs1ALCLvl_LTE       0x20009b52     0x1  Data  Gb  ALC.o [1]
+tmpRvs1ALCLvl_LTE_A1    0x20009b60     0x1  Data  Gb  ALC.o [1]
+tmpRvs1ALCLvl_LTE_A2    0x20009b61     0x1  Data  Gb  ALC.o [1]
+tmpRvsALCLvl_2G         0x20009b5c     0x1  Data  Gb  ALC.o [1]
+tmpRvsALCLvl_3G         0x20003314     0x1  Data  Gb  ALC.o [1]
+tmpRvsALCLvl_LTE        0x20009b5d     0x1  Data  Gb  ALC.o [1]
+tmpRvsALCLvl_LTE_A1     0x20009b5e     0x1  Data  Gb  ALC.o [1]
+tmpRvsALCLvl_LTE_A2     0x20009b5f     0x1  Data  Gb  ALC.o [1]
+tmpRvsAttn1_2G          0x20003315     0x1  Data  Gb  ALC.o [1]
+vsprintf                0x08022459    0x28  Code  Gb  vsprintf.o [3]
+
+
+[1] = D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\sout
+[2] = command line
+[3] = dl7M_tl_in.a
+[4] = rt7M_tl.a
+[5] = shb_l.a
+[6] = stm32FxC_cpulib_gsi_20100114.a
+[7] = stm32FxC_lib_gsi_20100114.a
+
+  104 768 bytes of readonly  code memory
+    8 383 bytes of readonly  data memory
+   39 797 bytes of readwrite data memory
+
+Errors: none
+Warnings: none

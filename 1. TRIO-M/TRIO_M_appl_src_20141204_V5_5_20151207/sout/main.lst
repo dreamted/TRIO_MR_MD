@@ -1,0 +1,705 @@
+###############################################################################
+#                                                                             #
+#                                                       19/May/2017  23:29:53 #
+# IAR ANSI C/C++ Compiler V5.50.5.21995/W32 EVALUATION for ARM                #
+# Copyright (C) 1999-2010 IAR Systems AB.                                     #
+#                                                                             #
+#    Cpu mode     =  thumb                                                    #
+#    Endian       =  little                                                   #
+#    Source file  =  D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V5_5_ #
+#                    20151207\code\main.c                                     #
+#    Command line =  "D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V5_5 #
+#                    _20151207\code\main.c" -D _MIMO_Type -D __2rd -D         #
+#                    __PLLEnToggle -lcN "D:\Project\TRIO\1.                   #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\sout\" -o  #
+#                    "D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V5_5 #
+#                    _20151207\sout\" --endian=little --cpu=Cortex-M3 -e      #
+#                    --require_prototypes --warnings_are_errors --fpu=None    #
+#                    --dlib_config "D:\Program Files (x86)\IAR                #
+#                    Systems\Embedded Workbench 5.4                           #
+#                    Evaluation\arm\INC\DLib_Config_Normal.h" -I              #
+#                    "D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V5_5 #
+#                    _20151207\include\" -I "D:\Project\TRIO\1.               #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\lib_stm32\ #
+#                    inc\" -I "D:\Project\TRIO\1.                             #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\lib_stm32\ #
+#                    src\" -I "D:\Project\TRIO\1.                             #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\uC-CPU\"   #
+#                    -I "D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V #
+#                    5_5_20151207\uC-LIB\" -I "D:\Project\TRIO\1.             #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\uCOS-II\Po #
+#                    rts\" -I "D:\Project\TRIO\1.                             #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\uCOS-II\So #
+#                    urce\" -I "D:\Project\TRIO\1.                            #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\uC-Probe\" #
+#                     -I "D:\Program Files (x86)\IAR Systems\Embedded         #
+#                    Workbench 5.4 Evaluation\arm\INC\" -Oh                   #
+#    List file    =  D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V5_5_ #
+#                    20151207\sout\main.lst                                   #
+#    Object file  =  D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V5_5_ #
+#                    20151207\sout\main.o                                     #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\code\main.c
+      1          /*
+      2          *********************************************************************************************************
+      3          *                                              EXAMPLE CODE
+      4          *
+      5          *                          (c) Copyright 2003-2007; Micrium, Inc.; Weston, FL
+      6          *
+      7          *               All rights reserved.  Protected by international copyright laws.
+      8          *               Knowledge of the source code may NOT be used to develop a similar product.
+      9          *               Please help us continue to provide the Embedded community with the finest
+     10          *               software available.  Your honesty is greatly appreciated.
+     11          *********************************************************************************************************
+     12          */
+     13          #define MAIN_C
+     14          
+     15          #include "../include/main.h"
+     16          
+     17          /*******************************************************************************
+     18          * Function Name  : InitStm32f103
+     19          * Description    : Initializes the stm32_x application.
+     20          * Input          : None
+     21          * Output         : None
+     22          * Return         : None
+     23          *******************************************************************************/
+     24          
+     25          void InitStm32f103(void)
+     26          {
+     27          	NVIC_DeInit();
+     28          	InitRCC();
+     29          	InitAFIO();
+     30          	InitGPIO();
+     31          	#ifdef __FSMC_SRAM_H
+     32          		FSMC_SRAM_Init();
+     33          	#endif
+     34          	// Set the Vector Table base location at 0x08000000
+     35          	Tmr_TickInit(1L);	// timer init!!(1: 1ms)
+     36          }
+     37          
+     38          /*******************************************************************************
+     39          * Function Name  : InitRCC
+     40          * Description    : Initializes the stm32_x rcc application.
+     41          * Input          : None
+     42          * Output         : None
+     43          * Return         : None
+     44          *******************************************************************************/
+     45          
+     46          void InitRCC(void)
+     47          {
+     48          	INT16U tmpcnt = 0xffff;
+     49          	// SYSCLK, HCLK, PCLK2 and PCLK1 configuration
+     50          	// RCC system reset(for debug purpose)
+     51          	// RCC_DeInit();
+     52          	// Enable HSE, Wait till HSE is ready
+     53          
+     54          	RCC->CFGR.Data = 0;
+     55          
+     56          #ifdef HSE_USED
+     57          	if(RCC_WaitForHSEStartUp(1))
+     58          #else 
+     59          	if(RCC_WaitForHSEStartUp(0))
+     60          #endif
+     61          	{
+     62          		u32 tmpreg;
+     63          
+     64          		// SYSTEM BUS CLOCK SELECTION
+     65          		RCC->CFGR.HPRE = __SYSCLK1;
+     66          		RCC->CFGR.PPRE2 = __HCLK1;
+     67          		RCC->CFGR.PPRE1 = __HCLK1;
+     68          
+     69          		RCC->CFGR.ADCPRE = __PCLK22;	// ADCCLK = PCLK2/2 --> 36/2: 18MHz
+     70          
+     71          		// Flash 1 wait state
+     72          #if   (SYSCLK	>= (48000000L))
+     73          		FLASH->ACR.Bit.LATENCY = LATENCY2;
+     74          #elif (SYSCLK	>= (24000000L))
+     75          		FLASH->ACR.Bit.LATENCY = LATENCY1;
+     76          #else
+     77          		FLASH->ACR.Bit.LATENCY = LATENCY0;
+     78          #endif
+     79          		FLASH->ACR.Bit.PRFTBE = ENABLE;
+     80          
+     81          		RCC->CR.PLLON = DISABLE; // Enable PLL
+     82          		// CLOCK SOURCE SELECTION
+     83          		// PLLCLK = 8MHZ * 9 = 72 MHz
+     84          		RCC->CFGR.PLLMUL = __PLLMUL9;
+     85          		RCC->CFGR.PLLSRC = __HSESRC;
+     86          		RCC->CFGR.PLLXTPRE = __HSESRC2; // HSE CLK(8Mhz)/2 = 4 MHZ
+     87          
+     88          		RCC->CR.PLLON = ENABLE; // Enable PLL
+     89          
+     90          		tmpcnt = 0xffff;
+     91          		
+     92          		// Wait till PLL is ready
+     93          		do {
+     94          			tmpreg = RCC->CR.PLLRDY;
+     95          		}
+     96          		while(!tmpreg && tmpcnt--);
+     97          		
+     98          		RCC->CFGR.SW = __SW_PLL; // Select PLL as system clock source
+     99          		// Wait till PLL is used as system clock source
+    100          		tmpcnt = 0xffff;
+    101          
+    102          		do {
+    103          			tmpreg = RCC->CFGR.SWS;
+    104          		}
+    105          		while(tmpreg != __SW_PLL && tmpcnt--);
+    106          
+    107          	}
+    108          	else
+    109          	{
+    110          		/* Add here some code to deal with this error */
+    111          		u32 tmpreg;
+    112          
+    113          		RCC->CFGR.HPRE = __SYSCLK1;
+    114          		RCC->CFGR.PPRE2 = __HCLK1;
+    115          		RCC->CFGR.PPRE1 = __HCLK1;
+    116          
+    117          		RCC->CFGR.ADCPRE = __PCLK22;	// ADCCLK = PCLK2/2 --> 36/2: 18MHz
+    118          
+    119          		// Flash 1 wait state
+    120          #if	  (SYSCLK	>= (48000000L))
+    121          		FLASH->ACR.Bit.LATENCY = LATENCY2;
+    122          #elif (SYSCLK	>= (24000000L))
+    123          		FLASH->ACR.Bit.LATENCY = LATENCY1;
+    124          #else
+    125          		FLASH->ACR.Bit.LATENCY = LATENCY0;
+    126          #endif
+    127          		FLASH->ACR.Bit.PRFTBE = ENABLE;
+    128          		
+    129          		// CLOCK SOURCE SELECTION
+    130          		// CASE 101: PLLCLK = 8MHZ * 4 = 32 MHz
+    131          		////////////////////////////////////////////////////////////////////////
+    132          		// 
+    133          		RCC->CR.PLLON = DISABLE; // Enable PLL
+    134          		
+    135          #if	  (SYSCLK	>  8000000L)
+    136          		RCC->CFGR.PLLMUL = ((SYSCLK/4000000L) - 2);
+    137          
+    138          		RCC->CR.PLLON = ENABLE; // Enable PLL
+    139          
+    140          		// Wait till PLL is ready
+    141          		do {
+    142          			tmpreg = RCC->CR.PLLRDY;
+    143          		}
+    144          		while(!tmpreg);
+    145          
+    146          		RCC->CFGR.SW = __SW_PLL; // Select PLL as system clock source
+    147          		// Wait till PLL is used as system clock source
+    148          		do {
+    149          			tmpreg = RCC->CFGR.SWS;
+    150          		}
+    151          		while(tmpreg != __SW_PLL);
+    152          #else
+    153          		RCC->CFGR.SW = __SW_HSI; // Select PLL as system clock source
+    154          		// Wait till PLL is used as system clock source
+    155          		do {
+    156          			tmpreg = RCC->CFGR.SWS;
+    157          		}
+    158          		while(tmpreg != __SW_HSI);
+    159          
+    160          #if	  (SYSCLK	>  4000000L)
+    161          			RCC->CFGR.HPRE = __SYSCLK1;
+    162          #else
+    163          			RCC->CFGR.HPRE = __SYSCLK2;
+    164          #endif
+    165          #endif
+    166          	}
+    167          }
+    168          
+    169          
+    170          /*******************************************************************************
+    171          * Function Name  : InitRCC
+    172          * Description    : Initializes the stm32_x afio application.
+    173          * Input          : None
+    174          * Output         : None
+    175          * Return         : None
+    176          *******************************************************************************/
+    177          void InitAFIO(void)
+    178          {
+    179          	// APB2 BUS RELATED
+    180          	// EXTI_WAKEUP, GPIOA, GPIOB, GPIOC, GPIOD, GPIOE, GPIOF, GPIOE
+    181          	// TIM1, SPI1, TIM8, USART1, ADC1,2,3
+    182          	RCC->APB2ENR.Data |= ( __IOPAEN | __IOPBEN | __IOPCEN | __IOPDEN | __IOPEEN |
+    183          						  __AFIOEN | __ADC1EN | __TIM1EN | __SPI1EN
+    184          						);
+    185          	// APB1 BUS RELATED
+    186          	// PWREN, BKPEN
+    187          	// TIM2, TIM3, TIM4, TIM5, TIM6, TIM7, 
+    188          	// USART2, USART3, SPI2
+    189          	// I2C1, I2C2, bxCAN, USB20, SRAM512B, WWDB
+    190          	RCC->APB1ENR.Data |= (__USART3EN);
+    191          
+    192          	// RELATED PORT
+    193          	// 1. PB4/JNTRST
+    194          	// 2. PB3/JTDO/TRACESWO
+    195          	// 3. PA15/JTCK/SWCLK
+    196          	// 4. PA13/JTMS/SWDIO
+    197          
+    198          	AFIO->MAPR.SWJ_CFG = __SWJ_RMAP_DISABLE;
+    199          	AFIO->MAPR.PD01_REMAP = 1;
+    200          	
+    201          }
+    202          
+    203          /*******************************************************************************
+    204          * Function Name  : InitGPIO
+    205          * Description    : Initializes the stm32_x gpio application.
+    206          * Input          : None
+    207          * Output         : None
+    208          * Return         : None
+    209          *******************************************************************************/
+    210          
+    211          void InitGPIO(void)
+    212          {
+    213          
+    214          ////////////////////////////////////////////////////////////////////////////////////
+    215          //Port A Initiallization
+    216          	GPIOA->CNF.B0 = __ADC_IN0;
+    217          #ifdef __2rd
+    218          	GPIOA->CNF.B1 = __PA1_OUT_PP;		// DIP SW ID1
+    219          	GPIOA->ODR.B1 = SET;				// PULL-UP	
+    220          #else
+    221          	GPIOA->CNF.B1 = __ADC_IN1;
+    222          #endif
+    223          	GPIOA->CNF.B2 = __ADC_IN2; 
+    224          	GPIOA->CNF.B3 = __ADC_IN3; 
+    225          	
+    226          #ifdef __2rd
+    227          	GPIOA->CNF.B4 = __PA4_IN_PU;
+    228          	GPIOA->ODR.B4 = SET;				// PULL-UP	
+    229          #else
+    230          	GPIOA->CNF.B4 = __ADC_IN4;
+    231          #endif
+    232          	GPIOA->CNF.B5 = __ADC_IN5; 
+    233          	GPIOA->CNF.B6 = __ADC_IN6;
+    234          	GPIOA->CNF.B7 = __ADC_IN7;
+    235          
+    236          
+    237          	GPIOA->CNF.B8 = __PA8_IN_PU;
+    238          	GPIOA->ODR.B8 = SET;				// PULL-UP	
+    239          
+    240          	GPIOA->CNF.B9 = __USART1_TX;
+    241          	GPIOA->CNF.B10 = __USART1_RX;
+    242          
+    243          
+    244          	GPIOA->CNF.B11 = __PA11_OU_PP;
+    245          	GPIOA->ODR.B11 = SET;				// PULL-UP	
+    246          
+    247          	GPIOA->CNF.B12 = __PA12_IN_PU;
+    248          	GPIOA->ODR.B12 = SET;				// PULL-UP	
+    249          
+    250          	GPIOA->CNF.B13 = __PA13_OU_PP;		// DIP SW ID1
+    251          	GPIOA->ODR.B13 = SET;				// PULL-UP	
+    252          
+    253          	GPIOA->CNF.B14 = __PA14_OU_PP;		// DIP SW ID2
+    254          	GPIOA->ODR.B14 = SET;				// PULL-UP
+    255          
+    256          	GPIOA->CNF.B15 = __PA15_IN_PU;		// DIP SW ID0
+    257          	GPIOA->ODR.B15 = SET;				// PULL-UP
+    258          
+    259          	//Port A Initialization End
+    260          	//Port B Initialization
+    261          	/////////////////////////
+    262          	GPIOB->CNF.B0 = __ADC_IN8;
+    263          	GPIOB->CNF.B1 = __ADC_IN9; 
+    264          
+    265          	GPIOB->CNF.B2 = __PB2_OU_PP;
+    266          
+    267          	GPIOB->CNF.B3 = __PB3_IN_PU;
+    268          	GPIOB->ODR.B3 = SET;				// PULL_UP
+    269          
+    270          	GPIOB->CNF.B4 = __PB4_OU_PP;
+    271          
+    272          	GPIOB->CNF.B5 = __PB5_OU_PP;
+    273          	GPIOB->ODR.B5 = SET;				// PULL_UP
+    274          
+    275          
+    276          	GPIOB->CNF.B6 = __PB6_OU_PP;
+    277          	GPIOB->ODR.B6 = SET;				// PULL_UP
+    278          //////////////////////////////////////////////////
+    279          
+    280          
+    281          
+    282          /////////////////////////////////////////////////////////////////////////////////////
+    283          #ifndef __FSMC_SRAM_H
+    284          	GPIOB->CNF.B7 = __PB7_IN_FL;		// __NADV
+    285          
+    286          
+    287          #else
+    288          	GPIOB->CNF.B7 = __PB8_OU_PP;
+    289          	GPIOB->ODR.B7 = SET;				// PULL_UP
+    290          
+    291          #endif
+    292          
+    293          //	GPIOB->CNF.B8 = __PB8_IN_PU;
+    294          //	GPIOB->ODR.B8 = SET;				// PULL_UP
+    295          	
+    296          	GPIOB->CNF.B9 = __PB9_OU_PP;
+    297          	GPIOB->ODR.B9 = SET;				// PULL_UP
+    298          
+    299          	GPIOB->CNF.B10 = __USART3_TX;
+    300          	GPIOB->ODR.B10 = SET;				// PULL_UP
+    301          
+    302          	GPIOB->CNF.B11 = __USART3_RX;
+    303          
+    304          	GPIOB->CNF.B12 = __PB12_IN_PU;
+    305          	GPIOB->ODR.B12 = SET;
+    306          	// PULL_UP
+    307          //	GPIOB->CNF.B13 = __PB13_IN_PU;
+    308          //	GPIOB->ODR.B13 = SET;				// PULL_UP
+    309          
+    310          	GPIOB->CNF.B8 = __PB8_OU_PP;
+    311          	GPIOB->ODR.B8 = SET;				// PULL_UP
+    312          
+    313          
+    314          	GPIOB->CNF.B13 = __PB13_OU_PP;
+    315          	GPIOB->ODR.B13 = SET;				// PULL_UP
+    316          	
+    317          	GPIOB->CNF.B14 = __PB14_IN_PU;
+    318          	GPIOB->ODR.B14 = SET;				// PULL_UP
+    319          
+    320          	GPIOB->CNF.B15 = __PB15_OU_PP;
+    321          	GPIOB->ODR.B15 = SET;				// PULL_UP
+    322          	
+    323          
+    324          ///////////////////////////////////////////
+    325          	
+    326          //Port B Initialization End
+    327          
+    328          	GPIOC->CNF.B0 = __ADC_IN10;
+    329          	GPIOC->CNF.B1 = __ADC_IN11; ///////
+    330          	GPIOC->CNF.B2 = __ADC_IN12; 
+    331          	GPIOC->CNF.B3 = __ADC_IN13; 
+    332          	GPIOC->CNF.B4 = __ADC_IN14; 
+    333          	GPIOC->CNF.B5 = __ADC_IN15; 
+    334          
+    335          	///
+    336          	#ifdef __2rd
+    337          		GPIOC->CNF.B6 = __PC6_OU_PP;
+    338          		GPIOC->ODR.B6 = SET;				// PULL_UP
+    339          	#else
+    340          		GPIOC->CNF.B6 = __PC6_IN_PU;
+    341          		GPIOC->ODR.B6 = SET;				// PULL_UP
+    342          	#endif
+    343          
+    344          	GPIOC->CNF.B7 = __PC7_IN_PU;
+    345          	GPIOC->ODR.B7 = SET;				// PULL_UP
+    346          
+    347          	GPIOC->CNF.B8 = __PC8_IN_PU;
+    348          	GPIOC->ODR.B8 = SET;				// PULL_UP
+    349          
+    350          	GPIOC->CNF.B9 = __PC9_OU_PP;
+    351          	GPIOC->ODR.B9 = SET;				// PULL_UP
+    352          	
+    353          	GPIOC->CNF.B10 = __USART4_TX;
+    354          	GPIOC->CNF.B11 = __USART4_RX;
+    355          
+    356          	GPIOC->CNF.B12 = __PC12_IN_PU;
+    357          	GPIOC->ODR.B12 = SET;				// PULL_UP		
+    358          
+    359          	GPIOC->CNF.B13 = __PC13_IN_FL;
+    360          
+    361          	GPIOC->CNF.B14 = __PC14_OU_PP;
+    362          	GPIOC->ODR.B14 = SET;				// PULL_UP
+    363          	GPIOC->CNF.B15 = __PC15_OU_PP;
+    364          	GPIOC->ODR.B15 = SET;				// PULL_UP
+    365          
+    366          	//Port C Initialization End
+    367          
+    368          	//Port D Initialization
+    369          
+    370          #ifndef	__FSMC_SRAM_H
+    371          	GPIOD->CNF.B0 = __PD0_OU_PP;		// __FAD2
+    372          	GPIOD->CNF.B1 = __PD1_OU_PP;		// __FAD3 
+    373          #else
+    374          
+    375          	GPIOD->CNF.B0 = __PD0_OU_PP;		// __FAD2
+    376          	GPIOD->CNF.B1 = __PD1_OU_PP;		// __FAD3 
+    377          
+    378          	GPIOD->CNF.B0 = __PD0_IN_PU;
+    379          	GPIOD->ODR.B0 = SET;		
+    380          	GPIOD->CNF.B1 = __PD1_IN_PU;
+    381          	GPIOD->ODR.B1 = SET;		
+    382          #endif
+    383          
+    384          	GPIOD->CNF.B0 = __PD0_OU_PP;		// __FAD2
+    385          	GPIOD->ODR.B0 = SET;				// PULL_UP
+    386          	
+    387          	GPIOD->CNF.B1 = __PD1_OU_PP;		// __FAD3 
+    388          	GPIOD->ODR.B1 = SET;				// PULL_UP
+    389          
+    390          	GPIOD->CNF.B2 = __PD2_OU_PP;
+    391          	GPIOD->ODR.B2 = SET;				// PULL_UP
+    392          
+    393          	GPIOD->CNF.B3 = __PD3_OU_PP;
+    394          	GPIOD->ODR.B3 = SET;				// PULL UP
+    395          #ifndef	__FSMC_SRAM_H
+    396          	GPIOD->CNF.B4 = __PD4_IN_FL;		// __NOE
+    397          	GPIOD->CNF.B5 = __PD5_IN_FL;		// __NWE
+    398          #else
+    399          	GPIOD->CNF.B4 = __PD4_OU_PP;
+    400          	GPIOD->ODR.B4 = SET;
+    401          
+    402          	GPIOD->CNF.B5 = __PD5_OU_PP;
+    403          	GPIOD->ODR.B5 = SET;
+    404          #endif
+    405          	GPIOD->CNF.B6 = __PD6_OU_PP;
+    406          	GPIOD->ODR.B6 = SET;				// PULL UP
+    407          #ifndef __FSMC_SRAM_H
+    408          	GPIOD->CNF.B7 = __PD7_IN_FL;		// __NCE
+    409          #else
+    410          	GPIOD->CNF.B7 = __PD7_OU_PP;
+    411          	GPIOD->ODR.B7 = SET;				// PULL_UP
+    412          #endif
+    413          
+    414          	GPIOD->CNF.B8 = __PD8_OU_PP;
+    415          	GPIOD->ODR.B8 = SET;				// PULL_UP
+    416          
+    417          
+    418          #ifndef __EXT_RAM_USED
+    419          {
+    420          
+    421          #ifndef __UPPER_DATA_USED
+    422          	GPIOD->CNF.B9 = __PD9_OU_PP;
+    423          	GPIOD->ODR.B9 = SET;				// PULL_UP
+    424          
+    425          	GPIOD->CNF.B10 = __PD10_OU_PP;
+    426          	GPIOD->ODR.B10 = SET;				// PULL_UP
+    427          
+    428          	GPIOD->CNF.B11 = __PD11_OU_PP;
+    429          	GPIOD->ODR.B11 = SET;				// PULL_UP
+    430          
+    431          	GPIOD->CNF.B12 = __PD12_OU_PP;
+    432          	GPIOD->ODR.B12 = SET;				// PULL_UP
+    433          
+    434          	GPIOD->CNF.B13 = __PD13_OU_PP;
+    435          	GPIOD->ODR.B13 = SET;				// PULL_UP
+    436          
+    437          	GPIOD->CNF.B14 = __PD14_OU_PP;
+    438          	GPIOD->ODR.B14 = SET;				// PULL_UP
+    439          	GPIOD->CNF.B15 = __PD15_OU_PP;
+    440          	GPIOD->ODR.B15 = SET;				// PULL_UP
+    441          #endif
+    442          	GPIOD->CNF.B11 = __PD11_OU_PP;		// __FA16
+    443          	GPIOD->CNF.B12 = __PD12_OU_PP;		// __FA17
+    444          	GPIOD->CNF.B13 = __PD13_OU_PP;		// __FA18
+    445          ///////////////////////////////////////////////////////
+    446          
+    447          	GPIOD->CNF.B14 = __PD14_IN_PU;
+    448          	GPIOD->ODR.B14 = SET;		
+    449          
+    450          	GPIOD->CNF.B15 = __PD15_IN_PU;
+    451          	GPIOD->ODR.B15 = SET;		
+    452          
+    453          
+    454          #ifndef	__FSMC_SRAM_H
+    455          	GPIOD->CNF.B14 = __PD14_OU_PP;		// __FAD0
+    456          	GPIOD->CNF.B15 = __PD15_OU_PP;		// __FAD1
+    457          #endif
+    458          }
+    459          #else
+    460          
+    461          #endif
+    462          
+    463          	//Port D Initialization End
+    464          	//Port E Initialization
+    465          	GPIOE->CNF.B0 = __PE0_OU_PP;
+    466          	GPIOE->ODR.B0 = SET;
+    467          
+    468          	GPIOE->CNF.B1 = __PE1_OU_PP;
+    469          	GPIOE->ODR.B1 = SET;
+    470          	
+    471          	GPIOE->CNF.B2 = __PE2_IN_FL;
+    472          
+    473          #ifndef __EXT_RAM_USED
+    474          {
+    475          #ifndef __FSMC_SRAM_H	
+    476          	GPIOE->CNF.B3 = __PE3_OU_PP;		// __FA19
+    477          	GPIOE->CNF.B4 = __PE4_OU_PP;		// __FA20
+    478          	GPIOE->CNF.B5 = __PE5_IN_FL;		// __FA21
+    479          	GPIOE->CNF.B6 = __PE6_IN_FL;		// __FA22
+    480          
+    481          	GPIOE->CNF.B7 = __PE7_OU_PP;		// __FAD4
+    482          	GPIOE->CNF.B8 = __PE8_OU_PP;		// __FAD5
+    483          	GPIOE->CNF.B9 = __PE9_OU_PP;		// __FAD6
+    484          	GPIOE->CNF.B10 = __PE10_IN_FL;		// __FAD7
+    485          #endif
+    486          
+    487          #ifndef __UPPER_DATA_USED
+    488          	GPIOE->CNF.B0 = __PE0_OU_PP;
+    489          	GPIOE->ODR.B0 = SET;				// PULL_UP
+    490          	
+    491          	GPIOE->CNF.B1 = __PE1_OU_PP;
+    492          	GPIOE->ODR.B1 = SET;				// PULL_UP
+    493          
+    494          	GPIOE->CNF.B2 = __PE2_OU_PP;
+    495          	GPIOE->ODR.B2 = SET;				// PULL UP
+    496          
+    497          	GPIOE->CNF.B3 = __PE3_OU_PP;
+    498          	GPIOE->ODR.B3 = SET;				// PULL UP
+    499          
+    500          	GPIOE->CNF.B4 = __PE4_OU_PP;
+    501          	GPIOE->ODR.B4 = SET;		
+    502          
+    503          	GPIOE->CNF.B5 = __PE5_OU_PP;
+    504          	GPIOE->ODR.B5 = SET;
+    505          
+    506          	GPIOE->CNF.B6 = __PE6_OU_PP;
+    507          	GPIOE->ODR.B6 = SET;
+    508          
+    509          	GPIOE->CNF.B7 = __PE7_OU_PP;
+    510          	GPIOE->ODR.B7 = SET;			// PULL UP
+    511          
+    512          	GPIOE->CNF.B8 = __PE8_OU_PP;
+    513          	GPIOE->ODR.B8 = SET;			// PULL UP
+    514          
+    515          	GPIOE->CNF.B9 = __PE9_OU_PP;
+    516          	GPIOE->ODR.B9 = SET;				// PULL UP
+    517          
+    518          	GPIOE->CNF.B10 = __PE10_OU_PP;
+    519          	GPIOE->ODR.B10 = SET;				// PULL UP
+    520          
+    521          	GPIOE->CNF.B11 = __PE11_OU_PP;
+    522          	GPIOE->ODR.B11 = SET;				// PULL UP
+    523          
+    524          
+    525          	GPIOE->CNF.B12 = __PE12_OU_PP;
+    526          	GPIOE->ODR.B12 = SET;				// PULL UP
+    527          
+    528          	GPIOE->CNF.B13 = __PE13_OU_PP;
+    529          	GPIOE->ODR.B13 = SET;				// PULL UP
+    530          
+    531          	GPIOE->CNF.B14 = __PE14_OU_PP;
+    532          	GPIOE->ODR.B14 = SET;				// PULL UP
+    533          
+    534          	GPIOE->CNF.B15 = __PE15_OU_PP;
+    535          	GPIOE->ODR.B15 = SET;				// PULL UP
+    536          #endif
+    537          }
+    538          #else
+    539          
+    540          #endif
+    541          	//Port E Initialization End
+    542          }
+    543          
+    544          void PheripheralInit(void)
+    545          {
+    546          	WatchdogInit();
+    547          	WatchdogClear();
+    548          
+    549          	SerPtr = &pUSART1;
+    550          	SerPtr->init(38400L, (_DATA8BIT | _1_STOP | _NONPARITY));
+    551          
+    552          	Ser4Ptr = &pUSART4;											
+    553          	Ser4Ptr->init(115200L, (_DATA8BIT | _1_STOP | _NONPARITY));
+    554          
+    555          	/////////////////////////////////////////////////////////
+    556           	// Function Task recursion
+    557          	WRCS_SerInit();
+    558          	_PCA9555Init();
+    559          
+    560          	ExpioInit();
+    561          	ADCInit(TRUE);
+    562          	ADC_Init();
+    563          
+    564          	SmsInit();	
+    565          
+    566          	TestInit();
+    567          }
+    568          
+    569          extern const  INTVECT_ELEM  AppVectTbl[];
+    570          
+    571          void LedDisplay(void)
+    572          {
+    573          	if(TimeOverCheck(TimerLed))
+    574          	{
+    575          		TimerRegist(TimerLed, Time100mSec*5L);
+    576          		RUNLEDSEL ^= 1;
+    577          	}
+    578          }
+    579          
+    580          extern u32 CurrINT;
+    581          void  mainTask (void *p_arg)
+    582          {
+    583              (void)p_arg;
+    584          
+    585          	InitStm32f103();
+    586          	PheripheralInit();
+    587          
+    588          	TimerRegist(TimerLed, Time100mSec);
+    589           
+    590              while(1)
+    591          	{
+    592          		LedDisplay();
+    593          		CheckSoftTimer();
+    594          		ADC1_SWStart();
+    595          
+    596          		OSTimeDly(1L);
+    597              }
+    598          }
+    599          
+
+   Maximum stack usage in bytes:
+
+     Function        .cstack
+     --------        -------
+     InitAFIO             0
+     InitGPIO             0
+     InitRCC             16
+     InitStm32f103        8
+     LedDisplay           8
+     PheripheralInit     16
+     mainTask             8
+
+
+   Section sizes:
+
+     Function/Label  Bytes
+     --------------  -----
+     MainTaskStk      256
+     SerPtr             8
+     Ser4Ptr
+     convinfo          52
+     iAdcIndex          1
+     InitStm32f103     32
+     InitRCC          258
+     InitAFIO          46
+     InitGPIO        1600
+     PheripheralInit   90
+     LedDisplay        32
+     mainTask          38
+     ??DataTable4       4
+     ??DataTable4_1     4
+     ??DataTable4_2     4
+     ??DataTable4_3     4
+     ??DataTable4_4     4
+     ??DataTable4_5     4
+     ??DataTable4_6     4
+     ??DataTable4_7     4
+     ??DataTable4_8     4
+     ??DataTable4_9     4
+     ??DataTable4_10    4
+     ??DataTable4_11    4
+     ??DataTable4_12    4
+     ??DataTable4_13    4
+     ??DataTable4_14    4
+     ??DataTable4_15    4
+     ??DataTable4_16    4
+     ??DataTable4_17    4
+
+ 
+     9 bytes in section .bss
+    52 bytes in section .rodata
+ 2 168 bytes in section .text
+   256 bytes in section iram
+ 
+ 2 168 bytes of CODE  memory
+    52 bytes of CONST memory
+   265 bytes of DATA  memory
+
+Errors: none
+Warnings: none

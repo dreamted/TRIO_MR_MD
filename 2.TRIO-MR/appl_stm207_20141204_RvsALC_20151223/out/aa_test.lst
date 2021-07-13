@@ -1,0 +1,4099 @@
+###############################################################################
+#                                                                             #
+# IAR ANSI C/C++ Compiler V6.30.1.53127/W32 for ARM     08/Feb/2018  09:39:42 #
+# Copyright 1999-2011 IAR Systems AB.                                         #
+#                                                                             #
+#    Cpu mode     =  thumb                                                    #
+#    Endian       =  little                                                   #
+#    Source file  =  D:\Project\TRIO\2.TRIO-MR\appl_stm207_20141204_RvsALC_20 #
+#                    151223\code\aa_test.c                                    #
+#    Command line =  D:\Project\TRIO\2.TRIO-MR\appl_stm207_20141204_RvsALC_20 #
+#                    151223\code\aa_test.c -lC D:\Project\TRIO\2.TRIO-MR\appl #
+#                    _stm207_20141204_RvsALC_20151223\out\ -o                 #
+#                    D:\Project\TRIO\2.TRIO-MR\appl_stm207_20141204_RvsALC_20 #
+#                    151223\out\ --endian=little --cpu=Cortex-M3 -e           #
+#                    --fpu=None --dlib_config "D:\Program Files (x86)\IAR     #
+#                    Systems\Embedded Workbench 6.0\arm\INC\c\DLib_Config_Nor #
+#                    mal.h" -I D:\Project\TRIO\2.TRIO-MR\appl_stm207_20141204 #
+#                    _RvsALC_20151223\include\ -I                             #
+#                    D:\Project\TRIO\2.TRIO-MR\appl_stm207_20141204_RvsALC_20 #
+#                    151223\STM32F2xx_StdPeriph_Driver_v1212\ -I              #
+#                    D:\Project\TRIO\2.TRIO-MR\appl_stm207_20141204_RvsALC_20 #
+#                    151223\STM32F2xx_StdPeriph_Driver_v1212\inc\ -I          #
+#                    D:\Project\TRIO\2.TRIO-MR\appl_stm207_20141204_RvsALC_20 #
+#                    151223\uC-CPU\ -I D:\Project\TRIO\2.TRIO-MR\appl_stm207_ #
+#                    20141204_RvsALC_20151223\uC-LIB\ -I                      #
+#                    D:\Project\TRIO\2.TRIO-MR\appl_stm207_20141204_RvsALC_20 #
+#                    151223\uCOS-II\Ports\ -I D:\Project\TRIO\2.TRIO-MR\appl_ #
+#                    stm207_20141204_RvsALC_20151223\uCOS-II\Source\ -I       #
+#                    D:\Project\TRIO\2.TRIO-MR\appl_stm207_20141204_RvsALC_20 #
+#                    151223\uC-Probe\ -Oh --use_c++_inline                    #
+#    List file    =  D:\Project\TRIO\2.TRIO-MR\appl_stm207_20141204_RvsALC_20 #
+#                    151223\out\aa_test.lst                                   #
+#    Object file  =  D:\Project\TRIO\2.TRIO-MR\appl_stm207_20141204_RvsALC_20 #
+#                    151223\out\aa_test.o                                     #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\Project\TRIO\2.TRIO-MR\appl_stm207_20141204_RvsALC_20151223\code\aa_test.c
+      1          
+      2          /******************** (C) COPYRIGHT 2008 PILOG, NSINFO *************************
+      3          * File Name          : exlib.c
+      4          * Author             : Yoon Byong-Gyu(bgyoon@naver.com)
+      5          * Date First Issued  : 02/01/2008
+      6          * Description        : This file provides all the port/input/update firmware functions.
+      7          * $Revision: 0.1 $
+      8          * $Revision date: 2008.01.__
+      9          ********************************************************************************/
+     10          
+     11          #define TEST_C
+     12          
+     13          #include "../include/main.h"
+
+   \                                 In section iram, align 4
+   \   static __absolute OS_STK TestTaskStk[512]
+   \                     TestTaskStk:
+   \   00000000                      DS8 2048
+
+   \                                 In section .bss, align 1
+   \   __absolute INT8U tTestFlag
+   \                     tTestFlag:
+   \   00000000                      DS8 1
+
+   \                                 In section .bss, align 4
+   \   __absolute char tIndex
+   \                     tIndex:
+   \   00000000                      DS8 1
+   \   __absolute INT8S PrevWRCnt
+   \                     PrevWRCnt:
+   \   00000001                      DS8 1
+   \   __absolute INT8S PrevRDCnt
+   \                     PrevRDCnt:
+   \   00000002                      DS8 1
+   \   00000003                      DS8 1
+   \   __absolute INT8U PrevData[5][30]
+   \                     PrevData:
+   \   00000004                      DS8 152
+
+   \                                 In section .bss, align 4
+   \   __absolute INT8U tRevData[30]
+   \                     tRevData:
+   \   00000000                      DS8 32
+
+   \                                 In section .bss, align 1
+   \   __absolute INT8U gTestFlag
+   \                     gTestFlag:
+   \   00000000                      DS8 1
+
+   \                                 In section .bss, align 1
+   \   __absolute INT8U SysPath
+   \                     SysPath:
+   \   00000000                      DS8 1
+
+   \                                 In section .data, align 4
+   \   __absolute unsigned char const *testResult[2]
+   \                     testResult:
+   \   00000000   0x........         DC32 `?<Constant "NON TESTED">`, `?<Constant "    TESTED">`
+   \              0x........   
+
+   \                                 In section .bss, align 4
+   \   __absolute _inputStsStr tinputStsOld
+   \                     tinputStsOld:
+   \   00000000                      DS8 52
+
+   \                                 In section .data, align 4
+   \   __absolute _inputStsStr tinputSts
+   \                     tinputSts:
+   \   00000000   0x00 0x00          DC8 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \   00000010   0x00 0x00          DC8 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \   00000020   0x00 0x00          DC8 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \   __absolute char const *tDisplay[5]
+   \                     tDisplay:
+   \   00000034   0x........         DC32 `?<Constant "Insert          :">`
+   \   00000038   0x........         DC32 `?<Constant "AC_Alarm        :">`
+   \   0000003C   0x........         DC32 `?<Constant "PLL_CDMALTE     :">`
+   \   00000040   0x........         DC32 `?<Constant "PLL_WCDMA       :">`
+   \   00000044   0x........         DC32 `?<Constant "PLL_LTE_A2      :">`
+
+   \                                 In section .bss, align 1
+   \   __absolute INT8U FNDi
+   \                     FNDi:
+   \   00000000                      DS8 1
+
+   \                                 In section .bss, align 1
+   \   __absolute INT8U FNDj
+   \                     FNDj:
+   \   00000000                      DS8 1
+
+   \                                 In section .bss, align 4
+   \   __absolute INT32U testFNDCnt
+   \                     testFNDCnt:
+   \   00000000                      DS8 4
+
+   \                                 In section .data, align 1
+   \   __absolute INT8U FNDSTOPFlag
+   \                     FNDSTOPFlag:
+   \   00000000   0x01               DC8 1
+     14          
+
+   \                                 In section .text, align 2, keep-with-next
+     15          void TestInit(void)
+     16          {
+     17          	OSTaskCreate(TestTask, (void *)NULL, (OS_STK *)&TestTaskStk[TEST_START_STK_SIZE - 1], TEST_START_PRIO);
+   \                     TestInit:
+   \   00000000   0x2305             MOVS     R3,#+5
+   \   00000002   0x.... 0x....      LDR.W    R2,??DataTable79
+   \   00000006   0x2100             MOVS     R1,#+0
+   \   00000008   0x.... 0x....      ADR.W    R0,TestTask
+   \   0000000C   0x.... 0x....      B.W      OSTaskCreate
+     18          }
+     19          
+
+   \                                 In section .text, align 4, keep-with-next
+     20          void TestTask(void *p_arg)
+     21          {
+   \                     TestTask:
+   \   00000000   0xB5F8             PUSH     {R3-R7,LR}
+     22          	INT16U nCnt = 0;
+     23          //	INT32U nFlag = 0;
+     24              nCnt = nCnt;
+   \   00000002   0x2000             MOVS     R0,#+0
+   \   00000004   0xF8AD 0x0000      STRH     R0,[SP, #+0]
+     25          	gTestFlag = FALSE;
+   \   00000008   0x.... 0x....      LDR.W    R4,??DataTable78
+   \   0000000C   0x7020             STRB     R0,[R4, #+0]
+     26          	
+     27          	OSTimeDly(TEST_START_PRIO*100L);
+   \   0000000E   0xF44F 0x70FA      MOV      R0,#+500
+   \   00000012   0x.... 0x....      BL       OSTimeDly
+   \   00000016   0x.... 0x....      ADR.W    R5,OnCommand
+   \   0000001A   0x.... 0x....      LDR.W    R6,??DataTable79_1
+   \   0000001E   0x.... 0x....      LDR.W    R7,??DataTable79_2
+     28          	
+     29          	while(1)
+     30          	{
+     31          		if(iUser_Value2 == __ChangeDebug)
+   \                     ??TestTask_0:
+   \   00000022   0x7838             LDRB     R0,[R7, #+0]
+   \   00000024   0x280D             CMP      R0,#+13
+   \   00000026   0xD121             BNE.N    ??TestTask_1
+     32          		{
+     33          			PrintLogo();
+   \   00000028   0x.... 0x....      BL       PrintLogo
+     34          			PromptOut();
+   \   0000002C   0x.... 0x....      BL       PromptOut
+     35          			gTestFlag = TRUE;
+   \   00000030   0x2001             MOVS     R0,#+1
+   \   00000032   0x7020             STRB     R0,[R4, #+0]
+     36          	
+     37          			while(iUser_Value2 == __ChangeDebug)
+   \   00000034   0x7838             LDRB     R0,[R7, #+0]
+   \   00000036   0x280D             CMP      R0,#+13
+   \   00000038   0xD118             BNE.N    ??TestTask_1
+     38          			{
+     39          				if(SerPtr->CheckByte(1, &nCnt))
+   \                     ??TestTask_2:
+   \   0000003A   0xA900             ADD      R1,SP,#+0
+   \   0000003C   0x2001             MOVS     R0,#+1
+   \   0000003E   0x6832             LDR      R2,[R6, #+0]
+   \   00000040   0x6852             LDR      R2,[R2, #+4]
+   \   00000042   0x4790             BLX      R2
+   \   00000044   0xB130             CBZ.N    R0,??TestTask_3
+     40          				{
+     41          					KeyProc(SerPtr->RxGetByte(), OnCommand);
+   \   00000046   0x6830             LDR      R0,[R6, #+0]
+   \   00000048   0x6880             LDR      R0,[R0, #+8]
+   \   0000004A   0x4780             BLX      R0
+   \   0000004C   0x4629             MOV      R1,R5
+   \   0000004E   0xB2C0             UXTB     R0,R0
+   \   00000050   0x.... 0x....      BL       KeyProc
+     42          				}
+     43          
+     44          				if(TimeOverCheck(Timer_DebugCnt)) DownLoadBootingJump();
+   \                     ??TestTask_3:
+   \   00000054   0x2006             MOVS     R0,#+6
+   \   00000056   0x.... 0x....      BL       TimeOverCheck
+   \   0000005A   0xB108             CBZ.N    R0,??TestTask_4
+   \   0000005C   0x.... 0x....      BL       DownLoadBootingJump
+     45          				OSTimeDly(10u);
+   \                     ??TestTask_4:
+   \   00000060   0x200A             MOVS     R0,#+10
+   \   00000062   0x.... 0x....      BL       OSTimeDly
+   \   00000066   0x7838             LDRB     R0,[R7, #+0]
+   \   00000068   0x280D             CMP      R0,#+13
+   \   0000006A   0xD0E6             BEQ.N    ??TestTask_2
+     46          			}
+     47          		}
+     48          //		HwTestOutFunc(&nFlag);
+     49          
+     50          		OSTimeDly(200L);
+   \                     ??TestTask_1:
+   \   0000006C   0x20C8             MOVS     R0,#+200
+   \   0000006E   0x.... 0x....      BL       OSTimeDly
+   \   00000072   0xE7D6             B.N      ??TestTask_0
+     51          	}
+     52          }
+     53          
+
+   \                                 In section .text, align 2, keep-with-next
+     54          void KeyProc( char sbuf, void (*func)(void))
+     55          {
+   \                     KeyProc:
+   \   00000000   0xE92D 0x41F0      PUSH     {R4-R8,LR}
+   \   00000004   0x460C             MOV      R4,R1
+     56          	INT16U nSize = sizeof(tRevData);
+     57          
+     58          	tRevData[tIndex%nSize] = sbuf;
+   \   00000006   0x.... 0x....      LDR.W    R5,??DataTable79_3
+   \   0000000A   0x7829             LDRB     R1,[R5, #+0]
+   \   0000000C   0xF04F 0x081E      MOV      R8,#+30
+   \   00000010   0xFB91 0xF2F8      SDIV     R2,R1,R8
+   \   00000014   0xEBC2 0x1302      RSB      R3,R2,R2, LSL #+4
+   \   00000018   0xEBA1 0x0243      SUB      R2,R1,R3, LSL #+1
+   \   0000001C   0x.... 0x....      LDR.W    R7,??DataTable79_4
+   \   00000020   0x55D0             STRB     R0,[R2, R7]
+     59          	if( tRevData[tIndex%nSize] == 0x0D )			// Enter 입력
+   \   00000022   0x280D             CMP      R0,#+13
+   \   00000024   0xD12B             BNE.N    ??KeyProc_0
+     60          	{
+     61          		SerPtr->PutToBuffer('\r');
+   \   00000026   0x.... 0x....      LDR.W    R6,??DataTable79_1
+   \   0000002A   0x6831             LDR      R1,[R6, #+0]
+   \   0000002C   0x6989             LDR      R1,[R1, #+24]
+   \   0000002E   0x4788             BLX      R1
+     62          		SerPtr->PutToBuffer('\n');
+   \   00000030   0x200A             MOVS     R0,#+10
+   \   00000032   0x6831             LDR      R1,[R6, #+0]
+   \   00000034   0x6989             LDR      R1,[R1, #+24]
+   \   00000036   0x4788             BLX      R1
+     63          		tRevData[tIndex%nSize] = '\0';
+   \   00000038   0x7828             LDRB     R0,[R5, #+0]
+   \   0000003A   0xFB90 0xF1F8      SDIV     R1,R0,R8
+   \   0000003E   0xEBC1 0x1201      RSB      R2,R1,R1, LSL #+4
+   \   00000042   0xEBA0 0x0142      SUB      R1,R0,R2, LSL #+1
+   \   00000046   0x2200             MOVS     R2,#+0
+   \   00000048   0x55CA             STRB     R2,[R1, R7]
+     64          
+     65          		if(tIndex != 0)
+   \   0000004A   0xB1A0             CBZ.N    R0,??KeyProc_1
+     66          		{
+     67          			strcpy((char *)PrevData[PrevWRCnt++], (const char *)tRevData);
+   \   0000004C   0xF995 0x0001      LDRSB    R0,[R5, #+1]
+   \   00000050   0x1C41             ADDS     R1,R0,#+1
+   \   00000052   0x7069             STRB     R1,[R5, #+1]
+   \   00000054   0x4639             MOV      R1,R7
+   \   00000056   0xEBC0 0x1200      RSB      R2,R0,R0, LSL #+4
+   \   0000005A   0xEB05 0x0042      ADD      R0,R5,R2, LSL #+1
+   \   0000005E   0x1D00             ADDS     R0,R0,#+4
+   \   00000060   0x.... 0x....      BL       strcpy
+     68          			PrevWRCnt %= 5;
+   \   00000064   0xF995 0x0001      LDRSB    R0,[R5, #+1]
+   \   00000068   0x2105             MOVS     R1,#+5
+   \   0000006A   0xFB90 0xF1F1      SDIV     R1,R0,R1
+   \   0000006E   0xEB01 0x0181      ADD      R1,R1,R1, LSL #+2
+   \   00000072   0x1A40             SUBS     R0,R0,R1
+   \   00000074   0x7068             STRB     R0,[R5, #+1]
+     69          		}
+     70          		PrevRDCnt = PrevWRCnt;
+   \                     ??KeyProc_1:
+   \   00000076   0x7868             LDRB     R0,[R5, #+1]
+   \   00000078   0x70A8             STRB     R0,[R5, #+2]
+     71          		func();
+   \   0000007A   0x47A0             BLX      R4
+     72          		tIndex = 0;
+   \   0000007C   0xE05D             B.N      ??KeyProc_2
+     73          
+     74          		return;
+     75          	}
+     76          	else if(tRevData[tIndex%nSize] == 0x08) // Back Space
+   \                     ??KeyProc_0:
+   \   0000007E   0x2808             CMP      R0,#+8
+   \   00000080   0xD111             BNE.N    ??KeyProc_3
+     77          	{
+     78          		if (tIndex == 0)
+   \   00000082   0x2900             CMP      R1,#+0
+   \   00000084   0xD05B             BEQ.N    ??KeyProc_4
+     79          			return;
+     80          
+     81          		SerPtr->PutToBuffer(0x08);
+   \   00000086   0x.... 0x....      LDR.W    R4,??DataTable79_1
+   \   0000008A   0x6821             LDR      R1,[R4, #+0]
+   \   0000008C   0x6989             LDR      R1,[R1, #+24]
+   \   0000008E   0x4788             BLX      R1
+     82          		SerPtr->PutToBuffer(' ');
+   \   00000090   0x2020             MOVS     R0,#+32
+   \   00000092   0x6821             LDR      R1,[R4, #+0]
+   \   00000094   0x6989             LDR      R1,[R1, #+24]
+   \   00000096   0x4788             BLX      R1
+     83          		SerPtr->PutToBuffer(0x08);
+   \   00000098   0x2008             MOVS     R0,#+8
+   \   0000009A   0x6821             LDR      R1,[R4, #+0]
+   \   0000009C   0x6989             LDR      R1,[R1, #+24]
+   \   0000009E   0x4788             BLX      R1
+     84          		tIndex--;
+   \   000000A0   0x7828             LDRB     R0,[R5, #+0]
+   \   000000A2   0x1E40             SUBS     R0,R0,#+1
+   \   000000A4   0xE04A             B.N      ??KeyProc_5
+     85          
+     86          		return;
+     87          	}
+     88          	else if( tRevData[tIndex%nSize] == 0x09 )	// tab
+   \                     ??KeyProc_3:
+   \   000000A6   0x2809             CMP      R0,#+9
+   \   000000A8   0xD13C             BNE.N    ??KeyProc_6
+     89          	{
+     90          		while(tIndex)
+   \   000000AA   0x2900             CMP      R1,#+0
+   \   000000AC   0x.... 0x....      LDR.W    R4,??DataTable79_1
+   \   000000B0   0xD011             BEQ.N    ??KeyProc_7
+     91          		{
+     92          			SerPtr->PutToBuffer(0x08);
+   \                     ??KeyProc_8:
+   \   000000B2   0x2008             MOVS     R0,#+8
+   \   000000B4   0x6821             LDR      R1,[R4, #+0]
+   \   000000B6   0x6989             LDR      R1,[R1, #+24]
+   \   000000B8   0x4788             BLX      R1
+     93          			SerPtr->PutToBuffer(' ');
+   \   000000BA   0x2020             MOVS     R0,#+32
+   \   000000BC   0x6821             LDR      R1,[R4, #+0]
+   \   000000BE   0x6989             LDR      R1,[R1, #+24]
+   \   000000C0   0x4788             BLX      R1
+     94          			SerPtr->PutToBuffer(0x08);
+   \   000000C2   0x2008             MOVS     R0,#+8
+   \   000000C4   0x6821             LDR      R1,[R4, #+0]
+   \   000000C6   0x6989             LDR      R1,[R1, #+24]
+   \   000000C8   0x4788             BLX      R1
+     95          			tIndex--;
+   \   000000CA   0x7828             LDRB     R0,[R5, #+0]
+   \   000000CC   0x1E40             SUBS     R0,R0,#+1
+   \   000000CE   0x7028             STRB     R0,[R5, #+0]
+   \   000000D0   0xB2C0             UXTB     R0,R0
+   \   000000D2   0x2800             CMP      R0,#+0
+   \   000000D4   0xD1ED             BNE.N    ??KeyProc_8
+     96          		}
+     97          
+     98          		PrevRDCnt--;
+   \                     ??KeyProc_7:
+   \   000000D6   0x78A8             LDRB     R0,[R5, #+2]
+   \   000000D8   0x1E40             SUBS     R0,R0,#+1
+   \   000000DA   0x70A8             STRB     R0,[R5, #+2]
+     99          		if(PrevRDCnt < 0) PrevRDCnt = 4;
+   \   000000DC   0xB240             SXTB     R0,R0
+   \   000000DE   0x2800             CMP      R0,#+0
+   \   000000E0   0xBF44             ITT      MI 
+   \   000000E2   0x2004             MOVMI    R0,#+4
+   \   000000E4   0x70A8             STRBMI   R0,[R5, #+2]
+    100          		strcpy((char *)tRevData, (const char *)PrevData[PrevRDCnt]);
+   \   000000E6   0xF995 0x0002      LDRSB    R0,[R5, #+2]
+   \   000000EA   0xEBC0 0x1100      RSB      R1,R0,R0, LSL #+4
+   \   000000EE   0xEB05 0x0041      ADD      R0,R5,R1, LSL #+1
+   \   000000F2   0x1D01             ADDS     R1,R0,#+4
+   \   000000F4   0x4638             MOV      R0,R7
+   \   000000F6   0x.... 0x....      BL       strcpy
+    101          
+    102          		SerPtr->printf("%s", PrevData[PrevRDCnt]);
+   \   000000FA   0xF995 0x0002      LDRSB    R0,[R5, #+2]
+   \   000000FE   0xEBC0 0x1100      RSB      R1,R0,R0, LSL #+4
+   \   00000102   0xEB05 0x0041      ADD      R0,R5,R1, LSL #+1
+   \   00000106   0x1D01             ADDS     R1,R0,#+4
+   \   00000108   0x....             ADR.N    R0,??DataTable71  ;; 0x25, 0x73, 0x00, 0x00
+   \   0000010A   0x6822             LDR      R2,[R4, #+0]
+   \   0000010C   0x6912             LDR      R2,[R2, #+16]
+   \   0000010E   0x4790             BLX      R2
+    103          		tIndex = strlen((const char *)PrevData[PrevRDCnt]);
+   \   00000110   0xF995 0x0002      LDRSB    R0,[R5, #+2]
+   \   00000114   0xEBC0 0x1100      RSB      R1,R0,R0, LSL #+4
+   \   00000118   0xEB05 0x0041      ADD      R0,R5,R1, LSL #+1
+   \   0000011C   0x1D00             ADDS     R0,R0,#+4
+   \   0000011E   0x.... 0x....      BL       strlen
+   \   00000122   0xE00B             B.N      ??KeyProc_5
+    104          
+    105          		return;
+    106          	}
+    107          	
+    108          	SerPtr->PutToBuffer(tRevData[tIndex%nSize]);			// 입력 키 출력
+   \                     ??KeyProc_6:
+   \   00000124   0x.... 0x....      LDR.W    R1,??DataTable79_1
+   \   00000128   0x6809             LDR      R1,[R1, #+0]
+   \   0000012A   0x6989             LDR      R1,[R1, #+24]
+   \   0000012C   0x4788             BLX      R1
+    109          
+    110          	if(++tIndex >= nSize) tIndex = 0;
+   \   0000012E   0x7828             LDRB     R0,[R5, #+0]
+   \   00000130   0x1C40             ADDS     R0,R0,#+1
+   \   00000132   0x7028             STRB     R0,[R5, #+0]
+   \   00000134   0xB2C0             UXTB     R0,R0
+   \   00000136   0x281E             CMP      R0,#+30
+   \   00000138   0xD301             BCC.N    ??KeyProc_4
+   \                     ??KeyProc_2:
+   \   0000013A   0x2000             MOVS     R0,#+0
+   \                     ??KeyProc_5:
+   \   0000013C   0x7028             STRB     R0,[R5, #+0]
+   \                     ??KeyProc_4:
+   \   0000013E   0xE8BD 0x81F0      POP      {R4-R8,PC}       ;; return
+    111          }
+    112          
+
+   \                                 In section .text, align 2, keep-with-next
+    113          INT8U htob(INT8U hex)
+    114          {
+    115          	INT8U i;
+    116          	
+    117          	if (hex >= '0' && hex <= '9') i=hex-'0';
+   \                     htob:
+   \   00000000   0xF1A0 0x0130      SUB      R1,R0,#+48
+   \   00000004   0xB2C9             UXTB     R1,R1
+   \   00000006   0x290A             CMP      R1,#+10
+   \   00000008   0xD307             BCC.N    ??htob_0
+    118          	else if ( hex >= 'A' && hex <= 'F' )i=hex-'A'+10;
+   \   0000000A   0xF1A0 0x0141      SUB      R1,R0,#+65
+   \   0000000E   0x2906             CMP      R1,#+6
+   \   00000010   0xBF34             ITE      CC 
+   \   00000012   0xF1A0 0x0137      SUBCC    R1,R0,#+55
+   \   00000016   0xF1A0 0x0157      SUBCS    R1,R0,#+87
+    119          	else i=hex-'a'+10;
+    120          	
+    121          	return i;
+   \                     ??htob_0:
+   \   0000001A   0xB2C8             UXTB     R0,R1
+   \   0000001C   0x4770             BX       LR               ;; return
+    122          }
+    123          
+
+   \                                 In section .text, align 2, keep-with-next
+    124          INT8U dGetHex (INT8U Data_H, INT8U Data_L)
+    125          {
+   \                     dGetHex:
+   \   00000000   0xB538             PUSH     {R3-R5,LR}
+   \   00000002   0x460C             MOV      R4,R1
+    126          	INT8U i;
+    127          	
+    128          	i=htob( Data_H );
+   \   00000004   0x.... 0x....      BL       htob
+   \   00000008   0x4605             MOV      R5,R0
+    129          	i=htob( Data_L )+(i<<4);
+    130          	return i;
+   \   0000000A   0x4620             MOV      R0,R4
+   \   0000000C   0x.... 0x....      BL       htob
+   \   00000010   0xEB00 0x1005      ADD      R0,R0,R5, LSL #+4
+   \   00000014   0xB2C0             UXTB     R0,R0
+   \   00000016   0xBD32             POP      {R1,R4,R5,PC}    ;; return
+    131          }
+    132          
+
+   \                                 In section .text, align 2, keep-with-next
+    133          void TestCommand(void)
+    134          {
+   \                     TestCommand:
+   \   00000000   0xB580             PUSH     {R7,LR}
+    135          
+    136          	INT8U tdata = FALSE;
+    137          	
+    138          	if(tRevData[0] == 't' && tRevData[1] == 'e' && tRevData[2] == 's' && tRevData[3] == 't') tdata = TRUE;
+   \   00000002   0x.... 0x....      LDR.W    R0,??DataTable79_4
+   \   00000006   0x7801             LDRB     R1,[R0, #+0]
+   \   00000008   0x2974             CMP      R1,#+116
+   \   0000000A   0xD108             BNE.N    ??TestCommand_0
+   \   0000000C   0x7841             LDRB     R1,[R0, #+1]
+   \   0000000E   0x2965             CMP      R1,#+101
+   \   00000010   0xBF01             ITTTT    EQ 
+   \   00000012   0x7881             LDRBEQ   R1,[R0, #+2]
+   \   00000014   0x2973             CMPEQ    R1,#+115
+   \   00000016   0x78C0             LDRBEQ   R0,[R0, #+3]
+   \   00000018   0x2874             CMPEQ    R0,#+116
+   \   0000001A   0xD11C             BNE.N    ??TestCommand_1
+   \   0000001C   0xE00A             B.N      ??TestCommand_2
+    139          	if(tRevData[0] == 'T' && tRevData[1] == 'E' && tRevData[2] == 'S' && tRevData[3] == 'T') tdata = TRUE;
+   \                     ??TestCommand_0:
+   \   0000001E   0x2954             CMP      R1,#+84
+   \   00000020   0xBF04             ITT      EQ 
+   \   00000022   0x7841             LDRBEQ   R1,[R0, #+1]
+   \   00000024   0x2945             CMPEQ    R1,#+69
+   \   00000026   0xD116             BNE.N    ??TestCommand_1
+   \   00000028   0x7881             LDRB     R1,[R0, #+2]
+   \   0000002A   0x2953             CMP      R1,#+83
+   \   0000002C   0xBF04             ITT      EQ 
+   \   0000002E   0x78C0             LDRBEQ   R0,[R0, #+3]
+   \   00000030   0x2854             CMPEQ    R0,#+84
+   \   00000032   0xD110             BNE.N    ??TestCommand_1
+    140          
+    141          	if(tdata){
+    142          		iUser_Value2 = __ChangeDebug;
+   \                     ??TestCommand_2:
+   \   00000034   0x.... 0x....      LDR.W    R0,??DataTable79_2
+   \   00000038   0x210D             MOVS     R1,#+13
+   \   0000003A   0x7001             STRB     R1,[R0, #+0]
+    143          		iDebugCnt = 0; 
+   \   0000003C   0x.... 0x....      LDR.W    R0,??DataTable80
+   \   00000040   0x2100             MOVS     R1,#+0
+   \   00000042   0x7001             STRB     R1,[R0, #+0]
+    144          		TimerRegist(Timer_DebugCnt, Time1Min*30L);
+   \   00000044   0x.... 0x....      LDR.W    R1,??DataTable80_1  ;; 0x1b7740
+   \   00000048   0x2006             MOVS     R0,#+6
+   \   0000004A   0x.... 0x....      BL       TimerRegist
+    145          		TimerRegist(TimerSioRx, Time100mSec);
+   \   0000004E   0x2164             MOVS     R1,#+100
+   \   00000050   0x2002             MOVS     R0,#+2
+   \   00000052   0x.... 0x....      BL       TimerRegist
+    146          	}
+    147          	PromptOut();
+   \                     ??TestCommand_1:
+   \   00000056   0xE8BD 0x4001      POP      {R0,LR}
+   \   0000005A   0x.... 0x....      B.W      PromptOut
+    148          }
+    149          
+    150          
+    151          
+
+   \                                 In section .text, align 4, keep-with-next
+    152          void OnCommand ( void )
+    153          {
+   \                     OnCommand:
+   \   00000000   0xB530             PUSH     {R4,R5,LR}
+   \   00000002   0xB083             SUB      SP,SP,#+12
+    154          	INT8U tdata = TRUE;
+    155          	
+    156          	switch(tRevData[0])
+   \   00000004   0x.... 0x....      LDR.W    R0,??DataTable79_4
+   \   00000008   0x7800             LDRB     R0,[R0, #+0]
+   \   0000000A   0x283F             CMP      R0,#+63
+   \   0000000C   0xD020             BEQ.N    ??OnCommand_0
+   \   0000000E   0x2841             CMP      R0,#+65
+   \   00000010   0xD021             BEQ.N    ??OnCommand_1
+   \   00000012   0x2843             CMP      R0,#+67
+   \   00000014   0xF000 0x80E2      BEQ.W    ??OnCommand_2
+   \   00000018   0x2847             CMP      R0,#+71
+   \   0000001A   0xF000 0x8126      BEQ.W    ??OnCommand_3
+   \   0000001E   0x2849             CMP      R0,#+73
+   \   00000020   0xF000 0x8095      BEQ.W    ??OnCommand_4
+   \   00000024   0x284F             CMP      R0,#+79
+   \   00000026   0xD053             BEQ.N    ??OnCommand_5
+   \   00000028   0x2853             CMP      R0,#+83
+   \   0000002A   0xF000 0x8121      BEQ.W    ??OnCommand_6
+   \   0000002E   0x2861             CMP      R0,#+97
+   \   00000030   0xD011             BEQ.N    ??OnCommand_1
+   \   00000032   0x2863             CMP      R0,#+99
+   \   00000034   0xF000 0x80D2      BEQ.W    ??OnCommand_2
+   \   00000038   0x2867             CMP      R0,#+103
+   \   0000003A   0xF000 0x8116      BEQ.W    ??OnCommand_3
+   \   0000003E   0x2869             CMP      R0,#+105
+   \   00000040   0xF000 0x8085      BEQ.W    ??OnCommand_4
+   \   00000044   0x286F             CMP      R0,#+111
+   \   00000046   0xD043             BEQ.N    ??OnCommand_5
+   \   00000048   0x2873             CMP      R0,#+115
+   \   0000004A   0xF000 0x8111      BEQ.W    ??OnCommand_6
+   \   0000004E   0xE11D             B.N      ??OnCommand_7
+    157          	{
+    158          		case '?':
+    159          			PrintLogo();
+   \                     ??OnCommand_0:
+   \   00000050   0x.... 0x....      BL       PrintLogo
+    160          		break;
+   \   00000054   0xE11A             B.N      ??OnCommand_7
+    161          		
+    162          		case 'A':
+    163          		case 'a':
+    164          		{
+    165          			char *tstmsg = "ADC Input";
+    166          
+    167          			
+    168          			if(SavetoTestBackup(ADCTest, SET, NULL) == SET)
+    169          			{
+    170          				tdata = returnmsgTest(tstmsg);
+    171          			}
+    172          			
+    173          
+    174          			if(tdata)
+    175          			{
+    176          				INT16U nCnt;
+    177          
+    178          				SerPtr->printf("\n* [%s] TEST START TimeOut 5 Min]\n", tstmsg);
+   \                     ??OnCommand_1:
+   \   00000056   0x.... 0x....      ADR.W    R5,`?<Constant "ADC Input">`
+   \   0000005A   0x.... 0x....      LDR.W    R4,??DataTable79_1
+   \   0000005E   0x4629             MOV      R1,R5
+   \   00000060   0x.... 0x....      ADR.W    R0,`?<Constant "\\n* [%s] TEST START Ti...">`
+   \   00000064   0x6822             LDR      R2,[R4, #+0]
+   \   00000066   0x6912             LDR      R2,[R2, #+16]
+   \   00000068   0x4790             BLX      R2
+    179          
+    180          				TimerRegist(TimerTest, Time1Sec*60L*5L);
+   \   0000006A   0x.... 0x....      LDR.W    R1,??DataTable80_3  ;; 0x493e0
+   \   0000006E   0x2003             MOVS     R0,#+3
+   \   00000070   0x.... 0x....      BL       TimerRegist
+   \   00000074   0xE003             B.N      ??OnCommand_8
+    181          
+    182          				while(1)
+    183          				{
+    184          					AdInputStatus();
+    185          
+    186          
+    187          					if(TimeOverCheck(TimerTest))
+    188          					{
+    189          						SerPtr->printf("%s Test TimeOut\n", tstmsg);
+    190          
+    191          						TimerRegist(TimerTest, Time1Sec);
+    192          						break;
+    193          					}
+    194          					if(SerPtr->CheckByte(1, &nCnt))
+    195          					{
+    196          						nCnt = SerPtr->RxGetByte();
+    197          						if(nCnt == 'c' || nCnt == 'C')
+    198          						{
+    199          							SerPtr->printf("%s Test Canceled\n", tstmsg);
+    200          							break;
+    201          						}
+    202          						else if(nCnt == 'f' || nCnt == 'F')
+    203          						{
+    204          //							gOK:
+    205          							SerPtr->printf("%s Test Finished\n", tstmsg);
+    206          							SavetoTestBackup(ADCTest, SET, SET);
+    207          							break;
+    208          						}
+    209          					}
+    210          					OSTimeDly(2000L);
+   \                     ??OnCommand_9:
+   \   00000076   0xF44F 0x60FA      MOV      R0,#+2000
+   \   0000007A   0x.... 0x....      BL       OSTimeDly
+   \                     ??OnCommand_8:
+   \   0000007E   0x.... 0x....      BL       AdInputStatus
+   \   00000082   0x2003             MOVS     R0,#+3
+   \   00000084   0x.... 0x....      BL       TimeOverCheck
+   \   00000088   0xB118             CBZ.N    R0,??OnCommand_10
+   \   0000008A   0x4629             MOV      R1,R5
+   \   0000008C   0x.... 0x....      ADR.W    R0,`?<Constant "%s Test TimeOut\\n">`
+   \   00000090   0xE0C1             B.N      ??OnCommand_11
+   \                     ??OnCommand_10:
+   \   00000092   0xA900             ADD      R1,SP,#+0
+   \   00000094   0x2001             MOVS     R0,#+1
+   \   00000096   0x6822             LDR      R2,[R4, #+0]
+   \   00000098   0x6852             LDR      R2,[R2, #+4]
+   \   0000009A   0x4790             BLX      R2
+   \   0000009C   0x2800             CMP      R0,#+0
+   \   0000009E   0xD0EA             BEQ.N    ??OnCommand_9
+   \   000000A0   0x6820             LDR      R0,[R4, #+0]
+   \   000000A2   0x6880             LDR      R0,[R0, #+8]
+   \   000000A4   0x4780             BLX      R0
+   \   000000A6   0xF8AD 0x0000      STRH     R0,[SP, #+0]
+   \   000000AA   0xF8BD 0x0000      LDRH     R0,[SP, #+0]
+   \   000000AE   0x2863             CMP      R0,#+99
+   \   000000B0   0xBF18             IT       NE 
+   \   000000B2   0x2843             CMPNE    R0,#+67
+   \   000000B4   0xBF04             ITT      EQ 
+   \   000000B6   0x4629             MOVEQ    R1,R5
+   \   000000B8   0x.... 0x....      ADREQ.W  R0,`?<Constant "%s Test Canceled\\n">`
+   \   000000BC   0xF000 0x80D1      BEQ.W    ??OnCommand_12
+   \   000000C0   0x2866             CMP      R0,#+102
+   \   000000C2   0xBF18             IT       NE 
+   \   000000C4   0x2846             CMPNE    R0,#+70
+   \   000000C6   0xD1D6             BNE.N    ??OnCommand_9
+   \   000000C8   0x4629             MOV      R1,R5
+   \   000000CA   0x.... 0x....      ADR.W    R0,`?<Constant "%s Test Finished\\n">`
+   \   000000CE   0xE0C8             B.N      ??OnCommand_12
+    211          					/////////////////////////////////////////////////////////////
+    212          				}
+    213          			}
+    214          		}
+    215          		break;
+    216          
+    217          		case 'O':
+    218          		case 'o':
+    219          			{
+    220          				char *tstmsg = "Dig Output";
+    221          				
+    222          				if(SavetoTestBackup(OutputTest, SET, NULL) == SET)
+    223          				{
+    224          					tdata = returnmsgTest(tstmsg);
+    225          				}
+    226          				
+    227          				if(tdata)
+    228          				{
+    229          					INT32U nFlag = 0;
+   \                     ??OnCommand_5:
+   \   000000D0   0x2000             MOVS     R0,#+0
+   \   000000D2   0x9001             STR      R0,[SP, #+4]
+    230          					INT16U nCnt;
+    231          	
+    232          					SerPtr->printf("\n* [%s TEST START TimeOut 5Min]\n", tstmsg);
+   \   000000D4   0x.... 0x....      ADR.W    R5,`?<Constant "Dig Output">`
+   \   000000D8   0x.... 0x....      LDR.W    R4,??DataTable79_1
+   \   000000DC   0x4629             MOV      R1,R5
+   \   000000DE   0x.... 0x....      ADR.W    R0,`?<Constant "\\n* [%s TEST START Tim...">`
+   \   000000E2   0x6822             LDR      R2,[R4, #+0]
+   \   000000E4   0x6912             LDR      R2,[R2, #+16]
+   \   000000E6   0x4790             BLX      R2
+    233          	
+    234          					TimerRegist(TimerTest, Time1Sec*60L*5L);
+   \   000000E8   0x.... 0x....      LDR.W    R1,??DataTable80_3  ;; 0x493e0
+   \   000000EC   0x2003             MOVS     R0,#+3
+   \   000000EE   0x.... 0x....      BL       TimerRegist
+   \   000000F2   0xE002             B.N      ??OnCommand_13
+    235          	
+    236          					while(1)
+    237          					{
+    238          						HwTestOutFunc(&nFlag);
+    239          	
+    240          						if(TimeOverCheck(TimerTest))
+    241          						{
+    242          							SerPtr->printf("%s test TimeOut\n", tstmsg);
+    243          							TimerRegist(TimerTest, Time1Sec);
+    244          							break;
+    245          						}
+    246          						if(SerPtr->CheckByte(1, &nCnt))
+    247          						{
+    248          							nCnt = SerPtr->RxGetByte();
+    249          							if(nCnt == 'C' || nCnt == 'c')
+    250          							{
+    251          								SerPtr->printf("%s test Canceled\n", tstmsg);
+    252          								break;
+    253          							}
+    254          							else if(nCnt == 'F' || nCnt == 'f')
+    255          							{
+    256          								SerPtr->printf("%s test Finished\n", tstmsg);
+    257          								SavetoTestBackup(OutputTest, SET, SET);
+    258          								break;
+    259          							}
+    260          						}
+    261          						OSTimeDly(250L*1L);
+   \                     ??OnCommand_14:
+   \   000000F4   0x20FA             MOVS     R0,#+250
+   \   000000F6   0x.... 0x....      BL       OSTimeDly
+   \                     ??OnCommand_13:
+   \   000000FA   0xA801             ADD      R0,SP,#+4
+   \   000000FC   0x.... 0x....      BL       HwTestOutFunc
+   \   00000100   0x2003             MOVS     R0,#+3
+   \   00000102   0x.... 0x....      BL       TimeOverCheck
+   \   00000106   0xB118             CBZ.N    R0,??OnCommand_15
+   \   00000108   0x4629             MOV      R1,R5
+   \   0000010A   0x.... 0x....      ADR.W    R0,`?<Constant "%s test TimeOut\\n">`
+   \   0000010E   0xE082             B.N      ??OnCommand_11
+   \                     ??OnCommand_15:
+   \   00000110   0xA900             ADD      R1,SP,#+0
+   \   00000112   0x2001             MOVS     R0,#+1
+   \   00000114   0x6822             LDR      R2,[R4, #+0]
+   \   00000116   0x6852             LDR      R2,[R2, #+4]
+   \   00000118   0x4790             BLX      R2
+   \   0000011A   0x2800             CMP      R0,#+0
+   \   0000011C   0xD0EA             BEQ.N    ??OnCommand_14
+   \   0000011E   0x6820             LDR      R0,[R4, #+0]
+   \   00000120   0x6880             LDR      R0,[R0, #+8]
+   \   00000122   0x4780             BLX      R0
+   \   00000124   0xF8AD 0x0000      STRH     R0,[SP, #+0]
+   \   00000128   0xF8BD 0x0000      LDRH     R0,[SP, #+0]
+   \   0000012C   0x2843             CMP      R0,#+67
+   \   0000012E   0xBF18             IT       NE 
+   \   00000130   0x2863             CMPNE    R0,#+99
+   \   00000132   0xBF04             ITT      EQ 
+   \   00000134   0x4629             MOVEQ    R1,R5
+   \   00000136   0x.... 0x....      ADREQ.W  R0,`?<Constant "%s test Canceled\\n">`
+   \   0000013A   0xF000 0x8092      BEQ.W    ??OnCommand_12
+   \   0000013E   0x2846             CMP      R0,#+70
+   \   00000140   0xBF18             IT       NE 
+   \   00000142   0x2866             CMPNE    R0,#+102
+   \   00000144   0xD1D6             BNE.N    ??OnCommand_14
+   \   00000146   0x4629             MOV      R1,R5
+   \   00000148   0x.... 0x....      ADR.W    R0,`?<Constant "%s test Finished\\n">`
+   \   0000014C   0xE089             B.N      ??OnCommand_12
+    262          						/////////////////////////////////////////////////////////////						
+    263          					}
+    264          				}
+    265          			}
+    266          		break;
+    267          
+    268          		case 'I':
+    269          		case 'i':
+    270          			{
+    271          				char *tstmsg = "Dig Input";
+    272          
+    273          				if(SavetoTestBackup(InputTest, SET, NULL) == SET)
+    274          				{
+    275          					tdata = returnmsgTest(tstmsg);
+    276          				}
+    277          				if(tdata)
+    278          				{
+    279          					INT16U nCnt;
+    280          	
+    281          					SerPtr->printf("\n* [%s TEST START TimeOut 5 Min]\n", tstmsg);
+   \                     ??OnCommand_4:
+   \   0000014E   0x.... 0x....      ADR.W    R5,`?<Constant "Dig Input">`
+   \   00000152   0x.... 0x....      LDR.W    R4,??DataTable79_1
+   \   00000156   0x4629             MOV      R1,R5
+   \   00000158   0x.... 0x....      ADR.W    R0,`?<Constant "\\n* [%s TEST START Tim...">_1`
+   \   0000015C   0x6822             LDR      R2,[R4, #+0]
+   \   0000015E   0x6912             LDR      R2,[R2, #+16]
+   \   00000160   0x4790             BLX      R2
+    282          					TimerRegist(TimerTest, Time1Sec*60L*1L);
+   \   00000162   0xF64E 0x2160      MOVW     R1,#+60000
+   \   00000166   0x2003             MOVS     R0,#+3
+   \   00000168   0x.... 0x....      BL       TimerRegist
+    283          	
+    284          					CurrentInputStatus(0);
+   \   0000016C   0x2000             MOVS     R0,#+0
+   \   0000016E   0x.... 0x....      BL       CurrentInputStatus
+    285          					tinputStsOld = tinputSts;
+   \   00000172   0x.... 0x....      LDR.W    R0,??DataTable80_5
+   \   00000176   0x.... 0x....      LDR.W    R1,??DataTable80_7
+   \   0000017A   0x2234             MOVS     R2,#+52
+   \   0000017C   0x.... 0x....      BL       __aeabi_memcpy4
+   \   00000180   0xE003             B.N      ??OnCommand_16
+    286          
+    287          					while(1)
+    288          					{
+    289          						CurrentInputStatus(1);
+    290          	
+    291          						if(TimeOverCheck(TimerTest))
+    292          						{
+    293          							SerPtr->printf("%s Test TimeOut\n", tstmsg);
+    294          							TimerRegist(TimerTest, Time1Sec);
+    295          							break;
+    296          						}
+    297          						if(SerPtr->CheckByte(1, &nCnt))
+    298          						{
+    299          							nCnt = SerPtr->RxGetByte();
+    300          							if(nCnt == 'c' || nCnt == 'C')
+    301          							{
+    302          								SerPtr->printf("%s Test Canceled\n", tstmsg);
+    303          								break;
+    304          							}
+    305          							else if(nCnt == 'f' || nCnt == 'F')
+    306          							{
+    307          								SerPtr->printf("%s Test Finished\n", tstmsg);
+    308          								SavetoTestBackup(InputTest, SET, SET);
+    309          								break;
+    310          							}
+    311          						}
+    312          						OSTimeDly(300L);
+   \                     ??OnCommand_17:
+   \   00000182   0xF44F 0x7096      MOV      R0,#+300
+   \   00000186   0x.... 0x....      BL       OSTimeDly
+   \                     ??OnCommand_16:
+   \   0000018A   0x2001             MOVS     R0,#+1
+   \   0000018C   0x.... 0x....      BL       CurrentInputStatus
+   \   00000190   0x2003             MOVS     R0,#+3
+   \   00000192   0x.... 0x....      BL       TimeOverCheck
+   \   00000196   0xB118             CBZ.N    R0,??OnCommand_18
+   \   00000198   0x4629             MOV      R1,R5
+   \   0000019A   0x.... 0x....      ADR.W    R0,`?<Constant "%s Test TimeOut\\n">`
+   \   0000019E   0xE03A             B.N      ??OnCommand_11
+   \                     ??OnCommand_18:
+   \   000001A0   0xA900             ADD      R1,SP,#+0
+   \   000001A2   0x2001             MOVS     R0,#+1
+   \   000001A4   0x6822             LDR      R2,[R4, #+0]
+   \   000001A6   0x6852             LDR      R2,[R2, #+4]
+   \   000001A8   0x4790             BLX      R2
+   \   000001AA   0x2800             CMP      R0,#+0
+   \   000001AC   0xD0E9             BEQ.N    ??OnCommand_17
+   \   000001AE   0x6820             LDR      R0,[R4, #+0]
+   \   000001B0   0x6880             LDR      R0,[R0, #+8]
+   \   000001B2   0x4780             BLX      R0
+   \   000001B4   0xF8AD 0x0000      STRH     R0,[SP, #+0]
+   \   000001B8   0xF8BD 0x0000      LDRH     R0,[SP, #+0]
+   \   000001BC   0x2863             CMP      R0,#+99
+   \   000001BE   0xBF18             IT       NE 
+   \   000001C0   0x2843             CMPNE    R0,#+67
+   \   000001C2   0xBF04             ITT      EQ 
+   \   000001C4   0x4629             MOVEQ    R1,R5
+   \   000001C6   0x.... 0x....      ADREQ.W  R0,`?<Constant "%s Test Canceled\\n">`
+   \   000001CA   0xD04A             BEQ.N    ??OnCommand_12
+   \   000001CC   0x2866             CMP      R0,#+102
+   \   000001CE   0xBF18             IT       NE 
+   \   000001D0   0x2846             CMPNE    R0,#+70
+   \   000001D2   0xD1D6             BNE.N    ??OnCommand_17
+   \   000001D4   0x4629             MOV      R1,R5
+   \   000001D6   0x.... 0x....      ADR.W    R0,`?<Constant "%s Test Finished\\n">`
+   \   000001DA   0xE042             B.N      ??OnCommand_12
+    313          						/////////////////////////////////////////////////////////////
+    314          					}
+    315          				}
+    316          			}
+    317          		break;
+    318          		
+    319          		case 'C':
+    320          		case 'c':
+    321          			{
+    322          				char *tstmsg = "COM 시험";
+    323          				
+    324          				if(SavetoTestBackup(CommTest, SET, NULL) == SET)
+    325          				{
+    326          					tdata = returnmsgTest(tstmsg);
+    327          				}
+    328          
+    329          				if(tdata)
+    330          				{
+    331          					INT16U nCnt;
+    332          	
+    333          					SerPtr->printf("\n* [%s TEST START TimeOut 5Min]\n", tstmsg);
+   \                     ??OnCommand_2:
+   \   000001DC   0x.... 0x....      ADR.W    R5,`?<Constant "COM \\275\\303\\307\\350">`
+   \   000001E0   0x.... 0x....      LDR.W    R4,??DataTable79_1
+   \   000001E4   0x4629             MOV      R1,R5
+   \   000001E6   0x.... 0x....      ADR.W    R0,`?<Constant "\\n* [%s TEST START Tim...">`
+   \   000001EA   0x6822             LDR      R2,[R4, #+0]
+   \   000001EC   0x6912             LDR      R2,[R2, #+16]
+   \   000001EE   0x4790             BLX      R2
+    334          	
+    335          					TimerRegist(TimerTest, Time1Sec*60L*5L);
+   \   000001F0   0x.... 0x....      LDR.W    R1,??DataTable80_3  ;; 0x493e0
+   \   000001F4   0x2003             MOVS     R0,#+3
+   \   000001F6   0x.... 0x....      BL       TimerRegist
+   \   000001FA   0xE003             B.N      ??OnCommand_19
+    336          	
+    337          					while(1)
+    338          					{
+    339          						COMTestFunc();
+    340          						if(TimeOverCheck(TimerTest))
+    341          						{
+    342          							SerPtr->printf("%s test Test TimeOut\n", tstmsg);
+    343          							TimerRegist(TimerTest, Time1Sec);
+    344          							break;
+    345          						}
+    346          	
+    347          						if(SerPtr->CheckByte(1, &nCnt))
+    348          						{
+    349          							nCnt = SerPtr->RxGetByte();
+    350          							if(nCnt == 'C' || nCnt == 'c')
+    351          							{
+    352          								SerPtr->printf("%s test Test Canceled\n", tstmsg);
+    353          								break;
+    354          							}
+    355          							else if(nCnt == 'F' || nCnt == 'f')
+    356          							{
+    357          								
+    358          								SerPtr->printf("%s Test Test Finished\n", tstmsg);
+    359          								SavetoTestBackup(CommTest, SET, SET);
+    360          								break;
+    361          							}
+    362          						}
+    363          						OSTimeDly(2000L);
+   \                     ??OnCommand_20:
+   \   000001FC   0xF44F 0x60FA      MOV      R0,#+2000
+   \   00000200   0x.... 0x....      BL       OSTimeDly
+   \                     ??OnCommand_19:
+   \   00000204   0x.... 0x....      BL       COMTestFunc
+   \   00000208   0x2003             MOVS     R0,#+3
+   \   0000020A   0x.... 0x....      BL       TimeOverCheck
+   \   0000020E   0xB158             CBZ.N    R0,??OnCommand_21
+   \   00000210   0x4629             MOV      R1,R5
+   \   00000212   0x.... 0x....      ADR.W    R0,`?<Constant "%s test Test TimeOut\\n">`
+   \                     ??OnCommand_11:
+   \   00000216   0x6822             LDR      R2,[R4, #+0]
+   \   00000218   0x6912             LDR      R2,[R2, #+16]
+   \   0000021A   0x4790             BLX      R2
+   \   0000021C   0xF44F 0x717A      MOV      R1,#+1000
+   \   00000220   0x2003             MOVS     R0,#+3
+   \   00000222   0x.... 0x....      BL       TimerRegist
+   \   00000226   0xE031             B.N      ??OnCommand_7
+   \                     ??OnCommand_21:
+   \   00000228   0xA900             ADD      R1,SP,#+0
+   \   0000022A   0x2001             MOVS     R0,#+1
+   \   0000022C   0x6822             LDR      R2,[R4, #+0]
+   \   0000022E   0x6852             LDR      R2,[R2, #+4]
+   \   00000230   0x4790             BLX      R2
+   \   00000232   0x2800             CMP      R0,#+0
+   \   00000234   0xD0E2             BEQ.N    ??OnCommand_20
+   \   00000236   0x6820             LDR      R0,[R4, #+0]
+   \   00000238   0x6880             LDR      R0,[R0, #+8]
+   \   0000023A   0x4780             BLX      R0
+   \   0000023C   0xF8AD 0x0000      STRH     R0,[SP, #+0]
+   \   00000240   0xF8BD 0x0000      LDRH     R0,[SP, #+0]
+   \   00000244   0x2843             CMP      R0,#+67
+   \   00000246   0xBF18             IT       NE 
+   \   00000248   0x2863             CMPNE    R0,#+99
+   \   0000024A   0xBF04             ITT      EQ 
+   \   0000024C   0x4629             MOVEQ    R1,R5
+   \   0000024E   0x.... 0x....      ADREQ.W  R0,`?<Constant "%s test Test Canceled\\n">`
+   \   00000252   0xD006             BEQ.N    ??OnCommand_12
+   \   00000254   0x2846             CMP      R0,#+70
+   \   00000256   0xBF18             IT       NE 
+   \   00000258   0x2866             CMPNE    R0,#+102
+   \   0000025A   0xD1CF             BNE.N    ??OnCommand_20
+   \   0000025C   0x4629             MOV      R1,R5
+   \   0000025E   0x.... 0x....      ADR.W    R0,`?<Constant "%s Test Test Finished\\n">`
+   \                     ??OnCommand_12:
+   \   00000262   0x6822             LDR      R2,[R4, #+0]
+   \   00000264   0x6912             LDR      R2,[R2, #+16]
+   \   00000266   0x4790             BLX      R2
+   \   00000268   0xE010             B.N      ??OnCommand_7
+    364          					}
+    365          				}
+    366          			}
+    367          		break;
+    368          
+    369          		case 'G':
+    370          		case 'g':
+    371          			DownloadFlagClr();
+   \                     ??OnCommand_3:
+   \   0000026A   0x.... 0x....      BL       DownloadFlagClr
+    372          			ForDelay(20L);
+   \   0000026E   0xE008             B.N      ??OnCommand_22
+    373          			DownLoadBootingJump();
+    374          		break;
+    375          
+    376          		case 'E':
+    377          		case 'e':
+    378          #if 0         
+    379          		{
+    380          			EE_TABLE1 *ptr = &gEE_TABLE1;
+    381          			INT32U AddrOffset = vEE_TABLE1Addr + (INT32U)&(ptr->BdTestBp) - (INT32U )&gEE_TABLE1;
+    382          
+    383          			if(SavetoTestBackup(EepromTest, SET, NULL) == SET)
+    384          			{
+    385          				char *tstmsg = "EEPROM(AT24C64) 시험";
+    386          				tdata = returnmsgTest(tstmsg);
+    387          			}
+    388          
+    389          			if(tdata)
+    390          			{
+    391          				WriteEEprom(At24cDevID, AddrOffset + EepromResult, 'e', 0);
+    392          				tdata = ReadEEprom(At24cDevID, AddrOffset + EepromResult, 0);
+    393          
+    394          				SerPtr->printf("\n\nWriting 24C64_Addr[%d] = 'e' -> ", AddrOffset);
+    395          				if(tdata == 'e'){
+    396          					SerPtr->printf("success read_data = [%c][0x%02x]\n\n", tdata, tdata);
+    397          					SavetoTestBackup(EepromTest, SET, SET);
+    398          				}
+    399          				else{
+    400          					SerPtr->printf("failed  read_data = [%d][0x%02x]\n\n", tdata, tdata);
+    401          					SavetoTestBackup(EepromTest, RESET, SET);
+    402          				}
+    403          			}
+    404          		}
+    405          #endif       
+    406          		break;		
+    407          
+    408          		case 'S':
+    409          		case 's':
+    410          			SerPtr->printf("\n Default Back-up End -> Reboot...  \n\n");
+   \                     ??OnCommand_6:
+   \   00000270   0x.... 0x....      ADR.W    R0,`?<Constant "\\n Default Back-up End...">`
+   \   00000274   0x.... 0x....      LDR.W    R1,??DataTable79_1
+   \   00000278   0x6809             LDR      R1,[R1, #+0]
+   \   0000027A   0x6909             LDR      R1,[R1, #+16]
+   \   0000027C   0x4788             BLX      R1
+    411          
+    412          			DefaultTable();
+   \   0000027E   0x.... 0x....      BL       DefaultTable
+    413          			ForDelay(20L);
+   \                     ??OnCommand_22:
+   \   00000282   0x2014             MOVS     R0,#+20
+   \   00000284   0x.... 0x....      BL       ForDelay
+    414          			DownLoadBootingJump();
+   \   00000288   0x.... 0x....      BL       DownLoadBootingJump
+    415          		break;
+    416          		
+    417          		default:
+    418          		break;
+    419          
+    420          	}
+    421          	PromptOut();
+   \                     ??OnCommand_7:
+   \   0000028C   0x.... 0x....      BL       PromptOut
+    422          }
+   \   00000290   0xB003             ADD      SP,SP,#+12
+   \   00000292   0xBD30             POP      {R4,R5,PC}       ;; return
+    423          
+    424          
+
+   \                                 In section .text, align 2, keep-with-next
+    425          void AdInputStatus(void)
+    426          {
+   \                     AdInputStatus:
+   \   00000000   0xE92D 0x41F0      PUSH     {R4-R8,LR}
+    427          ////////////////////////////////////////////////////////////////////////////////
+    428          #if 1
+    429          	if(ADC_CheckFinish(ADC_Channel_0))		ADC_ChannelEnable(ADC_Channel_0);
+   \   00000004   0x2000             MOVS     R0,#+0
+   \   00000006   0x.... 0x....      BL       ADC_CheckFinish
+   \   0000000A   0xB110             CBZ.N    R0,??AdInputStatus_0
+   \   0000000C   0x2000             MOVS     R0,#+0
+   \   0000000E   0x.... 0x....      BL       ADC_ChannelEnable
+    430          	if(ADC_CheckFinish(ADC_Channel_1))		ADC_ChannelEnable(ADC_Channel_1);
+   \                     ??AdInputStatus_0:
+   \   00000012   0x2001             MOVS     R0,#+1
+   \   00000014   0x.... 0x....      BL       ADC_CheckFinish
+   \   00000018   0xB110             CBZ.N    R0,??AdInputStatus_1
+   \   0000001A   0x2001             MOVS     R0,#+1
+   \   0000001C   0x.... 0x....      BL       ADC_ChannelEnable
+    431          	if(ADC_CheckFinish(ADC_Channel_2))		ADC_ChannelEnable(ADC_Channel_2);
+   \                     ??AdInputStatus_1:
+   \   00000020   0x2002             MOVS     R0,#+2
+   \   00000022   0x.... 0x....      BL       ADC_CheckFinish
+   \   00000026   0xB110             CBZ.N    R0,??AdInputStatus_2
+   \   00000028   0x2002             MOVS     R0,#+2
+   \   0000002A   0x.... 0x....      BL       ADC_ChannelEnable
+    432          	if(ADC_CheckFinish(ADC_Channel_3))		ADC_ChannelEnable(ADC_Channel_3);
+   \                     ??AdInputStatus_2:
+   \   0000002E   0x2003             MOVS     R0,#+3
+   \   00000030   0x.... 0x....      BL       ADC_CheckFinish
+   \   00000034   0xB110             CBZ.N    R0,??AdInputStatus_3
+   \   00000036   0x2003             MOVS     R0,#+3
+   \   00000038   0x.... 0x....      BL       ADC_ChannelEnable
+    433          	if(ADC_CheckFinish(ADC_Channel_4))		ADC_ChannelEnable(ADC_Channel_4);
+   \                     ??AdInputStatus_3:
+   \   0000003C   0x2004             MOVS     R0,#+4
+   \   0000003E   0x.... 0x....      BL       ADC_CheckFinish
+   \   00000042   0xB110             CBZ.N    R0,??AdInputStatus_4
+   \   00000044   0x2004             MOVS     R0,#+4
+   \   00000046   0x.... 0x....      BL       ADC_ChannelEnable
+    434          	if(ADC_CheckFinish(ADC_Channel_5))		ADC_ChannelEnable(ADC_Channel_5);
+   \                     ??AdInputStatus_4:
+   \   0000004A   0x2005             MOVS     R0,#+5
+   \   0000004C   0x.... 0x....      BL       ADC_CheckFinish
+   \   00000050   0xB110             CBZ.N    R0,??AdInputStatus_5
+   \   00000052   0x2005             MOVS     R0,#+5
+   \   00000054   0x.... 0x....      BL       ADC_ChannelEnable
+    435          	if(ADC_CheckFinish(ADC_Channel_6))		ADC_ChannelEnable(ADC_Channel_6);
+   \                     ??AdInputStatus_5:
+   \   00000058   0x2006             MOVS     R0,#+6
+   \   0000005A   0x.... 0x....      BL       ADC_CheckFinish
+   \   0000005E   0xB110             CBZ.N    R0,??AdInputStatus_6
+   \   00000060   0x2006             MOVS     R0,#+6
+   \   00000062   0x.... 0x....      BL       ADC_ChannelEnable
+    436          	if(ADC_CheckFinish(ADC_Channel_7))		ADC_ChannelEnable(ADC_Channel_7);
+   \                     ??AdInputStatus_6:
+   \   00000066   0x2007             MOVS     R0,#+7
+   \   00000068   0x.... 0x....      BL       ADC_CheckFinish
+   \   0000006C   0xB110             CBZ.N    R0,??AdInputStatus_7
+   \   0000006E   0x2007             MOVS     R0,#+7
+   \   00000070   0x.... 0x....      BL       ADC_ChannelEnable
+    437          	if(ADC_CheckFinish(ADC_Channel_8))		ADC_ChannelEnable(ADC_Channel_8);
+   \                     ??AdInputStatus_7:
+   \   00000074   0x2008             MOVS     R0,#+8
+   \   00000076   0x.... 0x....      BL       ADC_CheckFinish
+   \   0000007A   0xB110             CBZ.N    R0,??AdInputStatus_8
+   \   0000007C   0x2008             MOVS     R0,#+8
+   \   0000007E   0x.... 0x....      BL       ADC_ChannelEnable
+    438          	if(ADC_CheckFinish(ADC_Channel_9))		ADC_ChannelEnable(ADC_Channel_9);
+   \                     ??AdInputStatus_8:
+   \   00000082   0x2009             MOVS     R0,#+9
+   \   00000084   0x.... 0x....      BL       ADC_CheckFinish
+   \   00000088   0xB110             CBZ.N    R0,??AdInputStatus_9
+   \   0000008A   0x2009             MOVS     R0,#+9
+   \   0000008C   0x.... 0x....      BL       ADC_ChannelEnable
+    439          	if(ADC_CheckFinish(ADC_Channel_10))		ADC_ChannelEnable(ADC_Channel_10);
+   \                     ??AdInputStatus_9:
+   \   00000090   0x200A             MOVS     R0,#+10
+   \   00000092   0x.... 0x....      BL       ADC_CheckFinish
+   \   00000096   0xB110             CBZ.N    R0,??AdInputStatus_10
+   \   00000098   0x200A             MOVS     R0,#+10
+   \   0000009A   0x.... 0x....      BL       ADC_ChannelEnable
+    440          	if(ADC_CheckFinish(ADC_Channel_11))		ADC_ChannelEnable(ADC_Channel_11);
+   \                     ??AdInputStatus_10:
+   \   0000009E   0x200B             MOVS     R0,#+11
+   \   000000A0   0x.... 0x....      BL       ADC_CheckFinish
+   \   000000A4   0xB110             CBZ.N    R0,??AdInputStatus_11
+   \   000000A6   0x200B             MOVS     R0,#+11
+   \   000000A8   0x.... 0x....      BL       ADC_ChannelEnable
+    441          	if(ADC_CheckFinish(ADC_Channel_12))		ADC_ChannelEnable(ADC_Channel_12);
+   \                     ??AdInputStatus_11:
+   \   000000AC   0x200C             MOVS     R0,#+12
+   \   000000AE   0x.... 0x....      BL       ADC_CheckFinish
+   \   000000B2   0xB110             CBZ.N    R0,??AdInputStatus_12
+   \   000000B4   0x200C             MOVS     R0,#+12
+   \   000000B6   0x.... 0x....      BL       ADC_ChannelEnable
+    442          	if(ADC_CheckFinish(ADC_Channel_13))		ADC_ChannelEnable(ADC_Channel_13);
+   \                     ??AdInputStatus_12:
+   \   000000BA   0x200D             MOVS     R0,#+13
+   \   000000BC   0x.... 0x....      BL       ADC_CheckFinish
+   \   000000C0   0xB110             CBZ.N    R0,??AdInputStatus_13
+   \   000000C2   0x200D             MOVS     R0,#+13
+   \   000000C4   0x.... 0x....      BL       ADC_ChannelEnable
+    443          	if(ADC_CheckFinish(ADC_Channel_14))		ADC_ChannelEnable(ADC_Channel_14);
+   \                     ??AdInputStatus_13:
+   \   000000C8   0x200E             MOVS     R0,#+14
+   \   000000CA   0x.... 0x....      BL       ADC_CheckFinish
+   \   000000CE   0xB110             CBZ.N    R0,??AdInputStatus_14
+   \   000000D0   0x200E             MOVS     R0,#+14
+   \   000000D2   0x.... 0x....      BL       ADC_ChannelEnable
+    444          	if(ADC_CheckFinish(ADC_Channel_15))		ADC_ChannelEnable(ADC_Channel_15);
+   \                     ??AdInputStatus_14:
+   \   000000D6   0x200F             MOVS     R0,#+15
+   \   000000D8   0x.... 0x....      BL       ADC_CheckFinish
+   \   000000DC   0xB110             CBZ.N    R0,??AdInputStatus_15
+   \   000000DE   0x200F             MOVS     R0,#+15
+   \   000000E0   0x.... 0x....      BL       ADC_ChannelEnable
+    445          #endif	
+    446          
+    447          //	SerPtr->printf("ADC_Channel_0[%04d]\n", 	ADC_DATA1[FwdOutAvgVolt_2G],	ADC_DATA1[RvsOutVolt_2G],ADC_DATA1[FwdOutAvgVolt_LTE],ADC_DATA1[RvsOutVolt_LTE]);	
+    448          
+    449          //	Data = AdctoVolt5opamp(ADC_AVR[adcFWDPWRdect_3G][0]);
+    450          
+    451          	PrintStar();
+   \                     ??AdInputStatus_15:
+   \   000000E4   0x.... 0x....      BL       PrintStar
+    452          	
+    453          
+    454          #if 1
+    455          	{
+    456          
+    457          		INT16S Data, tmpx;
+    458          
+    459          //		Data = AdctoVolt33V(ADC_SUM[ADC_Channel_14]);
+    460          		Data = AdctoVolt33V(ADC_AVR[ADC_Channel_0][0]);
+   \   000000E8   0x.... 0x....      LDR.W    R4,??DataTable80_9
+   \   000000EC   0x6820             LDR      R0,[R4, #+0]
+   \   000000EE   0x8800             LDRH     R0,[R0, #+0]
+   \   000000F0   0x.... 0x....      BL       AdctoVolt33V
+   \   000000F4   0xB207             SXTH     R7,R0
+    461          		SerPtr->printf(STARMSG);
+   \   000000F6   0x.... 0x....      LDR.W    R5,??DataTable79_1
+   \   000000FA   0x....             ADR.N    R6,??DataTable75  ;; 0x2A, 0x20, 0x00, 0x00
+   \   000000FC   0x4630             MOV      R0,R6
+   \   000000FE   0x6829             LDR      R1,[R5, #+0]
+   \   00000100   0x6909             LDR      R1,[R1, #+16]
+   \   00000102   0x4788             BLX      R1
+    462          		SerPtr->printf("[AIN0] : %d.%03d[V]\n", Data/1000, Data%1000);
+   \   00000104   0xF44F 0x787A      MOV      R8,#+1000
+   \   00000108   0xFB97 0xF1F8      SDIV     R1,R7,R8
+   \   0000010C   0xFB08 0x7211      MLS      R2,R8,R1,R7
+   \   00000110   0x.... 0x....      ADR.W    R0,`?<Constant "[AIN0] : %d.%03d[V]\\n">`
+   \   00000114   0x682B             LDR      R3,[R5, #+0]
+   \   00000116   0x691B             LDR      R3,[R3, #+16]
+   \   00000118   0x4798             BLX      R3
+    463          
+    464          		Data = AdctoVolt33V(ADC_AVR[ADC_Channel_1][0]);
+   \   0000011A   0x6860             LDR      R0,[R4, #+4]
+   \   0000011C   0x8800             LDRH     R0,[R0, #+0]
+   \   0000011E   0x.... 0x....      BL       AdctoVolt33V
+   \   00000122   0xB207             SXTH     R7,R0
+    465          		SerPtr->printf(STARMSG);
+   \   00000124   0x4630             MOV      R0,R6
+   \   00000126   0x6829             LDR      R1,[R5, #+0]
+   \   00000128   0x6909             LDR      R1,[R1, #+16]
+   \   0000012A   0x4788             BLX      R1
+    466          		SerPtr->printf("[AIN1] : %d.%03d[V]\n", Data/1000, Data%1000);
+   \   0000012C   0xFB97 0xF1F8      SDIV     R1,R7,R8
+   \   00000130   0xFB08 0x7211      MLS      R2,R8,R1,R7
+   \   00000134   0x.... 0x....      ADR.W    R0,`?<Constant "[AIN1] : %d.%03d[V]\\n">`
+   \   00000138   0x682B             LDR      R3,[R5, #+0]
+   \   0000013A   0x691B             LDR      R3,[R3, #+16]
+   \   0000013C   0x4798             BLX      R3
+    467          
+    468          		Data = AdctoVolt33V(ADC_AVR[ADC_Channel_2][0]);
+   \   0000013E   0x68A0             LDR      R0,[R4, #+8]
+   \   00000140   0x8800             LDRH     R0,[R0, #+0]
+   \   00000142   0x.... 0x....      BL       AdctoVolt33V
+   \   00000146   0xB207             SXTH     R7,R0
+    469          		SerPtr->printf(STARMSG);
+   \   00000148   0x4630             MOV      R0,R6
+   \   0000014A   0x6829             LDR      R1,[R5, #+0]
+   \   0000014C   0x6909             LDR      R1,[R1, #+16]
+   \   0000014E   0x4788             BLX      R1
+    470          		SerPtr->printf("[AIN2] : %d.%03d[V]\n", Data/1000, Data%1000);
+   \   00000150   0xFB97 0xF1F8      SDIV     R1,R7,R8
+   \   00000154   0xFB08 0x7211      MLS      R2,R8,R1,R7
+   \   00000158   0x.... 0x....      ADR.W    R0,`?<Constant "[AIN2] : %d.%03d[V]\\n">`
+   \   0000015C   0x682B             LDR      R3,[R5, #+0]
+   \   0000015E   0x691B             LDR      R3,[R3, #+16]
+   \   00000160   0x4798             BLX      R3
+    471          
+    472          		Data = AdctoVolt33V(ADC_AVR[ADC_Channel_3][0]);
+   \   00000162   0x68E0             LDR      R0,[R4, #+12]
+   \   00000164   0x8800             LDRH     R0,[R0, #+0]
+   \   00000166   0x.... 0x....      BL       AdctoVolt33V
+   \   0000016A   0xB207             SXTH     R7,R0
+    473          		SerPtr->printf(STARMSG);
+   \   0000016C   0x4630             MOV      R0,R6
+   \   0000016E   0x6829             LDR      R1,[R5, #+0]
+   \   00000170   0x6909             LDR      R1,[R1, #+16]
+   \   00000172   0x4788             BLX      R1
+    474          		SerPtr->printf("[AIN3] : %d.%03d[V]\n", Data/1000, Data%1000);
+   \   00000174   0xFB97 0xF1F8      SDIV     R1,R7,R8
+   \   00000178   0xFB08 0x7211      MLS      R2,R8,R1,R7
+   \   0000017C   0x.... 0x....      ADR.W    R0,`?<Constant "[AIN3] : %d.%03d[V]\\n">`
+   \   00000180   0x682B             LDR      R3,[R5, #+0]
+   \   00000182   0x691B             LDR      R3,[R3, #+16]
+   \   00000184   0x4798             BLX      R3
+    475          
+    476          		Data = AdctoVolt33V(ADC_AVR[ADC_Channel_4][0]);
+   \   00000186   0x6920             LDR      R0,[R4, #+16]
+   \   00000188   0x8800             LDRH     R0,[R0, #+0]
+   \   0000018A   0x.... 0x....      BL       AdctoVolt33V
+   \   0000018E   0xB207             SXTH     R7,R0
+    477          		SerPtr->printf(STARMSG);
+   \   00000190   0x4630             MOV      R0,R6
+   \   00000192   0x6829             LDR      R1,[R5, #+0]
+   \   00000194   0x6909             LDR      R1,[R1, #+16]
+   \   00000196   0x4788             BLX      R1
+    478          		SerPtr->printf("[AIN4] : %d.%03d[V]\n", Data/1000, Data%1000);
+   \   00000198   0xFB97 0xF1F8      SDIV     R1,R7,R8
+   \   0000019C   0xFB08 0x7211      MLS      R2,R8,R1,R7
+   \   000001A0   0x.... 0x....      ADR.W    R0,`?<Constant "[AIN4] : %d.%03d[V]\\n">`
+   \   000001A4   0x682B             LDR      R3,[R5, #+0]
+   \   000001A6   0x691B             LDR      R3,[R3, #+16]
+   \   000001A8   0x4798             BLX      R3
+    479          
+    480          		Data = AdctoVolt33V(ADC_AVR[ADC_Channel_5][0]);
+   \   000001AA   0x6960             LDR      R0,[R4, #+20]
+   \   000001AC   0x8800             LDRH     R0,[R0, #+0]
+   \   000001AE   0x.... 0x....      BL       AdctoVolt33V
+   \   000001B2   0xB207             SXTH     R7,R0
+    481          		SerPtr->printf(STARMSG);
+   \   000001B4   0x4630             MOV      R0,R6
+   \   000001B6   0x6829             LDR      R1,[R5, #+0]
+   \   000001B8   0x6909             LDR      R1,[R1, #+16]
+   \   000001BA   0x4788             BLX      R1
+    482          		SerPtr->printf("[AIN5] : %d.%03d[V]\n", Data/1000, Data%1000);
+   \   000001BC   0xFB97 0xF1F8      SDIV     R1,R7,R8
+   \   000001C0   0xFB08 0x7211      MLS      R2,R8,R1,R7
+   \   000001C4   0x.... 0x....      ADR.W    R0,`?<Constant "[AIN5] : %d.%03d[V]\\n">`
+   \   000001C8   0x682B             LDR      R3,[R5, #+0]
+   \   000001CA   0x691B             LDR      R3,[R3, #+16]
+   \   000001CC   0x4798             BLX      R3
+    483          
+    484          		Data = AdctoVolt33V(ADC_AVR[ADC_Channel_6][0]);
+   \   000001CE   0x69A0             LDR      R0,[R4, #+24]
+   \   000001D0   0x8800             LDRH     R0,[R0, #+0]
+   \   000001D2   0x.... 0x....      BL       AdctoVolt33V
+   \   000001D6   0xB207             SXTH     R7,R0
+    485          		SerPtr->printf(STARMSG);
+   \   000001D8   0x4630             MOV      R0,R6
+   \   000001DA   0x6829             LDR      R1,[R5, #+0]
+   \   000001DC   0x6909             LDR      R1,[R1, #+16]
+   \   000001DE   0x4788             BLX      R1
+    486          		SerPtr->printf("[AIN6] : %d.%03d[V]\n", Data/1000, Data%1000);
+   \   000001E0   0xFB97 0xF1F8      SDIV     R1,R7,R8
+   \   000001E4   0xFB08 0x7211      MLS      R2,R8,R1,R7
+   \   000001E8   0x.... 0x....      ADR.W    R0,`?<Constant "[AIN6] : %d.%03d[V]\\n">`
+   \   000001EC   0x682B             LDR      R3,[R5, #+0]
+   \   000001EE   0x691B             LDR      R3,[R3, #+16]
+   \   000001F0   0x4798             BLX      R3
+    487          
+    488          		Data = AdctoVolt33V(ADC_AVR[ADC_Channel_7][0]);
+   \   000001F2   0x69E0             LDR      R0,[R4, #+28]
+   \   000001F4   0x8800             LDRH     R0,[R0, #+0]
+   \   000001F6   0x.... 0x....      BL       AdctoVolt33V
+   \   000001FA   0xB207             SXTH     R7,R0
+    489          		SerPtr->printf(STARMSG);
+   \   000001FC   0x4630             MOV      R0,R6
+   \   000001FE   0x6829             LDR      R1,[R5, #+0]
+   \   00000200   0x6909             LDR      R1,[R1, #+16]
+   \   00000202   0x4788             BLX      R1
+    490          		SerPtr->printf("[AIN7] : %d.%03d[V]\n", Data/1000, Data%1000);
+   \   00000204   0xFB97 0xF1F8      SDIV     R1,R7,R8
+   \   00000208   0xFB08 0x7211      MLS      R2,R8,R1,R7
+   \   0000020C   0x.... 0x....      ADR.W    R0,`?<Constant "[AIN7] : %d.%03d[V]\\n">`
+   \   00000210   0x682B             LDR      R3,[R5, #+0]
+   \   00000212   0x691B             LDR      R3,[R3, #+16]
+   \   00000214   0x4798             BLX      R3
+    491          
+    492          		Data = AdctoVolt33V(ADC_AVR[ADC_Channel_8][0]);
+   \   00000216   0x6A20             LDR      R0,[R4, #+32]
+   \   00000218   0x8800             LDRH     R0,[R0, #+0]
+   \   0000021A   0x.... 0x....      BL       AdctoVolt33V
+   \   0000021E   0xB207             SXTH     R7,R0
+    493          		SerPtr->printf(STARMSG);
+   \   00000220   0x4630             MOV      R0,R6
+   \   00000222   0x6829             LDR      R1,[R5, #+0]
+   \   00000224   0x6909             LDR      R1,[R1, #+16]
+   \   00000226   0x4788             BLX      R1
+    494          		SerPtr->printf("[AIN8] : %d.%03d[V]\n", Data/1000, Data%1000);
+   \   00000228   0xFB97 0xF1F8      SDIV     R1,R7,R8
+   \   0000022C   0xFB08 0x7211      MLS      R2,R8,R1,R7
+   \   00000230   0x.... 0x....      ADR.W    R0,`?<Constant "[AIN8] : %d.%03d[V]\\n">`
+   \   00000234   0x682B             LDR      R3,[R5, #+0]
+   \   00000236   0x691B             LDR      R3,[R3, #+16]
+   \   00000238   0x4798             BLX      R3
+    495          
+    496          		Data = AdctoVolt33V(ADC_AVR[ADC_Channel_9][0]);
+   \   0000023A   0x6A60             LDR      R0,[R4, #+36]
+   \   0000023C   0x8800             LDRH     R0,[R0, #+0]
+   \   0000023E   0x.... 0x....      BL       AdctoVolt33V
+   \   00000242   0xB207             SXTH     R7,R0
+    497          		SerPtr->printf(STARMSG);
+   \   00000244   0x4630             MOV      R0,R6
+   \   00000246   0x6829             LDR      R1,[R5, #+0]
+   \   00000248   0x6909             LDR      R1,[R1, #+16]
+   \   0000024A   0x4788             BLX      R1
+    498          		SerPtr->printf("[AIN9] : %d.%03d[V]\n", Data/1000, Data%1000);
+   \   0000024C   0xFB97 0xF1F8      SDIV     R1,R7,R8
+   \   00000250   0xFB08 0x7211      MLS      R2,R8,R1,R7
+   \   00000254   0x.... 0x....      ADR.W    R0,`?<Constant "[AIN9] : %d.%03d[V]\\n">`
+   \   00000258   0x682B             LDR      R3,[R5, #+0]
+   \   0000025A   0x691B             LDR      R3,[R3, #+16]
+   \   0000025C   0x4798             BLX      R3
+    499          
+    500          		Data = AdctoVolt33V(ADC_AVR[ADC_Channel_10][0]);
+   \   0000025E   0x6AA0             LDR      R0,[R4, #+40]
+   \   00000260   0x8800             LDRH     R0,[R0, #+0]
+   \   00000262   0x.... 0x....      BL       AdctoVolt33V
+   \   00000266   0xB207             SXTH     R7,R0
+    501          		SerPtr->printf(STARMSG);
+   \   00000268   0x4630             MOV      R0,R6
+   \   0000026A   0x6829             LDR      R1,[R5, #+0]
+   \   0000026C   0x6909             LDR      R1,[R1, #+16]
+   \   0000026E   0x4788             BLX      R1
+    502          		SerPtr->printf("[AIN10] : %d.%03d[V]\n", Data/1000, Data%1000);
+   \   00000270   0xFB97 0xF1F8      SDIV     R1,R7,R8
+   \   00000274   0xFB08 0x7211      MLS      R2,R8,R1,R7
+   \   00000278   0x.... 0x....      ADR.W    R0,`?<Constant "[AIN10] : %d.%03d[V]\\n">`
+   \   0000027C   0x682B             LDR      R3,[R5, #+0]
+   \   0000027E   0x691B             LDR      R3,[R3, #+16]
+   \   00000280   0x4798             BLX      R3
+    503          
+    504          		Data = AdctoVolt33V(ADC_AVR[ADC_Channel_11][0]);
+   \   00000282   0x6AE0             LDR      R0,[R4, #+44]
+   \   00000284   0x8800             LDRH     R0,[R0, #+0]
+   \   00000286   0x.... 0x....      BL       AdctoVolt33V
+   \   0000028A   0xB207             SXTH     R7,R0
+    505          		SerPtr->printf(STARMSG);
+   \   0000028C   0x4630             MOV      R0,R6
+   \   0000028E   0x6829             LDR      R1,[R5, #+0]
+   \   00000290   0x6909             LDR      R1,[R1, #+16]
+   \   00000292   0x4788             BLX      R1
+    506          		SerPtr->printf("[AIN11] : %d.%03d[V]\n", Data/1000, Data%1000);
+   \   00000294   0xFB97 0xF1F8      SDIV     R1,R7,R8
+   \   00000298   0xFB08 0x7211      MLS      R2,R8,R1,R7
+   \   0000029C   0x.... 0x....      ADR.W    R0,`?<Constant "[AIN11] : %d.%03d[V]\\n">`
+   \   000002A0   0x682B             LDR      R3,[R5, #+0]
+   \   000002A2   0x691B             LDR      R3,[R3, #+16]
+   \   000002A4   0x4798             BLX      R3
+    507          
+    508          
+    509          		Data = AdctoVolt33V(ADC_AVR[ADC_Channel_12][0]);
+   \   000002A6   0x6B20             LDR      R0,[R4, #+48]
+   \   000002A8   0x8800             LDRH     R0,[R0, #+0]
+   \   000002AA   0x.... 0x....      BL       AdctoVolt33V
+   \   000002AE   0xB207             SXTH     R7,R0
+    510          		SerPtr->printf(STARMSG);
+   \   000002B0   0x4630             MOV      R0,R6
+   \   000002B2   0x6829             LDR      R1,[R5, #+0]
+   \   000002B4   0x6909             LDR      R1,[R1, #+16]
+   \   000002B6   0x4788             BLX      R1
+    511          		SerPtr->printf("[AIN12] : %d.%03d[V]\n", Data/1000, Data%1000);
+   \   000002B8   0xFB97 0xF1F8      SDIV     R1,R7,R8
+   \   000002BC   0xFB08 0x7211      MLS      R2,R8,R1,R7
+   \   000002C0   0x.... 0x....      ADR.W    R0,`?<Constant "[AIN12] : %d.%03d[V]\\n">`
+   \   000002C4   0x682B             LDR      R3,[R5, #+0]
+   \   000002C6   0x691B             LDR      R3,[R3, #+16]
+   \   000002C8   0x4798             BLX      R3
+    512          
+    513          		Data = AdctoVolt33V(ADC_AVR[ADC_Channel_13][0]);
+   \   000002CA   0x6B60             LDR      R0,[R4, #+52]
+   \   000002CC   0x8800             LDRH     R0,[R0, #+0]
+   \   000002CE   0x.... 0x....      BL       AdctoVolt33V
+   \   000002D2   0xB207             SXTH     R7,R0
+    514          		SerPtr->printf(STARMSG);
+   \   000002D4   0x4630             MOV      R0,R6
+   \   000002D6   0x6829             LDR      R1,[R5, #+0]
+   \   000002D8   0x6909             LDR      R1,[R1, #+16]
+   \   000002DA   0x4788             BLX      R1
+    515          		SerPtr->printf("[AIN13] : %d.%03d[V]\n", Data/1000, Data%1000);
+   \   000002DC   0xFB97 0xF1F8      SDIV     R1,R7,R8
+   \   000002E0   0xFB08 0x7211      MLS      R2,R8,R1,R7
+   \   000002E4   0x.... 0x....      ADR.W    R0,`?<Constant "[AIN13] : %d.%03d[V]\\n">`
+   \   000002E8   0x682B             LDR      R3,[R5, #+0]
+   \   000002EA   0x691B             LDR      R3,[R3, #+16]
+   \   000002EC   0x4798             BLX      R3
+    516          
+    517          		Data = AdctoVolt33V(ADC_AVR[ADC_Channel_14][0]);
+   \   000002EE   0x6BA0             LDR      R0,[R4, #+56]
+   \   000002F0   0x8800             LDRH     R0,[R0, #+0]
+   \   000002F2   0x.... 0x....      BL       AdctoVolt33V
+   \   000002F6   0xB207             SXTH     R7,R0
+    518          		SerPtr->printf(STARMSG);
+   \   000002F8   0x4630             MOV      R0,R6
+   \   000002FA   0x6829             LDR      R1,[R5, #+0]
+   \   000002FC   0x6909             LDR      R1,[R1, #+16]
+   \   000002FE   0x4788             BLX      R1
+    519          		SerPtr->printf("[AIN14] : %d.%03d[V]\n", Data/1000, Data%1000);
+   \   00000300   0xFB97 0xF1F8      SDIV     R1,R7,R8
+   \   00000304   0xFB08 0x7211      MLS      R2,R8,R1,R7
+   \   00000308   0x.... 0x....      ADR.W    R0,`?<Constant "[AIN14] : %d.%03d[V]\\n">`
+   \   0000030C   0x682B             LDR      R3,[R5, #+0]
+   \   0000030E   0x691B             LDR      R3,[R3, #+16]
+   \   00000310   0x4798             BLX      R3
+    520          
+    521          //		Data = AdctoVolt33V(ADC_AVR[ADC_Channel_15][0]);
+    522          		Data = (ADC_AVR[ADC_Channel_15][0]);
+   \   00000312   0x6BE0             LDR      R0,[R4, #+60]
+   \   00000314   0xF9B0 0x4000      LDRSH    R4,[R0, #+0]
+    523          		tmpx = ReadEnvTempTable(Data);
+   \   00000318   0x4620             MOV      R0,R4
+   \   0000031A   0x.... 0x....      BL       ReadEnvTempTable
+   \   0000031E   0x4607             MOV      R7,R0
+    524          		SerPtr->printf(STARMSG);
+   \   00000320   0x4630             MOV      R0,R6
+   \   00000322   0x6829             LDR      R1,[R5, #+0]
+   \   00000324   0x6909             LDR      R1,[R1, #+16]
+   \   00000326   0x4788             BLX      R1
+    525          		SerPtr->printf("TEMP                   : %d.%03d[V], %d['C]\n", Data/1000, Data%1000, tmpx/10);
+   \   00000328   0xFB94 0xF1F8      SDIV     R1,R4,R8
+   \   0000032C   0xB23A             SXTH     R2,R7
+   \   0000032E   0x200A             MOVS     R0,#+10
+   \   00000330   0xFB92 0xF3F0      SDIV     R3,R2,R0
+   \   00000334   0xFB08 0x4211      MLS      R2,R8,R1,R4
+   \   00000338   0x.... 0x....      ADR.W    R0,`?<Constant "TEMP                 ...">`
+   \   0000033C   0x682C             LDR      R4,[R5, #+0]
+   \   0000033E   0x6924             LDR      R4,[R4, #+16]
+   \   00000340   0x47A0             BLX      R4
+    526          
+    527          		
+    528          		OSTimeDly(30L);
+   \   00000342   0x201E             MOVS     R0,#+30
+   \   00000344   0x.... 0x....      BL       OSTimeDly
+    529          
+    530          	}
+    531          #endif
+    532          
+    533          	SerPtr->printf("\n\n");
+   \   00000348   0x....             ADR.N    R0,??DataTable76  ;; 0x0A, 0x0A, 0x00, 0x00
+   \   0000034A   0x6829             LDR      R1,[R5, #+0]
+   \   0000034C   0x6909             LDR      R1,[R1, #+16]
+   \   0000034E   0x4788             BLX      R1
+    534          	
+    535          	PrintStar();
+   \   00000350   0xE8BD 0x41F0      POP      {R4-R8,LR}
+   \   00000354   0x....             B.N      PrintStar
+    536          }
+    537          
+    538          
+    539          
+    540          
+
+   \                                 In section .text, align 2, keep-with-next
+    541          void AdcPrintf(char *sptr, INT16U rawData, INT8U is_5V)
+    542          {
+   \                     AdcPrintf:
+   \   00000000   0xB5F8             PUSH     {R3-R7,LR}
+   \   00000002   0x4604             MOV      R4,R0
+   \   00000004   0x460F             MOV      R7,R1
+    543          	INT16U Data=0;
+    544          	if(is_5V) 	Data = AdctoVolt5opamp(rawData);
+   \   00000006   0x2A00             CMP      R2,#+0
+   \   00000008   0x4638             MOV      R0,R7
+   \   0000000A   0xD002             BEQ.N    ??AdcPrintf_0
+   \   0000000C   0x.... 0x....      BL       AdctoVolt5opamp
+   \   00000010   0xE001             B.N      ??AdcPrintf_1
+    545          	else		Data = AdctoVolt33V(rawData);
+   \                     ??AdcPrintf_0:
+   \   00000012   0x.... 0x....      BL       AdctoVolt33V
+   \                     ??AdcPrintf_1:
+   \   00000016   0x4606             MOV      R6,R0
+    546          	
+    547          	SerPtr->printf(STARMSG);
+   \   00000018   0x.... 0x....      LDR.W    R5,??DataTable79_1
+   \   0000001C   0x....             ADR.N    R0,??DataTable75  ;; 0x2A, 0x20, 0x00, 0x00
+   \   0000001E   0x6829             LDR      R1,[R5, #+0]
+   \   00000020   0x6909             LDR      R1,[R1, #+16]
+   \   00000022   0x4788             BLX      R1
+    548          	SerPtr->printf("%s: %d.%d[V], [raw:%04d]", sptr, Data/10, Data%10, rawData);
+   \   00000024   0x200A             MOVS     R0,#+10
+   \   00000026   0xFB96 0xF2F0      SDIV     R2,R6,R0
+   \   0000002A   0x9700             STR      R7,[SP, #+0]
+   \   0000002C   0xEB02 0x0082      ADD      R0,R2,R2, LSL #+2
+   \   00000030   0xEBA6 0x0340      SUB      R3,R6,R0, LSL #+1
+   \   00000034   0x4621             MOV      R1,R4
+   \   00000036   0x.... 0x....      ADR.W    R0,`?<Constant "%s: %d.%d[V], [raw:%04d]">`
+   \   0000003A   0x682C             LDR      R4,[R5, #+0]
+   \   0000003C   0x6924             LDR      R4,[R4, #+16]
+   \   0000003E   0x47A0             BLX      R4
+    549          	SerPtr->printf(ENTMSG);
+   \   00000040   0x....             ADR.N    R0,??DataTable76_1  ;; "\n"
+   \   00000042   0x6829             LDR      R1,[R5, #+0]
+   \   00000044   0x6909             LDR      R1,[R1, #+16]
+   \   00000046   0xE8BD 0x40F4      POP      {R2,R4-R7,LR}
+   \   0000004A   0x4708             BX       R1
+    550          }
+    551          
+    552          
+    553          
+    554          
+
+   \                                 In section .bss, align 4
+    555          INT32U comtstcnt = 0;
+   \                     comtstcnt:
+   \   00000000                      DS8 4
+    556          
+
+   \                                 In section .text, align 2, keep-with-next
+    557          void COMTestFunc(void)
+    558          {
+   \                     COMTestFunc:
+   \   00000000   0xB570             PUSH     {R4-R6,LR}
+   \   00000002   0xB082             SUB      SP,SP,#+8
+    559          	INT16U Recv;
+    560          
+    561          	{
+    562          		pUSART1.printf(STARMSG);
+   \   00000004   0x.... 0x....      LDR.W    R4,??DataTable80_10
+   \   00000008   0x....             ADR.N    R0,??DataTable75  ;; 0x2A, 0x20, 0x00, 0x00
+   \   0000000A   0x6921             LDR      R1,[R4, #+16]
+   \   0000000C   0x4788             BLX      R1
+    563          		pUSART1.printf("통신시험 Ser4[MODEM] 시험을 체크하여 주세요     ");
+   \   0000000E   0x.... 0x....      ADR.W    R0,`?<Constant "\\305\\353\\275\\305\\275\\303\\307\\350 S`
+   \   00000012   0x6921             LDR      R1,[R4, #+16]
+   \   00000014   0x4788             BLX      R1
+    564          		pUSART4.BuffClear();
+   \   00000016   0x.... 0x....      LDR.W    R6,??DataTable80_11
+   \   0000001A   0x6A30             LDR      R0,[R6, #+32]
+   \   0000001C   0x4780             BLX      R0
+    565          		pUSART4.PutToBuffer(comtstcnt & 0x0f);		
+   \   0000001E   0x.... 0x....      LDR.W    R5,??DataTable80_12
+   \   00000022   0x7828             LDRB     R0,[R5, #+0]
+   \   00000024   0xF000 0x000F      AND      R0,R0,#0xF
+   \   00000028   0x69B1             LDR      R1,[R6, #+24]
+   \   0000002A   0x4788             BLX      R1
+    566          
+    567          		OSTimeDly(100L);
+   \   0000002C   0x2064             MOVS     R0,#+100
+   \   0000002E   0x.... 0x....      BL       OSTimeDly
+    568          
+    569          		if(pUSART4.CheckByte(1, &Recv))
+   \   00000032   0xA900             ADD      R1,SP,#+0
+   \   00000034   0x2001             MOVS     R0,#+1
+   \   00000036   0x6872             LDR      R2,[R6, #+4]
+   \   00000038   0x4790             BLX      R2
+   \   0000003A   0xB168             CBZ.N    R0,??COMTestFunc_0
+    570          		{
+    571          			if( pUSART4.RxGetByte() == (comtstcnt & 0x0f)// &&
+    572          				//pUSART3.RxGetByte() == 'b' &&
+    573          				//pUSART3.RxGetByte() == 'i' &&
+    574          				//pUSART3.RxGetByte() == 'z' &&
+    575          				//pUSART3.RxGetByte() == 'i'
+    576          				)
+   \   0000003C   0x68B0             LDR      R0,[R6, #+8]
+   \   0000003E   0x4780             BLX      R0
+   \   00000040   0x6921             LDR      R1,[R4, #+16]
+   \   00000042   0x782A             LDRB     R2,[R5, #+0]
+   \   00000044   0xF002 0x020F      AND      R2,R2,#0xF
+   \   00000048   0x4290             CMP      R0,R2
+   \   0000004A   0xBF0C             ITE      EQ 
+   \   0000004C   0x.... 0x....      ADREQ.W  R0,`?<Constant "[OK]">`
+   \   00000050   0x.... 0x....      ADRNE.W  R0,`?<Constant "[FAIL 1]">`
+    577          						pUSART1.printf("[OK]");
+    578          			else		pUSART1.printf("[FAIL 1]");
+   \   00000054   0x4788             BLX      R1
+   \   00000056   0xE005             B.N      ??COMTestFunc_1
+    579          		}
+    580          		else pUSART1.printf("[FAIL 2]: %d", Recv);
+   \                     ??COMTestFunc_0:
+   \   00000058   0xF8BD 0x1000      LDRH     R1,[SP, #+0]
+   \   0000005C   0x.... 0x....      ADR.W    R0,`?<Constant "[FAIL 2]: %d">`
+   \   00000060   0x6922             LDR      R2,[R4, #+16]
+   \   00000062   0x4790             BLX      R2
+    581          		pUSART1.printf(ENTMSG);
+   \                     ??COMTestFunc_1:
+   \   00000064   0x....             ADR.N    R6,??DataTable77  ;; "\n"
+   \   00000066   0x4630             MOV      R0,R6
+   \   00000068   0x6921             LDR      R1,[R4, #+16]
+   \   0000006A   0x4788             BLX      R1
+    582          	}
+    583          		
+    584          
+    585          	pUSART1.printf(ENTMSG);
+   \   0000006C   0x4630             MOV      R0,R6
+   \   0000006E   0x6921             LDR      R1,[R4, #+16]
+   \   00000070   0x4788             BLX      R1
+    586          	pUSART1.printf(ENTMSG);
+   \   00000072   0x4630             MOV      R0,R6
+   \   00000074   0x6921             LDR      R1,[R4, #+16]
+   \   00000076   0x4788             BLX      R1
+    587          	comtstcnt++;
+   \   00000078   0x6828             LDR      R0,[R5, #+0]
+   \   0000007A   0x1C40             ADDS     R0,R0,#+1
+   \   0000007C   0x6028             STR      R0,[R5, #+0]
+    588          }
+   \   0000007E   0xBD73             POP      {R0,R1,R4-R6,PC}  ;; return
+    589          
+
+   \                                 In section .text, align 2, keep-with-next
+    590          void CurrentInputStatus(INT8U vcheck)
+    591          {
+   \                     CurrentInputStatus:
+   \   00000000   0xE92D 0x47F0      PUSH     {R4-R10,LR}
+   \   00000004   0xB082             SUB      SP,SP,#+8
+   \   00000006   0x0004             MOVS     R4,R0
+    592          	INT8U tcnt = 0;
+    593          	INT8U tval = FALSE;
+    594              tcnt = tcnt;
+    595          
+    596          	if(!vcheck)PrintStar();
+   \   00000008   0xBF08             IT       EQ 
+   \   0000000A   0x.... 0x....      BLEQ     PrintStar
+    597          	{
+    598          #if 0
+    599          		tval += DigitalInputDiplay(tcnt++, _4G_PLL_LD, STARMSG, NULL, vcheck);
+    600          		tval += DigitalInputDiplay(tcnt++, _3G_PLL_LD, PHAMSG, ENTMSG, vcheck);
+    601          #endif
+    602          		tval += DigitalInputDiplay(tcnt++, RRTYPE, STARMSG, NULL, vcheck);
+   \   0000000E   0x....             ADR.N    R6,??DataTable76_2  ;; 0x2A, 0x20, 0x00, 0x00
+   \   00000010   0x9400             STR      R4,[SP, #+0]
+   \   00000012   0x2300             MOVS     R3,#+0
+   \   00000014   0x4632             MOV      R2,R6
+   \   00000016   0x.... 0x....      LDR.W    R0,??DataTable80_13  ;; 0x40020810
+   \   0000001A   0x6800             LDR      R0,[R0, #+0]
+   \   0000001C   0xF3C0 0x11C0      UBFX     R1,R0,#+7,#+1
+   \   00000020   0x2000             MOVS     R0,#+0
+   \   00000022   0x.... 0x....      BL       DigitalInputDiplay
+   \   00000026   0x4681             MOV      R9,R0
+    603          		tval += DigitalInputDiplay(tcnt++, AC_Alarm, PHAMSG, NULL, vcheck);
+   \   00000028   0x.... 0x....      ADR.W    R8,??DataTable77_1  ;; 0x2C, 0x20, 0x00, 0x00
+   \   0000002C   0x.... 0x....      LDR.W    R7,??DataTable80_14  ;; 0x40020410
+   \   00000030   0x9400             STR      R4,[SP, #+0]
+   \   00000032   0x2300             MOVS     R3,#+0
+   \   00000034   0x4642             MOV      R2,R8
+   \   00000036   0x6838             LDR      R0,[R7, #+0]
+   \   00000038   0x0B80             LSRS     R0,R0,#+14
+   \   0000003A   0xF000 0x0101      AND      R1,R0,#0x1
+   \   0000003E   0x2001             MOVS     R0,#+1
+   \   00000040   0x.... 0x....      BL       DigitalInputDiplay
+   \   00000044   0x4682             MOV      R10,R0
+    604          		tval += DigitalInputDiplay(tcnt++, PLLAlarm_CDMALTE, PHAMSG, ENTMSG, vcheck);
+   \   00000046   0x....             ADR.N    R5,??DataTable76_1  ;; "\n"
+   \   00000048   0x9400             STR      R4,[SP, #+0]
+   \   0000004A   0x462B             MOV      R3,R5
+   \   0000004C   0x4642             MOV      R2,R8
+   \   0000004E   0x6838             LDR      R0,[R7, #+0]
+   \   00000050   0x0B00             LSRS     R0,R0,#+12
+   \   00000052   0xF000 0x0101      AND      R1,R0,#0x1
+   \   00000056   0x2002             MOVS     R0,#+2
+   \   00000058   0x.... 0x....      BL       DigitalInputDiplay
+   \   0000005C   0x4607             MOV      R7,R0
+    605          		
+    606          		tval += DigitalInputDiplay(tcnt++, PLLAlarm_WCDMA, STARMSG, NULL, vcheck);
+   \   0000005E   0x9400             STR      R4,[SP, #+0]
+   \   00000060   0x2300             MOVS     R3,#+0
+   \   00000062   0x4632             MOV      R2,R6
+   \   00000064   0x.... 0x....      LDR.W    R0,??DataTable80_15  ;; 0x40020010
+   \   00000068   0x6800             LDR      R0,[R0, #+0]
+   \   0000006A   0x0B00             LSRS     R0,R0,#+12
+   \   0000006C   0xF000 0x0101      AND      R1,R0,#0x1
+   \   00000070   0x2003             MOVS     R0,#+3
+   \   00000072   0x.... 0x....      BL       DigitalInputDiplay
+    607          		tval += DigitalInputDiplay(tcnt++, PLLAlarm_LTE_A2_0, PHAMSG, ENTMSG, vcheck);
+   \   00000076   0xEB0A 0x0109      ADD      R1,R10,R9
+   \   0000007A   0x1879             ADDS     R1,R7,R1
+   \   0000007C   0x1846             ADDS     R6,R0,R1
+   \   0000007E   0x9400             STR      R4,[SP, #+0]
+   \   00000080   0x462B             MOV      R3,R5
+   \   00000082   0x4642             MOV      R2,R8
+   \   00000084   0x.... 0x....      LDR.W    R0,??DataTable80_16  ;; 0x40020c10
+   \   00000088   0x6800             LDR      R0,[R0, #+0]
+   \   0000008A   0x0BC0             LSRS     R0,R0,#+15
+   \   0000008C   0xF000 0x0101      AND      R1,R0,#0x1
+   \   00000090   0x2004             MOVS     R0,#+4
+   \   00000092   0x.... 0x....      BL       DigitalInputDiplay
+   \   00000096   0x1980             ADDS     R0,R0,R6
+    608           	}
+    609          	
+    610          	if(!vcheck)PrintStar();
+   \   00000098   0x2C00             CMP      R4,#+0
+   \   0000009A   0xBF04             ITT      EQ 
+   \   0000009C   0xE8BD 0x47F3      POPEQ    {R0,R1,R4-R10,LR}
+   \   000000A0   0x.... 0x....      BEQ.W    PrintStar
+    611          	if(vcheck)
+    612          	{
+    613          		if(tval) SerPtr->printf("\n");
+   \   000000A4   0xB2C0             UXTB     R0,R0
+   \   000000A6   0xB138             CBZ.N    R0,??CurrentInputStatus_0
+   \   000000A8   0x4628             MOV      R0,R5
+   \   000000AA   0x.... 0x....      LDR.W    R1,??DataTable79_1
+   \   000000AE   0x6809             LDR      R1,[R1, #+0]
+   \   000000B0   0x6909             LDR      R1,[R1, #+16]
+   \   000000B2   0xE8BD 0x47FC      POP      {R2-R10,LR}
+   \   000000B6   0x4708             BX       R1
+    614          	}
+    615          }
+   \                     ??CurrentInputStatus_0:
+   \   000000B8   0xE8BD 0x87F3      POP      {R0,R1,R4-R10,PC}  ;; return
+    616          
+    617          
+    618          
+
+   \                                 In section .text, align 4, keep-with-next
+    619          void HwTestOutFunc(INT32U *nFlag)
+    620          {
+   \                     HwTestOutFunc:
+   \   00000000   0xE92D 0x4FF0      PUSH     {R4-R11,LR}
+   \   00000004   0xB083             SUB      SP,SP,#+12
+   \   00000006   0x4683             MOV      R11,R0
+    621          #if 1
+    622          	INT32U MaxValue = 0xFFFF;
+   \   00000008   0xF64F 0x70FF      MOVW     R0,#+65535
+   \   0000000C   0x9000             STR      R0,[SP, #+0]
+    623          	INT8U Data = *nFlag;
+   \   0000000E   0xF89B 0x0000      LDRB     R0,[R11, #+0]
+   \   00000012   0x9001             STR      R0,[SP, #+4]
+    624          
+    625          	INT8U i = 0;
+   \   00000014   0x2400             MOVS     R4,#+0
+    626          
+    627          	GreenLED_CDMA		= 0;
+   \   00000016   0x.... 0x....      LDR.W    R5,??DataTable80_17  ;; 0x40020c14
+   \   0000001A   0x6828             LDR      R0,[R5, #+0]
+   \   0000001C   0xF020 0x0010      BIC      R0,R0,#0x10
+   \   00000020   0x6028             STR      R0,[R5, #+0]
+    628          	RedLED_CDMA			= 0;
+   \   00000022   0x6828             LDR      R0,[R5, #+0]
+   \   00000024   0xF020 0x0008      BIC      R0,R0,#0x8
+   \   00000028   0x6028             STR      R0,[R5, #+0]
+    629          	GreenLED_WCDMA		= 0;
+   \   0000002A   0x.... 0x....      LDR.W    R6,??DataTable80_18  ;; 0x40020014
+   \   0000002E   0x6830             LDR      R0,[R6, #+0]
+   \   00000030   0xF420 0x4080      BIC      R0,R0,#0x4000
+   \   00000034   0x6030             STR      R0,[R6, #+0]
+    630          	RedLED_WCDMA		= 0;
+   \   00000036   0x6828             LDR      R0,[R5, #+0]
+   \   00000038   0xF020 0x0080      BIC      R0,R0,#0x80
+   \   0000003C   0x6028             STR      R0,[R5, #+0]
+    631          	GreenLED_LTE 		= 0;
+   \   0000003E   0x6828             LDR      R0,[R5, #+0]
+   \   00000040   0xF020 0x0040      BIC      R0,R0,#0x40
+   \   00000044   0x6028             STR      R0,[R5, #+0]
+    632          	RedLED_LTE			= 0;
+   \   00000046   0x6828             LDR      R0,[R5, #+0]
+   \   00000048   0xF020 0x0020      BIC      R0,R0,#0x20
+   \   0000004C   0x6028             STR      R0,[R5, #+0]
+    633          	GreenLED_LTE_A2_0	= 0;
+   \   0000004E   0x6828             LDR      R0,[R5, #+0]
+   \   00000050   0x0840             LSRS     R0,R0,#+1
+   \   00000052   0x0040             LSLS     R0,R0,#+1
+   \   00000054   0x6028             STR      R0,[R5, #+0]
+    634          	RedLED_LTE_A2_0		= 0;	
+   \   00000056   0x6828             LDR      R0,[R5, #+0]
+   \   00000058   0xF020 0x0002      BIC      R0,R0,#0x2
+   \   0000005C   0x6028             STR      R0,[R5, #+0]
+    635          
+    636          	AmpOnOff_CDMA		= 0;
+   \   0000005E   0x.... 0x....      LDR.W    R7,??DataTable80_19  ;; 0x40021014
+   \   00000062   0x6838             LDR      R0,[R7, #+0]
+   \   00000064   0xF420 0x5080      BIC      R0,R0,#0x1000
+   \   00000068   0x6038             STR      R0,[R7, #+0]
+    637          	AmpOnOff_LTE_0		= 0;
+   \   0000006A   0x6838             LDR      R0,[R7, #+0]
+   \   0000006C   0xF420 0x5000      BIC      R0,R0,#0x2000
+   \   00000070   0x6038             STR      R0,[R7, #+0]
+    638          	AmpOnOff_LTE_A2_0	= 0;
+   \   00000072   0x6828             LDR      R0,[R5, #+0]
+   \   00000074   0xF420 0x7080      BIC      R0,R0,#0x100
+   \   00000078   0x6028             STR      R0,[R5, #+0]
+    639          	AmpOnOff_WCDMA		= 0;
+   \   0000007A   0x6828             LDR      R0,[R5, #+0]
+   \   0000007C   0xF420 0x7000      BIC      R0,R0,#0x200
+   \   00000080   0x6028             STR      R0,[R5, #+0]
+    640          
+    641          	
+    642          	PLLEN_LTE			= 0;
+   \   00000082   0x.... 0x....      LDR.W    R8,??DataTable80_20  ;; 0x40020414
+   \   00000086   0xF8D8 0x0000      LDR      R0,[R8, #+0]
+   \   0000008A   0xF420 0x7080      BIC      R0,R0,#0x100
+   \   0000008E   0xF8C8 0x0000      STR      R0,[R8, #+0]
+    643          	PLLEN_LTE_A2		= 0;
+   \   00000092   0x.... 0x....      LDR.W    R9,??DataTable80_21  ;; 0x40020814
+   \   00000096   0xF8D9 0x0000      LDR      R0,[R9, #+0]
+   \   0000009A   0xF020 0x0040      BIC      R0,R0,#0x40
+   \   0000009E   0xF8C9 0x0000      STR      R0,[R9, #+0]
+    644          	PLLEN_LTE_A2_1		= 0;
+   \   000000A2   0x6830             LDR      R0,[R6, #+0]
+   \   000000A4   0xF420 0x5000      BIC      R0,R0,#0x2000
+   \   000000A8   0x6030             STR      R0,[R6, #+0]
+    645          
+    646          	SMS_PWR 			= 0;
+   \   000000AA   0x6838             LDR      R0,[R7, #+0]
+   \   000000AC   0xF420 0x6000      BIC      R0,R0,#0x800
+   \   000000B0   0x6038             STR      R0,[R7, #+0]
+   \   000000B2   0x.... 0x....      LDR.W    R10,??DataTable80_22
+   \   000000B6   0xF8DA 0x2000      LDR      R2,[R10, #+0]
+   \   000000BA   0x.... 0x....      LDR.W    R1,??DataTable80_23
+   \   000000BE   0x2038             MOVS     R0,#+56
+    647          
+    648          
+    649          	PCA9555BitSet(SP_EN1,&AttnCS0Val); 
+   \   000000C0   0x.... 0x....      BL       pPCA9555BitSet
+   \   000000C4   0xF8DA 0x2000      LDR      R2,[R10, #+0]
+   \   000000C8   0x.... 0x....      LDR.W    R1,??DataTable80_24
+   \   000000CC   0x2039             MOVS     R0,#+57
+    650          	PCA9555BitSet(SP_EN2,&AttnCS1Val); 
+   \   000000CE   0x.... 0x....      BL       pPCA9555BitSet
+    651          
+    652          
+    653          	for(i = 0;i < Att_SelMax ; i++)
+    654          	{
+    655          		AttnDataOutput(i, ~0);
+   \                     ??HwTestOutFunc_1:
+   \   000000D2   0x21FF             MOVS     R1,#+255
+   \   000000D4   0x4620             MOV      R0,R4
+   \   000000D6   0x.... 0x....      BL       AttnDataOutput
+    656          	}
+   \   000000DA   0x1C64             ADDS     R4,R4,#+1
+   \   000000DC   0x2C1A             CMP      R4,#+26
+   \   000000DE   0xD3F8             BCC.N    ??HwTestOutFunc_1
+    657          
+    658          	switch(Data)
+   \   000000E0   0x9801             LDR      R0,[SP, #+4]
+   \   000000E2   0x2817             CMP      R0,#+23
+   \   000000E4   0xF200 0x80A4      BHI.W    ??HwTestOutFunc_2
+   \   000000E8   0xE8DF 0xF000      TBB      [PC, R0]
+   \                     ??HwTestOutFunc_0:
+   \   000000EC   0x0C 0x11          DC8      0xC,0x11,0x16,0x1B
+   \              0x16 0x1B    
+   \   000000F0   0x20 0x25          DC8      0x20,0x25,0x2A,0x2F
+   \              0x2A 0x2F    
+   \   000000F4   0x34 0x39          DC8      0x34,0x39,0x3E,0x42
+   \              0x3E 0x42    
+   \   000000F8   0x48 0x50          DC8      0x48,0x50,0x57,0x5C
+   \              0x57 0x5C    
+   \   000000FC   0x63 0x6A          DC8      0x63,0x6A,0x73,0x7C
+   \              0x73 0x7C    
+   \   00000100   0x85 0x8E          DC8      0x85,0x8E,0x97,0xA0
+   \              0x97 0xA0    
+    659          	{
+    660          		case 0:
+    661          			GreenLED_CDMA	= 1;
+   \                     ??HwTestOutFunc_3:
+   \   00000104   0x6828             LDR      R0,[R5, #+0]
+   \   00000106   0xF040 0x0010      ORR      R0,R0,#0x10
+   \   0000010A   0x6028             STR      R0,[R5, #+0]
+   \   0000010C   0xE090             B.N      ??HwTestOutFunc_2
+    662          		break;
+    663          		
+    664          		case 1:
+    665          			RedLED_CDMA		= 1;
+   \                     ??HwTestOutFunc_4:
+   \   0000010E   0x6828             LDR      R0,[R5, #+0]
+   \   00000110   0xF040 0x0008      ORR      R0,R0,#0x8
+   \   00000114   0x6028             STR      R0,[R5, #+0]
+   \   00000116   0xE08B             B.N      ??HwTestOutFunc_2
+    666          		break;
+    667          
+    668          		case 2:
+    669          			GreenLED_LTE 	= 1;
+   \                     ??HwTestOutFunc_5:
+   \   00000118   0x6828             LDR      R0,[R5, #+0]
+   \   0000011A   0xF040 0x0040      ORR      R0,R0,#0x40
+   \   0000011E   0x6028             STR      R0,[R5, #+0]
+   \   00000120   0xE086             B.N      ??HwTestOutFunc_2
+    670          		break;
+    671          		
+    672          		case 3:
+    673          			RedLED_LTE		= 1;
+   \                     ??HwTestOutFunc_6:
+   \   00000122   0x6828             LDR      R0,[R5, #+0]
+   \   00000124   0xF040 0x0020      ORR      R0,R0,#0x20
+   \   00000128   0x6028             STR      R0,[R5, #+0]
+   \   0000012A   0xE081             B.N      ??HwTestOutFunc_2
+    674          		break;			
+    675          		
+    676          		case 4:
+    677          			GreenLED_LTE_A2_0	= 1;
+   \                     ??HwTestOutFunc_7:
+   \   0000012C   0x6828             LDR      R0,[R5, #+0]
+   \   0000012E   0xF040 0x0001      ORR      R0,R0,#0x1
+   \   00000132   0x6028             STR      R0,[R5, #+0]
+   \   00000134   0xE07C             B.N      ??HwTestOutFunc_2
+    678          		break;
+    679          		
+    680          		case 5:
+    681          			RedLED_LTE_A2_0		= 1;
+   \                     ??HwTestOutFunc_8:
+   \   00000136   0x6828             LDR      R0,[R5, #+0]
+   \   00000138   0xF040 0x0002      ORR      R0,R0,#0x2
+   \   0000013C   0x6028             STR      R0,[R5, #+0]
+   \   0000013E   0xE077             B.N      ??HwTestOutFunc_2
+    682          		break;	
+    683          
+    684          		case 6:
+    685          			GreenLED_WCDMA	= 1;
+   \                     ??HwTestOutFunc_9:
+   \   00000140   0x6830             LDR      R0,[R6, #+0]
+   \   00000142   0xF440 0x4080      ORR      R0,R0,#0x4000
+   \   00000146   0x6030             STR      R0,[R6, #+0]
+   \   00000148   0xE072             B.N      ??HwTestOutFunc_2
+    686          		break;
+    687          		
+    688          		case 7:
+    689          			RedLED_WCDMA	= 1;
+   \                     ??HwTestOutFunc_10:
+   \   0000014A   0x6828             LDR      R0,[R5, #+0]
+   \   0000014C   0xF040 0x0080      ORR      R0,R0,#0x80
+   \   00000150   0x6028             STR      R0,[R5, #+0]
+   \   00000152   0xE06D             B.N      ??HwTestOutFunc_2
+    690          		break;			
+    691          		
+    692          		case 8:
+    693          			AmpOnOff_CDMA		= 1;
+   \                     ??HwTestOutFunc_11:
+   \   00000154   0x6838             LDR      R0,[R7, #+0]
+   \   00000156   0xF440 0x5080      ORR      R0,R0,#0x1000
+   \   0000015A   0x6038             STR      R0,[R7, #+0]
+   \   0000015C   0xE068             B.N      ??HwTestOutFunc_2
+    694          		break;
+    695          		
+    696          		case 9:
+    697          			AmpOnOff_LTE_0		= 1;
+   \                     ??HwTestOutFunc_12:
+   \   0000015E   0x6838             LDR      R0,[R7, #+0]
+   \   00000160   0xF440 0x5000      ORR      R0,R0,#0x2000
+   \   00000164   0x6038             STR      R0,[R7, #+0]
+    698          		break;
+   \   00000166   0xE063             B.N      ??HwTestOutFunc_2
+    699          		
+    700          		case 10:
+    701          			AmpOnOff_LTE_A2_0 	= 1;
+   \                     ??HwTestOutFunc_13:
+   \   00000168   0x6828             LDR      R0,[R5, #+0]
+   \   0000016A   0xF44F 0x7180      MOV      R1,#+256
+   \   0000016E   0xE002             B.N      ??HwTestOutFunc_14
+    702          		break;
+    703          		
+    704          		case 11:
+    705          			AmpOnOff_WCDMA 		= 1;
+   \                     ??HwTestOutFunc_15:
+   \   00000170   0x6828             LDR      R0,[R5, #+0]
+   \   00000172   0xF44F 0x7100      MOV      R1,#+512
+   \                     ??HwTestOutFunc_14:
+   \   00000176   0x4308             ORRS     R0,R1,R0
+   \   00000178   0x6028             STR      R0,[R5, #+0]
+    706          		break;
+   \   0000017A   0xE059             B.N      ??HwTestOutFunc_2
+    707          
+    708                  case 12:
+    709          			PLLEN_LTE 		= 1;
+   \                     ??HwTestOutFunc_16:
+   \   0000017C   0xF8D8 0x0000      LDR      R0,[R8, #+0]
+   \   00000180   0xF44F 0x7180      MOV      R1,#+256
+   \   00000184   0x4308             ORRS     R0,R1,R0
+   \   00000186   0xF8C8 0x0000      STR      R0,[R8, #+0]
+    710          		break;
+   \   0000018A   0xE051             B.N      ??HwTestOutFunc_2
+    711          
+    712                  case 13:
+    713          			PLLEN_LTE_A2 		= 1;
+   \                     ??HwTestOutFunc_17:
+   \   0000018C   0xF8D9 0x0000      LDR      R0,[R9, #+0]
+   \   00000190   0xF040 0x0040      ORR      R0,R0,#0x40
+   \   00000194   0xF8C9 0x0000      STR      R0,[R9, #+0]
+    714          		break;
+   \   00000198   0xE04A             B.N      ??HwTestOutFunc_2
+    715          
+    716             		case 14:
+    717          			PLLEN_LTE_A2_1 		= 1;
+   \                     ??HwTestOutFunc_18:
+   \   0000019A   0x6830             LDR      R0,[R6, #+0]
+   \   0000019C   0xF440 0x5000      ORR      R0,R0,#0x2000
+   \   000001A0   0x6030             STR      R0,[R6, #+0]
+    718          		break;
+   \   000001A2   0xE045             B.N      ??HwTestOutFunc_2
+    719          
+    720             		case 15:
+    721          			PCA9555BitRst(SP_EN1,&AttnCS0Val); 
+   \                     ??HwTestOutFunc_19:
+   \   000001A4   0xF8DA 0x2000      LDR      R2,[R10, #+0]
+   \   000001A8   0x....             LDR.N    R1,??DataTable80_23
+   \   000001AA   0x2038             MOVS     R0,#+56
+   \   000001AC   0x.... 0x....      BL       pPCA9555BitRst
+   \   000001B0   0xE03E             B.N      ??HwTestOutFunc_2
+    722          		break;
+    723          
+    724          
+    725             		case 16:
+    726          			PCA9555BitRst(SP_EN2,&AttnCS1Val); 
+   \                     ??HwTestOutFunc_20:
+   \   000001B2   0xF8DA 0x2000      LDR      R2,[R10, #+0]
+   \   000001B6   0x....             LDR.N    R1,??DataTable80_24
+   \   000001B8   0x2039             MOVS     R0,#+57
+   \   000001BA   0x.... 0x....      BL       pPCA9555BitRst
+    727          		break;
+   \   000001BE   0xE037             B.N      ??HwTestOutFunc_2
+    728          
+    729          
+    730          
+    731          		case 17:
+    732          			for(i = 0;i < Att_SelMax ; i++)
+   \                     ??HwTestOutFunc_21:
+   \   000001C0   0x2400             MOVS     R4,#+0
+    733          			{
+    734          				AttnDataOutput(i, ~1);
+   \                     ??HwTestOutFunc_22:
+   \   000001C2   0x21FE             MOVS     R1,#+254
+   \   000001C4   0x4620             MOV      R0,R4
+   \   000001C6   0x.... 0x....      BL       AttnDataOutput
+    735          			}
+   \   000001CA   0x1C64             ADDS     R4,R4,#+1
+   \   000001CC   0x2C1A             CMP      R4,#+26
+   \   000001CE   0xD3F8             BCC.N    ??HwTestOutFunc_22
+   \   000001D0   0xE02E             B.N      ??HwTestOutFunc_2
+    736          		break;
+    737          
+    738          		case 18:
+    739          			for(i = 0;i < Att_SelMax ; i++)
+   \                     ??HwTestOutFunc_23:
+   \   000001D2   0x2400             MOVS     R4,#+0
+    740          			{
+    741          				AttnDataOutput(i, ~2);
+   \                     ??HwTestOutFunc_24:
+   \   000001D4   0x21FD             MOVS     R1,#+253
+   \   000001D6   0x4620             MOV      R0,R4
+   \   000001D8   0x.... 0x....      BL       AttnDataOutput
+    742          			}
+   \   000001DC   0x1C64             ADDS     R4,R4,#+1
+   \   000001DE   0x2C1A             CMP      R4,#+26
+   \   000001E0   0xD3F8             BCC.N    ??HwTestOutFunc_24
+   \   000001E2   0xE025             B.N      ??HwTestOutFunc_2
+    743          		break;
+    744          
+    745          		case 19:
+    746          			for(i = 0;i < Att_SelMax ; i++)
+   \                     ??HwTestOutFunc_25:
+   \   000001E4   0x2400             MOVS     R4,#+0
+    747          			{
+    748          				AttnDataOutput(i, ~4);
+   \                     ??HwTestOutFunc_26:
+   \   000001E6   0x21FB             MOVS     R1,#+251
+   \   000001E8   0x4620             MOV      R0,R4
+   \   000001EA   0x.... 0x....      BL       AttnDataOutput
+    749          			}
+   \   000001EE   0x1C64             ADDS     R4,R4,#+1
+   \   000001F0   0x2C1A             CMP      R4,#+26
+   \   000001F2   0xD3F8             BCC.N    ??HwTestOutFunc_26
+   \   000001F4   0xE01C             B.N      ??HwTestOutFunc_2
+    750          		break;
+    751          
+    752          		case 20:
+    753          			for(i = 0;i < Att_SelMax ; i++)
+   \                     ??HwTestOutFunc_27:
+   \   000001F6   0x2400             MOVS     R4,#+0
+    754          			{
+    755          				AttnDataOutput(i, ~8);
+   \                     ??HwTestOutFunc_28:
+   \   000001F8   0x21F7             MOVS     R1,#+247
+   \   000001FA   0x4620             MOV      R0,R4
+   \   000001FC   0x.... 0x....      BL       AttnDataOutput
+    756          			}
+   \   00000200   0x1C64             ADDS     R4,R4,#+1
+   \   00000202   0x2C1A             CMP      R4,#+26
+   \   00000204   0xD3F8             BCC.N    ??HwTestOutFunc_28
+   \   00000206   0xE013             B.N      ??HwTestOutFunc_2
+    757          		break;
+    758          
+    759          		case 21:
+    760          			for(i = 0;i < Att_SelMax ; i++)
+   \                     ??HwTestOutFunc_29:
+   \   00000208   0x2400             MOVS     R4,#+0
+    761          			{
+    762          				AttnDataOutput(i, ~16);
+   \                     ??HwTestOutFunc_30:
+   \   0000020A   0x21EF             MOVS     R1,#+239
+   \   0000020C   0x4620             MOV      R0,R4
+   \   0000020E   0x.... 0x....      BL       AttnDataOutput
+    763          			}
+   \   00000212   0x1C64             ADDS     R4,R4,#+1
+   \   00000214   0x2C1A             CMP      R4,#+26
+   \   00000216   0xD3F8             BCC.N    ??HwTestOutFunc_30
+   \   00000218   0xE00A             B.N      ??HwTestOutFunc_2
+    764          		break;
+    765          
+    766          		case 22:
+    767          			for(i = 0;i < Att_SelMax ; i++)
+   \                     ??HwTestOutFunc_31:
+   \   0000021A   0x2400             MOVS     R4,#+0
+    768          			{
+    769          				AttnDataOutput(i, ~32);
+   \                     ??HwTestOutFunc_32:
+   \   0000021C   0x21DF             MOVS     R1,#+223
+   \   0000021E   0x4620             MOV      R0,R4
+   \   00000220   0x.... 0x....      BL       AttnDataOutput
+    770          			}
+   \   00000224   0x1C64             ADDS     R4,R4,#+1
+   \   00000226   0x2C1A             CMP      R4,#+26
+   \   00000228   0xD3F8             BCC.N    ??HwTestOutFunc_32
+   \   0000022A   0xE001             B.N      ??HwTestOutFunc_2
+    771          		break;
+    772          
+    773           		case 23:
+    774          			MaxValue = Data;
+   \                     ??HwTestOutFunc_33:
+   \   0000022C   0x2017             MOVS     R0,#+23
+   \   0000022E   0x9000             STR      R0,[SP, #+0]
+    775          			//BuzzShort();
+    776          		break;
+    777          	}
+    778          
+    779          	*nFlag = *nFlag + 1;
+   \                     ??HwTestOutFunc_2:
+   \   00000230   0xF8DB 0x0000      LDR      R0,[R11, #+0]
+   \   00000234   0x1C40             ADDS     R0,R0,#+1
+   \   00000236   0xF8CB 0x0000      STR      R0,[R11, #+0]
+    780          
+    781          	if(*nFlag >= MaxValue) *nFlag = 0;
+   \   0000023A   0x9900             LDR      R1,[SP, #+0]
+   \   0000023C   0x4288             CMP      R0,R1
+   \   0000023E   0xBF24             ITT      CS 
+   \   00000240   0x2000             MOVCS    R0,#+0
+   \   00000242   0xF8CB 0x0000      STRCS    R0,[R11, #+0]
+    782          #endif
+    783          }
+   \   00000246   0xB003             ADD      SP,SP,#+12
+   \   00000248   0xE8BD 0x8FF0      POP      {R4-R11,PC}      ;; return
+    784          
+
+   \                                 In section .text, align 2, keep-with-next
+    785          INT32U DigitalInputDiplay(INT8U num, INT8U ival,
+    786          							INT8U *fmsg, INT8U *emsg,
+    787          							INT8U vcheck)
+    788          {
+   \                     DigitalInputDiplay:
+   \   00000000   0xE92D 0x45F8      PUSH     {R3-R8,R10,LR}
+   \   00000004   0x4604             MOV      R4,R0
+   \   00000006   0x460D             MOV      R5,R1
+   \   00000008   0x4611             MOV      R1,R2
+   \   0000000A   0x461E             MOV      R6,R3
+   \   0000000C   0x9808             LDR      R0,[SP, #+32]
+    789          	INT32U temp = FALSE;
+   \   0000000E   0x2700             MOVS     R7,#+0
+    790          	INT8U *currentptr = (INT8U *)&tinputSts;
+    791          	INT8U *beforeptr = (INT8U *)&tinputStsOld;
+    792          
+    793          	// first
+    794          	if(!vcheck)
+   \   00000010   0xB9E0             CBNZ.N   R0,??DigitalInputDiplay_0
+    795          	{
+    796          		if(fmsg != NULL) SerPtr->printf("%s", fmsg);	// start // phase mssage
+   \   00000012   0xB1D9             CBZ.N    R1,??DigitalInputDiplay_0
+   \   00000014   0x....             ADR.N    R0,??DataTable80_2  ;; 0x25, 0x73, 0x00, 0x00
+   \   00000016   0x....             LDR.N    R2,??DataTable79_1
+   \   00000018   0x6812             LDR      R2,[R2, #+0]
+   \   0000001A   0x6912             LDR      R2,[R2, #+16]
+   \   0000001C   0x4790             BLX      R2
+   \   0000001E   0x....             LDR.N    R0,??DataTable80_7
+   \   00000020   0x5425             STRB     R5,[R4, R0]
+    797          	}
+    798          
+    799          	currentptr[num] = ival;
+    800          
+    801          	{
+    802          
+    803          		if( (vcheck && (beforeptr[num] != currentptr[num]) ) )
+    804          		{
+    805          			SerPtr->printf("%02d. ", num);
+    806          			SerPtr->printf("%s", tDisplay[num]);
+    807          			{
+    808          				if(ival) SerPtr->printf(OFFMSG);
+    809          				else	 SerPtr->printf(ONMSG);
+    810          			}
+    811          			temp = TRUE;
+    812          		}
+    813          		else if(!vcheck)
+    814          		{
+    815          			SerPtr->printf("%s", tDisplay[num]);
+   \                     ??DigitalInputDiplay_1:
+   \   00000022   0x.... 0x....      LDR.W    R8,??DataTable79_1
+   \   00000026   0x....             LDR.N    R0,??DataTable80_7
+   \   00000028   0xEB00 0x0084      ADD      R0,R0,R4, LSL #+2
+   \   0000002C   0x6B41             LDR      R1,[R0, #+52]
+   \   0000002E   0x....             ADR.N    R0,??DataTable80_2  ;; 0x25, 0x73, 0x00, 0x00
+   \   00000030   0xF8D8 0x2000      LDR      R2,[R8, #+0]
+   \   00000034   0x6912             LDR      R2,[R2, #+16]
+   \   00000036   0x4790             BLX      R2
+   \   00000038   0xF8D8 0x0000      LDR      R0,[R8, #+0]
+   \   0000003C   0x6901             LDR      R1,[R0, #+16]
+   \   0000003E   0x2D00             CMP      R5,#+0
+   \   00000040   0xBF14             ITE      NE 
+   \   00000042   0x.... 0x....      ADRNE.W  R0,`?<Constant "[OFF]">`
+   \   00000046   0x.... 0x....      ADREQ.W  R0,`?<Constant "[ON ]">`
+    816          			{
+    817          				if(ival) SerPtr->printf(OFFMSG);
+   \   0000004A   0xE022             B.N      ??DigitalInputDiplay_2
+    818          				else	 SerPtr->printf(ONMSG);
+    819          			}
+    820          		}
+   \                     ??DigitalInputDiplay_0:
+   \   0000004C   0x.... 0x....      LDR.W    R10,??DataTable80_7
+   \   00000050   0xF804 0x500A      STRB     R5,[R4, R10]
+   \   00000054   0x2800             CMP      R0,#+0
+   \   00000056   0xD0E4             BEQ.N    ??DigitalInputDiplay_1
+   \   00000058   0x....             LDR.N    R0,??DataTable80_5
+   \   0000005A   0x5C20             LDRB     R0,[R4, R0]
+   \   0000005C   0x42A8             CMP      R0,R5
+   \   0000005E   0xD022             BEQ.N    ??DigitalInputDiplay_3
+   \   00000060   0x....             LDR.N    R6,??DataTable79_1
+   \   00000062   0x4621             MOV      R1,R4
+   \   00000064   0x.... 0x....      ADR.W    R0,`?<Constant "%02d. ">`
+   \   00000068   0x6832             LDR      R2,[R6, #+0]
+   \   0000006A   0x6912             LDR      R2,[R2, #+16]
+   \   0000006C   0x4790             BLX      R2
+   \   0000006E   0xEB0A 0x0084      ADD      R0,R10,R4, LSL #+2
+   \   00000072   0x6B41             LDR      R1,[R0, #+52]
+   \   00000074   0x....             ADR.N    R0,??DataTable80_2  ;; 0x25, 0x73, 0x00, 0x00
+   \   00000076   0x6832             LDR      R2,[R6, #+0]
+   \   00000078   0x6912             LDR      R2,[R2, #+16]
+   \   0000007A   0x4790             BLX      R2
+   \   0000007C   0x6830             LDR      R0,[R6, #+0]
+   \   0000007E   0x6901             LDR      R1,[R0, #+16]
+   \   00000080   0x2D00             CMP      R5,#+0
+   \   00000082   0xBF14             ITE      NE 
+   \   00000084   0x.... 0x....      ADRNE.W  R0,`?<Constant "[OFF]">`
+   \   00000088   0x.... 0x....      ADREQ.W  R0,`?<Constant "[ON ]">`
+   \   0000008C   0x4788             BLX      R1
+   \   0000008E   0x2701             MOVS     R7,#+1
+   \   00000090   0xE001             B.N      ??DigitalInputDiplay_4
+    821          	}
+   \                     ??DigitalInputDiplay_2:
+   \   00000092   0x4788             BLX      R1
+    822          
+    823          ////////////////////////////////////////////////////////////////////////////////
+    824          	if(vcheck)
+    825          	{
+    826          		if(temp)
+    827          		{
+    828          			OSTimeDly(1L);
+    829          			SerPtr->printf(ENTMSG);
+    830          		}
+    831          	}
+    832          	else
+    833          	{
+    834          		if(emsg)
+   \   00000094   0xB13E             CBZ.N    R6,??DigitalInputDiplay_3
+    835          		{
+    836          			OSTimeDly(1L);
+   \                     ??DigitalInputDiplay_4:
+   \   00000096   0x2001             MOVS     R0,#+1
+   \   00000098   0x.... 0x....      BL       OSTimeDly
+    837          			SerPtr->printf(ENTMSG);
+   \   0000009C   0x....             ADR.N    R0,??DataTable80_4  ;; "\n"
+   \   0000009E   0x....             LDR.N    R1,??DataTable79_1
+   \   000000A0   0x6809             LDR      R1,[R1, #+0]
+   \   000000A2   0x6909             LDR      R1,[R1, #+16]
+   \   000000A4   0x4788             BLX      R1
+    838          		}
+    839          	}
+    840          
+    841          	beforeptr[num] = currentptr[num];
+   \                     ??DigitalInputDiplay_3:
+   \   000000A6   0x....             LDR.N    R0,??DataTable80_5
+   \   000000A8   0x....             LDR.N    R1,??DataTable80_7
+   \   000000AA   0x5C61             LDRB     R1,[R4, R1]
+   \   000000AC   0x5421             STRB     R1,[R4, R0]
+    842          	return (INT32U)temp;
+   \   000000AE   0x4638             MOV      R0,R7
+   \   000000B0   0xE8BD 0x85F2      POP      {R1,R4-R8,R10,PC}  ;; return
+    843          }
+    844          
+    845          
+
+   \                                 In section .text, align 2, keep-with-next
+    846          INT8U returnmsgTest(char *str)
+    847          {
+   \                     returnmsgTest:
+   \   00000000   0xB580             PUSH     {R7,LR}
+    848          	SerPtr->printf("%s이 수행되어 있습니다. 계속 진행하시겠습니까?[Y]es, [C]ancel\n", str);
+   \   00000002   0x4601             MOV      R1,R0
+   \   00000004   0x.... 0x....      ADR.W    R0,`?<Constant "%s\\300\\314 \\274\\366\\307\\340\\265\\30`
+   \   00000008   0x....             LDR.N    R2,??DataTable80_25
+   \   0000000A   0x6812             LDR      R2,[R2, #+0]
+   \   0000000C   0x6912             LDR      R2,[R2, #+16]
+   \   0000000E   0x4790             BLX      R2
+    849          	return WaringMssageReturn();
+   \   00000010   0xE8BD 0x4001      POP      {R0,LR}
+   \   00000014                      REQUIRE WaringMssageReturn
+   \   00000014                      ;; // Fall through to label WaringMssageReturn
+    850          }
+    851          
+
+   \                                 In section .text, align 2, keep-with-next
+    852          INT8U WaringMssageReturn(void)
+    853          {
+   \                     WaringMssageReturn:
+   \   00000000   0xB538             PUSH     {R3-R5,LR}
+    854          	INT16U nCnt;
+    855          
+    856          	TimerRegist(TimerTest, Time1Sec*5L);
+   \   00000002   0xF241 0x3588      MOVW     R5,#+5000
+   \   00000006   0x4629             MOV      R1,R5
+   \   00000008   0x2003             MOVS     R0,#+3
+   \   0000000A   0x.... 0x....      BL       TimerRegist
+   \   0000000E   0x....             LDR.N    R4,??DataTable80_25
+   \   00000010   0xE002             B.N      ??WaringMssageReturn_0
+    857          
+    858          	while(1)
+    859          	{
+    860          		if(TimeOverCheck(TimerTest))
+    861          		{
+    862          			TimerRegist(TimerTest, Time1Sec*5L);
+    863          			return TRUE;
+    864          		}
+    865          		if(SerPtr->CheckByte(1, &nCnt))
+    866          		{
+    867          			nCnt = SerPtr->RxGetByte();
+    868          			if(nCnt == 'C' || nCnt == 'c')
+    869          			{
+    870          				SerPtr->printf("CANCEL TEST \n");
+    871          				return FALSE;
+    872          			}
+    873          			else return TRUE;
+    874          		}
+    875          		OSTimeDly(10L);
+   \                     ??WaringMssageReturn_1:
+   \   00000012   0x200A             MOVS     R0,#+10
+   \   00000014   0x.... 0x....      BL       OSTimeDly
+   \                     ??WaringMssageReturn_0:
+   \   00000018   0x2003             MOVS     R0,#+3
+   \   0000001A   0x.... 0x....      BL       TimeOverCheck
+   \   0000001E   0xB128             CBZ.N    R0,??WaringMssageReturn_2
+   \   00000020   0x4629             MOV      R1,R5
+   \   00000022   0x2003             MOVS     R0,#+3
+   \   00000024   0x.... 0x....      BL       TimerRegist
+   \   00000028   0x2001             MOVS     R0,#+1
+   \   0000002A   0xBD32             POP      {R1,R4,R5,PC}
+   \                     ??WaringMssageReturn_2:
+   \   0000002C   0xA900             ADD      R1,SP,#+0
+   \   0000002E   0x2001             MOVS     R0,#+1
+   \   00000030   0x6822             LDR      R2,[R4, #+0]
+   \   00000032   0x6852             LDR      R2,[R2, #+4]
+   \   00000034   0x4790             BLX      R2
+   \   00000036   0x2800             CMP      R0,#+0
+   \   00000038   0xD0EB             BEQ.N    ??WaringMssageReturn_1
+   \   0000003A   0x6820             LDR      R0,[R4, #+0]
+   \   0000003C   0x6880             LDR      R0,[R0, #+8]
+   \   0000003E   0x4780             BLX      R0
+   \   00000040   0xF8AD 0x0000      STRH     R0,[SP, #+0]
+   \   00000044   0xF8BD 0x0000      LDRH     R0,[SP, #+0]
+   \   00000048   0x2843             CMP      R0,#+67
+   \   0000004A   0xBF18             IT       NE 
+   \   0000004C   0x2863             CMPNE    R0,#+99
+   \   0000004E   0xD106             BNE.N    ??WaringMssageReturn_3
+   \   00000050   0x.... 0x....      ADR.W    R0,`?<Constant "CANCEL TEST \\n">`
+   \   00000054   0x6821             LDR      R1,[R4, #+0]
+   \   00000056   0x6909             LDR      R1,[R1, #+16]
+   \   00000058   0x4788             BLX      R1
+   \   0000005A   0x2000             MOVS     R0,#+0
+   \   0000005C   0xBD32             POP      {R1,R4,R5,PC}
+   \                     ??WaringMssageReturn_3:
+   \   0000005E   0x2001             MOVS     R0,#+1
+   \   00000060   0xBD32             POP      {R1,R4,R5,PC}    ;; return
+    876          	}
+    877          }
+    878          #if 1
+
+   \                                 In section .text, align 2, keep-with-next
+    879          INT8U SavetoTestBackup(INT8U tmpIndex, INT8U tSet, INT8U IsItLoad)
+    880          {
+    881          #if 0
+    882          	EE_TABLE1 *ptr = &gEE_TABLE1;
+    883          	INT32U AddrOffset = vEE_TABLE1Addr + (INT32U)&(ptr->BdTestBp) - (INT32U )&gEE_TABLE1;
+    884          
+    885          	AddrOffset += tmpIndex;
+    886          
+    887          	if(IsItLoad)
+    888          	{
+    889          		ptr->BdTestBp[tmpIndex] = tSet;
+    890          		WriteEEprom(At24cDevID, AddrOffset, tSet, 0);
+    891          	}
+    892          	return (ptr->BdTestBp[tmpIndex]);
+    893          #endif
+    894          
+    895          return 0;
+   \                     SavetoTestBackup:
+   \   00000000   0x2000             MOVS     R0,#+0
+   \   00000002   0x4770             BX       LR               ;; return
+    896          
+    897          }
+    898          #endif
+    899          
+
+   \                                 In section .text, align 2, keep-with-next
+    900          void PrintLogo(void)
+    901          {
+   \                     PrintLogo:
+   \   00000000   0xB538             PUSH     {R3-R5,LR}
+    902          
+    903          	SerPtr->printf("\n\n");
+   \   00000002   0x....             LDR.N    R4,??DataTable80_25
+   \   00000004   0x....             ADR.N    R0,??DataTable80_6  ;; 0x0A, 0x0A, 0x00, 0x00
+   \   00000006   0x6821             LDR      R1,[R4, #+0]
+   \   00000008   0x6909             LDR      R1,[R1, #+16]
+   \   0000000A   0x4788             BLX      R1
+    904          	PrintStar();
+   \   0000000C   0x.... 0x....      BL       PrintStar
+    905          	SerPtr->printf("*\n");
+   \   00000010   0x....             ADR.N    R0,??DataTable80_8  ;; 0x2A, 0x0A, 0x00, 0x00
+   \   00000012   0x6821             LDR      R1,[R4, #+0]
+   \   00000014   0x6909             LDR      R1,[R1, #+16]
+   \   00000016   0x4788             BLX      R1
+    906          	SerPtr->printf("* %s [VER:%d.%d]\n", BoardTestMode, (SystemVer >> 4 & 0x0f), (SystemVer >> 0 & 0x0f));
+   \   00000018   0x2301             MOVS     R3,#+1
+   \   0000001A   0x2205             MOVS     R2,#+5
+   \   0000001C   0x.... 0x....      ADR.W    R1,`?<Constant "TRIO RCU CTRL TEST PR...">`
+   \   00000020   0x.... 0x....      ADR.W    R0,`?<Constant "* %s [VER:%d.%d]\\n">`
+   \   00000024   0x6825             LDR      R5,[R4, #+0]
+   \   00000026   0x692D             LDR      R5,[R5, #+16]
+   \   00000028   0x47A8             BLX      R5
+    907          	SerPtr->printf("*    -COMMAND 1st-\n");
+   \   0000002A   0x.... 0x....      ADR.W    R0,`?<Constant "*    -COMMAND 1st-\\n">`
+   \   0000002E   0x6821             LDR      R1,[R4, #+0]
+   \   00000030   0x6909             LDR      R1,[R1, #+16]
+   \   00000032   0x4788             BLX      R1
+    908          	SerPtr->printf("*  ?        : help(this message)\n");
+   \   00000034   0x.... 0x....      ADR.W    R0,`?<Constant "*  ?        : help(th...">`
+   \   00000038   0x6821             LDR      R1,[R4, #+0]
+   \   0000003A   0x6909             LDR      R1,[R1, #+16]
+   \   0000003C   0x4788             BLX      R1
+    909          	SerPtr->printf("*  I        : INPUT Test          [%s]\n", testResult[0x03 & SavetoTestBackup(InputTest, NULL, NULL)]);
+   \   0000003E   0x....             LDR.N    R5,??DataTable80_26
+   \   00000040   0x6829             LDR      R1,[R5, #+0]
+   \   00000042   0x.... 0x....      ADR.W    R0,`?<Constant "*  I        : INPUT T...">`
+   \   00000046   0x6822             LDR      R2,[R4, #+0]
+   \   00000048   0x6912             LDR      R2,[R2, #+16]
+   \   0000004A   0x4790             BLX      R2
+    910          	SerPtr->printf("*  O        : OUTPUT Test         [%s]\n", testResult[0x03 & SavetoTestBackup(OutputTest,  NULL, NULL)]);
+   \   0000004C   0x6829             LDR      R1,[R5, #+0]
+   \   0000004E   0x.... 0x....      ADR.W    R0,`?<Constant "*  O        : OUTPUT ...">`
+   \   00000052   0x6822             LDR      R2,[R4, #+0]
+   \   00000054   0x6912             LDR      R2,[R2, #+16]
+   \   00000056   0x4790             BLX      R2
+    911          	SerPtr->printf("*  C        : SERIAL[UART]        [%s]\n", testResult[0x03 & SavetoTestBackup(CommTest, NULL, NULL)]);
+   \   00000058   0x6829             LDR      R1,[R5, #+0]
+   \   0000005A   0x.... 0x....      ADR.W    R0,`?<Constant "*  C        : SERIAL[...">`
+   \   0000005E   0x6822             LDR      R2,[R4, #+0]
+   \   00000060   0x6912             LDR      R2,[R2, #+16]
+   \   00000062   0x4790             BLX      R2
+    912          	SerPtr->printf("*  A        : ANALOG DECT         [%s]\n", testResult[0x03 & SavetoTestBackup(ADCTest, 	NULL, NULL)]);
+   \   00000064   0x6829             LDR      R1,[R5, #+0]
+   \   00000066   0x.... 0x....      ADR.W    R0,`?<Constant "*  A        : ANALOG ...">`
+   \   0000006A   0x6822             LDR      R2,[R4, #+0]
+   \   0000006C   0x6912             LDR      R2,[R2, #+16]
+   \   0000006E   0x4790             BLX      R2
+    913          	SerPtr->printf("*  E        : EEPROM TEST         [%s]\n", testResult[0x03 & SavetoTestBackup(EepromTest, NULL, NULL)]);
+   \   00000070   0x6829             LDR      R1,[R5, #+0]
+   \   00000072   0x.... 0x....      ADR.W    R0,`?<Constant "*  E        : EEPROM ...">`
+   \   00000076   0x6822             LDR      R2,[R4, #+0]
+   \   00000078   0x6912             LDR      R2,[R2, #+16]
+   \   0000007A   0x4790             BLX      R2
+    914          	SerPtr->printf("*  S        : Factory SET\n");
+   \   0000007C   0x.... 0x....      ADR.W    R0,`?<Constant "*  S        : Factory...">`
+   \   00000080   0x6821             LDR      R1,[R4, #+0]
+   \   00000082   0x6909             LDR      R1,[R1, #+16]
+   \   00000084   0x4788             BLX      R1
+    915          
+    916          //	SerPtr->printf("*  G        : compulsory boot/#,\n");
+    917          	
+    918          	PrintStar();
+   \   00000086   0xE8BD 0x4031      POP      {R0,R4,R5,LR}
+   \   0000008A                      REQUIRE PrintStar
+   \   0000008A                      ;; // Fall through to label PrintStar
+    919          }
+    920          
+    921          
+    922          
+    923          
+
+   \                                 In section .text, align 2, keep-with-next
+    924          void PrintStar(void)
+    925          {
+    926          	SerPtr->printf("*******************************************************************************\n");
+   \                     PrintStar:
+   \   00000000   0x.... 0x....      ADR.W    R0,`?<Constant "*********************...">`
+   \   00000004   0x....             B.N      ?Subroutine0
+    927          }
+
+   \                                 In section .text, align 2, keep-with-next
+   \                     ?Subroutine0:
+   \   00000000   0x....             LDR.N    R1,??DataTable80_25
+   \   00000002   0x6809             LDR      R1,[R1, #+0]
+   \   00000004   0x6909             LDR      R1,[R1, #+16]
+   \   00000006   0x4708             BX       R1
+    928          
+
+   \                                 In section .text, align 2, keep-with-next
+    929          void PromptOut(void)
+    930          {
+    931          	
+    932          	SerPtr->printf("TRIO-M >>");
+   \                     PromptOut:
+   \   00000000   0x.... 0x....      ADR.W    R0,`?<Constant "TRIO-M >>">`
+   \   00000004                      REQUIRE ?Subroutine0
+   \   00000004                      ;; // Fall through to label ?Subroutine0
+    933          }
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable71:
+   \   00000000   0x25 0x73          DC8      0x25, 0x73, 0x00, 0x00
+   \              0x00 0x00    
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable75:
+   \   00000000   0x2A 0x20          DC8      0x2A, 0x20, 0x00, 0x00
+   \              0x00 0x00    
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable76:
+   \   00000000   0x0A 0x0A          DC8      0x0A, 0x0A, 0x00, 0x00
+   \              0x00 0x00    
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable76_1:
+   \   00000000   0x0A 0x00          DC8      "\n",0x0,0x0
+   \              0x00 0x00    
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable76_2:
+   \   00000000   0x2A 0x20          DC8      0x2A, 0x20, 0x00, 0x00
+   \              0x00 0x00    
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable77:
+   \   00000000   0x0A 0x00          DC8      "\n",0x0,0x0
+   \              0x00 0x00    
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable77_1:
+   \   00000000   0x2C 0x20          DC8      0x2C, 0x20, 0x00, 0x00
+   \              0x00 0x00    
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable78:
+   \   00000000   0x........         DC32     gTestFlag
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable79:
+   \   00000000   0x........         DC32     TestTaskStk+0x7FC
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable79_1:
+   \   00000000   0x........         DC32     SerPtr
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable79_2:
+   \   00000000   0x........         DC32     iUser_Value2
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable79_3:
+   \   00000000   0x........         DC32     tIndex
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable79_4:
+   \   00000000   0x........         DC32     tRevData
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable80:
+   \   00000000   0x........         DC32     iDebugCnt
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable80_1:
+   \   00000000   0x001B7740         DC32     0x1b7740
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable80_2:
+   \   00000000   0x25 0x73          DC8      0x25, 0x73, 0x00, 0x00
+   \              0x00 0x00    
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable80_3:
+   \   00000000   0x000493E0         DC32     0x493e0
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable80_4:
+   \   00000000   0x0A 0x00          DC8      "\n",0x0,0x0
+   \              0x00 0x00    
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable80_5:
+   \   00000000   0x........         DC32     tinputStsOld
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable80_6:
+   \   00000000   0x0A 0x0A          DC8      0x0A, 0x0A, 0x00, 0x00
+   \              0x00 0x00    
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable80_7:
+   \   00000000   0x........         DC32     tinputSts
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable80_8:
+   \   00000000   0x2A 0x0A          DC8      0x2A, 0x0A, 0x00, 0x00
+   \              0x00 0x00    
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable80_9:
+   \   00000000   0x........         DC32     ADC_AVR
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable80_10:
+   \   00000000   0x........         DC32     pUSART1
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable80_11:
+   \   00000000   0x........         DC32     pUSART4
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable80_12:
+   \   00000000   0x........         DC32     comtstcnt
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable80_13:
+   \   00000000   0x40020810         DC32     0x40020810
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable80_14:
+   \   00000000   0x40020410         DC32     0x40020410
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable80_15:
+   \   00000000   0x40020010         DC32     0x40020010
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable80_16:
+   \   00000000   0x40020C10         DC32     0x40020c10
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable80_17:
+   \   00000000   0x40020C14         DC32     0x40020c14
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable80_18:
+   \   00000000   0x40020014         DC32     0x40020014
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable80_19:
+   \   00000000   0x40021014         DC32     0x40021014
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable80_20:
+   \   00000000   0x40020414         DC32     0x40020414
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable80_21:
+   \   00000000   0x40020814         DC32     0x40020814
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable80_22:
+   \   00000000   0x........         DC32     pPCA9555Str
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable80_23:
+   \   00000000   0x........         DC32     AttnCS0Val
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable80_24:
+   \   00000000   0x........         DC32     AttnCS1Val
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable80_25:
+   \   00000000   0x........         DC32     SerPtr
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable80_26:
+   \   00000000   0x........         DC32     testResult
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     `?<Constant "ADC Input">`:
+   \   00000000   0x41 0x44          DC8 "ADC Input"
+   \              0x43 0x20    
+   \              0x49 0x6E    
+   \              0x70 0x75    
+   \              0x74 0x00    
+   \   0000000A   0x00 0x00          DC8 0, 0
+
+   \                                 In section .rodata, align 4, keep-with-next
+   \                     `?<Constant "NON TESTED">`:
+   \   00000000   0x4E 0x4F          DC8 "NON TESTED"
+   \              0x4E 0x20    
+   \              0x54 0x45    
+   \              0x53 0x54    
+   \              0x45 0x44    
+   \              0x00         
+   \   0000000B   0x00               DC8 0
+
+   \                                 In section .rodata, align 4, keep-with-next
+   \                     `?<Constant "    TESTED">`:
+   \   00000000   0x20 0x20          DC8 "    TESTED"
+   \              0x20 0x20    
+   \              0x54 0x45    
+   \              0x53 0x54    
+   \              0x45 0x44    
+   \              0x00         
+   \   0000000B   0x00               DC8 0
+
+   \                                 In section .rodata, align 4, keep-with-next
+   \                     `?<Constant "Insert          :">`:
+   \   00000000   0x49 0x6E          DC8 "Insert          :"
+   \              0x73 0x65    
+   \              0x72 0x74    
+   \              0x20 0x20    
+   \              0x20 0x20    
+   \              0x20 0x20    
+   \              0x20 0x20    
+   \              0x20 0x20    
+   \              0x3A 0x00    
+   \   00000012   0x00 0x00          DC8 0, 0
+
+   \                                 In section .rodata, align 4, keep-with-next
+   \                     `?<Constant "AC_Alarm        :">`:
+   \   00000000   0x41 0x43          DC8 "AC_Alarm        :"
+   \              0x5F 0x41    
+   \              0x6C 0x61    
+   \              0x72 0x6D    
+   \              0x20 0x20    
+   \              0x20 0x20    
+   \              0x20 0x20    
+   \              0x20 0x20    
+   \              0x3A 0x00    
+   \   00000012   0x00 0x00          DC8 0, 0
+
+   \                                 In section .rodata, align 4, keep-with-next
+   \                     `?<Constant "PLL_CDMALTE     :">`:
+   \   00000000   0x50 0x4C          DC8 "PLL_CDMALTE     :"
+   \              0x4C 0x5F    
+   \              0x43 0x44    
+   \              0x4D 0x41    
+   \              0x4C 0x54    
+   \              0x45 0x20    
+   \              0x20 0x20    
+   \              0x20 0x20    
+   \              0x3A 0x00    
+   \   00000012   0x00 0x00          DC8 0, 0
+
+   \                                 In section .rodata, align 4, keep-with-next
+   \                     `?<Constant "PLL_WCDMA       :">`:
+   \   00000000   0x50 0x4C          DC8 "PLL_WCDMA       :"
+   \              0x4C 0x5F    
+   \              0x57 0x43    
+   \              0x44 0x4D    
+   \              0x41 0x20    
+   \              0x20 0x20    
+   \              0x20 0x20    
+   \              0x20 0x20    
+   \              0x3A 0x00    
+   \   00000012   0x00 0x00          DC8 0, 0
+
+   \                                 In section .rodata, align 4, keep-with-next
+   \                     `?<Constant "PLL_LTE_A2      :">`:
+   \   00000000   0x50 0x4C          DC8 "PLL_LTE_A2      :"
+   \              0x4C 0x5F    
+   \              0x4C 0x54    
+   \              0x45 0x5F    
+   \              0x41 0x32    
+   \              0x20 0x20    
+   \              0x20 0x20    
+   \              0x20 0x20    
+   \              0x3A 0x00    
+   \   00000012   0x00 0x00          DC8 0, 0
+
+   \                                 In section .rodata, align 4, keep-with-next
+   \                     `?<Constant "%s">`:
+   \   00000000   0x25 0x73          DC8 "%s"
+   \              0x00         
+   \   00000003   0x00               DC8 0
+
+   \                                 In section .rodata, align 4, keep-with-next
+   \                     `?<Constant "* ">`:
+   \   00000000   0x2A 0x20          DC8 "* "
+   \              0x00         
+   \   00000003   0x00               DC8 0
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     `?<Constant "\\n* [%s] TEST START Ti...">`:
+   \   00000000   0x0A 0x2A          DC8 "\012* [%s] TEST START TimeOut 5 Min]\012"
+   \              0x20 0x5B    
+   \              0x25 0x73    
+   \              0x5D 0x20    
+   \              0x54 0x45    
+   \              0x53 0x54    
+   \              0x20 0x53    
+   \              0x54 0x41    
+   \              0x52 0x54    
+   \              0x20 0x54    
+   \              0x69 0x6D    
+   \              0x65 0x4F    
+   \              0x75 0x74    
+   \              0x20 0x35    
+   \              0x20 0x4D    
+   \              0x69 0x6E    
+   \              0x5D 0x0A    
+   \              0x00         
+   \   00000023   0x00               DC8 0
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     `?<Constant "%s Test TimeOut\\n">`:
+   \   00000000   0x25 0x73          DC8 "%s Test TimeOut\012"
+   \              0x20 0x54    
+   \              0x65 0x73    
+   \              0x74 0x20    
+   \              0x54 0x69    
+   \              0x6D 0x65    
+   \              0x4F 0x75    
+   \              0x74 0x0A    
+   \              0x00         
+   \   00000011   0x00 0x00          DC8 0, 0, 0
+   \              0x00         
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     `?<Constant "%s Test Canceled\\n">`:
+   \   00000000   0x25 0x73          DC8 "%s Test Canceled\012"
+   \              0x20 0x54    
+   \              0x65 0x73    
+   \              0x74 0x20    
+   \              0x43 0x61    
+   \              0x6E 0x63    
+   \              0x65 0x6C    
+   \              0x65 0x64    
+   \              0x0A 0x00    
+   \   00000012   0x00 0x00          DC8 0, 0
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     `?<Constant "%s Test Finished\\n">`:
+   \   00000000   0x25 0x73          DC8 "%s Test Finished\012"
+   \              0x20 0x54    
+   \              0x65 0x73    
+   \              0x74 0x20    
+   \              0x46 0x69    
+   \              0x6E 0x69    
+   \              0x73 0x68    
+   \              0x65 0x64    
+   \              0x0A 0x00    
+   \   00000012   0x00 0x00          DC8 0, 0
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     `?<Constant "Dig Output">`:
+   \   00000000   0x44 0x69          DC8 "Dig Output"
+   \              0x67 0x20    
+   \              0x4F 0x75    
+   \              0x74 0x70    
+   \              0x75 0x74    
+   \              0x00         
+   \   0000000B   0x00               DC8 0
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     `?<Constant "\\n* [%s TEST START Tim...">`:
+   \   00000000   0x0A 0x2A          DC8 "\012* [%s TEST START TimeOut 5Min]\012"
+   \              0x20 0x5B    
+   \              0x25 0x73    
+   \              0x20 0x54    
+   \              0x45 0x53    
+   \              0x54 0x20    
+   \              0x53 0x54    
+   \              0x41 0x52    
+   \              0x54 0x20    
+   \              0x54 0x69    
+   \              0x6D 0x65    
+   \              0x4F 0x75    
+   \              0x74 0x20    
+   \              0x35 0x4D    
+   \              0x69 0x6E    
+   \              0x5D 0x0A    
+   \              0x00         
+   \   00000021   0x00 0x00          DC8 0, 0, 0
+   \              0x00         
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     `?<Constant "%s test TimeOut\\n">`:
+   \   00000000   0x25 0x73          DC8 "%s test TimeOut\012"
+   \              0x20 0x74    
+   \              0x65 0x73    
+   \              0x74 0x20    
+   \              0x54 0x69    
+   \              0x6D 0x65    
+   \              0x4F 0x75    
+   \              0x74 0x0A    
+   \              0x00         
+   \   00000011   0x00 0x00          DC8 0, 0, 0
+   \              0x00         
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     `?<Constant "%s test Canceled\\n">`:
+   \   00000000   0x25 0x73          DC8 "%s test Canceled\012"
+   \              0x20 0x74    
+   \              0x65 0x73    
+   \              0x74 0x20    
+   \              0x43 0x61    
+   \              0x6E 0x63    
+   \              0x65 0x6C    
+   \              0x65 0x64    
+   \              0x0A 0x00    
+   \   00000012   0x00 0x00          DC8 0, 0
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     `?<Constant "%s test Finished\\n">`:
+   \   00000000   0x25 0x73          DC8 "%s test Finished\012"
+   \              0x20 0x74    
+   \              0x65 0x73    
+   \              0x74 0x20    
+   \              0x46 0x69    
+   \              0x6E 0x69    
+   \              0x73 0x68    
+   \              0x65 0x64    
+   \              0x0A 0x00    
+   \   00000012   0x00 0x00          DC8 0, 0
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     `?<Constant "Dig Input">`:
+   \   00000000   0x44 0x69          DC8 "Dig Input"
+   \              0x67 0x20    
+   \              0x49 0x6E    
+   \              0x70 0x75    
+   \              0x74 0x00    
+   \   0000000A   0x00 0x00          DC8 0, 0
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     `?<Constant "\\n* [%s TEST START Tim...">_1`:
+   \   00000000   0x0A 0x2A          DC8 "\012* [%s TEST START TimeOut 5 Min]\012"
+   \              0x20 0x5B    
+   \              0x25 0x73    
+   \              0x20 0x54    
+   \              0x45 0x53    
+   \              0x54 0x20    
+   \              0x53 0x54    
+   \              0x41 0x52    
+   \              0x54 0x20    
+   \              0x54 0x69    
+   \              0x6D 0x65    
+   \              0x4F 0x75    
+   \              0x74 0x20    
+   \              0x35 0x20    
+   \              0x4D 0x69    
+   \              0x6E 0x5D    
+   \              0x0A 0x00    
+   \   00000022   0x00 0x00          DC8 0, 0
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     `?<Constant "COM \\275\\303\\307\\350">`:
+   \   00000000   0x43 0x4F          DC8 "COM \275\303\307\350"
+   \              0x4D 0x20    
+   \              0xBD 0xC3    
+   \              0xC7 0xE8    
+   \              0x00         
+   \   00000009   0x00 0x00          DC8 0, 0, 0
+   \              0x00         
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     `?<Constant "%s test Test TimeOut\\n">`:
+   \   00000000   0x25 0x73          DC8 "%s test Test TimeOut\012"
+   \              0x20 0x74    
+   \              0x65 0x73    
+   \              0x74 0x20    
+   \              0x54 0x65    
+   \              0x73 0x74    
+   \              0x20 0x54    
+   \              0x69 0x6D    
+   \              0x65 0x4F    
+   \              0x75 0x74    
+   \              0x0A 0x00    
+   \   00000016   0x00 0x00          DC8 0, 0
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     `?<Constant "%s test Test Canceled\\n">`:
+   \   00000000   0x25 0x73          DC8 "%s test Test Canceled\012"
+   \              0x20 0x74    
+   \              0x65 0x73    
+   \              0x74 0x20    
+   \              0x54 0x65    
+   \              0x73 0x74    
+   \              0x20 0x43    
+   \              0x61 0x6E    
+   \              0x63 0x65    
+   \              0x6C 0x65    
+   \              0x64 0x0A    
+   \              0x00         
+   \   00000017   0x00               DC8 0
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     `?<Constant "%s Test Test Finished\\n">`:
+   \   00000000   0x25 0x73          DC8 "%s Test Test Finished\012"
+   \              0x20 0x54    
+   \              0x65 0x73    
+   \              0x74 0x20    
+   \              0x54 0x65    
+   \              0x73 0x74    
+   \              0x20 0x46    
+   \              0x69 0x6E    
+   \              0x69 0x73    
+   \              0x68 0x65    
+   \              0x64 0x0A    
+   \              0x00         
+   \   00000017   0x00               DC8 0
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     `?<Constant "\\n Default Back-up End...">`:
+   \   00000000   0x0A 0x20          DC8 "\012 Default Back-up End -> Reboot...  \012\012"
+   \              0x44 0x65    
+   \              0x66 0x61    
+   \              0x75 0x6C    
+   \              0x74 0x20    
+   \              0x42 0x61    
+   \              0x63 0x6B    
+   \              0x2D 0x75    
+   \              0x70 0x20    
+   \              0x45 0x6E    
+   \              0x64 0x20    
+   \              0x2D 0x3E    
+   \              0x20 0x52    
+   \              0x65 0x62    
+   \              0x6F 0x6F    
+   \              0x74 0x2E    
+   \              0x2E 0x2E    
+   \              0x20 0x20    
+   \              0x0A 0x0A    
+   \              0x00         
+   \   00000027   0x00               DC8 0
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     `?<Constant "[AIN0] : %d.%03d[V]\\n">`:
+   \   00000000   0x5B 0x41          DC8 "[AIN0] : %d.%03d[V]\012"
+   \              0x49 0x4E    
+   \              0x30 0x5D    
+   \              0x20 0x3A    
+   \              0x20 0x25    
+   \              0x64 0x2E    
+   \              0x25 0x30    
+   \              0x33 0x64    
+   \              0x5B 0x56    
+   \              0x5D 0x0A    
+   \              0x00         
+   \   00000015   0x00 0x00          DC8 0, 0, 0
+   \              0x00         
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     `?<Constant "[AIN1] : %d.%03d[V]\\n">`:
+   \   00000000   0x5B 0x41          DC8 "[AIN1] : %d.%03d[V]\012"
+   \              0x49 0x4E    
+   \              0x31 0x5D    
+   \              0x20 0x3A    
+   \              0x20 0x25    
+   \              0x64 0x2E    
+   \              0x25 0x30    
+   \              0x33 0x64    
+   \              0x5B 0x56    
+   \              0x5D 0x0A    
+   \              0x00         
+   \   00000015   0x00 0x00          DC8 0, 0, 0
+   \              0x00         
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     `?<Constant "[AIN2] : %d.%03d[V]\\n">`:
+   \   00000000   0x5B 0x41          DC8 "[AIN2] : %d.%03d[V]\012"
+   \              0x49 0x4E    
+   \              0x32 0x5D    
+   \              0x20 0x3A    
+   \              0x20 0x25    
+   \              0x64 0x2E    
+   \              0x25 0x30    
+   \              0x33 0x64    
+   \              0x5B 0x56    
+   \              0x5D 0x0A    
+   \              0x00         
+   \   00000015   0x00 0x00          DC8 0, 0, 0
+   \              0x00         
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     `?<Constant "[AIN3] : %d.%03d[V]\\n">`:
+   \   00000000   0x5B 0x41          DC8 "[AIN3] : %d.%03d[V]\012"
+   \              0x49 0x4E    
+   \              0x33 0x5D    
+   \              0x20 0x3A    
+   \              0x20 0x25    
+   \              0x64 0x2E    
+   \              0x25 0x30    
+   \              0x33 0x64    
+   \              0x5B 0x56    
+   \              0x5D 0x0A    
+   \              0x00         
+   \   00000015   0x00 0x00          DC8 0, 0, 0
+   \              0x00         
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     `?<Constant "[AIN4] : %d.%03d[V]\\n">`:
+   \   00000000   0x5B 0x41          DC8 "[AIN4] : %d.%03d[V]\012"
+   \              0x49 0x4E    
+   \              0x34 0x5D    
+   \              0x20 0x3A    
+   \              0x20 0x25    
+   \              0x64 0x2E    
+   \              0x25 0x30    
+   \              0x33 0x64    
+   \              0x5B 0x56    
+   \              0x5D 0x0A    
+   \              0x00         
+   \   00000015   0x00 0x00          DC8 0, 0, 0
+   \              0x00         
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     `?<Constant "[AIN5] : %d.%03d[V]\\n">`:
+   \   00000000   0x5B 0x41          DC8 "[AIN5] : %d.%03d[V]\012"
+   \              0x49 0x4E    
+   \              0x35 0x5D    
+   \              0x20 0x3A    
+   \              0x20 0x25    
+   \              0x64 0x2E    
+   \              0x25 0x30    
+   \              0x33 0x64    
+   \              0x5B 0x56    
+   \              0x5D 0x0A    
+   \              0x00         
+   \   00000015   0x00 0x00          DC8 0, 0, 0
+   \              0x00         
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     `?<Constant "[AIN6] : %d.%03d[V]\\n">`:
+   \   00000000   0x5B 0x41          DC8 "[AIN6] : %d.%03d[V]\012"
+   \              0x49 0x4E    
+   \              0x36 0x5D    
+   \              0x20 0x3A    
+   \              0x20 0x25    
+   \              0x64 0x2E    
+   \              0x25 0x30    
+   \              0x33 0x64    
+   \              0x5B 0x56    
+   \              0x5D 0x0A    
+   \              0x00         
+   \   00000015   0x00 0x00          DC8 0, 0, 0
+   \              0x00         
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     `?<Constant "[AIN7] : %d.%03d[V]\\n">`:
+   \   00000000   0x5B 0x41          DC8 "[AIN7] : %d.%03d[V]\012"
+   \              0x49 0x4E    
+   \              0x37 0x5D    
+   \              0x20 0x3A    
+   \              0x20 0x25    
+   \              0x64 0x2E    
+   \              0x25 0x30    
+   \              0x33 0x64    
+   \              0x5B 0x56    
+   \              0x5D 0x0A    
+   \              0x00         
+   \   00000015   0x00 0x00          DC8 0, 0, 0
+   \              0x00         
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     `?<Constant "[AIN8] : %d.%03d[V]\\n">`:
+   \   00000000   0x5B 0x41          DC8 "[AIN8] : %d.%03d[V]\012"
+   \              0x49 0x4E    
+   \              0x38 0x5D    
+   \              0x20 0x3A    
+   \              0x20 0x25    
+   \              0x64 0x2E    
+   \              0x25 0x30    
+   \              0x33 0x64    
+   \              0x5B 0x56    
+   \              0x5D 0x0A    
+   \              0x00         
+   \   00000015   0x00 0x00          DC8 0, 0, 0
+   \              0x00         
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     `?<Constant "[AIN9] : %d.%03d[V]\\n">`:
+   \   00000000   0x5B 0x41          DC8 "[AIN9] : %d.%03d[V]\012"
+   \              0x49 0x4E    
+   \              0x39 0x5D    
+   \              0x20 0x3A    
+   \              0x20 0x25    
+   \              0x64 0x2E    
+   \              0x25 0x30    
+   \              0x33 0x64    
+   \              0x5B 0x56    
+   \              0x5D 0x0A    
+   \              0x00         
+   \   00000015   0x00 0x00          DC8 0, 0, 0
+   \              0x00         
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     `?<Constant "[AIN10] : %d.%03d[V]\\n">`:
+   \   00000000   0x5B 0x41          DC8 "[AIN10] : %d.%03d[V]\012"
+   \              0x49 0x4E    
+   \              0x31 0x30    
+   \              0x5D 0x20    
+   \              0x3A 0x20    
+   \              0x25 0x64    
+   \              0x2E 0x25    
+   \              0x30 0x33    
+   \              0x64 0x5B    
+   \              0x56 0x5D    
+   \              0x0A 0x00    
+   \   00000016   0x00 0x00          DC8 0, 0
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     `?<Constant "[AIN11] : %d.%03d[V]\\n">`:
+   \   00000000   0x5B 0x41          DC8 "[AIN11] : %d.%03d[V]\012"
+   \              0x49 0x4E    
+   \              0x31 0x31    
+   \              0x5D 0x20    
+   \              0x3A 0x20    
+   \              0x25 0x64    
+   \              0x2E 0x25    
+   \              0x30 0x33    
+   \              0x64 0x5B    
+   \              0x56 0x5D    
+   \              0x0A 0x00    
+   \   00000016   0x00 0x00          DC8 0, 0
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     `?<Constant "[AIN12] : %d.%03d[V]\\n">`:
+   \   00000000   0x5B 0x41          DC8 "[AIN12] : %d.%03d[V]\012"
+   \              0x49 0x4E    
+   \              0x31 0x32    
+   \              0x5D 0x20    
+   \              0x3A 0x20    
+   \              0x25 0x64    
+   \              0x2E 0x25    
+   \              0x30 0x33    
+   \              0x64 0x5B    
+   \              0x56 0x5D    
+   \              0x0A 0x00    
+   \   00000016   0x00 0x00          DC8 0, 0
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     `?<Constant "[AIN13] : %d.%03d[V]\\n">`:
+   \   00000000   0x5B 0x41          DC8 "[AIN13] : %d.%03d[V]\012"
+   \              0x49 0x4E    
+   \              0x31 0x33    
+   \              0x5D 0x20    
+   \              0x3A 0x20    
+   \              0x25 0x64    
+   \              0x2E 0x25    
+   \              0x30 0x33    
+   \              0x64 0x5B    
+   \              0x56 0x5D    
+   \              0x0A 0x00    
+   \   00000016   0x00 0x00          DC8 0, 0
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     `?<Constant "[AIN14] : %d.%03d[V]\\n">`:
+   \   00000000   0x5B 0x41          DC8 "[AIN14] : %d.%03d[V]\012"
+   \              0x49 0x4E    
+   \              0x31 0x34    
+   \              0x5D 0x20    
+   \              0x3A 0x20    
+   \              0x25 0x64    
+   \              0x2E 0x25    
+   \              0x30 0x33    
+   \              0x64 0x5B    
+   \              0x56 0x5D    
+   \              0x0A 0x00    
+   \   00000016   0x00 0x00          DC8 0, 0
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     `?<Constant "TEMP                 ...">`:
+   \   00000000   0x54 0x45          DC8 "TEMP                   : %d.%03d[V], %d['C]\012"
+   \              0x4D 0x50    
+   \              0x20 0x20    
+   \              0x20 0x20    
+   \              0x20 0x20    
+   \              0x20 0x20    
+   \              0x20 0x20    
+   \              0x20 0x20    
+   \              0x20 0x20    
+   \              0x20 0x20    
+   \              0x20 0x20    
+   \              0x20 0x3A    
+   \              0x20 0x25    
+   \              0x64 0x2E    
+   \              0x25 0x30    
+   \              0x33 0x64    
+   \              0x5B 0x56    
+   \              0x5D 0x2C    
+   \              0x20 0x25    
+   \              0x64 0x5B    
+   \              0x27 0x43    
+   \              0x5D 0x0A    
+   \              0x00         
+   \   0000002D   0x00 0x00          DC8 0, 0, 0
+   \              0x00         
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     `?<Constant "%s: %d.%d[V], [raw:%04d]">`:
+   \   00000000   0x25 0x73          DC8 "%s: %d.%d[V], [raw:%04d]"
+   \              0x3A 0x20    
+   \              0x25 0x64    
+   \              0x2E 0x25    
+   \              0x64 0x5B    
+   \              0x56 0x5D    
+   \              0x2C 0x20    
+   \              0x5B 0x72    
+   \              0x61 0x77    
+   \              0x3A 0x25    
+   \              0x30 0x34    
+   \              0x64 0x5D    
+   \              0x00         
+   \   00000019   0x00 0x00          DC8 0, 0, 0
+   \              0x00         
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     `?<Constant "\\305\\353\\275\\305\\275\\303\\307\\350 S`:
+   \   00000000   0xC5 0xEB          DC8 "\305\353\275\305\275\303\307\350 Ser4[MODEM] \275\303\307\350\300\273 \303\274\305\251\307\317\277\251 \301\326\274\274\277\344     "
+   \              0xBD 0xC5    
+   \              0xBD 0xC3    
+   \              0xC7 0xE8    
+   \              0x20 0x53    
+   \              0x65 0x72    
+   \              0x34 0x5B    
+   \              0x4D 0x4F    
+   \              0x44 0x45    
+   \              0x4D 0x5D    
+   \              0x20 0xBD    
+   \              0xC3 0xC7    
+   \              0xE8 0xC0    
+   \              0xBB 0x20    
+   \              0xC3 0xBC    
+   \              0xC5 0xA9    
+   \              0xC7 0xCF    
+   \              0xBF 0xA9    
+   \              0x20 0xC1    
+   \              0xD6 0xBC    
+   \              0xBC 0xBF    
+   \              0xE4 0x20    
+   \              0x20 0x20    
+   \              0x20 0x20    
+   \              0x00         
+   \   00000031   0x00 0x00          DC8 0, 0, 0
+   \              0x00         
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     `?<Constant "[OK]">`:
+   \   00000000   0x5B 0x4F          DC8 "[OK]"
+   \              0x4B 0x5D    
+   \              0x00         
+   \   00000005   0x00 0x00          DC8 0, 0, 0
+   \              0x00         
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     `?<Constant "[FAIL 1]">`:
+   \   00000000   0x5B 0x46          DC8 "[FAIL 1]"
+   \              0x41 0x49    
+   \              0x4C 0x20    
+   \              0x31 0x5D    
+   \              0x00         
+   \   00000009   0x00 0x00          DC8 0, 0, 0
+   \              0x00         
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     `?<Constant "[FAIL 2]: %d">`:
+   \   00000000   0x5B 0x46          DC8 "[FAIL 2]: %d"
+   \              0x41 0x49    
+   \              0x4C 0x20    
+   \              0x32 0x5D    
+   \              0x3A 0x20    
+   \              0x25 0x64    
+   \              0x00         
+   \   0000000D   0x00 0x00          DC8 0, 0, 0
+   \              0x00         
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     `?<Constant "%02d. ">`:
+   \   00000000   0x25 0x30          DC8 "%02d. "
+   \              0x32 0x64    
+   \              0x2E 0x20    
+   \              0x00         
+   \   00000007   0x00               DC8 0
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     `?<Constant "[OFF]">`:
+   \   00000000   0x5B 0x4F          DC8 "[OFF]"
+   \              0x46 0x46    
+   \              0x5D 0x00    
+   \   00000006   0x00 0x00          DC8 0, 0
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     `?<Constant "[ON ]">`:
+   \   00000000   0x5B 0x4F          DC8 "[ON ]"
+   \              0x4E 0x20    
+   \              0x5D 0x00    
+   \   00000006   0x00 0x00          DC8 0, 0
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     `?<Constant "%s\\300\\314 \\274\\366\\307\\340\\265\\30`:
+   \   00000000   0x25 0x73          DC8 25H, 73H, 0C0H, 0CCH, 20H, 0BCH, 0F6H, 0C7H
+   \              0xC0 0xCC    
+   \              0x20 0xBC    
+   \              0xF6 0xC7    
+   \   00000008   0xE0 0xB5          DC8 0E0H, 0B5H, 0C7H, 0BEH, 0EEH, 20H, 0C0H, 0D6H
+   \              0xC7 0xBE    
+   \              0xEE 0x20    
+   \              0xC0 0xD6    
+   \   00000010   0xBD 0xC0          DC8 0BDH, 0C0H, 0B4H, 0CFH, 0B4H, 0D9H, 2EH, 20H
+   \              0xB4 0xCF    
+   \              0xB4 0xD9    
+   \              0x2E 0x20    
+   \   00000018   0xB0 0xE8          DC8 0B0H, 0E8H, 0BCH, 0D3H, 20H, 0C1H, 0F8H, 0C7H
+   \              0xBC 0xD3    
+   \              0x20 0xC1    
+   \              0xF8 0xC7    
+   \   00000020   0xE0 0xC7          DC8 0E0H, 0C7H, 0CFH, 0BDH, 0C3H, 0B0H, 0DAH, 0BDH
+   \              0xCF 0xBD    
+   \              0xC3 0xB0    
+   \              0xDA 0xBD    
+   \   00000028   0xC0 0xB4          DC8 0C0H, 0B4H, 0CFH, 0B1H, 0EEH, 3FH, 5BH, 59H
+   \              0xCF 0xB1    
+   \              0xEE 0x3F    
+   \              0x5B 0x59    
+   \   00000030   0x5D 0x65          DC8 5DH, 65H, 73H, 2CH, 20H, 5BH, 43H, 5DH
+   \              0x73 0x2C    
+   \              0x20 0x5B    
+   \              0x43 0x5D    
+   \   00000038   0x61 0x6E          DC8 61H, 6EH, 63H, 65H, 6CH, 0AH, 0
+   \              0x63 0x65    
+   \              0x6C 0x0A    
+   \              0x00         
+   \   0000003F   0x00               DC8 0
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     `?<Constant "CANCEL TEST \\n">`:
+   \   00000000   0x43 0x41          DC8 "CANCEL TEST \012"
+   \              0x4E 0x43    
+   \              0x45 0x4C    
+   \              0x20 0x54    
+   \              0x45 0x53    
+   \              0x54 0x20    
+   \              0x0A 0x00    
+   \   0000000E   0x00 0x00          DC8 0, 0
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     `?<Constant "* %s [VER:%d.%d]\\n">`:
+   \   00000000   0x2A 0x20          DC8 "* %s [VER:%d.%d]\012"
+   \              0x25 0x73    
+   \              0x20 0x5B    
+   \              0x56 0x45    
+   \              0x52 0x3A    
+   \              0x25 0x64    
+   \              0x2E 0x25    
+   \              0x64 0x5D    
+   \              0x0A 0x00    
+   \   00000012   0x00 0x00          DC8 0, 0
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     `?<Constant "TRIO RCU CTRL TEST PR...">`:
+   \   00000000   0x54 0x52          DC8 "TRIO RCU CTRL TEST PROGRAM"
+   \              0x49 0x4F    
+   \              0x20 0x52    
+   \              0x43 0x55    
+   \              0x20 0x43    
+   \              0x54 0x52    
+   \              0x4C 0x20    
+   \              0x54 0x45    
+   \              0x53 0x54    
+   \              0x20 0x50    
+   \              0x52 0x4F    
+   \              0x47 0x52    
+   \              0x41 0x4D    
+   \              0x00         
+   \   0000001B   0x00               DC8 0
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     `?<Constant "*    -COMMAND 1st-\\n">`:
+   \   00000000   0x2A 0x20          DC8 "*    -COMMAND 1st-\012"
+   \              0x20 0x20    
+   \              0x20 0x2D    
+   \              0x43 0x4F    
+   \              0x4D 0x4D    
+   \              0x41 0x4E    
+   \              0x44 0x20    
+   \              0x31 0x73    
+   \              0x74 0x2D    
+   \              0x0A 0x00    
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     `?<Constant "*  ?        : help(th...">`:
+   \   00000000   0x2A 0x20          DC8 "*  ?        : help(this message)\012"
+   \              0x20 0x3F    
+   \              0x20 0x20    
+   \              0x20 0x20    
+   \              0x20 0x20    
+   \              0x20 0x20    
+   \              0x3A 0x20    
+   \              0x68 0x65    
+   \              0x6C 0x70    
+   \              0x28 0x74    
+   \              0x68 0x69    
+   \              0x73 0x20    
+   \              0x6D 0x65    
+   \              0x73 0x73    
+   \              0x61 0x67    
+   \              0x65 0x29    
+   \              0x0A 0x00    
+   \   00000022   0x00 0x00          DC8 0, 0
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     `?<Constant "*  I        : INPUT T...">`:
+   \   00000000   0x2A 0x20          DC8 "*  I        : INPUT Test          [%s]\012"
+   \              0x20 0x49    
+   \              0x20 0x20    
+   \              0x20 0x20    
+   \              0x20 0x20    
+   \              0x20 0x20    
+   \              0x3A 0x20    
+   \              0x49 0x4E    
+   \              0x50 0x55    
+   \              0x54 0x20    
+   \              0x54 0x65    
+   \              0x73 0x74    
+   \              0x20 0x20    
+   \              0x20 0x20    
+   \              0x20 0x20    
+   \              0x20 0x20    
+   \              0x20 0x20    
+   \              0x5B 0x25    
+   \              0x73 0x5D    
+   \              0x0A 0x00    
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     `?<Constant "*  O        : OUTPUT ...">`:
+   \   00000000   0x2A 0x20          DC8 "*  O        : OUTPUT Test         [%s]\012"
+   \              0x20 0x4F    
+   \              0x20 0x20    
+   \              0x20 0x20    
+   \              0x20 0x20    
+   \              0x20 0x20    
+   \              0x3A 0x20    
+   \              0x4F 0x55    
+   \              0x54 0x50    
+   \              0x55 0x54    
+   \              0x20 0x54    
+   \              0x65 0x73    
+   \              0x74 0x20    
+   \              0x20 0x20    
+   \              0x20 0x20    
+   \              0x20 0x20    
+   \              0x20 0x20    
+   \              0x5B 0x25    
+   \              0x73 0x5D    
+   \              0x0A 0x00    
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     `?<Constant "*  C        : SERIAL[...">`:
+   \   00000000   0x2A 0x20          DC8 "*  C        : SERIAL[UART]        [%s]\012"
+   \              0x20 0x43    
+   \              0x20 0x20    
+   \              0x20 0x20    
+   \              0x20 0x20    
+   \              0x20 0x20    
+   \              0x3A 0x20    
+   \              0x53 0x45    
+   \              0x52 0x49    
+   \              0x41 0x4C    
+   \              0x5B 0x55    
+   \              0x41 0x52    
+   \              0x54 0x5D    
+   \              0x20 0x20    
+   \              0x20 0x20    
+   \              0x20 0x20    
+   \              0x20 0x20    
+   \              0x5B 0x25    
+   \              0x73 0x5D    
+   \              0x0A 0x00    
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     `?<Constant "*  A        : ANALOG ...">`:
+   \   00000000   0x2A 0x20          DC8 "*  A        : ANALOG DECT         [%s]\012"
+   \              0x20 0x41    
+   \              0x20 0x20    
+   \              0x20 0x20    
+   \              0x20 0x20    
+   \              0x20 0x20    
+   \              0x3A 0x20    
+   \              0x41 0x4E    
+   \              0x41 0x4C    
+   \              0x4F 0x47    
+   \              0x20 0x44    
+   \              0x45 0x43    
+   \              0x54 0x20    
+   \              0x20 0x20    
+   \              0x20 0x20    
+   \              0x20 0x20    
+   \              0x20 0x20    
+   \              0x5B 0x25    
+   \              0x73 0x5D    
+   \              0x0A 0x00    
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     `?<Constant "*  E        : EEPROM ...">`:
+   \   00000000   0x2A 0x20          DC8 "*  E        : EEPROM TEST         [%s]\012"
+   \              0x20 0x45    
+   \              0x20 0x20    
+   \              0x20 0x20    
+   \              0x20 0x20    
+   \              0x20 0x20    
+   \              0x3A 0x20    
+   \              0x45 0x45    
+   \              0x50 0x52    
+   \              0x4F 0x4D    
+   \              0x20 0x54    
+   \              0x45 0x53    
+   \              0x54 0x20    
+   \              0x20 0x20    
+   \              0x20 0x20    
+   \              0x20 0x20    
+   \              0x20 0x20    
+   \              0x5B 0x25    
+   \              0x73 0x5D    
+   \              0x0A 0x00    
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     `?<Constant "*  S        : Factory...">`:
+   \   00000000   0x2A 0x20          DC8 "*  S        : Factory SET\012"
+   \              0x20 0x53    
+   \              0x20 0x20    
+   \              0x20 0x20    
+   \              0x20 0x20    
+   \              0x20 0x20    
+   \              0x3A 0x20    
+   \              0x46 0x61    
+   \              0x63 0x74    
+   \              0x6F 0x72    
+   \              0x79 0x20    
+   \              0x53 0x45    
+   \              0x54 0x0A    
+   \              0x00         
+   \   0000001B   0x00               DC8 0
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     `?<Constant "*********************...">`:
+   \   00000000   0x2A 0x2A          DC8 2AH, 2AH, 2AH, 2AH, 2AH, 2AH, 2AH, 2AH
+   \              0x2A 0x2A    
+   \              0x2A 0x2A    
+   \              0x2A 0x2A    
+   \   00000008   0x2A 0x2A          DC8 2AH, 2AH, 2AH, 2AH, 2AH, 2AH, 2AH, 2AH
+   \              0x2A 0x2A    
+   \              0x2A 0x2A    
+   \              0x2A 0x2A    
+   \   00000010   0x2A 0x2A          DC8 2AH, 2AH, 2AH, 2AH, 2AH, 2AH, 2AH, 2AH
+   \              0x2A 0x2A    
+   \              0x2A 0x2A    
+   \              0x2A 0x2A    
+   \   00000018   0x2A 0x2A          DC8 2AH, 2AH, 2AH, 2AH, 2AH, 2AH, 2AH, 2AH
+   \              0x2A 0x2A    
+   \              0x2A 0x2A    
+   \              0x2A 0x2A    
+   \   00000020   0x2A 0x2A          DC8 2AH, 2AH, 2AH, 2AH, 2AH, 2AH, 2AH, 2AH
+   \              0x2A 0x2A    
+   \              0x2A 0x2A    
+   \              0x2A 0x2A    
+   \   00000028   0x2A 0x2A          DC8 2AH, 2AH, 2AH, 2AH, 2AH, 2AH, 2AH, 2AH
+   \              0x2A 0x2A    
+   \              0x2A 0x2A    
+   \              0x2A 0x2A    
+   \   00000030   0x2A 0x2A          DC8 2AH, 2AH, 2AH, 2AH, 2AH, 2AH, 2AH, 2AH
+   \              0x2A 0x2A    
+   \              0x2A 0x2A    
+   \              0x2A 0x2A    
+   \   00000038   0x2A 0x2A          DC8 2AH, 2AH, 2AH, 2AH, 2AH, 2AH, 2AH, 2AH
+   \              0x2A 0x2A    
+   \              0x2A 0x2A    
+   \              0x2A 0x2A    
+   \   00000040   0x2A 0x2A          DC8 2AH, 2AH, 2AH, 2AH, 2AH, 2AH, 2AH, 2AH
+   \              0x2A 0x2A    
+   \              0x2A 0x2A    
+   \              0x2A 0x2A    
+   \   00000048   0x2A 0x2A          DC8 2AH, 2AH, 2AH, 2AH, 2AH, 2AH, 2AH, 0AH
+   \              0x2A 0x2A    
+   \              0x2A 0x2A    
+   \              0x2A 0x0A    
+   \   00000050   0x00               DC8 0
+   \   00000051   0x00 0x00          DC8 0, 0, 0
+   \              0x00         
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     `?<Constant "TRIO-M >>">`:
+   \   00000000   0x54 0x52          DC8 "TRIO-M >>"
+   \              0x49 0x4F    
+   \              0x2D 0x4D    
+   \              0x20 0x3E    
+   \              0x3E 0x00    
+   \   0000000A   0x00 0x00          DC8 0, 0
+
+   \                                 In section .rodata, align 4, keep-with-next
+   \                     `?<Constant "\\n\\n">`:
+   \   00000000   0x0A 0x0A          DC8 "\012\012"
+   \              0x00         
+   \   00000003   0x00               DC8 0
+
+   \                                 In section .rodata, align 2, keep-with-next
+   \                     `?<Constant "\\n">`:
+   \   00000000   0x0A 0x00          DC8 "\012"
+
+   \                                 In section .rodata, align 4, keep-with-next
+   \                     `?<Constant ", ">`:
+   \   00000000   0x2C 0x20          DC8 ", "
+   \              0x00         
+   \   00000003   0x00               DC8 0
+
+   \                                 In section .rodata, align 4, keep-with-next
+   \                     `?<Constant "*\\n">`:
+   \   00000000   0x2A 0x0A          DC8 "*\012"
+   \              0x00         
+   \   00000003   0x00               DC8 0
+    934          
+    935          
+    936          
+    937          
+    938          
+    939          ///////////////////////////////////////////////////////////////////////////////
+    940          // End of Source File
+    941          ////////////////////////
+    942          
+
+   Maximum stack usage in bytes:
+
+   .cstack Function
+   ------- --------
+       24  AdInputStatus
+             24 -- Indirect call
+             24 -> ADC_ChannelEnable
+             24 -> ADC_CheckFinish
+             24 -> AdctoVolt33V
+             24 -> OSTimeDly
+              0 -> PrintStar
+             24 -> PrintStar
+             24 -> ReadEnvTempTable
+       24  AdcPrintf
+              0 -- Indirect call
+             24 -- Indirect call
+             24 -> AdctoVolt33V
+             24 -> AdctoVolt5opamp
+       24  COMTestFunc
+             24 -- Indirect call
+             24 -> OSTimeDly
+       40  CurrentInputStatus
+              0 -- Indirect call
+             40 -> DigitalInputDiplay
+             40 -> PrintStar
+       32  DigitalInputDiplay
+             32 -- Indirect call
+             32 -> OSTimeDly
+       48  HwTestOutFunc
+             48 -> AttnDataOutput
+             48 -> pPCA9555BitRst
+             48 -> pPCA9555BitSet
+       24  KeyProc
+             24 -- Indirect call
+             24 -> strcpy
+             24 -> strlen
+       24  OnCommand
+             24 -- Indirect call
+             24 -> AdInputStatus
+             24 -> COMTestFunc
+             24 -> CurrentInputStatus
+             24 -> DefaultTable
+             24 -> DownLoadBootingJump
+             24 -> DownloadFlagClr
+             24 -> ForDelay
+             24 -> HwTestOutFunc
+             24 -> OSTimeDly
+             24 -> PrintLogo
+             24 -> PromptOut
+             24 -> TimeOverCheck
+             24 -> TimerRegist
+             24 -> __aeabi_memcpy4
+       16  PrintLogo
+             16 -- Indirect call
+              0 -> PrintStar
+             16 -> PrintStar
+        0  PrintStar
+              0 -- Indirect call
+        0  PromptOut
+              0 -- Indirect call
+        0  SavetoTestBackup
+        8  TestCommand
+              0 -> PromptOut
+              8 -> TimerRegist
+        0  TestInit
+              0 -> OSTaskCreate
+       24  TestTask
+             24 -- Indirect call
+             24 -> DownLoadBootingJump
+             24 -> KeyProc
+             24 -> OSTimeDly
+             24 -> PrintLogo
+             24 -> PromptOut
+             24 -> TimeOverCheck
+       16  WaringMssageReturn
+             16 -- Indirect call
+             16 -> OSTimeDly
+             16 -> TimeOverCheck
+             16 -> TimerRegist
+       16  dGetHex
+             16 -> htob
+        0  htob
+        8  returnmsgTest
+              8 -- Indirect call
+              0 -> WaringMssageReturn
+
+
+   Section sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+      12  ?<Constant "    TESTED">
+       8  ?<Constant "%02d. ">
+      20  ?<Constant "%s Test Canceled\n">
+      20  ?<Constant "%s Test Finished\n">
+      24  ?<Constant "%s Test Test Finished\n">
+      20  ?<Constant "%s Test TimeOut\n">
+      20  ?<Constant "%s test Canceled\n">
+      20  ?<Constant "%s test Finished\n">
+      24  ?<Constant "%s test Test Canceled\n">
+      24  ?<Constant "%s test Test TimeOut\n">
+      20  ?<Constant "%s test TimeOut\n">
+       4  ?<Constant "%s">
+      28  ?<Constant "%s: %d.%d[V], [raw:%04d]">
+      64  ?<Constant "%s\300\314 \274\366\307\340\265\30
+      20  ?<Constant "*    -COMMAND 1st-\n">
+      36  ?<Constant "*  ?        : help(th...">
+      40  ?<Constant "*  A        : ANALOG ...">
+      40  ?<Constant "*  C        : SERIAL[...">
+      40  ?<Constant "*  E        : EEPROM ...">
+      40  ?<Constant "*  I        : INPUT T...">
+      40  ?<Constant "*  O        : OUTPUT ...">
+      28  ?<Constant "*  S        : Factory...">
+       4  ?<Constant "* ">
+      20  ?<Constant "* %s [VER:%d.%d]\n">
+      84  ?<Constant "*********************...">
+       4  ?<Constant "*\n">
+       4  ?<Constant ", ">
+      20  ?<Constant "AC_Alarm        :">
+      12  ?<Constant "ADC Input">
+      16  ?<Constant "CANCEL TEST \n">
+      12  ?<Constant "COM \275\303\307\350">
+      12  ?<Constant "Dig Input">
+      12  ?<Constant "Dig Output">
+      20  ?<Constant "Insert          :">
+      12  ?<Constant "NON TESTED">
+      20  ?<Constant "PLL_CDMALTE     :">
+      20  ?<Constant "PLL_LTE_A2      :">
+      20  ?<Constant "PLL_WCDMA       :">
+      48  ?<Constant "TEMP                 ...">
+      28  ?<Constant "TRIO RCU CTRL TEST PR...">
+      12  ?<Constant "TRIO-M >>">
+      24  ?<Constant "[AIN0] : %d.%03d[V]\n">
+      24  ?<Constant "[AIN10] : %d.%03d[V]\n">
+      24  ?<Constant "[AIN11] : %d.%03d[V]\n">
+      24  ?<Constant "[AIN12] : %d.%03d[V]\n">
+      24  ?<Constant "[AIN13] : %d.%03d[V]\n">
+      24  ?<Constant "[AIN14] : %d.%03d[V]\n">
+      24  ?<Constant "[AIN1] : %d.%03d[V]\n">
+      24  ?<Constant "[AIN2] : %d.%03d[V]\n">
+      24  ?<Constant "[AIN3] : %d.%03d[V]\n">
+      24  ?<Constant "[AIN4] : %d.%03d[V]\n">
+      24  ?<Constant "[AIN5] : %d.%03d[V]\n">
+      24  ?<Constant "[AIN6] : %d.%03d[V]\n">
+      24  ?<Constant "[AIN7] : %d.%03d[V]\n">
+      24  ?<Constant "[AIN8] : %d.%03d[V]\n">
+      24  ?<Constant "[AIN9] : %d.%03d[V]\n">
+      12  ?<Constant "[FAIL 1]">
+      16  ?<Constant "[FAIL 2]: %d">
+       8  ?<Constant "[OFF]">
+       8  ?<Constant "[OK]">
+       8  ?<Constant "[ON ]">
+      52  ?<Constant "\305\353\275\305\275\303\307\350 S
+      40  ?<Constant "\n Default Back-up End...">
+       2  ?<Constant "\n">
+      36  ?<Constant "\n* [%s TEST START Tim...">
+      36  ?<Constant "\n* [%s TEST START Tim...">_1
+      36  ?<Constant "\n* [%s] TEST START Ti...">
+       4  ?<Constant "\n\n">
+       4  ??DataTable71
+       4  ??DataTable75
+       4  ??DataTable76
+       4  ??DataTable76_1
+       4  ??DataTable76_2
+       4  ??DataTable77
+       4  ??DataTable77_1
+       4  ??DataTable78
+       4  ??DataTable79
+       4  ??DataTable79_1
+       4  ??DataTable79_2
+       4  ??DataTable79_3
+       4  ??DataTable79_4
+       4  ??DataTable80
+       4  ??DataTable80_1
+       4  ??DataTable80_10
+       4  ??DataTable80_11
+       4  ??DataTable80_12
+       4  ??DataTable80_13
+       4  ??DataTable80_14
+       4  ??DataTable80_15
+       4  ??DataTable80_16
+       4  ??DataTable80_17
+       4  ??DataTable80_18
+       4  ??DataTable80_19
+       4  ??DataTable80_2
+       4  ??DataTable80_20
+       4  ??DataTable80_21
+       4  ??DataTable80_22
+       4  ??DataTable80_23
+       4  ??DataTable80_24
+       4  ??DataTable80_25
+       4  ??DataTable80_26
+       4  ??DataTable80_3
+       4  ??DataTable80_4
+       4  ??DataTable80_5
+       4  ??DataTable80_6
+       4  ??DataTable80_7
+       4  ??DataTable80_8
+       4  ??DataTable80_9
+       8  ?Subroutine0
+     854  AdInputStatus
+      76  AdcPrintf
+     128  COMTestFunc
+     188  CurrentInputStatus
+     180  DigitalInputDiplay
+       1  FNDSTOPFlag
+       1  FNDi
+       1  FNDj
+     588  HwTestOutFunc
+     322  KeyProc
+     660  OnCommand
+     138  PrintLogo
+       6  PrintStar
+       4  PromptOut
+       4  SavetoTestBackup
+       1  SysPath
+      94  TestCommand
+      16  TestInit
+     116  TestTask
+    2048  TestTaskStk
+      98  WaringMssageReturn
+       4  comtstcnt
+      24  dGetHex
+       1  gTestFlag
+      30  htob
+      20  returnmsgTest
+     156  tIndex
+          PrevWRCnt
+          PrevRDCnt
+          PrevData
+      32  tRevData
+       1  tTestFlag
+       4  testFNDCnt
+       8  testResult
+      72  tinputSts
+          tDisplay
+      52  tinputStsOld
+
+ 
+   253 bytes in section .bss
+    81 bytes in section .data
+   146 bytes in section .rodata
+ 5 158 bytes in section .text
+ 2 048 bytes in section iram
+ 
+ 5 158 bytes of CODE  memory
+   146 bytes of CONST memory
+ 2 382 bytes of DATA  memory
+
+Errors: none
+Warnings: none

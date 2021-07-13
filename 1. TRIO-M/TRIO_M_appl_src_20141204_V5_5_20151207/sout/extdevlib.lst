@@ -1,0 +1,355 @@
+###############################################################################
+#                                                                             #
+# IAR ANSI C/C++ Compiler V5.30.2.51295/W32 for ARM     18/May/2012  17:34:59 #
+# Copyright 1999-2009 IAR Systems AB.                                         #
+#                                                                             #
+#    Cpu mode     =  thumb                                                    #
+#    Endian       =  little                                                   #
+#    Source file  =  D:\Project\TRIO\3.F_W\TRIO_appl_src_20120516\lib\ext\ext #
+#                    devlib.c                                                 #
+#    Command line =  D:\Project\TRIO\3.F_W\TRIO_appl_src_20120516\lib\ext\ext #
+#                    devlib.c -D NDEBUG -lcN D:\Project\TRIO\3.F_W\TRIO_appl_ #
+#                    src_20120516\sout\ -o D:\Project\TRIO\3.F_W\TRIO_appl_sr #
+#                    c_20120516\sout\ --endian=little --cpu=Cortex-M3 -e      #
+#                    --warnings_are_errors --fpu=None --dlib_config           #
+#                    "C:\Program Files\IAR Systems\Embedded Workbench         #
+#                    5.4\arm\INC\DLib_Config_Normal.h" -I                     #
+#                    D:\Project\TRIO\3.F_W\TRIO_appl_src_20120516\include\    #
+#                    -I D:\Project\TRIO\3.F_W\TRIO_appl_src_20120516\lib_stm3 #
+#                    2\inc\ -I D:\Project\TRIO\3.F_W\TRIO_appl_src_20120516\l #
+#                    ib_stm32\src\ -I D:\Project\TRIO\3.F_W\TRIO_appl_src_201 #
+#                    20516\uC-CPU\ -I D:\Project\TRIO\3.F_W\TRIO_appl_src_201 #
+#                    20516\uC-LIB\ -I D:\Project\TRIO\3.F_W\TRIO_appl_src_201 #
+#                    20516\uCOS-II\Ports\ -I D:\Project\TRIO\3.F_W\TRIO_appl_ #
+#                    src_20120516\uCOS-II\Source\ -I                          #
+#                    D:\Project\TRIO\3.F_W\TRIO_appl_src_20120516\uC-Probe\   #
+#                    -I "C:\Program Files\IAR Systems\Embedded Workbench      #
+#                    5.4\arm\INC\" -Oh                                        #
+#    List file    =  D:\Project\TRIO\3.F_W\TRIO_appl_src_20120516\sout\extdev #
+#                    lib.lst                                                  #
+#    Object file  =  D:\Project\TRIO\3.F_W\TRIO_appl_src_20120516\sout\extdev #
+#                    lib.o                                                    #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\Project\TRIO\3.F_W\TRIO_appl_src_20120516\lib\ext\extdevlib.c
+      1          /*********************************************
+      2          * File Name          : usart1_vx.x.c
+      3          * Author             :
+      4          * Date First Issued  : 01/17/2008
+      5          * Description        : This file provides all the USART0 firmware functions.
+      6          * $Revision: 0.1 $
+      7          * $Revision date: 2008.01.__
+      8          ********************************************************************************/
+      9          
+     10          #define	EXTDEV_C
+     11          
+     12          #include <stdarg.h>
+     13          #include <stdlib.h>
+     14          #include <stdio.h>
+     15          #include <string.h>
+     16          
+     17          #include "ucos_ii.h"
+     18          #include "cpu.h"
+     19          
+     20          #include "stm32f10x_type.h"
+     21          #include "stm32f10x_conf.h"
+     22          
+     23          #include "../include/extdevlibext.h"
+     24          #include "extdevlib.h"
+     25          #include "../dev/mem/fsmc_sram.h"
+     26          
+     27          
+     28          void DownFlagSet(INT16U mode)
+     29          {
+     30          	INT32U cpu_sr;
+     31          	OS_ENTER_CRITICAL();
+     32          	{
+     33          		SYS_BACK *ptr = (SYS_BACK *)RoadBackuptobuffer(__pSYSTAddr);
+     34          
+     35          		ptr->Data[DownLoadFlag1] = (mode >> 8) & 0xff;
+     36          		ptr->Data[DownLoadFlag2] = (mode >> 0) & 0xff;
+     37          
+     38          		WriteBuffertoBackup(__pSYSTAddr, sizeof(SYS_BACK));
+     39          	}
+     40          	OS_EXIT_CRITICAL();
+     41          }
+     42          
+     43          
+     44          void DownloadFlagClr(void)
+     45          {
+     46          	DownFlagSet(NOMODE);
+     47          }
+     48          
+     49          INT8U CheckSWConf(void)
+     50          {
+     51          	INT8U ret = 0;
+     52          
+     53          	ret = (ret << 1) | GPIOB->IDR.B3;	// DIP SW ID3
+     54          	ret = (ret << 1) | GPIOA->IDR.B14; 	// DIP SW ID2
+     55          	ret = (ret << 1) | GPIOA->IDR.B13;	// DIP SW ID1
+     56          	ret = (ret << 1) | GPIOA->IDR.B15;	// DIP SW ID0
+     57          
+     58          	return ((~ret) & 0x0f);
+     59          }
+     60          
+     61          ////////////////////////////////////////////////////////////////////////////////
+     62          
+     63          unsigned short int Crc16Calc(unsigned char *buf_ptr, unsigned long int len, unsigned short int ninit)
+     64          {
+     65          	INT16U dt;
+     66          	INT16U crc16;
+     67          
+     68          	len *= 8;
+     69          	for(crc16 = ninit; len >= 8; len -= 8, buf_ptr++)
+     70          	{
+     71          		crc16 = Crc_tbl[(crc16>>8) ^ *buf_ptr] ^ (crc16<<8);
+     72          	}
+     73          	if(len != 0)
+     74          	{
+     75          		dt = ((INT16U)(*buf_ptr)) << 8;
+     76          		while(len-- != 0)
+     77          		{
+     78          			if(((crc16^dt) & ((INT16U)1 << 15)) != 0)
+     79          			{crc16 <<= 1;crc16 ^= POLYNOMIAL;}
+     80          			else crc16 <<= 1;
+     81          			dt <<= 1;
+     82          		}
+     83          	}
+     84          	return(crc16);
+     85          }
+     86          
+     87          
+     88          // -1: error
+     89          #define USED_HALFWORD
+     90          
+     91          signed long int UpLoadData(unsigned char *ptr, unsigned short int len, unsigned long int pcnt)
+     92          {
+     93          	INT32U i = 0;
+     94          	INT32U rdata = 0;
+     95          	volatile INT8U *upLdAddr = (INT8U * )(__pAPBKAddr + pcnt);
+     96          
+     97          #ifdef USED_HALFWORD
+     98          	for(i = 0; i < len; i = i+2 )
+     99          #else
+    100          	for(i = 0; i < len; i = i+4 )
+    101          #endif
+    102          	{	// copy to download area.
+    103          		rdata = 0;
+    104          		rdata |= (*ptr++) << 0;
+    105          		rdata |= (*ptr++) << 8;
+    106          #ifndef USED_HALFWORD
+    107          		rdata |= (*ptr++) << 16;
+    108          		rdata |= (*ptr++) << 24;	
+    109          #endif
+    110          		WatchdogClear();
+    111          
+    112          #ifdef USED_HALFWORD
+    113          		if(FLASH_ProgramHalfWord(((INT32U)&upLdAddr[i]), rdata & 0xffff) != FLASH_COMPLETE )
+    114          #else
+    115          		if(FLASH_ProgramWord(((INT32U)&upLdAddr[i]), rdata) != FLASH_COMPLETE )
+    116          #endif
+    117                  {
+    118                      //pUSART3.dprintf("data: %08x, len: %d, i: %d, pcnt: %d \n", rdata, len, i, pcnt);
+    119                      return -1;
+    120                  }
+    121          
+    122          		if( !(i%128) ) OSTimeDly(1);
+    123          		
+    124          	}
+    125          	return (pcnt + len);
+    126          }
+    127          
+    128          signed long int UpLoadExtSRAM(unsigned char *ptr, unsigned short int len, unsigned long int pcnt)
+    129          {
+    130          	INT32U i = 0;
+    131          	INT32U rdata = 0;
+    132          	volatile INT8U *upLdAddr = (INT8U * )(__pAPBK_SRAMAddr + pcnt);
+    133          
+    134          	if((pcnt + len) > (APPLSIZE*2L)) return -1;
+    135          
+    136          	for(i = 0; i < len; i = i+4 )
+    137          	{	// copy to download area.
+    138          		rdata = 0;
+    139          		rdata |= (*ptr++) << 0;
+    140          		rdata |= (*ptr++) << 8;
+    141          		rdata |= (*ptr++) << 16;
+    142          		rdata |= (*ptr++) << 24;	
+    143          
+    144          		*(volatile INT32U *)((INT8U *)upLdAddr + i) = rdata;
+    145          		if( !(i%128) ) OSTimeDly(1);
+    146          	}
+    147          	return (pcnt + len);
+    148          }
+    149          
+    150          void DownloadFlagSet(unsigned long int nsize)
+    151          {
+    152          	INT32U cpu_sr;
+    153          	OS_ENTER_CRITICAL();
+    154          	{
+    155          		SYS_BACK *ptr = (SYS_BACK *)RoadBackuptobuffer(__pSYSTAddr);
+    156          
+    157          		ptr->Data[DownLoadFlag1] = (INT8U)(APDNMODE >> 8);
+    158          		ptr->Data[DownLoadFlag2] = (INT8U)(APDNMODE 	);
+    159          
+    160          		ptr->Data[FWDataSize3_MSB] = (INT8U)((nsize >> 24) & 0xFF);
+    161          		ptr->Data[FWDataSize2]	   = (INT8U)((nsize >> 16) & 0xFF);
+    162          		ptr->Data[FWDataSize1]	   = (INT8U)((nsize >> 8 ) & 0xFF);
+    163          		ptr->Data[FWDataSize0_LSB] = (INT8U)((nsize 	) & 0xFF);
+    164          
+    165          		WriteBuffertoBackup(__pSYSTAddr, sizeof(SYS_BACK)); 
+    166          	}
+    167          	OS_EXIT_CRITICAL();
+    168          }
+    169          
+    170          void DownloadFlagSetExtSRAM(unsigned long int nsize)
+    171          {
+    172          	INT32U cpu_sr;
+    173          	
+    174          	OS_ENTER_CRITICAL();
+    175          	{
+    176          		SYS_BACK *ptr = (SYS_BACK *)RoadBackuptobuffer(__pSYSTAddr);
+    177          
+    178          		ptr->Data[DownLoadFlag1] = (INT8U)(APDNSRAM >> 8);
+    179          		ptr->Data[DownLoadFlag2] = (INT8U)(APDNSRAM     );
+    180          
+    181          		ptr->Data[FWDataSize3_MSB] = (INT8U)((nsize >> 24) & 0xFF);
+    182          		ptr->Data[FWDataSize2]	   = (INT8U)((nsize >> 16) & 0xFF);
+    183          		ptr->Data[FWDataSize1]     = (INT8U)((nsize >> 8 ) & 0xFF);
+    184          		ptr->Data[FWDataSize0_LSB] = (INT8U)((nsize		) & 0xFF);
+    185          
+    186          		WriteBuffertoBackup(__pSYSTAddr, sizeof(SYS_BACK));	
+    187          	}
+    188          	OS_EXIT_CRITICAL();
+    189          }
+    190          
+    191          
+    192          void DownLoadBootingJump(void)
+    193          {
+    194          	//__SETPRIMASK(); //Interrupt Disable
+    195          	INT32U cpu_sr;
+    196          	OS_ENTER_CRITICAL();
+    197          	cpu_sr = cpu_sr;
+    198          	while(1);
+    199          }
+    200          
+    201          
+    202          #ifdef USART1_USING
+    203          	extern INT8U Tx1Buff[Tx1BuffLen];
+    204          	INT8U *eepBuff = (INT8U *)Tx1Buff;
+    205          #else
+    206          	INT8U eepBuff[2048];
+    207          #endif
+    208          
+    209          
+    210          
+    211          #define EE_ERROR	0
+    212          #define EE_NORMAL	1
+    213          
+    214          INT32U *RoadBackuptobuffer(INT32U sptr)
+    215          {
+    216          	INT32U *ptr = (INT32U *)eepBuff;
+    217          
+    218          	memcpy((INT8U *)ptr, (INT8U *)sptr, 2048);
+    219              return ptr;
+    220          }
+    221          
+    222          
+    223          int WriteBuffertoBackup(INT32U dptr, INT32U size)
+    224          {
+    225          	int FLASHStatus = FLASH_COMPLETE;
+    226          	int i = 0;
+    227          	INT32U *ptr = (INT32U *)eepBuff;
+    228          
+    229          	int tsize = (size)/4;
+    230          	if((size)%4) tsize++;
+    231          
+    232          	if(!memcmp((char *)eepBuff, (char *)dptr, size)) return TRUE;
+    233          
+    234          	FLASH_Unlock();
+    235          	FLASH_ClearFlag(FLASH_FLAG_BSY | FLASH_FLAG_EOP | FLASH_FLAG_PGERR | FLASH_FLAG_WRPRTERR);	
+    236          	WatchdogClear();
+    237          	FLASHStatus = FLASH_ErasePage((INT32U)dptr);
+    238          
+    239          	eepBuff[0] = (size >> 0) & 0xff;
+    240          	eepBuff[1] = (size >> 8) & 0xff;
+    241          
+    242          	eepBuff[size + 0] = ((0x1021 >> 0) & 0xff);
+    243          	eepBuff[size + 1] = ((0x1021 >> 8) & 0xff); // verifyFlag!!
+    244          
+    245          	if(FLASHStatus == FLASH_COMPLETE)
+    246          	{
+    247          		// mirror backup
+    248          		WatchdogClear();
+    249          		for(i = 0; i < tsize; i++)	// 1 dummy
+    250          		{
+    251          			if(FLASH_ProgramWord((INT32U)((INT32U *)dptr + i), *ptr++) != FLASH_COMPLETE)
+    252          			{
+    253          				FLASHStatus = FLASH_ERRORWR;				
+    254          				break;
+    255          			}
+    256          		}
+    257          	}
+    258          	FLASH_Lock();
+    259          	
+    260          	if( *(u16 *)(dptr + size) == 0x1021)	return TRUE;
+    261          	else									return FALSE;
+    262           }
+    263          
+    264          ////////////////////////////////////////////////////////////////////////////////
+    265          // End of Source File
+    266          /////////////////////
+    267          
+
+   Maximum stack usage in bytes:
+
+     Function               .cstack
+     --------               -------
+     CheckSWConf                 0
+     Crc16Calc                   8
+     DownFlagSet                16
+     DownLoadBootingJump         8
+     DownloadFlagClr             8
+     DownloadFlagSet            16
+     DownloadFlagSetExtSRAM     16
+     RoadBackuptobuffer          8
+     UpLoadData                 32
+     UpLoadExtSRAM              24
+     WriteBuffertoBackup        32
+
+
+   Section sizes:
+
+     Function/Label         Bytes
+     --------------         -----
+     Crc_tbl                 512
+     DownFlagSet              32
+     ??Subroutine1_0          20
+     DownloadFlagClr           6
+     CheckSWConf              64
+     Crc16Calc                88
+     UpLoadData              100
+     UpLoadExtSRAM           112
+     DownloadFlagSet          32
+     ?Subroutine0             16
+     DownloadFlagSetExtSRAM   32
+     DownLoadBootingJump       8
+     eepBuff                2048
+     RoadBackuptobuffer       20
+     WriteBuffertoBackup     138
+     ??DataTable3              4
+     ??DataTable8              4
+     ??DataTable10             4
+
+ 
+ 2 048 bytes in section .bss
+   512 bytes in section .rodata
+   680 bytes in section .text
+ 
+   680 bytes of CODE  memory
+   512 bytes of CONST memory
+ 2 048 bytes of DATA  memory
+
+Errors: none
+Warnings: none

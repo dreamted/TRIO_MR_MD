@@ -1,0 +1,455 @@
+###############################################################################
+#                                                                             #
+# IAR ANSI C/C++ Compiler V6.30.1.53127/W32 for ARM     07/Jan/2014  16:08:49 #
+# Copyright 1999-2011 IAR Systems AB.                                         #
+#                                                                             #
+#    Cpu mode     =  thumb                                                    #
+#    Endian       =  little                                                   #
+#    Source file  =  C:\Project\TRIO\2차버전\3.F_W\appl_stm207_20131104 -     #
+#                    복사본\STM32F2xx_StdPeriph_Driver_v1212\src\stm32f0xx_co #
+#                    re.c                                                     #
+#    Command line =  "C:\Project\TRIO\2차버전\3.F_W\appl_stm207_20131104 -    #
+#                    복사본\STM32F2xx_StdPeriph_Driver_v1212\src\stm32f0xx_co #
+#                    re.c" -D NDEBUG -lC "C:\Project\TRIO\2차버전\3.F_W\appl_ #
+#                    stm207_20131104 - 복사본\STM32F2xx_StdPeriph_Driver_v121 #
+#                    2\ewarm\sout\" -o "C:\Project\TRIO\2차버전\3.F_W\appl_st #
+#                    m207_20131104 - 복사본\STM32F2xx_StdPeriph_Driver_v1212\ #
+#                    ewarm\sout\" --endian=little --cpu=Cortex-M3 -e          #
+#                    --fpu=None --dlib_config "C:\Program Files (x86)\IAR     #
+#                    Systems\Embedded Workbench 6.0_2\arm\INC\c\DLib_Config_N #
+#                    ormal.h" -I "C:\Project\TRIO\2차버전\3.F_W\appl_stm207_2 #
+#                    0131104 - 복사본\STM32F2xx_StdPeriph_Driver_v1212\ewarm\ #
+#                    ..\" -I "C:\Project\TRIO\2차버전\3.F_W\appl_stm207_20131 #
+#                    104 - 복사본\STM32F2xx_StdPeriph_Driver_v1212\ewarm\..\i #
+#                    nc\" -I "C:\Project\TRIO\2차버전\3.F_W\appl_stm207_20131 #
+#                    104 - 복사본\STM32F2xx_StdPeriph_Driver_v1212\ewarm\..\. #
+#                    .\uC-CPU\" -I "C:\Project\TRIO\2차버전\3.F_W\appl_stm207 #
+#                    _20131104 - 복사본\STM32F2xx_StdPeriph_Driver_v1212\ewar #
+#                    m\..\..\uC-LIB\" -I "C:\Project\TRIO\2차버전\3.F_W\appl_ #
+#                    stm207_20131104 - 복사본\STM32F2xx_StdPeriph_Driver_v121 #
+#                    2\ewarm\..\..\uCOS-II\Ports\" -I                         #
+#                    "C:\Project\TRIO\2차버전\3.F_W\appl_stm207_20131104 -    #
+#                    복사본\STM32F2xx_StdPeriph_Driver_v1212\ewarm\..\..\uCOS #
+#                    -II\Source\" -Oh                                         #
+#    List file    =  C:\Project\TRIO\2차버전\3.F_W\appl_stm207_20131104 -     #
+#                    복사본\STM32F2xx_StdPeriph_Driver_v1212\ewarm\sout\stm32 #
+#                    f0xx_core.lst                                            #
+#    Object file  =  C:\Project\TRIO\2차버전\3.F_W\appl_stm207_20131104 -     #
+#                    복사본\STM32F2xx_StdPeriph_Driver_v1212\ewarm\sout\stm32 #
+#                    f0xx_core.o                                              #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+C:\Project\TRIO\2차버전\3.F_W\appl_stm207_20131104 - 복사본\STM32F2xx_StdPeriph_Driver_v1212\src\stm32f0xx_core.c
+      1          /**************************************************************************//**
+      2           * @file     core_cm3.c
+      3           * @brief    CMSIS Cortex-M3 Core Peripheral Access Layer Source File
+      4           * @version  V1.30
+      5           * @date     30. October 2009
+      6           *
+      7           * @note
+      8           * Copyright (C) 2009 ARM Limited. All rights reserved.
+      9           *
+     10           * @par
+     11           * ARM Limited (ARM) is supplying this software for use with Cortex-M 
+     12           * processor based microcontrollers.  This file can be freely distributed 
+     13           * within development tools that are supporting such ARM based processors. 
+     14           *
+     15           * @par
+     16           * THIS SOFTWARE IS PROVIDED "AS IS".  NO WARRANTIES, WHETHER EXPRESS, IMPLIED
+     17           * OR STATUTORY, INCLUDING, BUT NOT LIMITED TO, IMPLIED WARRANTIES OF
+     18           * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE APPLY TO THIS SOFTWARE.
+     19           * ARM SHALL NOT, IN ANY CIRCUMSTANCES, BE LIABLE FOR SPECIAL, INCIDENTAL, OR
+     20           * CONSEQUENTIAL DAMAGES, FOR ANY REASON WHATSOEVER.
+     21           *
+     22           ******************************************************************************/
+     23          
+     24          #include "stm32f2xx_1212.h"
+     25          
+     26          /* define compiler specific symbols */
+     27          //#define __ASM           __asm                                       /*!< asm keyword for IAR Compiler          */
+     28          //#define __INLINE        inline                                      /*!< inline keyword for IAR Compiler. Only avaiable in High optimization mode! */
+     29          
+     30          
+     31          /* ###################  Compiler specific Intrinsics  ########################### */
+     32          // ICC ARM
+     33          /*!*****************************************************************************
+     34           * @brief  InitSysTick (32 bit)
+     35           * @param  ms  interval value(ms)
+     36           * @return none
+     37           ******************************************************************************/
+     38          
+
+   \                                 In section .text, align 2, keep-with-next
+     39          void InitSysTick(u32 ms)
+     40          {
+   \                     InitSysTick:
+   \   00000000   0xB510             PUSH     {R4,LR}
+     41          	SysTick->LOAD = ((unsigned long long )ms * (SYSCLK))/(8*1000L) - 1;
+   \   00000002   0x....             LDR.N    R4,??DataTable0  ;; 0xe000e010
+   \   00000004   0x....             LDR.N    R1,??DataTable0_1  ;; 0x7270e00
+   \   00000006   0xFBA1 0x0100      UMULL    R0,R1,R1,R0
+   \   0000000A   0xF44F 0x52FA      MOV      R2,#+8000
+   \   0000000E   0x2300             MOVS     R3,#+0
+   \   00000010   0x.... 0x....      BL       __aeabi_uldivmod
+   \   00000014   0x1E40             SUBS     R0,R0,#+1
+   \   00000016   0x6060             STR      R0,[R4, #+4]
+     42            	// Configure HCLK clock as SysTick clock source
+     43           	SysTick->__B.CTRL.CLKSOURCE = __EXTSRC;
+   \   00000018   0x6820             LDR      R0,[R4, #+0]
+   \   0000001A   0xF020 0x0004      BIC      R0,R0,#0x4
+   \   0000001E   0x6020             STR      R0,[R4, #+0]
+     44            	// SysTick end of count event each 100us with input clock equal to 9MHz (HCLK/8, default)
+     45          	SysTick->__B.CTRL.TICKINT = __PENDINT;	// tick interrupt enable
+   \   00000020   0x6820             LDR      R0,[R4, #+0]
+   \   00000022   0xF040 0x0002      ORR      R0,R0,#0x2
+   \   00000026   0x6020             STR      R0,[R4, #+0]
+     46          	// Enable the SysTick Counter	
+     47          	SysTick->__B.CTRL.ENABLE = ENABLE;	// systick count enable
+   \   00000028   0x6820             LDR      R0,[R4, #+0]
+   \   0000002A   0xF040 0x0001      ORR      R0,R0,#0x1
+   \   0000002E   0x6020             STR      R0,[R4, #+0]
+     48          }
+   \   00000030   0xBD10             POP      {R4,PC}          ;; return
+     49          #if 0
+     50          static __INLINE uint32_t SysTick_Config(uint32_t ticks)
+     51          { 
+     52          	if (ticks > SysTick_LOAD_RELOAD_Msk)  return (1);            /* Reload value impossible */
+     53          	                                                           
+     54          	SysTick->LOAD  = (ticks & SysTick_LOAD_RELOAD_Msk) - 1;      /* set reload register */
+     55          	NVIC_SetPriority (SysTick_IRQn, (1 <<__NVIC_PRIO_BITS) - 1);  /* set Priority for Cortex-M0 System Interrupts */
+     56          	SysTick->VAL   = 0;                                          /* Load the SysTick Counter Value */
+     57          	SysTick->CTRL  = SysTick_CTRL_CLKSOURCE_Msk | 
+     58          	               SysTick_CTRL_TICKINT_Msk   | 
+     59          	               SysTick_CTRL_ENABLE_Msk;                    /* Enable SysTick IRQ and SysTick Timer */
+     60          	return (0);                                                  /* Function successful */
+     61          #endif
+     62          //SysTick_Type
+     63          
+     64          /*!*****************************************************************************
+     65          * @brief  SysTickHandler (32 bit)
+     66          * @parma  none
+     67          * @return none
+     68          *******************************************************************************/
+     69          extern void CheckSoftTimer(void);
+     70          
+
+   \                                 In section .text, align 2, keep-with-next
+     71          void SysTickIntHandler(void)
+     72          {
+     73          	CheckSoftTimer();
+   \                     SysTickIntHandler:
+   \   00000000   0x.... 0x....      B.W      CheckSoftTimer
+     74          }
+     75          
+     76          
+     77          
+     78          ////////////////////////////////////////////////////////////////////////////////
+     79          /* IAR iccarm specific functions */
+     80          #pragma diag_suppress=Pe940
+     81          
+     82          /**
+     83           * @brief  Return the Process Stack Pointer
+     84           *
+     85           * @return ProcessStackPointer
+     86           *
+     87           * Return the actual process stack pointer
+     88           */
+
+   \                                 In section .text, align 4, keep-with-next
+     89          uint32_t __get_PSP(void)
+     90          {
+     91          	__ASM("mrs r0, psp");
+   \                     __get_PSP:
+   \   00000000   0xF3EF 0x8009      mrs r0, psp      
+     92          	__ASM("bx lr");
+   \   00000004   0x4770             bx lr            
+     93          }
+   \   00000006   0x4770             BX       LR               ;; return
+     94          
+     95          /**
+     96           * @brief  Set the Process Stack Pointer
+     97           *
+     98           * @param  topOfProcStack  Process Stack Pointer
+     99           *
+    100           * Assign the value ProcessStackPointer to the MSP 
+    101           * (process stack pointer) Cortex processor register
+    102           */
+
+   \                                 In section .text, align 4, keep-with-next
+    103          void __set_PSP(uint32_t topOfProcStack)
+    104          {
+    105          	__ASM("msr psp, r0");
+   \                     __set_PSP:
+   \   00000000   0xF380 0x8809      msr psp, r0      
+    106          	__ASM("bx lr");
+   \   00000004   0x4770             bx lr            
+    107          }
+   \   00000006   0x4770             BX       LR               ;; return
+    108          
+    109          /**
+    110           * @brief  Return the Main Stack Pointer
+    111           *
+    112           * @return Main Stack Pointer
+    113           *
+    114           * Return the current value of the MSP (main stack pointer)
+    115           * Cortex processor register
+    116           */
+
+   \                                 In section .text, align 4, keep-with-next
+    117          uint32_t __get_MSP(void)
+    118          {
+    119            __ASM("mrs r0, msp");
+   \                     __get_MSP:
+   \   00000000   0xF3EF 0x8008      mrs r0, msp      
+    120            __ASM("bx lr");
+   \   00000004   0x4770             bx lr            
+    121          }
+   \   00000006   0x4770             BX       LR               ;; return
+    122          
+    123          /*******************************************************************************
+    124           * @brief  Set the Main Stack Pointer
+    125           *
+    126           * @param  topOfMainStack  Main Stack Pointer
+    127           *
+    128           * Assign the value mainStackPointer to the MSP 
+    129           * (main stack pointer) Cortex processor register
+    130           ******************************************************************************/
+
+   \                                 In section .text, align 4, keep-with-next
+    131          void __set_MSP(uint32_t topOfMainStack)
+    132          {
+    133          	__ASM("msr msp, r0");
+   \                     __set_MSP:
+   \   00000000   0xF380 0x8808      msr msp, r0      
+    134          	__ASM("bx lr");
+   \   00000004   0x4770             bx lr            
+    135          }
+   \   00000006   0x4770             BX       LR               ;; return
+    136          
+    137          /**
+    138           * @brief  Reverse byte order in unsigned short value
+    139           *
+    140           * @param  value  value to reverse
+    141           * @return        reversed value
+    142           *
+    143           * Reverse byte order in unsigned short value
+    144           */
+
+   \                                 In section .text, align 4, keep-with-next
+    145          uint32_t __REV16(uint16_t value)
+    146          {
+    147            __ASM("rev16 r0, r0");
+   \                     __REV16:
+   \   00000000   0xBA40             rev16 r0, r0     
+    148            __ASM("bx lr");
+   \   00000002   0x4770             bx lr            
+    149          }
+   \   00000004   0x4770             BX       LR               ;; return
+    150          
+    151          /**
+    152           * @brief  Reverse bit order of value
+    153           *
+    154           * @param  value  value to reverse
+    155           * @return        reversed value
+    156           *
+    157           * Reverse bit order of value
+    158           */
+
+   \                                 In section .text, align 4, keep-with-next
+    159          uint32_t __RBIT(uint32_t value)
+    160          {
+    161            __ASM("rbit r0, r0");
+   \                     __RBIT:
+   \   00000000   0xFA90 0xF0A0      rbit r0, r0      
+    162            __ASM("bx lr");
+   \   00000004   0x4770             bx lr            
+    163          }
+   \   00000006   0x4770             BX       LR               ;; return
+    164          
+    165          /**
+    166           * @brief  LDR Exclusive (8 bit)
+    167           *
+    168           * @param  *addr  address pointer
+    169           * @return        value of (*address)
+    170           *
+    171           * Exclusive LDR command for 8 bit values)
+    172           */
+
+   \                                 In section .text, align 4, keep-with-next
+    173          uint8_t __LDREXB(uint8_t *addr)
+    174          {
+    175            __ASM("ldrexb r0, [r0]");
+   \                     __LDREXB:
+   \   00000000   0xE8D0 0x0F4F      ldrexb r0, [r0]  
+    176            __ASM("bx lr"); 
+   \   00000004   0x4770             bx lr            
+    177          }
+   \   00000006   0x4770             BX       LR               ;; return
+    178          
+    179          /**
+    180           * @brief  LDR Exclusive (16 bit)
+    181           *
+    182           * @param  *addr  address pointer
+    183           * @return        value of (*address)
+    184           *
+    185           * Exclusive LDR command for 16 bit values
+    186           */
+
+   \                                 In section .text, align 4, keep-with-next
+    187          uint16_t __LDREXH(uint16_t *addr)
+    188          {
+    189            __ASM("ldrexh r0, [r0]");
+   \                     __LDREXH:
+   \   00000000   0xE8D0 0x0F5F      ldrexh r0, [r0]  
+    190            __ASM("bx lr");
+   \   00000004   0x4770             bx lr            
+    191          }
+   \   00000006   0x4770             BX       LR               ;; return
+    192          
+    193          /**
+    194           * @brief  LDR Exclusive (32 bit)
+    195           *
+    196           * @param  *addr  address pointer
+    197           * @return        value of (*address)
+    198           *
+    199           * Exclusive LDR command for 32 bit values
+    200           */
+
+   \                                 In section .text, align 4, keep-with-next
+    201          uint32_t __LDREXW(uint32_t *addr)
+    202          {
+    203            __ASM("ldrex r0, [r0]");
+   \                     __LDREXW:
+   \   00000000   0xE850 0x0F00      ldrex r0, [r0]   
+    204            __ASM("bx lr");
+   \   00000004   0x4770             bx lr            
+    205          }
+   \   00000006   0x4770             BX       LR               ;; return
+    206          
+    207          /**
+    208           * @brief  STR Exclusive (8 bit)
+    209           *
+    210           * @param  value  value to store
+    211           * @param  *addr  address pointer
+    212           * @return        successful / failed
+    213           *
+    214           * Exclusive STR command for 8 bit values
+    215           */
+
+   \                                 In section .text, align 4, keep-with-next
+    216          uint32_t __STREXB(uint8_t value, uint8_t *addr)
+    217          {
+    218            __ASM("strexb r0, r0, [r1]");
+   \                     __STREXB:
+   \   00000000   0xE8C1 0x0F40      strexb r0, r0, [r1] 
+    219            __ASM("bx lr");
+   \   00000004   0x4770             bx lr            
+    220          }
+   \   00000006   0x4770             BX       LR               ;; return
+    221          
+    222          /**
+    223           * @brief  STR Exclusive (16 bit)
+    224           *
+    225           * @param  value  value to store
+    226           * @param  *addr  address pointer
+    227           * @return        successful / failed
+    228           *
+    229           * Exclusive STR command for 16 bit values
+    230           */
+
+   \                                 In section .text, align 4, keep-with-next
+    231          uint32_t __STREXH(uint16_t value, uint16_t *addr)
+    232          {
+    233            __ASM("strexh r0, r0, [r1]");
+   \                     __STREXH:
+   \   00000000   0xE8C1 0x0F50      strexh r0, r0, [r1] 
+    234            __ASM("bx lr");
+   \   00000004   0x4770             bx lr            
+    235          }
+   \   00000006   0x4770             BX       LR               ;; return
+    236          
+    237          /**
+    238           * @brief  STR Exclusive (32 bit)
+    239           *
+    240           * @param  value  value to store
+    241           * @param  *addr  address pointer
+    242           * @return        successful / failed
+    243           *
+    244           * Exclusive STR command for 32 bit values
+    245           */
+
+   \                                 In section .text, align 4, keep-with-next
+    246          uint32_t __STREXW(uint32_t value, uint32_t *addr)
+    247          {
+    248            __ASM("strex r0, r0, [r1]");
+   \                     __STREXW:
+   \   00000000   0xE841 0x0000      strex r0, r0, [r1] 
+    249            __ASM("bx lr");
+   \   00000004   0x4770             bx lr            
+    250          }
+   \   00000006   0x4770             BX       LR               ;; return
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable0:
+   \   00000000   0xE000E010         DC32     0xe000e010
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable0_1:
+   \   00000000   0x07270E00         DC32     0x7270e00
+    251          
+    252          #pragma diag_default=Pe940
+    253          
+    254          
+
+   Maximum stack usage in bytes:
+
+   .cstack Function
+   ------- --------
+        8  InitSysTick
+             8 -> __aeabi_uldivmod
+        0  SysTickIntHandler
+             0 -> CheckSoftTimer
+        0  __LDREXB
+        0  __LDREXH
+        0  __LDREXW
+        0  __RBIT
+        0  __REV16
+        0  __STREXB
+        0  __STREXH
+        0  __STREXW
+        0  __get_MSP
+        0  __get_PSP
+        0  __set_MSP
+        0  __set_PSP
+
+
+   Section sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+       4  ??DataTable0
+       4  ??DataTable0_1
+      50  InitSysTick
+       4  SysTickIntHandler
+       8  __LDREXB
+       8  __LDREXH
+       8  __LDREXW
+       8  __RBIT
+       6  __REV16
+       8  __STREXB
+       8  __STREXH
+       8  __STREXW
+       8  __get_MSP
+       8  __get_PSP
+       8  __set_MSP
+       8  __set_PSP
+
+ 
+ 156 bytes in section .text
+ 
+ 156 bytes of CODE memory
+
+Errors: none
+Warnings: none

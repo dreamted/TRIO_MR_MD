@@ -1,0 +1,9 @@
+---- Average_Sum Matches (8 in 3 files) ----
+Aa_alc.c (d:\project\trio\3.trio-md\2_1g clearing\trio_md_appl_stm207_20150327_20150518_20161130\code):				Avg = Average_Sum(ADC_AVR[DET0_CH123],AvgMAX,AvgMIN,AdcLen);
+Aa_alc.c (d:\project\trio\3.trio-md\2_1g clearing\trio_md_appl_stm207_20150327_20150518_20161130\code):				Avg = Average_Sum(ADC_AVR[DET1_CH123],AvgMAX,AvgMIN,AdcLen);
+Aa_alc.c (d:\project\trio\3.trio-md\2_1g clearing\trio_md_appl_stm207_20150327_20150518_20161130\code):				Avg = Average_Sum(ADC_AVR[DET0_CH123],AvgMAX,AvgMIN,AdcLen);
+Aa_alc.c (d:\project\trio\3.trio-md\2_1g clearing\trio_md_appl_stm207_20150327_20150518_20161130\code):				Avg = Average_Sum(ADC_AVR[DET1_CH123],AvgMAX,AvgMIN,AdcLen);
+Aa_alc.c (d:\project\trio\3.trio-md\2_1g clearing\trio_md_appl_stm207_20150327_20150518_20161130\code):				Avg = Average_Sum(ADC_AVR[DET0_CH123],AvgMAX,AvgMIN,AdcLen);
+Aa_alc.c (d:\project\trio\3.trio-md\2_1g clearing\trio_md_appl_stm207_20150327_20150518_20161130\code):				Avg = Average_Sum(ADC_AVR[DET1_CH123],AvgMAX,AvgMIN,AdcLen);
+adcFunc.c (d:\project\trio\3.trio-md\2_1g clearing\trio_md_appl_stm207_20150327_20150518_20161130\code):INT16U Average_Sum(INT16U *aptr,INT16U AvgMAX, INT16U AvgMIN, INT16U nlen)
+AdcFunc.h (d:\project\trio\3.trio-md\2_1g clearing\trio_md_appl_stm207_20150327_20150518_20161130\include):INT16U Average_Sum(INT16U *aptr,INT16U AvgMAX, INT16U AvgMIN, INT16U nlen);

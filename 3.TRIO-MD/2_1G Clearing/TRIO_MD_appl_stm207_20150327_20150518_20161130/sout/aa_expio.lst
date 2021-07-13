@@ -1,0 +1,574 @@
+###############################################################################
+#                                                                             #
+# IAR ANSI C/C++ Compiler V6.21.1.52794/W32 for ARM     30/Aug/2012  21:29:28 #
+# Copyright 1999-2011 IAR Systems AB.                                         #
+#                                                                             #
+#    Cpu mode     =  thumb                                                    #
+#    Endian       =  little                                                   #
+#    Source file  =  D:\Work\Project\2012\NL_INBUILD\FW\MU\code\aa_expio.c    #
+#    Command line =  D:\Work\Project\2012\NL_INBUILD\FW\MU\code\aa_expio.c    #
+#                    -D OS_INCLUDED -D APPL_SRC -lcN                          #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\sout\ -lB          #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\sout\ -o           #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\sout\              #
+#                    --endian=little --cpu=Cortex-M3 -e --fpu=None            #
+#                    --dlib_config "C:\Programming\IAR Systems\Embedded       #
+#                    Workbench 6.0\arm\INC\c\DLib_Config_Normal.h" -I         #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\include\ -I        #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\..\..\STM32F2xx_St #
+#                    dPeriph_Driver\ -I D:\Work\Project\2012\NL_INBUILD\FW\MU #
+#                    \..\..\STM32F2xx_StdPeriph_Driver\inc\ -I                #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\uC-CPU\ -I         #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\uC-LIB\ -I         #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\uCOS-II\Ports\ -I  #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\uCOS-II\Source\    #
+#                    -I D:\Work\Project\2012\NL_INBUILD\FW\MU\uC-Probe\ -Oh   #
+#                    --use_c++_inline --require_prototypes                    #
+#    List file    =  D:\Work\Project\2012\NL_INBUILD\FW\MU\sout\aa_expio.lst  #
+#    Object file  =  D:\Work\Project\2012\NL_INBUILD\FW\MU\sout\aa_expio.o    #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\Work\Project\2012\NL_INBUILD\FW\MU\code\aa_expio.c
+      1          
+      2          /******************** (C) COPYRIGHT 2008 PILOG, NSINFO *************************
+      3          * File Name          : exlib.c
+      4          * Author             : Yoon Byong-Gyu(bgyoon@naver.com)
+      5          * Date First Issued  : 02/01/2008
+      6          * Description        : This file provides all the port/input/update firmware functions.
+      7          * $Revision: 0.1 $
+      8          * $Revision date: 2008.01.__
+      9          ********************************************************************************/
+     10          
+     11          #define EXPIO_C
+     12          
+     13          #include "../include/main.h"
+     14          
+     15          #include <stdlib.h>
+     16          
+     17          void ExpioInit(void)
+     18          {
+     19          	ExpioBitSet(PWR_LED);
+     20          	ExpioBitRst(ALM_LED);
+     21          	TimerRegist(TimerRunLed, Time100mSec*5L);
+     22          	
+     23          	ExpioPortInit();
+     24          
+     25          	OSTaskCreate(ExpioTask, (void *)NULL, (OS_STK *)&ExpioTaskStk[EXPIO_START_STK_SIZE - 1], EXPIO_START_PRIO);
+     26          
+     27          }
+     28          void ExpioPortInit(void)
+     29          {
+     30          	#ifndef __FSMC_SRAM_H
+     31          		////////////////////////////////////////////////////////////////////////////
+     32          		// 반드시 gpio init 에서 --> outputmode로 변경해야 한다...
+     33          		// select 한핀은 반드시 모두다 high로 만들어줘야 한다.
+     34          		//GPIOC->ODR.Bit.ODR6 = 1;	// CS0
+     35          		//GPIOE->ODR.Bit.ODR10 = 1; // CS1
+     36          		/***
+     37          		GPIOB->ODR.Bit.ODR9 = 1;	// CS2
+     38          		GPIOB->ODR.Bit.ODR12 = 1;	// CS3
+     39          		GPIOB->ODR.Bit.ODR13 = 1;	// CS4
+     40          		GPIOB->ODR.Bit.ODR14 = 1;	// CS5
+     41          		GPIOB->ODR.Bit.ODR15 = 1;	// CS6
+     42          		GPIOC->ODR.Bit.ODR14 = 1;	// CS7
+     43          		GPIOC->ODR.Bit.ODR15 = 1;	// CS8
+     44          		GPIOA->ODR.Bit.ODR11 = 1;	// CS9
+     45          		GPIOA->ODR.Bit.ODR12 = 1;	// CS10
+     46          	***/
+     47          	#endif //__FSMC_SRAM_H
+     48          	ExpioSem = OSSemCreate(1);
+     49          }
+     50          
+     51          void ExpioTask(void *p_arg)
+     52          {
+     53          	INT8U	Flag = 0;
+     54          	
+     55          	(void)p_arg;
+     56          
+     57          	////////////////////////////////
+     58          	OSTimeDly(200*EXPIO_START_PRIO);
+     59          
+     60          	//SerPtr->printf("addr 0x05 = %02x \n", WriteEEprom(0x05, 0x27));
+     61          	
+     62          	while(1)
+     63          	{
+     64          		//while(!DownLoadGiveupTimerSet(NULL) && !tTestFlag)
+     65          		while(!tTestFlag)
+     66          		{
+     67          			StatustoIO();
+     68          			StatusUpdate();
+     69          
+     70          			if(TimeOverCheck(TimerRunLed))
+     71          			{
+     72          				if(Flag) 	ExpioBitSet(RUN_LED);
+     73          				else		ExpioBitRst(RUN_LED);
+     74          				Flag ^= 1;
+     75          				TimerRegist(TimerRunLed, Time100mSec*5L);
+     76          			}
+     77          			OSTimeDly(50L);
+     78          		}
+     79          
+     80          		OSTimeDly(250L);
+     81          	}
+     82          }
+     83          
+     84          void StatusUpdate(void)
+     85          {
+     86          	// System
+     87          	if(DC_IN_ALM_CS)		MuStatus->MuAlm.DcIn_Alarm = _Alarm;
+     88          	else					MuStatus->MuAlm.DcIn_Alarm = _Normal;
+     89          	
+     90          	if(DC_OUT_ALM_CS)		MuStatus->MuAlm.DcOut_Alarm = _Alarm;
+     91          	else					MuStatus->MuAlm.DcOut_Alarm = _Normal;
+     92          
+     93          	if(FAN1_ALM_CS) 		MuStatus->MuAlm.Fan_Alarm = _Alarm;
+     94          	else					MuStatus->MuAlm.Fan_Alarm = _Normal;
+     95          	
+     96          /*
+     97          	if(DC_ALM_21G_CS)		MuStatus->MuAlm.DcIn_Alarm = _Alarm;
+     98          	else					MuStatus->MuAlm.DcIn_Alarm = _Normal;
+     99          
+    100          	if(DC_ALM_900M_CS)		MuStatus->MuAlm.DcIn_Alarm = _Alarm;
+    101          	else					MuStatus->MuAlm.DcIn_Alarm = _Normal;
+    102          
+    103          	if(DC_ALM_25G_CS)		MuStatus->MuAlm.DcIn_Alarm = _Alarm;
+    104          	else					MuStatus->MuAlm.DcIn_Alarm = _Normal;
+    105          */
+    106          
+    107          	// Insert
+    108          	if(INSERT_21G_CS)
+    109          	{
+    110          		MuStatus->MrfuSts[S_21G_PATH].Install = _Install;
+    111          		MuStatus->MrfuSts[M_21G_PATH].Install = _Install;
+    112          	}
+    113          	else
+    114          	{
+    115          		MuStatus->MrfuSts[S_21G_PATH].Install = _NotInstall;
+    116          		MuStatus->MrfuSts[M_21G_PATH].Install = _NotInstall;
+    117          	}
+    118          
+    119          	if(INSERT_900M_CS)
+    120          	{
+    121          		MuStatus->MrfuSts[S_900M_PATH].Install = _Install;
+    122          		MuStatus->MrfuSts[M_900M_PATH].Install = _Install;
+    123          	}
+    124          	else
+    125          	{
+    126          		MuStatus->MrfuSts[S_900M_PATH].Install = _NotInstall;
+    127          		MuStatus->MrfuSts[M_900M_PATH].Install = _NotInstall;
+    128          	}
+    129          
+    130          	if(INSERT_25G_CS)
+    131          	{
+    132          		MuStatus->MrfuSts[S_25G_PATH].Install = _Install;
+    133          		MuStatus->MrfuSts[M_25G_PATH].Install = _Install;
+    134          	}
+    135          	else
+    136          	{
+    137          		MuStatus->MrfuSts[S_25G_PATH].Install = _NotInstall;
+    138          		MuStatus->MrfuSts[M_25G_PATH].Install = _NotInstall;
+    139          	}
+    140          
+    141          	// DTU
+    142          	//#define DTU_BD_CS 		GPIOG->__B.IDR.B10
+    143          
+    144          	// PLL
+    145          	if(DL_PLL_LD_21G_CS)
+    146          	{
+    147          		MuStatus->MrfuSts[S_21G_PATH].Alarm.DL_Pll = _Alarm;
+    148          		MuStatus->MrfuSts[M_21G_PATH].Alarm.DL_Pll = _Alarm;
+    149          	}
+    150          	else
+    151          	{
+    152          		MuStatus->MrfuSts[S_21G_PATH].Alarm.DL_Pll = _Normal;
+    153          		MuStatus->MrfuSts[M_21G_PATH].Alarm.DL_Pll = _Normal;
+    154          	}
+    155          
+    156          	if(DL_PLL_LD_900M_CS)
+    157          	{
+    158          		MuStatus->MrfuSts[S_900M_PATH].Alarm.DL_Pll = _Alarm;
+    159          		MuStatus->MrfuSts[M_900M_PATH].Alarm.DL_Pll = _Alarm;
+    160          	}
+    161          	else
+    162          	{
+    163          		MuStatus->MrfuSts[S_900M_PATH].Alarm.DL_Pll = _Normal;
+    164          		MuStatus->MrfuSts[M_900M_PATH].Alarm.DL_Pll = _Normal;
+    165          	}
+    166          
+    167          	if(DL_PLL_LD_25G_CS)
+    168          	{
+    169          		MuStatus->MrfuSts[S_25G_PATH].Alarm.DL_Pll = _Alarm;
+    170          		MuStatus->MrfuSts[M_25G_PATH].Alarm.DL_Pll = _Alarm;
+    171          	}
+    172          	else
+    173          	{
+    174          		MuStatus->MrfuSts[S_25G_PATH].Alarm.DL_Pll = _Normal;
+    175          		MuStatus->MrfuSts[M_25G_PATH].Alarm.DL_Pll = _Normal;
+    176          	}
+    177          
+    178          	if(UL_PLL_LD_21G_CS)
+    179          	{
+    180          		MuStatus->MrfuSts[S_21G_PATH].Alarm.UL_Pll = _Alarm;
+    181          		MuStatus->MrfuSts[M_21G_PATH].Alarm.UL_Pll = _Alarm;
+    182          	}
+    183          	else
+    184          	{
+    185          		MuStatus->MrfuSts[S_21G_PATH].Alarm.UL_Pll = _Normal;
+    186          		MuStatus->MrfuSts[M_21G_PATH].Alarm.UL_Pll = _Normal;
+    187          	}
+    188          
+    189          	if(UL_PLL_LD_900M_CS)
+    190          	{
+    191          		MuStatus->MrfuSts[S_900M_PATH].Alarm.UL_Pll = _Alarm;
+    192          		MuStatus->MrfuSts[M_900M_PATH].Alarm.UL_Pll = _Alarm;
+    193          	}
+    194          	else
+    195          	{
+    196          		MuStatus->MrfuSts[S_900M_PATH].Alarm.UL_Pll = _Normal;
+    197          		MuStatus->MrfuSts[M_900M_PATH].Alarm.UL_Pll = _Normal;
+    198          	}
+    199          
+    200          	if(UL_PLL_LD_25G_CS)
+    201          	{
+    202          		MuStatus->MrfuSts[S_25G_PATH].Alarm.UL_Pll = _Alarm;
+    203          		MuStatus->MrfuSts[M_25G_PATH].Alarm.UL_Pll = _Alarm;
+    204          	}
+    205          	else
+    206          	{
+    207          		MuStatus->MrfuSts[S_25G_PATH].Alarm.UL_Pll = _Normal;
+    208          		MuStatus->MrfuSts[M_25G_PATH].Alarm.UL_Pll = _Normal;
+    209          	}
+    210          
+    211          }
+    212          
+    213          
+    214          ////////////////////////////////////////////////////////////////////////////////
+    215          void StatustoIO(void)
+    216          {
+    217          	INT8U	i = 0;
+    218          	INT8S	AttnOut = 0;
+    219          	INT8U	tindex = 0;
+    220          
+    221          	//-----------------------------------------------------------------------//
+    222          	// Power On
+    223          	if(MuStatus->MrfuSts[S_21G_PATH].Install == _ON)	PWR_ON_21G_CS = 1;
+    224          	else												PWR_ON_21G_CS = 0;
+    225          
+    226          	if(MuStatus->MrfuSts[S_900M_PATH].Install == _ON)	PWR_ON_900M_CS = 1;
+    227          	else												PWR_ON_900M_CS = 0;
+    228          
+    229          	if(MuStatus->MrfuSts[S_25G_PATH].Install == _ON)	PWR_ON_25G_CS = 1;
+    230          	else												PWR_ON_25G_CS = 0;
+    231          	
+    232          	//-----------------------------------------------------------------------//
+    233          	// Amp On/Off
+    234          	if(MuStatus->MrfuSts[S_21G_PATH].UL_Amp_OnOff == _ON)	ExpioBitSet(Amp_OnOff_S_21G_Sel);
+    235          	else													ExpioBitRst(Amp_OnOff_S_21G_Sel);
+    236          
+    237          	if(MuStatus->MrfuSts[M_21G_PATH].UL_Amp_OnOff == _ON)	ExpioBitSet(Amp_OnOff_M_21G_Sel);
+    238          	else													ExpioBitRst(Amp_OnOff_M_21G_Sel);
+    239          
+    240          	if(MuStatus->MrfuSts[S_900M_PATH].UL_Amp_OnOff == _ON)	ExpioBitSet(Amp_OnOff_S_900M_Sel);
+    241          	else													ExpioBitRst(Amp_OnOff_S_900M_Sel);
+    242          
+    243          	if(MuStatus->MrfuSts[M_900M_PATH].UL_Amp_OnOff == _ON)	ExpioBitSet(Amp_OnOff_M_900M_Sel);
+    244          	else													ExpioBitRst(Amp_OnOff_M_900M_Sel);
+    245          
+    246          	if(MuStatus->MrfuSts[S_25G_PATH].UL_Amp_OnOff == _ON)	ExpioBitSet(Amp_OnOff_S_25G_Sel);
+    247          	else													ExpioBitRst(Amp_OnOff_S_25G_Sel);
+    248          
+    249          	if(MuStatus->MrfuSts[M_25G_PATH].UL_Amp_OnOff == _ON)	ExpioBitSet(Amp_OnOff_M_25G_Sel);
+    250          	else													ExpioBitRst(Amp_OnOff_M_25G_Sel);
+    251          
+    252          	//-----------------------------------------------------------------------//
+    253          	// Temp Attn
+    254          	if(MuStatus->TempCompOnOff == _ON)
+    255          	{
+    256          		if(MuStatus->EnvTemp >= tempIndexHys)			tempIndexHys = MuStatus->EnvTemp;
+    257          		else if(MuStatus->EnvTemp < (tempIndexHys - 1)) tempIndexHys = MuStatus->EnvTemp;
+    258          /*
+    259          		tindex = TemptoIndex(tempIndexHys);
+    260          
+    261          		TempAttn[DL_S_21G_PATH] = vEE_TABLE->TempTable[Local_DL_S_21G_Temp].Data[tindex];
+    262          		TempAttn[UL_S_21G_PATH] = vEE_TABLE->TempTable[Local_UL_S_21G_Temp].Data[tindex];
+    263          		TempAttn[DL_M_21G_PATH] = vEE_TABLE->TempTable[Local_DL_M_21G_Temp].Data[tindex];
+    264          		TempAttn[UL_M_21G_PATH] = vEE_TABLE->TempTable[Local_UL_M_21G_Temp].Data[tindex];
+    265          
+    266          		TempAttn[DL_S_900M_PATH] = vEE_TABLE->TempTable[Local_DL_S_900M_Temp].Data[tindex];
+    267          		TempAttn[UL_S_900M_PATH] = vEE_TABLE->TempTable[Local_UL_S_900M_Temp].Data[tindex];
+    268          		TempAttn[DL_M_900M_PATH] = vEE_TABLE->TempTable[Local_DL_M_900M_Temp].Data[tindex];
+    269          		TempAttn[UL_M_900M_PATH] = vEE_TABLE->TempTable[Local_UL_M_900M_Temp].Data[tindex];
+    270          
+    271          		TempAttn[DL_S_25G_PATH] = vEE_TABLE->TempTable[Local_DL_S_25G_Temp].Data[tindex];
+    272          		TempAttn[UL_S_25G_PATH] = vEE_TABLE->TempTable[Local_UL_S_25G_Temp].Data[tindex];
+    273          		TempAttn[DL_M_25G_PATH] = vEE_TABLE->TempTable[Local_DL_M_25G_Temp].Data[tindex];
+    274          		TempAttn[UL_M_25G_PATH] = vEE_TABLE->TempTable[Local_UL_M_25G_Temp].Data[tindex];
+    275          */
+    276          	}
+    277          	else
+    278          	{
+    279          		for(i=0; i<ATTN_PATH_MAX; i++)
+    280          			TempAttn[i] = 0;
+    281          	}
+    282          
+    283          	//-----------------------------------------------------------------------//
+    284          	// 21G Attn
+    285          	tindex = MuStatus->MrfuSts[S_21G_PATH].DL_Attn;
+    286          	AttnOut = tindex*2+ MuStatus->MrfuOffset[S_21G_PATH].DL_Attn;//(INT8S)vEE_TABLE->AttnTable[Local_DL_S_21G_Attn].Data[tindex];// + MuStatus->MrfuSts[S_21G_PATH].DL_Attn;
+    287          	if(AttnOut < ATTN_MIN)	AttnOut = ATTN_MIN;
+    288          	if(AttnOut > ATTN_MAX)	AttnOut = ATTN_MAX;
+    289          	if(PreAttn[DL_S_21G_PATH] != AttnOut)
+    290          	{
+    291          		HMC624AttnOut(AttnOut, DL_S_21G_PATH);
+    292          		PreAttn[DL_S_21G_PATH] = AttnOut;
+    293          	}
+    294          
+    295          	tindex = MuStatus->MrfuSts[S_21G_PATH].UL_Attn;
+    296          	AttnOut = tindex*2+ MuStatus->MrfuOffset[S_21G_PATH].UL_Attn;//(INT8S)vEE_TABLE->AttnTable[Local_UL_S_21G_Attn].Data[tindex];// + MuStatus->MrfuSts[S_21G_PATH].UL_Attn;
+    297          	if(AttnOut < ATTN_MIN)	AttnOut = ATTN_MIN;
+    298          	if(AttnOut > ATTN_MAX)	AttnOut = ATTN_MAX;
+    299          	if(PreAttn[UL_S_21G_PATH] != AttnOut)
+    300          	{
+    301          		HMC624AttnOut(AttnOut, UL_S_21G_PATH);
+    302          		PreAttn[UL_S_21G_PATH] = AttnOut;
+    303          	}
+    304          
+    305          	tindex = MuStatus->MrfuSts[M_21G_PATH].DL_Attn;
+    306          	AttnOut = tindex*2+ MuStatus->MrfuOffset[M_21G_PATH].DL_Attn;//(INT8S)vEE_TABLE->AttnTable[Local_DL_M_21G_Attn].Data[tindex];// + MuStatus->MrfuSts[M_21G_PATH].DL_Attn;
+    307          	if(AttnOut < ATTN_MIN)	AttnOut = ATTN_MIN;
+    308          	if(AttnOut > ATTN_MAX)	AttnOut = ATTN_MAX;
+    309          	if(PreAttn[DL_M_21G_PATH] != AttnOut)
+    310          	{
+    311          		HMC624AttnOut(AttnOut, DL_M_21G_PATH);
+    312          		PreAttn[DL_M_21G_PATH] = AttnOut;
+    313          	}
+    314          
+    315          	tindex = MuStatus->MrfuSts[M_21G_PATH].UL_Attn;
+    316          	AttnOut = tindex*2+ MuStatus->MrfuOffset[M_21G_PATH].UL_Attn;//(INT8S)vEE_TABLE->AttnTable[Local_UL_M_21G_Attn].Data[tindex];// + MuStatus->MrfuSts[M_21G_PATH].UL_Attn;
+    317          	if(AttnOut < ATTN_MIN)	AttnOut = ATTN_MIN;
+    318          	if(AttnOut > ATTN_MAX)	AttnOut = ATTN_MAX;
+    319          	if(PreAttn[UL_M_21G_PATH] != AttnOut)
+    320          	{
+    321          		HMC624AttnOut(AttnOut, UL_M_21G_PATH);
+    322          		PreAttn[UL_M_21G_PATH] = AttnOut;
+    323          	}
+    324          
+    325          	
+    326          	//-----------------------------------------------------------------------//
+    327          	// 900M Attn
+    328          	tindex = MuStatus->MrfuSts[S_900M_PATH].DL_Attn;
+    329          	AttnOut = tindex*2+ MuStatus->MrfuOffset[S_900M_PATH].DL_Attn;//(INT8S)vEE_TABLE->AttnTable[Local_DL_S_900M_Attn].Data[tindex];// + MuStatus->MrfuSts[S_900M_PATH].DL_Attn;
+    330          	if(AttnOut < ATTN_MIN)	AttnOut = ATTN_MIN;
+    331          	if(AttnOut > ATTN_MAX)	AttnOut = ATTN_MAX;
+    332          	if(PreAttn[DL_S_900M_PATH] != AttnOut)
+    333          	{
+    334          		HMC624AttnOut(AttnOut, DL_S_900M_PATH);
+    335          		PreAttn[DL_S_900M_PATH] = AttnOut;
+    336          	}
+    337          
+    338          	tindex = MuStatus->MrfuSts[S_900M_PATH].UL_Attn;
+    339          	AttnOut = tindex*2+ MuStatus->MrfuOffset[S_900M_PATH].UL_Attn;//(INT8S)vEE_TABLE->AttnTable[Local_UL_S_900M_Attn].Data[tindex];// + MuStatus->MrfuSts[S_900M_PATH].UL_Attn;
+    340          	if(AttnOut < ATTN_MIN)	AttnOut = ATTN_MIN;
+    341          	if(AttnOut > ATTN_MAX)	AttnOut = ATTN_MAX;
+    342          	if(PreAttn[UL_S_900M_PATH] != AttnOut)
+    343          	{
+    344          		HMC624AttnOut(AttnOut, UL_S_900M_PATH);
+    345          		PreAttn[UL_S_900M_PATH] = AttnOut;
+    346          	}
+    347          
+    348          	tindex = MuStatus->MrfuSts[M_900M_PATH].DL_Attn;
+    349          	AttnOut = tindex*2+ MuStatus->MrfuOffset[M_900M_PATH].DL_Attn;//(INT8S)vEE_TABLE->AttnTable[Local_DL_M_900M_Attn].Data[tindex];// + MuStatus->MrfuSts[M_900M_PATH].DL_Attn;
+    350          	if(AttnOut < ATTN_MIN)	AttnOut = ATTN_MIN;
+    351          	if(AttnOut > ATTN_MAX)	AttnOut = ATTN_MAX;
+    352          	if(PreAttn[DL_M_900M_PATH] != AttnOut)
+    353          	{
+    354          		HMC624AttnOut(AttnOut, DL_M_900M_PATH);
+    355          		PreAttn[DL_M_900M_PATH] = AttnOut;
+    356          	}
+    357          
+    358          	tindex = MuStatus->MrfuSts[M_900M_PATH].UL_Attn;
+    359          	AttnOut = tindex*2+ MuStatus->MrfuOffset[M_900M_PATH].DL_Attn;//(INT8S)vEE_TABLE->AttnTable[Local_UL_M_900M_Attn].Data[tindex];// + MuStatus->MrfuSts[M_900M_PATH].UL_Attn;
+    360          	if(AttnOut < ATTN_MIN)	AttnOut = ATTN_MIN;
+    361          	if(AttnOut > ATTN_MAX)	AttnOut = ATTN_MAX;
+    362          	if(PreAttn[UL_M_900M_PATH] != AttnOut)
+    363          	{
+    364          		HMC624AttnOut(AttnOut, UL_M_900M_PATH);
+    365          		PreAttn[UL_M_900M_PATH] = AttnOut;
+    366          	}
+    367          
+    368          	
+    369          	//-----------------------------------------------------------------------//
+    370          	// 25G Attn
+    371          	tindex = MuStatus->MrfuSts[S_25G_PATH].DL_Attn;
+    372          	AttnOut = tindex*2+ MuStatus->MrfuOffset[S_25G_PATH].DL_Attn;//(INT8S)vEE_TABLE->AttnTable[Local_DL_S_25G_Attn].Data[tindex];// + MuStatus->MrfuSts[S_25G_PATH].DL_Attn;
+    373          	if(AttnOut < ATTN_MIN)	AttnOut = ATTN_MIN;
+    374          	if(AttnOut > ATTN_MAX)	AttnOut = ATTN_MAX;
+    375          	if(PreAttn[DL_S_25G_PATH] != AttnOut)
+    376          	{
+    377          		HMC624AttnOut(AttnOut, DL_S_25G_PATH);
+    378          		PreAttn[DL_S_25G_PATH] = AttnOut;
+    379          	}
+    380          
+    381          	tindex = MuStatus->MrfuSts[S_25G_PATH].UL_Attn;
+    382          	AttnOut = tindex*2+ MuStatus->MrfuOffset[S_25G_PATH].UL_Attn;//(INT8S)vEE_TABLE->AttnTable[Local_UL_S_25G_Attn].Data[tindex];// + MuStatus->MrfuSts[S_25G_PATH].UL_Attn;
+    383          	if(AttnOut < ATTN_MIN)	AttnOut = ATTN_MIN;
+    384          	if(AttnOut > ATTN_MAX)	AttnOut = ATTN_MAX;
+    385          	if(PreAttn[UL_S_25G_PATH] != AttnOut)
+    386          	{
+    387          		HMC624AttnOut(AttnOut, UL_S_25G_PATH);
+    388          		PreAttn[UL_S_25G_PATH] = AttnOut;
+    389          	}
+    390          
+    391          	tindex = MuStatus->MrfuSts[M_25G_PATH].DL_Attn;
+    392          	AttnOut = tindex*2+ MuStatus->MrfuOffset[M_25G_PATH].DL_Attn;//(INT8S)vEE_TABLE->AttnTable[Local_DL_M_25G_Attn].Data[tindex];// + MuStatus->MrfuSts[M_25G_PATH].DL_Attn;
+    393          	if(AttnOut < ATTN_MIN)	AttnOut = ATTN_MIN;
+    394          	if(AttnOut > ATTN_MAX)	AttnOut = ATTN_MAX;
+    395          	if(PreAttn[DL_M_25G_PATH] != AttnOut)
+    396          	{
+    397          		HMC624AttnOut(AttnOut, DL_M_25G_PATH);
+    398          		PreAttn[DL_M_25G_PATH] = AttnOut;
+    399          	}
+    400          
+    401          	tindex = MuStatus->MrfuSts[M_25G_PATH].UL_Attn;
+    402          	AttnOut = tindex*2+ MuStatus->MrfuOffset[M_25G_PATH].UL_Attn;//(INT8S)vEE_TABLE->AttnTable[Local_UL_M_25G_Attn].Data[tindex];// + MuStatus->MrfuSts[M_25G_PATH].UL_Attn;
+    403          	if(AttnOut < ATTN_MIN)	AttnOut = ATTN_MIN;
+    404          	if(AttnOut > ATTN_MAX)	AttnOut = ATTN_MAX;
+    405          	if(PreAttn[UL_M_25G_PATH] != AttnOut)
+    406          	{
+    407          		HMC624AttnOut(AttnOut, UL_M_25G_PATH);
+    408          		PreAttn[UL_M_25G_PATH] = AttnOut;
+    409          	}
+    410          }
+    411          
+    412          
+    413          INT8U MaxAttnCheck(INT16S cAttn, INT16S tMax)
+    414          {
+    415          	INT8U retval = cAttn;
+    416          	
+    417          	if(cAttn > tMax)
+    418          	{
+    419          		retval = tMax;
+    420          	}
+    421          	else if(cAttn < 0)
+    422          	{
+    423          		retval = 0;
+    424          	}
+    425          
+    426          	return retval;
+    427          }
+    428          
+    429          void HMC624AttnOut(INT8U AttVal, INT8U Path)
+    430          {
+    431          	INT8S	i = 0;
+    432          
+    433          	ATTN_CLK_CS = SET;
+    434          	ForDelay(50);
+    435          	AttnEn_Out(DISABLE, Path);
+    436          	ForDelay(50);
+    437          	
+    438          	for(i = 5; i >= 0; i--)
+    439          	{
+    440          		ATTN_CLK_CS = RESET;
+    441          		ForDelay(50);
+    442          		if((AttVal >> i) & 0x1) {ATTN_DATA_CS = RESET;}
+    443          		else					{ATTN_DATA_CS = SET;}
+    444          		ForDelay(50);
+    445          		ATTN_CLK_CS = SET;
+    446          		ForDelay(50);
+    447          	}
+    448          	// Enable Set
+    449          	AttnEn_Out(SET_STS, Path);
+    450          	ForDelay(50);
+    451          	AttnEn_Out(RST_STS, Path);
+    452          	ForDelay(50);
+    453          }
+    454          
+    455          void AttnEn_Out(INT8U OutSts, INT8U Path)
+    456          {
+    457          	INT16U	AttEn;
+    458          
+    459          	switch(Path)
+    460          	{
+    461          		case DL_S_21G_PATH: 	AttEn = DL_Attn_En_S_21G_Sel;		break;
+    462          		case UL_S_21G_PATH: 	AttEn = UL_Attn_En_S_21G_Sel;		break;
+    463          		case DL_M_21G_PATH: 	AttEn = DL_Attn_En_M_21G_Sel;		break;
+    464          		case UL_M_21G_PATH: 	AttEn = UL_Attn_En_M_21G_Sel;		break;
+    465          
+    466          		case DL_S_900M_PATH:	AttEn = DL_Attn_En_S_900M_Sel;		break;
+    467          		case UL_S_900M_PATH:	AttEn = UL_Attn_En_S_900M_Sel;		break;
+    468          		case DL_M_900M_PATH:	AttEn = DL_Attn_En_M_900M_Sel;		break;
+    469          		case UL_M_900M_PATH:	AttEn = UL_Attn_En_M_900M_Sel;		break;
+    470          
+    471          		case DL_S_25G_PATH: 	AttEn = DL_Attn_En_S_25G_Sel;		break;
+    472          		case UL_S_25G_PATH: 	AttEn = UL_Attn_En_S_25G_Sel;		break;
+    473          		case DL_M_25G_PATH: 	AttEn = DL_Attn_En_M_25G_Sel;		break;
+    474          		case UL_M_25G_PATH: 	AttEn = UL_Attn_En_M_25G_Sel;		break;
+    475          	}
+    476          
+    477          	if(OutSts == SET_STS)	ExpioBitSet(AttEn);
+    478          	else					ExpioBitRst(AttEn);
+    479          }
+    480          
+    481          
+    482          ///////////////////////////////////////////////////////////////////////////////
+    483          // End of Source File
+    484          ////////////////////////
+
+   Maximum stack usage in bytes:
+
+     Function      .cstack
+     --------      -------
+     AttnEn_Out         8
+     ExpioInit          8
+     ExpioPortInit      8
+     ExpioTask         16
+     HMC624AttnOut     24
+     MaxAttnCheck       0
+     StatusUpdate       4
+     StatustoIO        16
+
+
+   Section sizes:
+
+     Function/Label  Bytes
+     --------------  -----
+     ExpioTaskStk    1536
+     ExpioSem           4
+     PreAttn           28
+     tempIndexHys
+     TempAttn
+     ExpioInit         56
+     ExpioPortInit     16
+     ExpioTask         84
+     StatusUpdate     488
+     StatustoIO       700
+     MaxAttnCheck      20
+     HMC624AttnOut    132
+     AttnEn_Out        80
+     ??DataTable5       4
+     ??DataTable5_1     4
+     ??DataTable5_2     4
+     ??DataTable5_3     4
+     ??DataTable5_4     4
+     ??DataTable5_5     4
+     ??DataTable5_6     4
+     ??DataTable5_7     4
+     ??DataTable5_8     4
+     ??DataTable5_9     4
+     ??DataTable5_10    4
+     ??DataTable5_11    4
+     ??DataTable5_12    4
+
+ 
+     4 bytes in section .bss
+    28 bytes in section .data
+ 1 628 bytes in section .text
+ 1 536 bytes in section iram
+ 
+ 1 628 bytes of CODE memory
+ 1 568 bytes of DATA memory
+
+Errors: none
+Warnings: none

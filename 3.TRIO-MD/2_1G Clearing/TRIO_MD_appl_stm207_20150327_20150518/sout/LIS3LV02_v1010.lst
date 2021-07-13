@@ -1,0 +1,249 @@
+###############################################################################
+#                                                                             #
+#                                                       14/Nov/2010  14:44:17 #
+# IAR ANSI C/C++ Compiler V5.20.0.20892/W32 EVALUATION for ARM                #
+# Copyright 1999-2008 IAR Systems AB.                                         #
+#                                                                             #
+#    Cpu mode     =  thumb                                                    #
+#    Endian       =  little                                                   #
+#    Source file  =  C:\user\project\HK-DEI\fw\appl_rcub_20101101\dev\LIS3LV0 #
+#                    2\LIS3LV02_v1010.c                                       #
+#    Command line =  C:\user\project\HK-DEI\fw\appl_rcub_20101101\dev\LIS3LV0 #
+#                    2\LIS3LV02_v1010.c -lcN C:\user\project\HK-DEI\fw\appl_r #
+#                    cub_20101101\sout\ -lB C:\user\project\HK-DEI\fw\appl_rc #
+#                    ub_20101101\sout\ -o C:\user\project\HK-DEI\fw\appl_rcub #
+#                    _20101101\sout\ --endian=little --cpu=Cortex-M3 -e       #
+#                    --require_prototypes --fpu=None --dlib_config            #
+#                    "C:\compiler\EWARM 5.20\ARM\INC\DLib_Config_Normal.h"    #
+#                    -I C:\user\project\HK-DEI\fw\appl_rcub_20101101\include\ #
+#                     -I C:\user\project\HK-DEI\fw\appl_rcub_20101101\lib_stm #
+#                    32\inc\ -I C:\user\project\HK-DEI\fw\appl_rcub_20101101\ #
+#                    lib_stm32\src\ -I C:\user\project\HK-DEI\fw\appl_rcub_20 #
+#                    101101\uC-CPU\ -I C:\user\project\HK-DEI\fw\appl_rcub_20 #
+#                    101101\uC-LIB\ -I C:\user\project\HK-DEI\fw\appl_rcub_20 #
+#                    101101\uCOS-II\Ports\ -I C:\user\project\HK-DEI\fw\appl_ #
+#                    rcub_20101101\uCOS-II\Source\ -I                         #
+#                    C:\user\project\HK-DEI\fw\appl_rcub_20101101\uC-Probe\   #
+#                    -I "C:\compiler\EWARM 5.20\ARM\INC\" -Oh                 #
+#    List file    =  C:\user\project\HK-DEI\fw\appl_rcub_20101101\sout\LIS3LV #
+#                    02_v1010.lst                                             #
+#    Object file  =  C:\user\project\HK-DEI\fw\appl_rcub_20101101\sout\LIS3LV #
+#                    02_v1010.o                                               #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+C:\user\project\HK-DEI\fw\appl_rcub_20101101\dev\LIS3LV02\LIS3LV02_v1010.c
+      1          /*******************************************************************************
+      2           *
+      3           * This module contains the function STM32F103xxx original source file, a function
+      4           * whole things  initializations - global, include function and so on
+      5           *
+      6           *
+      7           * Note that this function is called before the data segments are
+      8           * initialized, this means that this function cannot rely on the
+      9           * values of global or static variables.
+     10           *
+     11           *
+     12           * Copyright 2008 - bizistyle(bgyoon@naver.com), All rights reserved.
+     13           *
+     14           * $Revision: 0.1 $
+     15           * $Revision date: 2008.07.
+     16          * v1010: APPEND + LIS33DL 
+     17           ******************************************************************************/
+     18          #define LIS03LV02_C
+     19          //#define LIS03LV02_DBG
+     20          
+     21          #include <math.h>
+     22          #include "../include/main.h"
+     23          
+     24          INT8U DevName;
+     25          
+     26          #if defined(USE_SPI1)
+     27          	#define LIS_CS_SET()	GPIOA->ODR.B4 = 1
+     28          	#define LIS_CS_RST()	GPIOA->ODR.B4 = 0
+     29          	#define LIS_BASE		SPI1
+     30          #elif defined(USE_SPI2)
+     31          	#define LIS_CS_SET()	GPIOB->ODR.B12 = 1
+     32          	#define LIS_CS_RST()	GPIOB->ODR.B12 = 0
+     33          	#define LIS_BASE		SPI2
+     34          #else
+     35          	#define LIS_CS_SET()
+     36          	#define LIS_CS_RST()
+     37          	#define LIS_BASE
+     38          #endif
+     39          
+     40          void Lis03lv02init(void)
+     41          {
+     42          //int i;
+     43          	#ifdef USE_SPI1
+     44          		//////////////////////////////////
+     45          		// Port
+     46          		GPIOA->CNF.B4 = __PA4_OU_PP;
+     47          		GPIOA->CNF.B5 = __SPI1_SCK;
+     48          		GPIOA->CNF.B7 = __SPI1_MOSI;
+     49          		GPIOA->CNF.B6 = __SPI1_MISO;
+     50          
+     51          		SPI1Init();		
+     52          	#elif defined(USE_SPI2)
+     53          		GPIOB->CNF.B12 = __PB12_OU_PP;
+     54          		GPIOB->CNF.B13 = __SPI2_SCK;
+     55          		GPIOB->CNF.B15 = __SPI2_MOSI;
+     56          		GPIOB->CNF.B14 = __SPI2_MISO;
+     57          		SPI2Init();
+     58          	#endif
+     59          	LIS_CS_SET();
+     60              DevName = ReadLSIData(WHO_AM_I);
+     61          #ifdef LIS03LV02_DBG	
+     62          	USART1Printf("CTRL REG:0x%02xh\n", ReadLSIData(CTRL_REG1));
+     63          	USART1Printf("WHO AM I:0x%02xh\n", DevName);
+     64          #endif
+     65          
+     66          	{
+     67          		LIS_CTRLReg Ctrl;
+     68          
+     69          		Ctrl.Data = 0;
+     70          		Ctrl.Xen = 1;
+     71          		Ctrl.Yen = 1;
+     72          		Ctrl.Zen = 1;
+     73          		Ctrl.PD = DEON;
+     74          		
+     75          		WriteLSI(CTRL_REG1, Ctrl.Data);		//myAccel3LV02 √ ±‚»≠ 1000.0111 Power on, enable all axis, self test off     
+     76          	}
+     77          }
+     78          
+     79          
+     80          INT8S SlopeConvert(TITLSTR *rval)
+     81          {
+     82          	double dval;
+     83          	
+     84          	INT16S	TempX = 0;
+     85          	INT16S	TempY = 0;
+     86          	INT16S	TempZ = 0;
+     87          		
+     88          	TempX  |= (ReadLSIData(OUTX_L) & 0xff) << 0;
+     89          	TempX  |= (ReadLSIData(OUTX_H) & 0xff) << 8;
+     90          	
+     91          	TempY  |= (ReadLSIData(OUTY_L) & 0xff) << 0;
+     92          	TempY  |= (ReadLSIData(OUTY_H) & 0xff) << 8;
+     93          
+     94          	TempZ  |= (ReadLSIData(OUTZ_L) & 0xff) << 0;
+     95          	TempZ  |= (ReadLSIData(OUTZ_H) & 0xff) << 8;
+     96          
+     97          #ifdef LIS03LV02_DBG
+     98          	USART1Printf("TempX:%03d\n",    TempX);
+     99          	USART1Printf("TempY:%03d\n",    TempY);
+    100          	USART1Printf("TempZ:%03d\n\n",TempZ);
+    101          #endif
+    102          	dval = (double)TempX/1024.0;
+    103          	rval->xradian = (INT16S)((asinf(dval)*1800)/3.14);
+    104          #ifdef LIS03LV02_DBG
+    105          	USART1Printf("x-val:%d\n", rval->xradian/10);
+    106          #endif
+    107          
+    108          	dval = (double)TempY/1024.0;
+    109          	rval->yradian = (INT16S)((asinf(dval)*1800)/3.14);
+    110          #ifdef LIS03LV02_DBG
+    111          	USART1Printf("y-val:%d\n", rval->yradian/10);
+    112          #endif
+    113          
+    114          	dval = (double)TempZ/1024.0;
+    115          	rval->zradian = (INT16S)((acosf(dval)*1800)/3.14);
+    116          #ifdef LIS03LV02_DBG
+    117          	USART1Printf("z-val:%d\n", rval->zradian/10);
+    118          #endif
+    119              
+    120          	return TRUE;
+    121          }
+    122          
+    123          INT16U SetLSICommand(INT16U Comm)
+    124          {
+    125          	//INT8U rtry = 0xff;
+    126          	
+    127          	//while(rtry-- && SPI_I2S_GetFlagStatus(LIS_BASE, SPI_I2S_FLAG_TXE) == RESET);
+    128          	while(SPI_I2S_GetFlagStatus(LIS_BASE, SPI_I2S_FLAG_TXE) == RESET);
+    129          	// Send SPI2 data
+    130          	SPI_I2S_SendData(LIS_BASE, Comm);
+    131          	// Wait to receive a byte
+    132            	while(SPI_I2S_GetFlagStatus(LIS_BASE, SPI_I2S_FLAG_RXNE) == RESET);
+    133          	//while(rtry-- && SPI_I2S_GetFlagStatus(LIS_BASE, SPI_I2S_FLAG_RXNE) == RESET);
+    134          	// Return the byte read from the SPI bus
+    135          	return SPI_I2S_ReceiveData(LIS_BASE);
+    136          }
+    137          
+    138          void WriteLSI(INT16U Comm, INT8U DATA)
+    139          {
+    140          	LIS_CS_RST();
+    141          
+    142          	SetLSICommand(MA3_ADDR_WR(Comm));
+    143          	SetLSICommand(DATA);
+    144          
+    145          	LIS_CS_SET();
+    146          }
+    147          
+    148          INT8U ReadLSICtrl(INT8U Comm)
+    149          {
+    150          	INT8U rval;
+    151          	LIS_CS_RST();
+    152          
+    153          		
+    154          	SetLSICommand(Comm);
+    155          	rval = SetLSICommand(NULL);
+    156          
+    157          	LIS_CS_SET();
+    158          
+    159          	return rval;
+    160          }
+    161          
+    162          
+    163          INT16U ReadLSIData(INT16U Comm)
+    164          {
+    165          	INT16U rval;
+    166          	LIS_CS_RST();
+    167          
+    168          	SetLSICommand(MA3_ADDR_RD(Comm));
+    169          	rval = SetLSICommand(NULL);
+    170          	
+    171          	LIS_CS_SET();
+    172          	return (rval);
+    173          }
+    174          
+    175          ////////////////////////////////////////////////////////////////////////////////
+    176          // End of Source File
+    177          /////////////////////
+    178          
+
+   Maximum stack usage in bytes:
+
+     Function      .cstack
+     --------      -------
+     Lis03lv02init      0
+     ReadLSICtrl        0
+     ReadLSIData        0
+     SetLSICommand      0
+     SlopeConvert       0
+     WriteLSI           0
+
+
+   Section sizes:
+
+     Function/Label Bytes
+     -------------- -----
+     DevName           1
+     Lis03lv02init   120
+     SlopeConvert    256
+     SetLSICommand    52
+     WriteLSI         40
+     ReadLSICtrl      34
+     ReadLSIData      42
+     ??DataTable2      4
+
+ 
+   1 byte  in section .bss
+ 548 bytes in section .text
+ 
+ 548 bytes of CODE memory
+   1 byte  of DATA memory
+
+Errors: none
+Warnings: none

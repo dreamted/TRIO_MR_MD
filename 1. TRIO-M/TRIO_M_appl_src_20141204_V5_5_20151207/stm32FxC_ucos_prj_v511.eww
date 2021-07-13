@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<workspace>
+  <project>
+    <path>$WS_DIR$\stm32FxC_cpulib_prj_v511.ewp</path>
+  </project>
+  <project>
+    <path>$WS_DIR$\stm32FxC_lib_prj_v511.ewp</path>
+  </project>
+  <project>
+    <path>$WS_DIR$\stm32FxC_ucos_prj_v511.ewp</path>
+  </project>
+  <batchBuild/>
+</workspace>
+
+

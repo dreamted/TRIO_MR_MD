@@ -1,0 +1,740 @@
+###############################################################################
+#                                                                             #
+#                                                       19/May/2017  23:29:02 #
+# IAR ANSI C/C++ Compiler V5.50.5.21995/W32 EVALUATION for ARM                #
+# Copyright (C) 1999-2010 IAR Systems AB.                                     #
+#                                                                             #
+#    Cpu mode     =  thumb                                                    #
+#    Endian       =  little                                                   #
+#    Source file  =  D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V5_5_ #
+#                    20151207\code\DDR_WRCS.c                                 #
+#    Command line =  "D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V5_5 #
+#                    _20151207\code\DDR_WRCS.c" -D _MIMO_Type -D __2rd -D     #
+#                    __PLLEnToggle -lcN "D:\Project\TRIO\1.                   #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\sout\" -o  #
+#                    "D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V5_5 #
+#                    _20151207\sout\" --endian=little --cpu=Cortex-M3 -e      #
+#                    --require_prototypes --warnings_are_errors --fpu=None    #
+#                    --dlib_config "D:\Program Files (x86)\IAR                #
+#                    Systems\Embedded Workbench 5.4                           #
+#                    Evaluation\arm\INC\DLib_Config_Normal.h" -I              #
+#                    "D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V5_5 #
+#                    _20151207\include\" -I "D:\Project\TRIO\1.               #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\lib_stm32\ #
+#                    inc\" -I "D:\Project\TRIO\1.                             #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\lib_stm32\ #
+#                    src\" -I "D:\Project\TRIO\1.                             #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\uC-CPU\"   #
+#                    -I "D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V #
+#                    5_5_20151207\uC-LIB\" -I "D:\Project\TRIO\1.             #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\uCOS-II\Po #
+#                    rts\" -I "D:\Project\TRIO\1.                             #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\uCOS-II\So #
+#                    urce\" -I "D:\Project\TRIO\1.                            #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\uC-Probe\" #
+#                     -I "D:\Program Files (x86)\IAR Systems\Embedded         #
+#                    Workbench 5.4 Evaluation\arm\INC\" -Oh                   #
+#    List file    =  D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V5_5_ #
+#                    20151207\sout\DDR_WRCS.lst                               #
+#    Object file  =  D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V5_5_ #
+#                    20151207\sout\DDR_WRCS.o                                 #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\code\DDR_WRCS.c
+      1          
+      2          /*********************************************
+      3          * File Name          : usart1_vx.x.c
+      4          * Author             : 
+      5          * Date First Issued  : 01/17/2008
+      6          * Description        : This file provides all the USART0 firmware functions.
+      7          * $Revision: 0.1 $
+      8          * $Revision date: 2008.01.__
+      9          ********************************************************************************/
+     10          
+     11          #define SER0INT_C
+     12          
+     13          #include "../include/main.h"
+     14          #include "download.c"
+     15          
+     16          void WRCS_SerInit(void)
+     17          {
+     18           	PcSer->CheckByte = pUSART1.CheckByte;
+     19          	PcSer->RxGetByte = pUSART1.RxGetByte;
+     20          	PcSer->PutStr = pUSART1.PutStr;
+     21          	PcSer->TxCheckByte = pUSART1.TxCheckByte;
+     22          
+     23          	PcSer->TimerRx = TimerSioRx;
+     24          	PcSer->WRCSRecv = &RPcsksio;
+     25          	PcSer->WRCSSend = &SPcsksio;
+     26          	
+     27          	CtrlSem = OSSemCreate(1);
+     28          
+     29          	PcSer->OSSem = OSSemCreate(1);
+     30          	
+     31           	OSTaskCreate(WRCSTask, (void *)PcSer, (OS_STK *)&Ser1TaskStk[SER1_STK_SIZE - 1], SER0TASK_PRIO);
+     32          
+     33          	LoadBackupData();	// default setting!!
+     34          	Initialize();
+     35          	AlarmInitialize();
+     36          		
+     37          
+     38          	SerPtr->printf(" TRIO-M VER:%d.%d.%d-->Type[%d]\n", (TRIO_M_SystemVer >> 4)& 0x0f, TRIO_M_SystemVer & 0x0f,TRIO_M_PROGRAMVER & 0x0f,iRepeaterType);
+     39          //	SerPtr->printf(" sizeof:[%d][%d][%d]:[%d][%d]\n", sizeof(EE_BACK1),sizeof(EE_TABLE),sizeof(EE_TABLE1),sizeof(__BackupStr),sizeof(SYS_BACK));
+     40          
+     41          
+     42          #if 0
+     43          	  SerPtr->printf("PwrAlarmCnt[%d][%d][%d][%d][%d]>[%d][%d][%d]\n",	PwrAlarmCnt.FwdAmpOnOff_2G, 
+     44          	  PwrAlarmCnt.FwdAmpOnOff_LTE, 
+     45          	  PwrAlarmCnt.FwdAmpOnOff_3G,
+     46          	  PwrAlarmCnt.FwdAmpOnOff_LTE_A1,
+     47          	  PwrAlarmCnt.FwdAmpOnOff_LTE_A2,
+     48          	  PwrAlarmCnt.FwdAmp1OnOff_LTE,
+     49          	  PwrAlarmCnt.FwdAmp1OnOff_LTE_A1,
+     50           	 PwrAlarmCnt.FwdAmp1OnOff_LTE_A2
+     51          );
+     52          #endif	 
+     53          
+     54          
+     55          	ChkTableAlarm = SET;
+     56          }
+     57          
+     58          
+     59          void WRCSTask(void *pdata)
+     60          {
+     61          	__ProtocolPtr *nPtr = (__ProtocolPtr *)PcSer;
+     62          
+     63          	pdata = pdata;
+     64          
+     65          	while(1)
+     66          	{
+     67          		nPtr->WRCSRecv->cBody = 0;
+     68          	
+     69          		if(!tTestFlag)
+     70          		{
+     71          			if(ProtocolCheck(nPtr))
+     72          			{
+     73          			#if TWO_BODY >= 2
+     74          				while(nPtr->WRCSRecv->cBody  <=  nPtr->WRCSRecv->BodyNo)
+     75          				{
+     76          			#endif
+     77           					ProtocolComCheck(nPtr);
+     78          			#if TWO_BODY >= 2
+     79          					nPtr->WRCSRecv->cBody++;
+     80          				}
+     81          			#endif
+     82          			}			
+     83          		}
+     84          		WRCS_DownLoadGiveupTimerChk(nPtr);
+     85          		OSTimeDly(100L);
+     86          	}
+     87          }
+     88          
+     89          INT32U ProtocolCheck(__ProtocolPtr *nPtr)
+     90          {
+     91          	INT16U nInitCnt, nCnt;
+     92          	INT16U i = 0;
+     93          	INT16U Data;
+     94          	INT8U Temp;
+     95          
+     96          	__WRCSSIO *Recv = nPtr->WRCSRecv;
+     97          
+     98          	TimerRegist(nPtr->TimerRx, Time1Sec*2L);
+     99          	while(1)
+    100          	{
+    101          		if(TimeOverCheck(nPtr->TimerRx)) return FALSE;
+    102          	
+    103          		if(nPtr->CheckByte(4, &nCnt))
+    104          		{
+    105          			Temp = nPtr->RxGetByte();
+    106          
+    107          			if (  (STX == Temp )
+    108          				&&(STX == nPtr->RxGetByte())
+    109          				&&(STX == nPtr->RxGetByte())
+    110          				&&(STX == nPtr->RxGetByte()))
+    111          			{
+    112          				Recv->Sync[0] = STX;
+    113          				Recv->Sync[1] = STX;
+    114          				Recv->Sync[2] = STX;
+    115          				Recv->Sync[3] = STX;
+    116          
+    117          				Recv->BodyNo = 0; // Default: 1EA
+    118          				break;
+    119          			}
+    120           			{
+    121          				if((nPtr == PcSer)&&(downloadFlag == 0))
+    122          				{
+    123          					if((Temp == 'x')||(Temp == 'X'))
+    124          					{
+    125          						iDebugCnt++;
+    126          						
+    127          						if(iDebugCnt > 20)
+    128          						{
+    129          							iUser_Value2 = __ChangeDebug;
+    130          							iDebugCnt = 0; 
+    131          							TimerRegist(Timer_DebugCnt, Time1Min*10L);
+    132          						}
+    133          					}
+    134          				}				
+    135          			}
+    136           		}
+    137          		else OSTimeDly(10L);
+    138          	}
+    139          
+    140          	TimerRegist(nPtr->TimerRx, Time1Sec);
+    141          	nPtr->CheckByte(1, &nInitCnt);
+    142          	while(!nPtr->CheckByte(4, &nCnt))
+    143          	{
+    144          		if(TimeOverCheck(nPtr->TimerRx))
+    145          		{
+    146          			if(nCnt > nInitCnt)
+    147          			{
+    148          				nInitCnt = nCnt;
+    149          				TimerRegist(nPtr->TimerRx, Time100mSec);
+    150          			}
+    151          			else return FALSE;
+    152          		}
+    153          		OSTimeDly(10L);
+    154          	}
+    155          	
+    156          	Recv->TryNo 		= nPtr->RxGetByte();
+    157          	Recv->BodyLen[0]	= nPtr->RxGetByte();
+    158          	Recv->BodyLen[1]	= nPtr->RxGetByte();
+    159          	Recv->CheckSum		= nPtr->RxGetByte();
+    160          
+    161          	Recv->BodyLength = (Recv->BodyLen[0] << 8) + (Recv->BodyLen[1]);
+    162          
+    163          	if(Recv->CheckSum != (INT8U)(Recv->TryNo + Recv->BodyLen[0] + Recv->BodyLen[1])
+    164          		|| (Recv->BodyLength >= (TWO_BODY*BODYSIZEMAX))
+    165          	)
+    166          	{								
+    167          		return FALSE;
+    168          	}
+    169              
+    170          #if TWO_BODY >= 2
+    171          BODYRE:
+    172          #endif
+    173          	TimerRegist(nPtr->TimerRx, Time1Sec*2);
+    174          	nPtr->CheckByte(1, &nInitCnt);
+    175          	while(1)
+    176          	{
+    177          		if(TimeOverCheck(nPtr->TimerRx)) ///1byte 500us
+    178          		{
+    179          			if(nCnt > nInitCnt)
+    180          			{
+    181          				nInitCnt = nCnt;
+    182          				TimerRegist(nPtr->TimerRx, Time100mSec);
+    183          			}
+    184          			else
+    185          			{
+    186          				return FALSE;
+    187          			}
+    188          		}
+    189          		if(nPtr->CheckByte(7, &nCnt))
+    190          		{
+    191          			break;// include 0x03
+    192          		}
+    193          		OSTimeDly(20L);
+    194          	}
+    195          	
+    196          	for(i = 0; i < 7 ; i++)
+    197          	{
+    198          		*((INT8U *)Recv->BodyFrame[Recv->BodyNo].SubID + i) = nPtr->RxGetByte();
+    199          	}
+    200          
+    201          	Recv->BodyFrame[Recv->BodyNo].SubLength
+    202          		=	 ((Recv->BodyFrame[Recv->BodyNo].SubLen[0] << 8)& 0xff00)
+    203          		  +  ((Recv->BodyFrame[Recv->BodyNo].SubLen[1] << 0)& 0x00ff);
+    204          
+    205          	if(Recv->BodyFrame[Recv->BodyNo].SubLength >= BODYSIZEMAX)	return FALSE;	
+    206          
+    207          
+    208          	TimerRegist(nPtr->TimerRx, Time1Sec*2);
+    209          
+    210          	nPtr->CheckByte(1, &nInitCnt);
+    211          	while(1)
+    212          	{
+    213          		if(TimeOverCheck(nPtr->TimerRx)) ///1byte 500us
+    214          		{
+    215          			if(nCnt > nInitCnt)
+    216          			{
+    217          				nInitCnt = nCnt;
+    218          				TimerRegist(nPtr->TimerRx, Time100mSec);
+    219          			}
+    220          			else
+    221          			{
+    222          				return FALSE;
+    223          			}
+    224          		}
+    225          		if(nPtr->CheckByte((INT16U)(Recv->BodyFrame[Recv->BodyNo].SubLength + 2), &nCnt))
+    226          		{
+    227          			break;// include 0x03
+    228          		}
+    229          		OSTimeDly(20L);
+    230          	}
+    231          	for(i = 0; i < Recv->BodyFrame[Recv->BodyNo].SubLength + 2; i++)
+    232          	{
+    233          	    *((INT8U *)Recv->BodyFrame[Recv->BodyNo].SubData + i) = nPtr->RxGetByte();
+    234          	}
+    235          
+    236          
+    237          	Recv->BodyFrame[Recv->BodyNo].Crc= Crc16Calc ( &(Recv->BodyFrame[Recv->BodyNo].SubID[0])
+    238          						                            , Recv->BodyFrame[Recv->BodyNo].SubLength + 5 + 2, NULL);
+    239          	Recv->BodyFrame[Recv->BodyNo].CrcOK = TRUE;
+    240          
+    241          	Data = Recv->BodyFrame[Recv->BodyNo].SubLength;
+    242          
+    243          	if (   ( (INT8U)(Recv->BodyFrame[Recv->BodyNo].Crc >> 8)!= Recv->BodyFrame[Recv->BodyNo].SubData[Data  ] )
+    244          		|| ( (INT8U)(Recv->BodyFrame[Recv->BodyNo].Crc     )!= Recv->BodyFrame[Recv->BodyNo].SubData[Data+1] )  )
+    245          	{
+    246          		//CRC ERROR!!
+    247          		Recv->BodyFrame[Recv->BodyNo].CrcOK = FALSE;
+    248          		return TRUE;
+    249          	}
+    250          
+    251          #if TWO_BODY >= 2
+    252          	if(!Recv->BodyNo)
+    253          	{
+    254          		if(Recv->BodyLength != (Recv->BodyFrame[Recv->BodyNo].SubLength
+    255          															  + 5 + 2 + 2))
+    256          		{
+    257          			Recv->BodyNo++;
+    258          			goto BODYRE;
+    259          		}
+    260          	}
+    261          #endif	
+    262          ////////////////////////////////////////////////////////////////////////////////
+    263          
+    264          	TimerRegist(nPtr->TimerRx, Time1Sec);
+    265          	nPtr->CheckByte(1, &nInitCnt);
+    266          	while(!nPtr->CheckByte(1, &nCnt))
+    267          	{
+    268          		if(TimeOverCheck(nPtr->TimerRx))
+    269          		{
+    270          			if(nCnt > nInitCnt)
+    271          			{
+    272          				nInitCnt = nCnt;
+    273          				TimerRegist(nPtr->TimerRx, Time100mSec);
+    274          			}
+    275          			else
+    276          			{
+    277          				return FALSE;
+    278          			}
+    279          		}
+    280          		OSTimeDly(10L);
+    281          	}
+    282          	Data = nPtr->RxGetByte();
+    283          
+    284          	if(Data != ETX)
+    285          	{
+    286          		return FALSE;
+    287          	}
+    288          	return TRUE;
+    289          }
+    290          
+    291          
+    292          INT16U WhatRxComm(__ProtocolPtr *nPtr)
+    293          {
+    294          	INT16U RetVal = 0;
+    295          	INT8U cBody = nPtr->WRCSRecv->cBody;
+    296          	
+    297          	if(nPtr->WRCSRecv->BodyFrame[cBody].CrcOK)
+    298          	{
+    299          		RetVal = nPtr->WRCSRecv->BodyFrame[cBody].Command;
+    300          	}
+    301          	else //NO ERROR
+    302          	{
+    303          		//ERROR CASE
+    304          		RetVal = AlarmSCODE;
+    305          	}
+    306              return (RetVal);
+    307          }
+    308          
+    309          void GenBodyFrame(INT8U* tid, INT8U *Data, INT16U nCnt,
+    310          					INT8U Comm, __ProtocolPtr *nPtr, INT8U BodyNo)
+    311          {
+    312          	int i = 0;
+    313          	int DataCnt = 0;
+    314          	
+    315          	__WRCSSIO *Send = nPtr->WRCSSend;
+    316          	
+    317          #if TWO_BODY >= 2
+    318          	__BODYFRAME *BodyFrame = &(Send->BodyFrame[BodyNo]);
+    319          #else
+    320          	__BODYFRAME *BodyFrame = &(Send->BodyFrame[0]);
+    321          	BodyNo = 0;
+    322          #endif
+    323          
+    324          	Send->BodyNo = BodyNo;
+    325          
+    326          	BodyFrame->SubID[0] = tid[0];
+    327          	BodyFrame->SubID[1] = tid[1];
+    328          	BodyFrame->SubID[2] = tid[2];
+    329          
+    330          	BodyFrame->Command = Comm;
+    331          	
+    332          	BodyFrame->RCode = TRIO_RCODE;
+    333          
+    334          	BodyFrame->SubLength = nCnt;
+    335          	BodyFrame->SubLen[0] = (INT8U)((nCnt) >> 8);
+    336          	BodyFrame->SubLen[1] = (INT8U)((nCnt) >> 0);
+    337          
+    338          	for(i = 0 ; i < nCnt && i < BODYSIZEMAX; i++)
+    339          	{
+    340          		BodyFrame->SubData[DataCnt++] = Data[i];
+    341          	}
+    342          
+    343          	///////////// CRC //
+    344          	{
+    345          		BodyFrame->Crc = Crc16Calc ((INT8U *)BodyFrame->SubID, 7 + i, NULL);
+    346          		BodyFrame->SubData[DataCnt++] = (INT8U)(BodyFrame->Crc >> 8);
+    347          		BodyFrame->SubData[DataCnt++] = (INT8U)(BodyFrame->Crc		);
+    348          	}
+    349          	
+    350          	BodyFrame->SubData[DataCnt++] = ETX;
+    351          }
+    352          
+    353          
+    354          unsigned char WRCS_ProDataAckTx(__ProtocolPtr *nPtr)
+    355          {
+    356          	INT16U i, Len = 0;
+    357          //	INT8U err = 0;
+    358          	
+    359          	__WRCSSIO *Send = nPtr->WRCSSend;
+    360          
+    361          #if TWO_BODY >= 2
+    362          	INT8U BodyNo = Send->BodyNo;
+    363          #else
+    364          	INT8U BodyNo = 0;
+    365          #endif
+    366          	
+    367          //	OSSemPend(nPtr->OSSem, 0, &err );
+    368          
+    369          	Send->Sync[0] = STX;
+    370          	Send->Sync[1] = STX;
+    371          	Send->Sync[2] = STX;
+    372          	Send->Sync[3] = STX;
+    373          
+    374          	Send->TryNo= '0';
+    375          
+    376          	Send->BodyLength = 0;
+    377          
+    378          	for(i = 0; i <= BodyNo; i++)
+    379          	{
+    380          		Len = ((Send->BodyFrame[i].SubLen[0] << 8) | Send->BodyFrame[i].SubLen[1]) + 5 + 2 + 2;
+    381          		Send->BodyLength += Len;
+    382          	}
+    383          	Send->BodyLen[0] = (INT8U)(Send->BodyLength >> 8);
+    384          	Send->BodyLen[1] = (INT8U)(Send->BodyLength >> 0);
+    385          
+    386          	Send->CheckSum = Send->TryNo + Send->BodyLen[0] + Send->BodyLen[1];
+    387          
+    388          	nPtr->PutStr((INT8U *)Send, 4 + 1 + 2 + 1, FALSE);
+    389          
+    390          	for(i = 0; i <= BodyNo; i++)
+    391          	{
+    392          		nPtr->PutStr((INT8U *)&Send->BodyFrame[i], Send->BodyFrame[i].SubLength + 7 + 2, FALSE);
+    393          	}
+    394          
+    395          	BodyNo = ETX;
+    396          	nPtr->PutStr((INT8U *)&BodyNo, 1, TRUE);
+    397          //	OSSemPost(nPtr->Sem);
+    398          //	return OS_NO_ERR;
+    399          	return 0;
+    400          
+    401          }
+    402          
+    403          void ProtocolComCheck (__ProtocolPtr *nPtr)
+    404          {
+    405          	INT16U tcnt = 0;
+    406          	INT16U Comm = WhatRxComm(nPtr);
+    407          	
+    408          	__WRCSSIO *Recv = nPtr->WRCSRecv;
+    409          	__WRCSSIO *Send = nPtr->WRCSSend;
+    410              __BODYFRAME *rBody = &Recv->BodyFrame[0];
+    411              __BODYFRAME *sBody = &Send->BodyFrame[0];
+    412          
+    413              INT8U tid[3] = {rBody->SubID[0], rBody->SubID[1], rBody->SubID[2]};
+    414          
+    415          	switch(Comm)
+    416          	{
+    417          		case SetDebugMode:
+    418          			tDnrSts->Text_Debug_Mode 		= rBody->SubData[0];
+    419          			tDnrSts->Comm_Debug_Mode.Data 	= rBody->SubData[1];
+    420          			tDnrSts->TestMode 				= rBody->SubData[2];
+    421          			tDnrSts->ModeValue 				= rBody->SubData[3];
+    422          
+    423           			GenBodyFrame(tid, (INT8U *)rBody->SubData, rBody->SubLength, Comm, nPtr, 0);
+    424          			WRCS_ProDataAckTx(nPtr);
+    425          		break;
+    426          
+    427          		case ControlQue:
+    428          			if(nPtr == PcSer || (nPtr == SmsSer))
+    429          			{
+    430          				if(WRCS_DownLoadGiveupTimerSet(NULL))
+    431          				{
+    432          					if( WRCS_DownLoadGiveupTimerSet(NULL) != (INT32U)nPtr ) return;
+    433          				}
+    434          
+    435          				AnalyzeAidData(nPtr, TRUE);
+    436          				{
+    437          					OSTimeDly(100L);
+    438           					tcnt = GenDnrAidSts((INT8U *)sBody->SubData, tDnrSts,nPtr);
+    439          					GenBodyFrame(tid, (INT8U *)sBody->SubData, tcnt, Comm, nPtr, 0);
+    440          					WRCS_ProDataAckTx(nPtr);
+    441          				}
+    442          			}
+    443          		break;
+    444          
+    445          		case DDRTableSetQue:
+    446          		case DDRTableStsQue:
+    447          			if(nPtr == PcSer || (nPtr == SmsSer))
+    448          			{
+    449          				if(WRCS_DownLoadGiveupTimerSet(NULL))
+    450          				{
+    451          					if( WRCS_DownLoadGiveupTimerSet(NULL) != (INT32U)nPtr ) return;
+    452          				}
+    453          
+    454          				Response_Table_DE(Comm,nPtr);
+    455          			}
+    456          		break;
+    457          
+    458          		case StatusQue:
+    459          			if(nPtr == PcSer || (nPtr == SmsSer))
+    460          			{
+    461          				{
+    462          					tcnt = GenDnrAidSts((INT8U *)sBody->SubData, tDnrSts,nPtr);
+    463          					GenBodyFrame(tid, (INT8U *)sBody->SubData, tcnt, Comm, nPtr, 0);
+    464          					WRCS_ProDataAckTx(nPtr);
+    465          				}
+    466          
+    467          				if((nPtr == SmsSer))
+    468          				{
+    469          					if( tDnrSts->ResetCase != 0)
+    470          					{
+    471          						tDnrSts->ResetCase = 0;
+    472          					}
+    473          				}
+    474          			}
+    475          			else
+    476          			{
+    477          				AnalyzeAidData(nPtr, FALSE);
+    478          			}
+    479          		break;
+    480          		
+    481          		case DefaultQue:
+    482          			DefaultValueSet_Test(rBody->SubData[0]);
+    483          			OSTimeDly(200L);			
+    484          
+    485          			tcnt = GenDnrAidSts((INT8U *)sBody->SubData, tDnrSts,nPtr);
+    486          			GenBodyFrame(tid, (INT8U *)sBody->SubData, tcnt, Comm, nPtr, 0);
+    487          			WRCS_ProDataAckTx(nPtr);
+    488          		break;
+    489          
+    490          		case DownloadCMD:
+    491          		case DownloadCMDConfirm:
+    492          		case DownLoadData:
+    493          		case DownLoadDataConfirm:
+    494           			if(nPtr == PcSer || (nPtr == SmsSer))
+    495          			{
+    496          				if(WRCS_DownLoadGiveupTimerSet(NULL))
+    497          				{
+    498          					if( WRCS_DownLoadGiveupTimerSet(NULL) != (INT32U)nPtr ) return;
+    499          				}
+    500          				WRCS_DownLoadGiveupTimerSet((INT32U)nPtr);
+    501          
+    502          				WRCS_DownloadFunc(nPtr);
+    503           			}
+    504          		default:
+    505          		break;
+    506          	}
+    507          }
+    508          
+    509          INT16U GenAidData(INT16U Aid, INT8U *dptr, INT8U *sptr, INT16U len)
+    510          {
+    511          	INT8U i = 0;
+    512          	INT8U rval = 0;
+    513          
+    514          	dptr[rval++] = (INT8U)((Aid >> 8) & 0xFF);
+    515          	dptr[rval++] = (INT8U)((Aid >> 0) & 0xFF);
+    516          	dptr[rval++] = len;
+    517          	for(i = 0; i < len; i++) dptr[rval++] = sptr[i];
+    518          
+    519          	return rval;
+    520          }
+    521          
+    522          INT16U GenAidData16(INT16U Aid, INT8U *dptr, INT16U sptr, INT16U len)
+    523          {
+    524          	INT8U rval = 0;
+    525          	
+    526          	dptr[rval++] = (INT8U)((Aid >> 8) & 0xFF);
+    527          	dptr[rval++] = (INT8U)((Aid >> 0) & 0xFF);
+    528          	dptr[rval++] = len;
+    529          	dptr[rval++] = (INT8U)((sptr >> 8) & 0xFF);
+    530          	dptr[rval++] = (INT8U)((sptr >> 0) & 0xFF);
+    531          
+    532          	return rval;
+    533          }
+    534          
+    535          
+    536          unsigned char Check_Data_Image( unsigned char *_Dat )
+    537          {
+    538          	unsigned char i;
+    539          	
+    540          	INT8U Img_Sum = 0;
+    541          
+    542          	
+    543          	Img_Sum = (REMOTE_IMG + Rmt_FPGA_IMG + Rmt_FPGA_APP_IMG);
+    544          
+    545          	for( i = 0; i < 32; i++ )
+    546          	{
+    547          		if (Img_Sum & REMOTE_IMG)
+    548          		{
+    549          			if( RmtCode_Image[i] != _Dat[i] ) Img_Sum &= (~REMOTE_IMG); 
+    550          		}
+    551           	}
+    552          	
+    553          	ImgKind = Img_Sum;
+    554          
+    555          	return ImgKind;
+    556          
+    557          }
+    558          
+    559          char ustrcmp(char *sbuff,char *dbuff, INT8U len)
+    560          {
+    561          	while(*dbuff){
+    562          		if(toupper(*sbuff++)!=*dbuff++)
+    563          			return(1);
+    564          	}
+    565          	return(0);
+    566          }
+    567          
+    568          unsigned long int pPrintf(INT8U	Command, const char *format, ...)
+    569          {
+    570          	INT8U tmpData[512];
+    571              OS_CPU_SR  cpu_sr;
+    572          
+    573          	OS_ENTER_CRITICAL();
+    574          	va_list argptr;	
+    575          	va_start(argptr, format);
+    576          	vsprintf((char *)tmpData, format, argptr);
+    577          	va_end( argptr );
+    578          
+    579          	{
+    580          		INT8U tid[3] = {0x00, 0xff, 0xff};
+    581          		GenBodyFrame(tid, (INT8U *)tmpData, strlen((const char *)tmpData), Command, PcSer, 0);
+    582          		WRCS_ProDataAckTx(PcSer);
+    583          	}
+    584          
+    585          	OS_EXIT_CRITICAL();
+    586          	return FALSE;
+    587          }
+    588          
+    589          
+    590          
+    591          
+    592          ////////////////////////////////////////////////////////////////////////////////
+    593          // End of Source File
+    594          /////////////////////
+    595          
+
+   Maximum stack usage in bytes:
+
+     Function                    .cstack
+     --------                    -------
+     Check_Data_Image                12
+     GenAidData                       8
+     GenAidData16                     4
+     GenBodyFrame                    24
+     ProtocolCheck                   32
+     ProtocolComCheck                40
+     WRCSTask                        16
+     WRCS_DownLoadGiveupTimerChk      8
+     WRCS_DownLoadGiveupTimerRst      0
+     WRCS_DownLoadGiveupTimerSet      8
+     WRCS_DownloadFunc               56
+     WRCS_ProDataAckTx               24
+     WRCS_ReceiveData                24
+     WRCS_SerInit                    16
+     WhatRxComm                       0
+     pPrintf                        552
+     ustrcmp                          0
+
+
+   Section sizes:
+
+     Function/Label                         Bytes
+     --------------                         -----
+     PcSerB                                   52
+     tDnrStsB                               1044
+     SerialPadOnFlag                           1
+     chkDownLoad                               1
+     DnImageCheck                              1
+     ImgKind                                5204
+     iDebugCnt
+     iUser_Value2
+     iRepeaterType
+     FrameCnt
+     TotFrame
+     Swcrc16
+     PcSer
+     CtrlSem
+     tDnrSts
+     downloadFlag
+     RmtCode_Image
+     DataCount
+     Ser1TaskStk
+     SPcsksio
+     RPcsksio
+     FrameCounterOld                           2
+     FrameCounter                              2
+     WRCS_DownLoadGiveupTimerSet              24
+     WRCS_DownLoadGiveupTimerRst              10
+     WRCS_DownLoadGiveupTimerChk              34
+     WRCS_DownloadFunc                       522
+     WRCS_ReceiveData                        112
+     WRCS_SerInit                            124
+     WRCSTask                                 52
+     ProtocolCheck                           836
+     WhatRxComm                               30
+     GenBodyFrame                            114
+     WRCS_ProDataAckTx                       168
+     ProtocolComCheck                        414
+     GenAidData                               44
+     GenAidData16                             22
+     Check_Data_Image                         42
+     ustrcmp                                  36
+     pPrintf                                  88
+     ??DataTable10                             4
+     ??DataTable10_1                           4
+     ??DataTable10_2                           4
+     ??DataTable10_3                           4
+     ??DataTable10_4                           4
+     ??DataTable10_5                           4
+     ??DataTable10_6                           4
+     ??DataTable10_7                           4
+     ??DataTable10_8                           4
+     ??DataTable10_9                           4
+     ??DataTable10_10                          4
+     ??DataTable10_11                          4
+     ??DataTable10_12                          4
+     ??DataTable10_13                          4
+     ??DataTable10_14                          4
+     ?<Constant "##GSI#DE-O#RMT#RCU#20...">   36
+     ?<Constant {0}>                          28
+     ?<Constant " TRIO-M VER:%d.%d.%d-...">   36
+     ?<Constant {0, 255, 255}>                 4
+
+ 
+ 1 099 bytes in section .bss
+ 5 208 bytes in section .data
+   104 bytes in section .rodata
+ 2 732 bytes in section .text
+ 
+ 2 732 bytes of CODE  memory
+   104 bytes of CONST memory
+ 6 307 bytes of DATA  memory
+
+Errors: none
+Warnings: none

@@ -1,0 +1,2574 @@
+###############################################################################
+#                                                                             #
+# IAR ANSI C/C++ Compiler V6.30.1.53127/W32 for ARM     17/Aug/2014  14:46:17 #
+# Copyright 1999-2011 IAR Systems AB.                                         #
+#                                                                             #
+#    Cpu mode     =  thumb                                                    #
+#    Endian       =  little                                                   #
+#    Source file  =  E:\TRIO_MD\3.F_W\TRIO_MD_APPL_STM207_20140812\dev\SFlash #
+#                    \N25Q.c                                                  #
+#    Command line =  E:\TRIO_MD\3.F_W\TRIO_MD_APPL_STM207_20140812\dev\SFlash #
+#                    \N25Q.c -lC E:\TRIO_MD\3.F_W\TRIO_MD_APPL_STM207_2014081 #
+#                    2\out\ -o E:\TRIO_MD\3.F_W\TRIO_MD_APPL_STM207_20140812\ #
+#                    out\ --endian=little --cpu=Cortex-M3 -e --fpu=None       #
+#                    --dlib_config "C:\Program Files\IAR Systems\Embedded     #
+#                    Workbench 6.0\arm\INC\c\DLib_Config_Normal.h" -I         #
+#                    E:\TRIO_MD\3.F_W\TRIO_MD_APPL_STM207_20140812\include\   #
+#                    -I E:\TRIO_MD\3.F_W\TRIO_MD_APPL_STM207_20140812\STM32F2 #
+#                    xx_StdPeriph_Driver_v1212\ -I                            #
+#                    E:\TRIO_MD\3.F_W\TRIO_MD_APPL_STM207_20140812\STM32F2xx_ #
+#                    StdPeriph_Driver_v1212\inc\ -I                           #
+#                    E:\TRIO_MD\3.F_W\TRIO_MD_APPL_STM207_20140812\uC-CPU\    #
+#                    -I E:\TRIO_MD\3.F_W\TRIO_MD_APPL_STM207_20140812\uC-LIB\ #
+#                     -I E:\TRIO_MD\3.F_W\TRIO_MD_APPL_STM207_20140812\uCOS-I #
+#                    I\Ports\ -I E:\TRIO_MD\3.F_W\TRIO_MD_APPL_STM207_2014081 #
+#                    2\uCOS-II\Source\ -I E:\TRIO_MD\3.F_W\TRIO_MD_APPL_STM20 #
+#                    7_20140812\uC-Probe\ -Oh --use_c++_inline                #
+#    List file    =  E:\TRIO_MD\3.F_W\TRIO_MD_APPL_STM207_20140812\out\N25Q.l #
+#                    st                                                       #
+#    Object file  =  E:\TRIO_MD\3.F_W\TRIO_MD_APPL_STM207_20140812\out\N25Q.o #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+E:\TRIO_MD\3.F_W\TRIO_MD_APPL_STM207_20140812\dev\SFlash\N25Q.c
+      1          /*
+      2           *
+      3           *  STFL-I based Serial Flash Memory Driver
+      4           *
+      5           *
+      6           *  Filename:		N25Q.c
+      7           *  Description:	Library routines for the N25Q Serial Flash Memories series
+      8           *
+      9           *
+     10           *  Version:		1.6
+     11           *  Date:		    Jan 2013
+     12           *  Authors:		Micron Italia
+     13           *
+     14           *  THE PRESENT SOFTWARE WHICH IS FOR GUIDANCE ONLY AIMS AT PROVIDING CUSTOMERS WITH
+     15           *  CODING INFORMATION REGARDING THEIR PRODUCTS IN ORDER FOR THEM TO SAVE TIME. AS A
+     16           *  RESULT, MICRON SHALL NOT BE HELD LIABLE FOR ANY DIRECT, INDIRECT OR CONSEQUENTIAL
+     17           *  DAMAGES WITH RESPECT TO ANY CLAIMS ARISING FROM THE CONTENT OF SUCH SOFTWARE
+     18           *  AND/OR THE USE MADE BY CUSTOMERS OF THE CODING INFORMATION CONTAINED HEREIN IN
+     19           *  CONNECTION WITH THEIR PRODUCTS.
+     20           *
+     21           *  Version History
+     22           *
+     23           *  Ver.		Date				Comments
+     24           *
+     25           *  1.0			April 2010			Initial relase
+     26           *  1.1			October 2011		Added 4-byte address mode support for N25Q256
+     27           *  1.2         January 2012    	Minor bug fixing
+     28           *  1.3			February 2012		Added support for N25Q 512M stacked (256M+256M)
+     29           *  1.4			October 2012		Added support for N25Q 8M and 16M
+     30           *  1.5			December 2012		Added support for Step B
+     31           *  1.6			January 2013		Added OTP Program and Read functions
+     32           *
+     33           */
+     34          
+     35          #include <stdio.h>
+     36          #include <stdlib.h>
+     37          #include <string.h>
+     38          
+     39          //#include "N25Q.h" 			/* Header file with global prototypes */
+     40          //#include "ucos_ii.h"
+     41          #include "../include/main.h"
+     42          
+     43          /* Serialize.h
+     44           *
+     45           * Serialize.h contains the signature for Serialize_SPI function.
+     46           * This function is platform depended and allows the driver to communicate with flash
+     47           * device. Serialize_SPI has the following signature:
+     48           *
+     49           * SPI_STATUS Serialize_SPI(const CharStream* char_stream_send,
+     50           *              CharStream* char_stream_recv,
+     51           *             SpiConfigOptions optBefore,
+     52           *             SpiConfigOptions optAfter
+     53           *             )
+     54           *
+     55           * where:
+     56           *
+     57           * -	char_stream_send: the char stream to be sent from the SPI master
+     58           * 		to the Flash memory. Usually contains instruction, address, and data
+     59           * 		to be programmed;
+     60           * -	char_stream_recv: the char stream to be received by the SPI master,
+     61           *      sent from the Flash memory. Usually contains data to be read from the
+     62           *      memory;
+     63           * -	optBefore: configurations of the SPI master before any transfer/receive;
+     64           * -	optAfter: configurations of the SPI after any transfer/receive;
+     65           * -	SPI_STATUS can be assume success or failed error value.
+     66           *
+     67           * and in particular optBefore and optAfter can assume the following values:
+     68           *
+     69           * -	OpsWakeUp: set the CS;
+     70           * -	OpsInitTransfer: keep the CS unchanged;
+     71           * -	OpsEndTransfer: clear the CS.
+     72           *
+     73           * This driver assume to use a SPI Flash specific controller who take care about the right
+     74           * signals management for Dual, Quad, Extended mode and dummy bytes insertion. If you
+     75           * use a generic SPI controller, some changes may be necessary.
+     76           *
+     77           */
+     78          //#include "Serialize.h"
+     79          
+     80          #ifdef TIME_H_EXISTS
+     81            #include <time.h>
+     82          #endif
+     83          
+     84          /* global flash device object */
+     85          FLASH_DEVICE_OBJECT *fdo;
+     86          
+     87          /* local function, not api */
+     88          void fill_addr_vect(uAddrType udAddr, NMX_uint8* pIns_Addr, NMX_uint8 num_address_byte);
+     89          ReturnType WAIT_TILL_Instruction_EXECUTION_COMPLETE(NMX_sint16 second);
+     90          
+     91          /*******************************************************************************
+     92          Function:     uAddrType BlockOffset ( uSectorType uscSectorNr);
+     93          Arguments:    Sector Number
+     94          
+     95          Description:  This function is used to obtain the sector's start address
+     96          Pseudo Code:
+     97             Step 1: Return the sector start address
+     98          *******************************************************************************/
+     99          uAddrType BlockOffset(uSectorType uscSectorNr) {
+    100          	return (uscSectorNr << fdo->Desc.FlashSectorSize_bit);
+    101          }
+    102          
+    103          /*******************************************************************************
+    104          Function:     ReturnType Driver_Init(void);
+    105          Arguments:
+    106          
+    107          Description:  This function is used to initialize the driver. The function perform
+    108          			  device detection and sets driver to use the right functions. If the
+    109          			  device is a N25Q256 or higher, the function enables the 4-byte address mode.
+    110          Pseudo Code:
+    111             Step 1: Detect the device type
+    112             Step 2: Set device parameters (shape and operation)
+    113             Step 3: If N25Q256 device or higher, call FlashEnter4ByteAddressMode and verify that
+    114          		   device accept 4-byte address mode.
+    115          *******************************************************************************/
+    116          ReturnType Driver_Init(FLASH_DEVICE_OBJECT *flash_device_object) {
+    117          	NMX_uint8 flag = 0;
+    118          	NMX_uint32 Device = 0;
+    119          
+    120          	fdo = flash_device_object;
+    121          
+    122          	FlashReadDeviceIdentification(&Device);
+    123          
+    124          	/* N25Q8 */
+    125          	if (Device == MEM_TYPE_N25Q8) {
+    126          		#ifdef DEBUG
+    127          		printf("Detected N25Q8\n");
+    128          		#endif
+    129          
+    130          		/* device shape */
+    131          		fdo->Desc.FlashSize = 0x100000;
+    132          		fdo->Desc.FlashSectorCount = 0x10;
+    133          		fdo->Desc.FlashSectorSize = 0x10000;
+    134          		fdo->Desc.FlashSectorSize_bit = 16;
+    135          		fdo->Desc.FlashSubSectorCount = 0x100;
+    136          		fdo->Desc.FlashSubSectorSize = 0x1000;
+    137          		fdo->Desc.FlashSubSectorSize_bit = 12;
+    138          		fdo->Desc.FlashPageCount = 0x1000;
+    139          		fdo->Desc.FlashPageSize = 0x0100;
+    140          		fdo->Desc.FlashOTPSize = 0x40;
+    141          		fdo->Desc.FlashAddressMask = 0x00FF;
+    142          
+    143          		/* this device support only 3 byte address mode */
+    144          		fdo->Desc.NumAddrByte = FLASH_3_BYTE_ADDR_MODE;
+    145          
+    146          		/* device operation */
+    147          		fdo->GenOp.DeviceId = FlashReadDeviceIdentification;
+    148          		fdo->GenOp.ReadStatusRegister = FlashReadStatusRegister;
+    149          		fdo->GenOp.DataProgram = DataProgram;
+    150          		fdo->GenOp.DataRead = DataRead;
+    151          		fdo->GenOp.SectorErase = FlashSectorErase;
+    152          		fdo->GenOp.SubSectorErase = FlashSubSectorErase;
+    153          		fdo->GenOp.DieErase = NULL_PTR;
+    154          		fdo->GenOp.BulkErase = NULL_PTR;
+    155          		fdo->GenOp.BlockOffset = BlockOffset;
+    156          		fdo->GenOp.WriteEnable = FlashWriteEnable;
+    157          		fdo->GenOp.WriteDisable = FlashWriteDisable;
+    158          		fdo->GenOp.ProgramEraseSuspend = NULL_PTR;
+    159          		fdo->GenOp.ProgramEraseResume = NULL_PTR;
+    160          		fdo->GenOp.ClearFlagStatusRegister = FlashClearFlagStatusRegister;
+    161          		fdo->GenOp.ReadNVConfigurationRegister = FlashReadNVConfigurationRegister;
+    162          		fdo->GenOp.ReadVolatileConfigurationRegister = FlashReadVolatileConfigurationRegister;
+    163          		fdo->GenOp.ReadVolatileEnhancedConfigurationRegister = FlashReadVolatileEnhancedConfigurationRegister;
+    164          		fdo->GenOp.ReadFlagStatusRegister  = FlashReadFlagStatusRegister;
+    165          		fdo->GenOp.WriteNVConfigurationRegister = FlashWriteNVConfigurationRegister;
+    166          		fdo->GenOp.WriteVolatileConfigurationRegister = FlashWriteVolatileConfigurationRegister;
+    167          		fdo->GenOp.WriteVolatileEnhancedConfigurationRegister = FlashWriteVolatileEnhancedConfigurationRegister;
+    168          		fdo->GenOp.Enter4ByteAddressMode = NULL_PTR;
+    169          		fdo->GenOp.Exit4ByteAddressMode = NULL_PTR;
+    170          		fdo->GenOp.LockSector = FlashLockSector;
+    171          		fdo->GenOp.UnlockAllSector = FlashUnlockAllSector;
+    172          		fdo->GenOp.OTPProgram = FlashOTPProgram;
+    173          		fdo->GenOp.OTPRead = FlashOTPRead;
+    174          
+    175          		return Flash_Success;
+    176          	}
+    177          
+    178          	/* N25Q16 */
+    179          	if (Device == MEM_TYPE_N25Q16) {
+    180          		#ifdef DEBUG
+    181          		printf("Detected N25Q16\n");
+    182          		#endif
+    183          
+    184          		/* device shape */
+    185          		fdo->Desc.FlashSize = 0x200000;
+    186          		fdo->Desc.FlashSectorCount = 0x20;
+    187          		fdo->Desc.FlashSectorSize = 0x10000;
+    188          		fdo->Desc.FlashSectorSize_bit = 16;
+    189          		fdo->Desc.FlashSubSectorCount = 0x200;
+    190          		fdo->Desc.FlashSubSectorSize = 0x1000;
+    191          		fdo->Desc.FlashSubSectorSize_bit = 12;
+    192          		fdo->Desc.FlashPageCount = 0x2000;
+    193          		fdo->Desc.FlashPageSize = 0x100;
+    194          		fdo->Desc.FlashOTPSize = 0x40;
+    195          		fdo->Desc.FlashAddressMask = 0x00FF;
+    196          
+    197          		/* this device support only 3 byte address mode */
+    198          		fdo->Desc.NumAddrByte = FLASH_3_BYTE_ADDR_MODE;
+    199          
+    200          		/* device operation */
+    201          		fdo->GenOp.DeviceId = FlashReadDeviceIdentification;
+    202          		fdo->GenOp.ReadStatusRegister = FlashReadStatusRegister;
+    203          		fdo->GenOp.DataProgram = DataProgram;
+    204          		fdo->GenOp.DataRead = DataRead;
+    205          		fdo->GenOp.SectorErase = FlashSectorErase;
+    206          		fdo->GenOp.SubSectorErase = FlashSubSectorErase;
+    207          		fdo->GenOp.DieErase = NULL_PTR;
+    208          		fdo->GenOp.BulkErase = NULL_PTR;
+    209          		fdo->GenOp.BlockOffset = BlockOffset;
+    210          		fdo->GenOp.WriteEnable = FlashWriteEnable;
+    211          		fdo->GenOp.WriteDisable = FlashWriteDisable;
+    212          		fdo->GenOp.ProgramEraseSuspend = NULL_PTR;
+    213          		fdo->GenOp.ProgramEraseResume = NULL_PTR;
+    214          		fdo->GenOp.ClearFlagStatusRegister = FlashClearFlagStatusRegister;
+    215          		fdo->GenOp.ReadNVConfigurationRegister = FlashReadNVConfigurationRegister;
+    216          		fdo->GenOp.ReadVolatileConfigurationRegister = FlashReadVolatileConfigurationRegister;
+    217          		fdo->GenOp.ReadVolatileEnhancedConfigurationRegister = FlashReadVolatileEnhancedConfigurationRegister;
+    218          		fdo->GenOp.ReadFlagStatusRegister  = FlashReadFlagStatusRegister;
+    219          		fdo->GenOp.WriteNVConfigurationRegister = FlashWriteNVConfigurationRegister;
+    220          		fdo->GenOp.WriteVolatileConfigurationRegister = FlashWriteVolatileConfigurationRegister;
+    221          		fdo->GenOp.WriteVolatileEnhancedConfigurationRegister = FlashWriteVolatileEnhancedConfigurationRegister;
+    222          		fdo->GenOp.Enter4ByteAddressMode = NULL_PTR;
+    223          		fdo->GenOp.Exit4ByteAddressMode = NULL_PTR;
+    224          		fdo->GenOp.LockSector = FlashLockSector;
+    225          		fdo->GenOp.UnlockAllSector = FlashUnlockAllSector;
+    226          		fdo->GenOp.OTPProgram = FlashOTPProgram;
+    227          		fdo->GenOp.OTPRead = FlashOTPRead;
+    228          
+    229          		return Flash_Success;
+    230          	}
+    231          
+    232          
+    233          	/* N25Q32 */
+    234          	if (Device == MEM_TYPE_N25Q32) {
+    235          		#ifdef DEBUG
+    236          		printf("Detected N25Q32\n");
+    237          		#endif
+    238          
+    239          		/* device shape */
+    240          		fdo->Desc.FlashSize = 0x400000;
+    241          		fdo->Desc.FlashSectorCount = 0x40;
+    242          		fdo->Desc.FlashSectorSize = 0x10000;
+    243          		fdo->Desc.FlashSectorSize_bit = 16;
+    244          		fdo->Desc.FlashSubSectorCount = 0x400;
+    245          		fdo->Desc.FlashSubSectorSize =  0x1000;
+    246          		fdo->Desc.FlashSubSectorSize_bit = 12;
+    247          		fdo->Desc.FlashPageCount = 0x4000;
+    248          		fdo->Desc.FlashPageSize = 0x100;
+    249          		fdo->Desc.FlashOTPSize = 0x40;
+    250          		fdo->Desc.FlashAddressMask = 0x00FF;
+    251          
+    252          		/* this device support only 3 byte address mode */
+    253          		fdo->Desc.NumAddrByte = FLASH_3_BYTE_ADDR_MODE;
+    254          
+    255          		/* device operation */
+    256          		fdo->GenOp.DeviceId = FlashReadDeviceIdentification;
+    257          		fdo->GenOp.ReadStatusRegister = FlashReadStatusRegister;
+    258          		fdo->GenOp.DataProgram = DataProgram;
+    259          		fdo->GenOp.DataRead = DataRead;
+    260          		fdo->GenOp.SectorErase = FlashSectorErase;
+    261          		fdo->GenOp.SubSectorErase = FlashSubSectorErase;
+    262          		fdo->GenOp.DieErase = NULL_PTR;
+    263          		fdo->GenOp.BulkErase = NULL_PTR;
+    264          		fdo->GenOp.BlockOffset = BlockOffset;
+    265          		fdo->GenOp.WriteEnable = FlashWriteEnable;
+    266          		fdo->GenOp.WriteDisable = FlashWriteDisable;
+    267          		fdo->GenOp.ProgramEraseSuspend = NULL_PTR;
+    268          		fdo->GenOp.ProgramEraseResume = NULL_PTR;
+    269          		fdo->GenOp.ClearFlagStatusRegister = FlashClearFlagStatusRegister;
+    270          		fdo->GenOp.ReadNVConfigurationRegister = FlashReadNVConfigurationRegister;
+    271          		fdo->GenOp.ReadVolatileConfigurationRegister = FlashReadVolatileConfigurationRegister;
+    272          		fdo->GenOp.ReadVolatileEnhancedConfigurationRegister = FlashReadVolatileEnhancedConfigurationRegister;
+    273          		fdo->GenOp.ReadFlagStatusRegister  = FlashReadFlagStatusRegister;
+    274          		fdo->GenOp.WriteNVConfigurationRegister = FlashWriteNVConfigurationRegister;
+    275          		fdo->GenOp.WriteVolatileConfigurationRegister = FlashWriteVolatileConfigurationRegister;
+    276          		fdo->GenOp.WriteVolatileEnhancedConfigurationRegister = FlashWriteVolatileEnhancedConfigurationRegister;
+    277          		fdo->GenOp.Enter4ByteAddressMode = NULL_PTR;
+    278          		fdo->GenOp.Exit4ByteAddressMode = NULL_PTR;
+    279          		fdo->GenOp.LockSector = FlashLockSector;
+    280          		fdo->GenOp.UnlockAllSector = FlashUnlockAllSector;
+    281          		fdo->GenOp.OTPProgram = FlashOTPProgram;
+    282          		fdo->GenOp.OTPRead = FlashOTPRead;
+    283          
+    284          		return Flash_Success;
+    285          	}
+    286          
+    287          	/* N25Q64 */
+    288          	if (Device == MEM_TYPE_N25Q64) {
+    289          		#ifdef DEBUG
+    290          		printf("Detected N25Q64\n");
+    291          		#endif
+    292          
+    293          		/* device shape */
+    294          		fdo->Desc.FlashSize = 0x800000;
+    295          		fdo->Desc.FlashSectorCount = 0x80;
+    296          		fdo->Desc.FlashSectorSize = 0x10000;
+    297          		fdo->Desc.FlashSectorSize_bit = 16;
+    298          		fdo->Desc.FlashSubSectorCount = 0x800;
+    299          		fdo->Desc.FlashSubSectorSize = 0x1000;
+    300          		fdo->Desc.FlashSubSectorSize_bit = 12;
+    301          		fdo->Desc.FlashPageCount = 0x8000;
+    302          		fdo->Desc.FlashPageSize = 0x100;
+    303          		fdo->Desc.FlashOTPSize = 0x40;
+    304          		fdo->Desc.FlashAddressMask = 0x00FF;
+    305          
+    306          		/* this device support only 3 byte address mode */
+    307          		fdo->Desc.NumAddrByte = FLASH_3_BYTE_ADDR_MODE;
+    308          
+    309          		/* device operation */
+    310          		fdo->GenOp.DeviceId = FlashReadDeviceIdentification;
+    311          		fdo->GenOp.ReadStatusRegister = FlashReadStatusRegister;
+    312          		fdo->GenOp.DataProgram = DataProgram;
+    313          		fdo->GenOp.DataRead = DataRead;
+    314          		fdo->GenOp.SectorErase = FlashSectorErase;
+    315          		fdo->GenOp.SubSectorErase = FlashSubSectorErase;
+    316          		fdo->GenOp.DieErase = NULL_PTR;
+    317          		fdo->GenOp.BulkErase = NULL_PTR;
+    318          		fdo->GenOp.BlockOffset = BlockOffset;
+    319          		fdo->GenOp.WriteEnable = FlashWriteEnable;
+    320          		fdo->GenOp.WriteDisable = FlashWriteDisable;
+    321          		fdo->GenOp.ProgramEraseSuspend = NULL_PTR;
+    322          		fdo->GenOp.ProgramEraseResume = NULL_PTR;
+    323          		fdo->GenOp.ClearFlagStatusRegister = FlashClearFlagStatusRegister;
+    324          		fdo->GenOp.ReadNVConfigurationRegister = FlashReadNVConfigurationRegister;
+    325          		fdo->GenOp.ReadVolatileConfigurationRegister = FlashReadVolatileConfigurationRegister;
+    326          		fdo->GenOp.ReadVolatileEnhancedConfigurationRegister = FlashReadVolatileEnhancedConfigurationRegister;
+    327          		fdo->GenOp.ReadFlagStatusRegister  = FlashReadFlagStatusRegister;
+    328          		fdo->GenOp.WriteNVConfigurationRegister = FlashWriteNVConfigurationRegister;
+    329          		fdo->GenOp.WriteVolatileConfigurationRegister = FlashWriteVolatileConfigurationRegister;
+    330          		fdo->GenOp.WriteVolatileEnhancedConfigurationRegister = FlashWriteVolatileEnhancedConfigurationRegister;
+    331          		fdo->GenOp.Enter4ByteAddressMode = NULL_PTR;
+    332          		fdo->GenOp.Exit4ByteAddressMode = NULL_PTR;
+    333          		fdo->GenOp.LockSector = FlashLockSector;
+    334          		fdo->GenOp.UnlockAllSector = FlashUnlockAllSector;
+    335          		fdo->GenOp.OTPProgram = FlashOTPProgram;
+    336          		fdo->GenOp.OTPRead = FlashOTPRead;
+    337          
+    338          		return Flash_Success;
+    339          	}
+    340          
+    341          	/* N25Q128 */
+    342          	if (Device == MEM_TYPE_N25Q128) {
+    343          		#ifdef DEBUG
+    344          		printf("Detected N25Q128\n");
+    345          		#endif
+    346          
+    347          		/* device shape */
+    348          		fdo->Desc.FlashSize = 0x1000000;
+    349          		fdo->Desc.FlashSectorCount = 0x100;
+    350          		fdo->Desc.FlashSectorSize = 0x10000;
+    351          		fdo->Desc.FlashSectorSize_bit = 16;
+    352          		fdo->Desc.FlashSubSectorCount = 0x1000;
+    353          		fdo->Desc.FlashSubSectorSize = 0x1000;
+    354          		fdo->Desc.FlashSubSectorSize_bit = 12;
+    355          		fdo->Desc.FlashPageCount = 0x10000;
+    356          		fdo->Desc.FlashPageSize = 0x100;
+    357          		fdo->Desc.FlashOTPSize = 0x40;
+    358          		fdo->Desc.FlashAddressMask = 0x00FF;
+    359          
+    360          		/* this device support only 3 byte address mode */
+    361          		fdo->Desc.NumAddrByte = FLASH_3_BYTE_ADDR_MODE;
+    362          
+    363          		/* device operation */
+    364          		fdo->GenOp.DeviceId = FlashReadDeviceIdentification;
+    365          		fdo->GenOp.ReadStatusRegister = FlashReadStatusRegister;
+    366          		fdo->GenOp.DataProgram = DataProgram;
+    367          		fdo->GenOp.DataRead = DataRead;
+    368          		fdo->GenOp.SectorErase = FlashSectorErase;
+    369          		fdo->GenOp.SubSectorErase = FlashSubSectorErase;
+    370          		fdo->GenOp.DieErase = NULL_PTR;
+    371          		fdo->GenOp.BulkErase = NULL_PTR;
+    372          		fdo->GenOp.BlockOffset = BlockOffset;
+    373          		fdo->GenOp.WriteEnable = FlashWriteEnable;
+    374          		fdo->GenOp.WriteDisable = FlashWriteDisable;
+    375          		fdo->GenOp.ProgramEraseSuspend = NULL_PTR;
+    376          		fdo->GenOp.ProgramEraseResume = NULL_PTR;
+    377          		fdo->GenOp.ClearFlagStatusRegister = FlashClearFlagStatusRegister;
+    378          		fdo->GenOp.ReadNVConfigurationRegister = FlashReadNVConfigurationRegister;
+    379          		fdo->GenOp.ReadVolatileConfigurationRegister = FlashReadVolatileConfigurationRegister;
+    380          		fdo->GenOp.ReadVolatileEnhancedConfigurationRegister = FlashReadVolatileEnhancedConfigurationRegister;
+    381          		fdo->GenOp.ReadFlagStatusRegister  = FlashReadFlagStatusRegister;
+    382          		fdo->GenOp.WriteNVConfigurationRegister = FlashWriteNVConfigurationRegister;
+    383          		fdo->GenOp.WriteVolatileConfigurationRegister = FlashWriteVolatileConfigurationRegister;
+    384          		fdo->GenOp.WriteVolatileEnhancedConfigurationRegister = FlashWriteVolatileEnhancedConfigurationRegister;
+    385          		fdo->GenOp.Enter4ByteAddressMode = NULL_PTR;
+    386          		fdo->GenOp.Exit4ByteAddressMode = NULL_PTR;
+    387          		fdo->GenOp.LockSector = FlashLockSector;
+    388          		fdo->GenOp.UnlockAllSector = FlashUnlockAllSector;
+    389          		fdo->GenOp.OTPProgram = FlashOTPProgram;
+    390          		fdo->GenOp.OTPRead = FlashOTPRead;
+    391          
+    392          		return Flash_Success;
+    393          	}
+    394          
+    395          	/* N25Q256 */
+    396          	if (Device == MEM_TYPE_N25Q256)	{
+    397          		#ifdef DEBUG
+    398          		printf("Detected N25Q256\n");
+    399          		#endif
+    400          
+    401          		/* device shape */
+    402          		fdo->Desc.FlashSize = 0x2000000;
+    403          		fdo->Desc.FlashSectorCount = 0x200;
+    404          		fdo->Desc.FlashSectorSize = 0x10000;
+    405          		fdo->Desc.FlashSectorSize_bit = 16;
+    406          		fdo->Desc.FlashSubSectorCount = 0x2000;
+    407          		fdo->Desc.FlashSubSectorSize = 0x1000;
+    408          		fdo->Desc.FlashSubSectorSize_bit = 12;
+    409          		fdo->Desc.FlashPageCount = 0x20000;
+    410          		fdo->Desc.FlashPageSize = 0x100;
+    411          		fdo->Desc.FlashOTPSize = 0x40;
+    412          		fdo->Desc.FlashAddressMask = 0x00FF;
+    413          
+    414          		/* 3-addr-byte is default startup address mode, except if you use
+    415          		 * NVConfig addr mode setting (please see datasheet for more details)
+    416          		 */
+    417          		fdo->Desc.NumAddrByte = FLASH_3_BYTE_ADDR_MODE;
+    418          
+    419          		/* device operation */
+    420          		fdo->GenOp.DeviceId = FlashReadDeviceIdentification;
+    421          		fdo->GenOp.ReadStatusRegister = FlashReadStatusRegister;
+    422          		fdo->GenOp.DataProgram = DataProgram;
+    423          		fdo->GenOp.DataRead = DataRead;
+    424          		fdo->GenOp.SectorErase = FlashSectorErase;
+    425          		fdo->GenOp.SubSectorErase = FlashSubSectorErase;
+    426          		fdo->GenOp.DieErase = NULL_PTR;
+    427          		#ifdef SUPPORT_N25Q_STEP_B
+    428          		fdo->GenOp.BulkErase = FlashBulkErase;
+    429          		#endif
+    430          		#ifndef SUPPORT_N25Q_STEP_B
+    431          		fdo->GenOp.BulkErase = NULL_PTR;
+    432          		#endif
+    433          		fdo->GenOp.BlockOffset = BlockOffset;
+    434          		fdo->GenOp.WriteEnable = FlashWriteEnable;
+    435          		fdo->GenOp.WriteDisable = FlashWriteDisable;
+    436          		fdo->GenOp.ProgramEraseSuspend = NULL_PTR;
+    437          		fdo->GenOp.ProgramEraseResume = NULL_PTR;
+    438          		fdo->GenOp.ClearFlagStatusRegister = FlashClearFlagStatusRegister;
+    439          		fdo->GenOp.ReadNVConfigurationRegister = FlashReadNVConfigurationRegister;
+    440          		fdo->GenOp.ReadVolatileConfigurationRegister = FlashReadVolatileConfigurationRegister;
+    441          		fdo->GenOp.ReadVolatileEnhancedConfigurationRegister = FlashReadVolatileEnhancedConfigurationRegister;
+    442          		fdo->GenOp.ReadFlagStatusRegister = FlashReadFlagStatusRegister;
+    443          		fdo->GenOp.WriteNVConfigurationRegister = FlashWriteNVConfigurationRegister;
+    444          		fdo->GenOp.WriteVolatileConfigurationRegister = FlashWriteVolatileConfigurationRegister;
+    445          		fdo->GenOp.WriteVolatileEnhancedConfigurationRegister = FlashWriteVolatileEnhancedConfigurationRegister;
+    446          		fdo->GenOp.Enter4ByteAddressMode = FlashEnter4ByteAddressMode;
+    447          		fdo->GenOp.Exit4ByteAddressMode = FlashExit4ByteAddressMode;
+    448          		fdo->GenOp.LockSector = FlashLockSector;
+    449          		fdo->GenOp.UnlockAllSector = FlashUnlockAllSector;
+    450          		fdo->GenOp.OTPProgram = FlashOTPProgram;
+    451          		fdo->GenOp.OTPRead = FlashOTPRead;
+    452          
+    453          		#ifdef ADDR_MODE_AUTO_DETECT
+    454          		/* assume you want to use the whole device size  */
+    455          		fdo->GenOp.Enter4ByteAddressMode();
+    456          		/* verify current addr mode */
+    457          		fdo->GenOp.ReadFlagStatusRegister(&flag);
+    458          		if (flag & 1)   /* test addressing bit of flag status reg (bit 0) */
+    459          			fdo->Desc.NumAddrByte = FLASH_4_BYTE_ADDR_MODE;
+    460          		#endif
+    461          
+    462          		return Flash_Success;
+    463          	}
+    464          
+    465          	/* N25Q512 */
+    466          	if (Device == MEM_TYPE_N25Q512)	{
+    467          		#ifdef DEBUG
+    468          		printf("Detected N25Q512\n");
+    469          		#endif
+    470          
+    471          		/* device shape */
+    472          		fdo->Desc.FlashSize = 0x4000000;
+    473          		fdo->Desc.FlashSectorCount = 0x400;
+    474          		fdo->Desc.FlashSectorSize = 0x10000;
+    475          		fdo->Desc.FlashSectorSize_bit = 16;
+    476          		fdo->Desc.FlashSubSectorCount = 10000;
+    477          		fdo->Desc.FlashSubSectorSize = 0x1000;
+    478          		fdo->Desc.FlashSubSectorSize_bit = 12;
+    479          		fdo->Desc.FlashPageCount = 0x40000;
+    480          		fdo->Desc.FlashPageSize = 0x100;
+    481          		fdo->Desc.FlashOTPSize = 0x40;
+    482          		fdo->Desc.FlashDieCount = 2;
+    483          		fdo->Desc.FlashDieSize = 0x2000000;
+    484          		fdo->Desc.FlashDieSize_bit = 26;
+    485          		fdo->Desc.FlashAddressMask = 0x00FF;
+    486          
+    487          		/* device operation */
+    488          		fdo->GenOp.DeviceId = FlashReadDeviceIdentification;
+    489          		fdo->GenOp.ReadStatusRegister = FlashReadStatusRegister;
+    490          		fdo->GenOp.DataProgram = DataProgram;
+    491          		fdo->GenOp.DataRead = DataRead;
+    492          		fdo->GenOp.SectorErase = FlashSectorErase;
+    493          		fdo->GenOp.SubSectorErase = FlashSubSectorErase;
+    494          		fdo->GenOp.DieErase = FlashDieErase;
+    495          		fdo->GenOp.BulkErase = NULL_PTR;
+    496          		fdo->GenOp.BlockOffset = BlockOffset;
+    497          		fdo->GenOp.WriteEnable = FlashWriteEnable;
+    498          		fdo->GenOp.WriteDisable = FlashWriteDisable;
+    499          		fdo->GenOp.ProgramEraseSuspend = NULL_PTR;
+    500          		fdo->GenOp.ProgramEraseResume = NULL_PTR;
+    501          		fdo->GenOp.ClearFlagStatusRegister = FlashClearFlagStatusRegister;
+    502          		fdo->GenOp.ReadNVConfigurationRegister = FlashReadNVConfigurationRegister;
+    503          		fdo->GenOp.ReadVolatileConfigurationRegister = FlashReadVolatileConfigurationRegister;
+    504          		fdo->GenOp.ReadVolatileEnhancedConfigurationRegister = FlashReadVolatileEnhancedConfigurationRegister;
+    505          		fdo->GenOp.ReadFlagStatusRegister = FlashReadFlagStatusRegister;
+    506          		fdo->GenOp.WriteNVConfigurationRegister = FlashWriteNVConfigurationRegister;
+    507          		fdo->GenOp.WriteVolatileConfigurationRegister = FlashWriteVolatileConfigurationRegister;
+    508          		fdo->GenOp.WriteVolatileEnhancedConfigurationRegister = FlashWriteVolatileEnhancedConfigurationRegister;
+    509          		fdo->GenOp.Enter4ByteAddressMode = FlashEnter4ByteAddressMode;
+    510          		fdo->GenOp.Exit4ByteAddressMode = FlashExit4ByteAddressMode;
+    511          		fdo->GenOp.LockSector = FlashLockSector;
+    512          		fdo->GenOp.UnlockAllSector = FlashUnlockAllSector;
+    513          		fdo->GenOp.OTPProgram = FlashOTPProgram;
+    514          		fdo->GenOp.OTPRead = FlashOTPRead;
+    515          
+    516          		#ifdef ADDR_MODE_AUTO_DETECT
+    517          		/* assume you want to use the whole device size  */
+    518          		fdo->GenOp.Enter4ByteAddressMode();
+    519          		/* verify current addr mode */
+    520          		fdo->GenOp.ReadFlagStatusRegister(&flag);
+    521          		if (flag & 1)   /* test addressing bit of flag status reg (bit 0) */
+    522          			fdo->Desc.NumAddrByte = FLASH_4_BYTE_ADDR_MODE;
+    523          		#endif
+    524          
+    525          		return Flash_Success;
+    526          	}
+    527          
+    528          	/* N25Q1G (512M+512m stacked) */
+    529          	if (Device == MEM_TYPE_N25Q1G) 	{
+    530          		#ifdef DEBUG
+    531          		printf("Detected N25Q1G\n");
+    532          		#endif
+    533          
+    534          		/* device shape */
+    535          		fdo->Desc.FlashSize = 0x8000000;
+    536          		fdo->Desc.FlashSectorCount = 0x800;
+    537          		fdo->Desc.FlashSectorSize = 0x10000;
+    538          		fdo->Desc.FlashSectorSize_bit = 16;
+    539          		fdo->Desc.FlashSubSectorCount = 0x8000;
+    540          		fdo->Desc.FlashSubSectorSize = 0x1000;
+    541          		fdo->Desc.FlashSubSectorSize_bit = 12;
+    542          		fdo->Desc.FlashPageCount = 0x80000;
+    543          		fdo->Desc.FlashPageSize = 0x100;
+    544          		fdo->Desc.FlashOTPSize = 0x40;
+    545          		fdo->Desc.FlashAddressMask = 0x00FF;
+    546          		fdo->Desc.FlashDieCount = 4;
+    547          		fdo->Desc.FlashDieSize = 0x2000000;
+    548          		fdo->Desc.FlashDieSize_bit = 26;
+    549          		fdo->Desc.NumAddrByte = FLASH_3_BYTE_ADDR_MODE;
+    550          
+    551          		/* device operation */
+    552          		fdo->GenOp.DeviceId = FlashReadDeviceIdentification;
+    553          		fdo->GenOp.ReadStatusRegister = FlashReadStatusRegister;
+    554          		fdo->GenOp.DataProgram = DataProgram;
+    555          		fdo->GenOp.DataRead = DataRead;
+    556          		fdo->GenOp.SectorErase = FlashSectorErase;
+    557          		fdo->GenOp.SubSectorErase = FlashSubSectorErase;
+    558          		fdo->GenOp.DieErase = FlashDieErase;
+    559          		fdo->GenOp.BulkErase = NULL_PTR;
+    560          		fdo->GenOp.BlockOffset = BlockOffset;
+    561          		fdo->GenOp.WriteEnable = FlashWriteEnable;
+    562          		fdo->GenOp.WriteDisable = FlashWriteDisable;
+    563          		fdo->GenOp.ProgramEraseSuspend = NULL_PTR;
+    564          		fdo->GenOp.ProgramEraseResume = NULL_PTR;
+    565          		fdo->GenOp.ClearFlagStatusRegister = FlashClearFlagStatusRegister;
+    566          		fdo->GenOp.ReadNVConfigurationRegister = FlashReadNVConfigurationRegister;
+    567          		fdo->GenOp.ReadVolatileConfigurationRegister = FlashReadVolatileConfigurationRegister;
+    568          		fdo->GenOp.ReadVolatileEnhancedConfigurationRegister = FlashReadVolatileEnhancedConfigurationRegister;
+    569          		fdo->GenOp.ReadFlagStatusRegister = FlashReadFlagStatusRegister;
+    570          		fdo->GenOp.WriteNVConfigurationRegister = FlashWriteNVConfigurationRegister;
+    571          		fdo->GenOp.WriteVolatileConfigurationRegister = FlashWriteVolatileConfigurationRegister;
+    572          		fdo->GenOp.WriteVolatileEnhancedConfigurationRegister = FlashWriteVolatileEnhancedConfigurationRegister;
+    573          		fdo->GenOp.Enter4ByteAddressMode = FlashEnter4ByteAddressMode;
+    574          		fdo->GenOp.Exit4ByteAddressMode = FlashExit4ByteAddressMode;
+    575          		fdo->GenOp.LockSector = FlashLockSector;
+    576          		fdo->GenOp.UnlockAllSector = FlashUnlockAllSector;
+    577          		fdo->GenOp.OTPProgram = FlashOTPProgram;
+    578          		fdo->GenOp.OTPRead = FlashOTPRead;
+    579          
+    580          		#ifdef ADDR_MODE_AUTO_DETECT
+    581          		/* assume you want to use the whole device size  */
+    582          		fdo->GenOp.Enter4ByteAddressMode();
+    583          		/* verify current addr mode */
+    584          		fdo->GenOp.ReadFlagStatusRegister(&flag);
+    585          		if (flag & 1)   /* test addressing bit of flag status reg (bit 0) */
+    586          			fdo->Desc.NumAddrByte = FLASH_4_BYTE_ADDR_MODE;
+    587          		#endif
+    588          
+    589          		return Flash_Success;
+    590          	}
+    591          
+    592          	#ifdef DEBUG
+    593          	printf("No device detected %x\n",Device);
+    594          	#endif
+    595          
+    596          	return Flash_WrongType;
+    597          }
+    598          
+    599          /*******************************************************************************
+    600          Function:     ReturnType Program(InstructionType insInstruction, ParameterType *fp )
+    601          Arguments:    insInstruction is an enum which contains all the available Instructions
+    602              of the SW driver.
+    603                        fp is a (union) parameter struct for all Flash Instruction parameters
+    604          Return Value: The function returns the following conditions:
+    605          
+    606             Flash_AddressInvalid,
+    607             Flash_MemoryOverflow,
+    608             Flash_PageEraseFailed,
+    609             Flash_PageNrInvalid,
+    610             Flash_SectorNrInvalid,
+    611             Flash_FunctionNotSupported,
+    612             Flash_NoInformationAvailable,
+    613             Flash_OperationOngoing,
+    614             Flash_OperationTimeOut,
+    615             Flash_ProgramFailed,
+    616             Flash_SpecificError,
+    617             Flash_SectorProtected,
+    618             Flash_SectorUnprotected,
+    619             Flash_SectorProtectFailed,
+    620             Flash_SectorUnprotectFailed,
+    621             Flash_SectorLocked,
+    622             Flash_SectorUnlocked,
+    623             Flash_SectorLockDownFailed,
+    624             Flash_Success,
+    625             Flash_WrongType
+    626          
+    627          Description:  This function is used to access all functions provided with the
+    628             current Flash device.
+    629          
+    630          Pseudo Code:
+    631             Step 1: Select the right action using the insInstruction parameter
+    632             Step 2: Execute the Flash memory Function
+    633             Step 3: Return the Error Code
+    634          *******************************************************************************/
+    635          ReturnType DataProgram(InstructionType insInstruction, ParameterType *fp) {
+    636             ReturnType rRetVal;
+    637             NMX_uint8 ucStatusRegister;
+                              ^
+Warning[Pe177]: variable "ucStatusRegister" was declared but never referenced
+    638             NMX_uint8 insCode;
+    639             NMX_uint8 ucManufacturerIdentification;
+                              ^
+Warning[Pe177]: variable "ucManufacturerIdentification" was declared but never
+          referenced
+    640          
+    641             switch (insInstruction) {
+    642          
+    643          		/* PAGE PROGRAM */
+    644             	   case PageProgram:
+    645          			#ifndef SUPPORT_N25Q_STEP_B
+    646          			insCode = SPI_FLASH_INS_PP;
+    647          			#endif
+    648          			#ifdef SUPPORT_N25Q_STEP_B
+    649          			insCode = SPI_FLASH_INS_PP4B;
+    650          			#endif
+    651          			break;
+    652          
+    653          		/* DUAL INPUT FAST PROGRAM */
+    654          	   	case DualInputProgram:
+    655          	   		insCode = SPI_FLASH_INS_DIPP;
+    656          			break;
+    657          
+    658          		/* EXTENDED DUAL INPUT FAST PROGRAM */
+    659          	   	case DualInputExtendedFastProgram:
+    660          	   		insCode = SPI_FLASH_INS_DIEPP;
+    661          			break;
+    662          
+    663          		/* QUAD INPUT FAST PROGRAM */
+    664          	   	case QuadInputProgram:
+    665          			#ifndef SUPPORT_N25Q_STEP_B
+    666          	   		insCode = SPI_FLASH_INS_QIPP;
+    667          			#endif
+    668          			#ifdef SUPPORT_N25Q_STEP_B
+    669          	   		insCode = SPI_FLASH_INS_QIPP4B;
+    670          			#endif
+    671          			break;
+    672          
+    673          		/* EXTENDED QUAD INPUT FAST PROGRAM */
+    674          	   	case QuadInputExtendedFastProgram:
+    675          	   		insCode = SPI_FLASH_INS_QIEPP;
+    676          			break;
+    677          
+    678          		default:
+    679          			return Flash_FunctionNotSupported;
+    680          			break;
+    681          
+    682             } /* EndSwitch */
+    683          
+    684            rRetVal = FlashDataProgram( (*fp).PageProgram.udAddr,
+    685                               (*fp).PageProgram.pArray,
+    686                               (*fp).PageProgram.udNrOfElementsInArray,
+    687                               insCode
+    688                             );
+    689          
+    690             return rRetVal;
+    691          } /* EndFunction Flash */
+    692          
+    693          
+    694          /*******************************************************************************
+    695          Function:     ReturnType DataRead(InstructionType insInstruction, ParameterType *fp)
+    696          Arguments:    insInstruction is an enum which contains all the available Instructions
+    697              of the SW driver.
+    698                        fp is a (union) parameter struct for all Flash Instruction parameters
+    699          Return Value: The function returns the following conditions:
+    700          
+    701             Flash_AddressInvalid,
+    702             Flash_MemoryOverflow,
+    703             Flash_PageEraseFailed,
+    704             Flash_PageNrInvalid,
+    705             Flash_SectorNrInvalid,
+    706             Flash_FunctionNotSupported,
+    707             Flash_NoInformationAvailable,
+    708             Flash_OperationOngoing,
+    709             Flash_OperationTimeOut,
+    710             Flash_ProgramFailed,
+    711             Flash_SpecificError,
+    712             Flash_SectorProtected,
+    713             Flash_SectorUnprotected,
+    714             Flash_SectorProtectFailed,
+    715             Flash_SectorUnprotectFailed,
+    716             Flash_SectorLocked,
+    717             Flash_SectorUnlocked,
+    718             Flash_SectorLockDownFailed,
+    719             Flash_Success,
+    720             Flash_WrongType
+    721          
+    722          Description:  This function is used to access all functions provided with the
+    723             current Flash device.
+    724          
+    725          Pseudo Code:
+    726             Step 1: Select the right action using the insInstruction parameter
+    727             Step 2: Execute the Flash memory Function
+    728             Step 3: Return the Error Code
+    729          *******************************************************************************/
+    730          ReturnType DataRead(InstructionType insInstruction, ParameterType *fp) {
+    731             NMX_uint8 ucStatusRegister;
+                              ^
+Warning[Pe177]: variable "ucStatusRegister" was declared but never referenced
+    732             NMX_uint8 ucManufacturerIdentification;
+                              ^
+Warning[Pe177]: variable "ucManufacturerIdentification" was declared but never
+          referenced
+    733             NMX_uint8 insCode;
+    734             NMX_uint16 dataOffset;
+                               ^
+Warning[Pe177]: variable "dataOffset" was declared but never referenced
+    735             ReturnType rRetVal;
+    736          
+    737             switch (insInstruction) {
+    738                case Read:
+    739          		insCode = SPI_FLASH_INS_READ;
+    740          		break;
+    741          
+    742                case FastRead:
+    743          		insCode = SPI_FLASH_INS_FAST_READ;
+    744          		break;
+    745          
+    746                case DualOutputFastRead:
+    747          		insCode = SPI_FLASH_INS_DOFR;
+    748          		break;
+    749          
+    750                case QuadOutputFastRead:
+    751          		insCode = SPI_FLASH_INS_QOFR;
+    752          		break;
+    753          
+    754                case DualInputOutputFastRead:
+    755          		insCode = SPI_FLASH_INS_DIOFR;
+    756          		break;
+    757          
+    758                case QuadInputOutputFastRead:
+    759          		insCode = SPI_FLASH_INS_QIOFR;
+    760          		break;
+    761          
+    762                default:
+    763          		return Flash_FunctionNotSupported;
+    764          		break;
+    765          
+    766             } /* EndSwitch */
+    767             rRetVal = FlashDataRead(fp->Read.udAddr, fp->Read.pArray, fp->Read.udNrOfElementsToRead, insCode);
+    768             return rRetVal;
+    769          }
+    770          
+    771          
+    772          /*******************************************************************************
+    773          Function:     FlashWriteEnable( void )
+    774          Arguments:    void
+    775          
+    776          Return Value:
+    777             Flash_Success
+    778          
+    779          Description:  This function sets the Write Enable Latch(WEL)
+    780                        by sending a WREN Instruction.
+    781          
+    782          Pseudo Code:
+    783             Step 1: Initialize the data (i.e. Instruction) packet to be sent serially
+    784             Step 2: Send the packet serially
+    785          *******************************************************************************/
+    786          ReturnType FlashWriteEnable( void ) {
+    787              CharStream char_stream_send;
+                     ^
+Error[Pe020]: identifier "CharStream" is undefined
+    788              NMX_uint8 cWREN = SPI_FLASH_INS_WREN;
+    789              NMX_uint8 ucSR;
+    790          
+    791              // Step 1: Initialize the data (i.e. Instruction) packet to be sent serially
+    792              char_stream_send.length = 1;
+    793              char_stream_send.pChar  = &cWREN;
+    794          
+    795              // Step 2: Send the packet serially
+    796              Serialize_SPI(&char_stream_send,
+                     ^
+Warning[Pe223]: function "Serialize_SPI" declared implicitly
+    797                        NULL_PTR,
+    798                        OpsWakeUp,
+                               ^
+Error[Pe020]: identifier "OpsWakeUp" is undefined
+    799                        OpsEndTransfer);
+                               ^
+Error[Pe020]: identifier "OpsEndTransfer" is undefined
+    800          
+    801              // Step 3: Read the Status Register.
+    802              do {
+    803                  FlashReadStatusRegister(&ucSR);
+    804              } while(~ucSR & SPI_SR1_WEL);
+                                     ^
+Error[Pe020]: identifier "SPI_SR1_WEL" is undefined
+    805          
+    806              return Flash_Success;
+    807          }
+    808          
+    809          /*******************************************************************************
+    810          Function:     FlashWriteDisable( void )
+    811          Arguments:    void
+    812          
+    813          Return Value:
+    814             Flash_Success
+    815          
+    816          Description:  This function resets the Write Enable Latch(WEL)
+    817                        by sending a WRDI Instruction.
+    818          
+    819          Pseudo Code:
+    820             Step 1: Initialize the data (i.e. Instruction) packet to be sent serially
+    821             Step 2: Send the packet serially
+    822          *******************************************************************************/
+    823          ReturnType  FlashWriteDisable( void ) {
+    824              CharStream char_stream_send;
+                     ^
+Error[Pe020]: identifier "CharStream" is undefined
+    825              NMX_uint8 cWRDI = SPI_FLASH_INS_WRDI;
+    826              NMX_uint8 ucSR;
+    827          
+    828              // Step 1: Initialize the data (i.e. Instruction) packet to be sent serially
+    829              char_stream_send.length = 1;
+    830              char_stream_send.pChar  = &cWRDI;
+    831          
+    832              // Step 2: Send the packet serially
+    833              Serialize_SPI(&char_stream_send,
+                     ^
+Warning[Pe223]: function "Serialize_SPI" declared implicitly
+    834                        NULL_PTR,
+    835                        OpsWakeUp,
+                               ^
+Error[Pe020]: identifier "OpsWakeUp" is undefined
+    836                        OpsEndTransfer);
+                               ^
+Error[Pe020]: identifier "OpsEndTransfer" is undefined
+    837          
+    838              // Step 3: Read the Status Register.
+    839              do {
+    840                  FlashReadStatusRegister(&ucSR);
+    841              } while(ucSR & SPI_SR1_WEL);
+                                    ^
+Error[Pe020]: identifier "SPI_SR1_WEL" is undefined
+    842          
+    843              return Flash_Success;
+    844          }
+    845          
+    846          /*******************************************************************************
+    847          Function:     FlashReadDeviceIdentification( NMX_uint32 *uwpDeviceIdentification)
+    848          Arguments:    uwpDeviceIdentificaiton, 32-bit buffer to hold the DeviceIdentification
+    849          			  read from the memory, with this parts:
+    850          
+    851          NMX_unit32
+    852          
+    853           | 0x00 | MANUFACTURER_ID | MEM_TYPE | MEM_CAPACITY |
+    854          MSB                                                LSB
+    855          
+    856          Return Value:
+    857             Flash_Success
+    858          
+    859          Description:  This function returns the Device Identification
+    860          			  (manufacurer id + memory type + memory capacity)
+    861                        by sending an SPI_FLASH_INS_RDID Instruction.
+    862          
+    863          Pseudo Code:
+    864             Step 1: Initialize the data (i.e. Instruction) packet to be sent serially
+    865             Step 2: Send the packet serially
+    866             Step 3: Device Identification is returned
+    867          *******************************************************************************/
+    868          ReturnType FlashReadDeviceIdentification(NMX_uint32 *uwpDeviceIdentification) {
+    869              CharStream char_stream_send;
+                     ^
+Error[Pe020]: identifier "CharStream" is undefined
+    870              CharStream char_stream_recv;
+                     ^
+Error[Pe020]: identifier "CharStream" is undefined
+    871              NMX_uint8  cRDID = SPI_FLASH_INS_RDID;
+    872              NMX_uint8  pIdentification[3];
+    873              // Step 1: Initialize the data (i.e. Instruction) packet to be sent serially
+    874              char_stream_send.length  = 1;
+    875              char_stream_send.pChar   = &cRDID;
+    876          
+    877              char_stream_recv.length  = 3;
+    878              char_stream_recv.pChar   = &pIdentification[0];
+    879          
+    880              // Step 2: Send the packet serially
+    881              Serialize_SPI(&char_stream_send,
+                     ^
+Warning[Pe223]: function "Serialize_SPI" declared implicitly
+    882                        &char_stream_recv,
+    883                        OpsWakeUp,
+                               ^
+Error[Pe020]: identifier "OpsWakeUp" is undefined
+    884                        OpsEndTransfer);
+                               ^
+Error[Pe020]: identifier "OpsEndTransfer" is undefined
+    885          
+    886          	#ifdef DEBUG
+    887          	printf("DeviceId[0] = 0x%x\n", char_stream_recv.pChar[0]);
+    888          	printf("DeviceId[1] = 0x%x\n", char_stream_recv.pChar[1]);
+    889          	printf("DeviceId[2] = 0x%x\n", char_stream_recv.pChar[2]);
+    890          	#endif
+    891          
+    892              // Step 3: Device Identification is returned ( manufaturer id + memory type + memory capacity )
+    893          	*uwpDeviceIdentification = char_stream_recv.pChar[0];
+    894          	*uwpDeviceIdentification <<= 8;
+    895              *uwpDeviceIdentification |= char_stream_recv.pChar[1];
+    896              *uwpDeviceIdentification <<= 8;
+    897              *uwpDeviceIdentification |= char_stream_recv.pChar[2];
+    898          
+    899              return Flash_Success;
+    900          }
+    901          
+    902          /*******************************************************************************
+    903          Function:     FlashReadStatusRegister( NMX_uint8 *ucpStatusRegister)    ----ok
+    904          Arguments:    ucpStatusRegister, 8-bit buffer to hold the Status Register value read
+    905                        from the memory
+    906          
+    907          Return Value:
+    908             Flash_Success
+    909          
+    910          Description:  This function reads the Status Register by sending an
+    911                         SPI_FLASH_INS_RDSR Instruction.
+    912          
+    913          Pseudo Code:
+    914             Step 1: Initialize the data (i.e. Instruction) packet to be sent serially
+    915             Step 2: Send the packet serially, get the Status Register content
+    916          
+    917          *******************************************************************************/
+    918          ReturnType FlashReadStatusRegister( NMX_uint8 *ucpStatusRegister) {
+    919              CharStream char_stream_send;
+                     ^
+Error[Pe020]: identifier "CharStream" is undefined
+    920              CharStream char_stream_recv;
+                     ^
+Error[Pe020]: identifier "CharStream" is undefined
+    921              NMX_uint8  cRDSR = SPI_FLASH_INS_RDSR;
+    922          
+    923              // Step 1: Initialize the data (i.e. Instruction) packet to be sent serially
+    924              char_stream_send.length  = 1;
+    925              char_stream_send.pChar   = &cRDSR;
+    926              char_stream_recv.length  = 1;
+    927              char_stream_recv.pChar   = ucpStatusRegister;
+    928          
+    929              // Step 2: Send the packet serially, get the Status Register content
+    930              Serialize_SPI(&char_stream_send,
+                     ^
+Warning[Pe223]: function "Serialize_SPI" declared implicitly
+    931                        &char_stream_recv,
+    932                        OpsWakeUp,
+                               ^
+Error[Pe020]: identifier "OpsWakeUp" is undefined
+    933                        OpsEndTransfer);
+                               ^
+Error[Pe020]: identifier "OpsEndTransfer" is undefined
+    934          
+    935              return Flash_Success;
+    936          }
+    937          
+    938          
+    939          /*******************************************************************************
+    940          Function:     FlashWriteStatusRegister( NMX_uint8 ucStatusRegister)
+    941          Arguments:    ucStatusRegister, an 8-bit new value to be written to the Status Register
+    942          
+    943          Return Value:
+    944             Flash_Success
+    945          
+    946          Description:  This function modifies the Status Register by sending an
+    947                        SPI_FLASH_INS_WRSR Instruction.
+    948                        The Write Status Register (WRSR) Instruction has no effect
+    949                        on b6, b5, b1(WEL) and b0(WIP) of the Status Register.b6 and b5 are
+    950                        always read as 0.
+    951          
+    952          Pseudo Code:
+    953             Step 1: Disable Write protection
+    954             Step 2: Initialize the data (i.e. Instruction & value) packet to be sent serially
+    955             Step 3: Send the packet serially
+    956             Step 4: Wait until the operation completes or a timeout occurs.
+    957          *******************************************************************************/
+    958          ReturnType  FlashWriteStatusRegister( NMX_uint8 ucStatusRegister) {
+    959              CharStream char_stream_send;
+                     ^
+Error[Pe020]: identifier "CharStream" is undefined
+    960              NMX_uint8  pIns_Val[2];
+    961          
+    962              // Step 1: Disable Write protection
+    963              fdo->GenOp.WriteEnable();
+    964          
+    965              // Step 2: Initialize the data (i.e. Instruction & value) packet to be sent serially
+    966              char_stream_send.length = 2;
+    967              char_stream_send.pChar  = pIns_Val;
+    968              pIns_Val[0] = SPI_FLASH_INS_WRSR;
+    969              pIns_Val[1] = ucStatusRegister;
+    970          
+    971              // Step 3: Send the packet serially
+    972              Serialize_SPI(&char_stream_send,
+                     ^
+Warning[Pe223]: function "Serialize_SPI" declared implicitly
+    973                        NULL_PTR,
+    974                        OpsWakeUp,
+                               ^
+Error[Pe020]: identifier "OpsWakeUp" is undefined
+    975                        OpsEndTransfer);
+                               ^
+Error[Pe020]: identifier "OpsEndTransfer" is undefined
+    976          
+    977              // Step 4: Wait until the operation completes or a timeout occurs.
+    978              return WAIT_TILL_Instruction_EXECUTION_COMPLETE(1);
+    979          }
+    980          
+    981          
+    982          /*******************************************************************************
+    983          Function:     FlashRead( NMX_uint32 udAddr, NMX_uint8 *ucpElements, NMX_uint32 udNrOfElementsToRead)
+    984          Arguments:    udAddr, start address to read from
+    985                        ucpElements, buffer to hold the elements to be returned
+    986                        udNrOfElementsToRead, number of elements to be returned, counted in bytes.
+    987          
+    988          Return Value:
+    989             Flash_AddressInvalid
+    990             Flash_Success
+    991          
+    992          Description:  This function reads the Flash memory by sending an
+    993                        SPI_FLASH_INS_READ Instruction.
+    994                        by design, the whole Flash memory space can be read with one READ Instruction
+    995                        by incrementing the start address and rolling to 0x0 automatically,
+    996                        that is, this function is across pages and sectors.
+    997          
+    998          Pseudo Code:
+    999             Step 1: Validate address input
+   1000             Step 2: Initialize the data (i.e. Instruction) packet to be sent serially
+   1001             Step 3: Send the packet serially, and fill the buffer with the data being returned
+   1002          *******************************************************************************/
+   1003          ReturnType FlashDataRead( uAddrType udAddr, NMX_uint8 *ucpElements, NMX_uint32 udNrOfElementsToRead, InstructionType insInstruction) {
+                            ^
+Error[Pe147]: declaration is incompatible with "__interwork __softfp
+          ReturnType FlashDataRead(uAddrType, NMX_uint8 *, NMX_uint32,
+          NMX_uint8)" (declared at line 499 of
+          "E:\TRIO_MD\3.F_W\TRIO_MD_APPL_STM207_20140812\include\../dev/SFlash/
+          N25Q.h")
+   1004              CharStream char_stream_send;
+                     ^
+Error[Pe020]: identifier "CharStream" is undefined
+   1005              CharStream char_stream_recv;
+                     ^
+Error[Pe020]: identifier "CharStream" is undefined
+   1006          	NMX_uint8  pIns_Addr[5];
+   1007          
+   1008              // Step 1: Validate address input
+   1009              if(!(udAddr < fdo->Desc.FlashSize))
+   1010          		return Flash_AddressInvalid;
+   1011          
+   1012              // Step 2: Initialize the data (i.e. Instruction) packet to be sent serially
+   1013          	char_stream_send.length   = fdo->Desc.NumAddrByte + 1;
+   1014              char_stream_send.pChar    = pIns_Addr;
+   1015              pIns_Addr[0]              = insInstruction;
+   1016          
+   1017          	fill_addr_vect(udAddr, pIns_Addr, fdo->Desc.NumAddrByte);
+   1018          
+   1019              char_stream_recv.length   = udNrOfElementsToRead;
+   1020              char_stream_recv.pChar    = ucpElements;
+   1021          
+   1022              // Step 3: Send the packet serially, and fill the buffer with the data being returned
+   1023              Serialize_SPI(&char_stream_send,
+                     ^
+Warning[Pe223]: function "Serialize_SPI" declared implicitly
+   1024                        &char_stream_recv,
+   1025                        OpsWakeUp,
+                               ^
+Error[Pe020]: identifier "OpsWakeUp" is undefined
+   1026                        OpsEndTransfer);
+                               ^
+Error[Pe020]: identifier "OpsEndTransfer" is undefined
+   1027          
+   1028              return Flash_Success;
+   1029          }
+   1030          
+   1031          /*******************************************************************************
+   1032          Function:     FlashPageProgram( NMX_uint32 udAddr, NMX_uint8 *pArray, NMX_uint32 udNrOfElementsInArray)
+   1033          Arguments:    udAddr, start address to write to
+   1034                        pArray, buffer to hold the elements to be programmed
+   1035                        udNrOfElementsInArray, number of elements to be programmed, counted in bytes
+   1036          
+   1037          Return Value:
+   1038             Flash_AddressInvalid
+   1039             Flash_OperationOngoing
+   1040             Flash_OperationTimeOut
+   1041             Flash_Success
+   1042          
+   1043          Description:  This function writes a maximum of 64 bytes of data into the memory by sending an
+   1044                        SPI_FLASH_INS_PP Instruction.
+   1045                        by design, the PP Instruction is effective WITHIN ONE page,i.e. 0xXX00 - 0xXXff.
+   1046                        when 0xXXff is reached, the address rolls over to 0xXX00 automatically.
+   1047          Note:
+   1048                        This function does not check whether the target memory area is in a Software
+   1049                        Protection Mode(SPM) or Hardware Protection Mode(HPM), in which case the PP
+   1050                        Instruction will be ignored.
+   1051                        The function assumes that the target memory area has previously been unprotected at both
+   1052                        the hardware and software levels.
+   1053                        To unprotect the memory, please call FlashWriteStatusRegister(NMX_uint8 ucStatusRegister),
+   1054                        and refer to the datasheet for the setup of a proper ucStatusRegister value.
+   1055          Pseudo Code:
+   1056             Step 1: Validate address input
+   1057             Step 2: Check whether any previous Write, Program or Erase cycle is on going
+   1058             Step 3: Disable Write protection (the Flash memory will automatically enable it again after
+   1059                     the execution of the Instruction)
+   1060             Step 4: Initialize the data (Instruction & address only) packet to be sent serially
+   1061             Step 5: Send the packet (Instruction & address only) serially
+   1062             Step 6: Initialize the data (data to be programmed) packet to be sent serially
+   1063             Step 7: Send the packet (data to be programmed) serially
+   1064             Step 8: Wait until the operation completes or a timeout occurs.
+   1065          *******************************************************************************/
+   1066          ReturnType FlashGenProgram(uAddrType udAddr, NMX_uint8 *pArray , NMX_uint32 udNrOfElementsInArray, NMX_uint8 ubSpiInstruction) {
+   1067              CharStream char_stream_send;
+                     ^
+Error[Pe020]: identifier "CharStream" is undefined
+   1068              NMX_uint8 pIns_Addr[5];
+   1069          	NMX_uint8 fsr_value;
+   1070          	ReturnType ret;
+   1071          
+   1072              // Step 1: Validate address input
+   1073              if(!(udAddr < fdo->Desc.FlashSize))
+   1074          		return Flash_AddressInvalid;
+   1075          
+   1076              // Step 2: Check whether any previous Write, Program or Erase cycle is on-going
+   1077              if(IsFlashBusy()) return Flash_OperationOngoing;
+   1078          
+   1079              // Step 3: Disable Write protection
+   1080              fdo->GenOp.WriteEnable();
+   1081          
+   1082              // Step 4: Initialize the data (Instruction & address only) packet to be sent serially
+   1083              char_stream_send.length   = fdo->Desc.NumAddrByte + 1;
+   1084              char_stream_send.pChar    = pIns_Addr;
+   1085          
+   1086              pIns_Addr[0]              = ubSpiInstruction;
+   1087          
+   1088          	fill_addr_vect(udAddr, pIns_Addr, fdo->Desc.NumAddrByte);
+   1089          
+   1090              // Step 5: Send the packet (Instruction & address only) serially
+   1091              Serialize_SPI(&char_stream_send,
+                     ^
+Warning[Pe223]: function "Serialize_SPI" declared implicitly
+   1092                        NULL_PTR,
+   1093                        OpsWakeUp,
+                               ^
+Error[Pe020]: identifier "OpsWakeUp" is undefined
+   1094                        OpsInitTransfer);
+                               ^
+Error[Pe020]: identifier "OpsInitTransfer" is undefined
+   1095          
+   1096              // Step 6: Initialize the data (data to be programmed) packet to be sent serially
+   1097              char_stream_send.length   = udNrOfElementsInArray;
+   1098              char_stream_send.pChar    = pArray;
+   1099          
+   1100              // Step 7: Send the packet (data to be programmed) serially
+   1101              Serialize_SPI(&char_stream_send,
+   1102                        NULL_PTR,
+   1103                        OpsWakeUp,
+   1104                        OpsEndTransfer);
+                               ^
+Error[Pe020]: identifier "OpsEndTransfer" is undefined
+   1105          
+   1106              // Step 8: Wait until the operation completes or a timeout occurs.
+   1107          	ret = WAIT_TILL_Instruction_EXECUTION_COMPLETE(1);
+   1108          
+   1109          
+   1110          	FlashReadFlagStatusRegister(&fsr_value);
+   1111          	FlashClearFlagStatusRegister();
+   1112          
+   1113          	if((fsr_value & SPI_FSR_PROT) && (fsr_value & SPI_FSR_PROGRAM))
+   1114          		return Flash_SectorProtected;
+   1115          
+   1116          	return ret;
+   1117          
+   1118          }
+   1119          
+   1120          
+   1121          /*******************************************************************************
+   1122          Function:     ReturnType FlashSectorErase( uSectorType uscSectorNr )
+   1123          Arguments:    uSectorType is the number of the Sector to be erased.
+   1124          
+   1125          Return Values:
+   1126             Flash_SectorNrInvalid
+   1127             Flash_OperationOngoing
+   1128             Flash_OperationTimeOut
+   1129             Flash_Success
+   1130          
+   1131          Description:  This function erases the Sector specified in uscSectorNr by sending an
+   1132                        SPI_FLASH_INS_SE Instruction.
+   1133                        The function checks that the sector number is within the valid range
+   1134                        before issuing the erase Instruction. Once erase has completed the status
+   1135                        Flash_Success is returned.
+   1136          Note:
+   1137                        This function does not check whether the target memory area is in a Software
+   1138                        Protection Mode(SPM) or Hardware Protection Mode(HPM), in which case the PP
+   1139                        Instruction will be ignored.
+   1140                        The function assumes that the target memory area has previously been unprotected at both
+   1141                        the hardware and software levels.
+   1142                        To unprotect the memory, please call FlashWriteStatusRegister(NMX_uint8 ucStatusRegister),
+   1143                        and refer to the datasheet to set a proper ucStatusRegister value.
+   1144          
+   1145          Pseudo Code:
+   1146             Step 1: Validate the sector number input
+   1147             Step 2: Check whether any previous Write, Program or Erase cycle is on going
+   1148             Step 3: Disable Write protection (the Flash memory will automatically enable it
+   1149                     again after the execution of the Instruction)
+   1150             Step 4: Initialize the data (Instruction & address) packet to be sent serially
+   1151             Step 5: Send the packet (Instruction & address) serially
+   1152             Step 6: Wait until the operation completes or a timeout occurs.
+   1153          *******************************************************************************/
+   1154          ReturnType  FlashSectorErase( uSectorType uscSectorNr ) {
+   1155              CharStream char_stream_send;
+                     ^
+Error[Pe020]: identifier "CharStream" is undefined
+   1156              //NMX_uint8  pIns_Addr[4];
+   1157              NMX_uint8  pIns_Addr[5];
+   1158              uAddrType SectorAddr;
+   1159          	NMX_uint8 fsr_value;
+   1160          	ReturnType ret;
+   1161          
+   1162              // Step 1: Validate the sector number input
+   1163              if(!(uscSectorNr < fdo->Desc.FlashSectorCount)) return Flash_SectorNrInvalid;
+   1164          
+   1165              SectorAddr = fdo->GenOp.BlockOffset(uscSectorNr);
+   1166          
+   1167              // Step 2: Check whether any previous Write, Program or Erase cycle is on going
+   1168              if(IsFlashBusy()) return Flash_OperationOngoing;
+   1169          
+   1170              // Step 3: Disable Write protection
+   1171              fdo->GenOp.WriteEnable();
+   1172          
+   1173              // Step 4: Initialize the data (Instruction & address) packet to be sent serially
+   1174              char_stream_send.length   = fdo->Desc.NumAddrByte + 1;
+   1175              char_stream_send.pChar    = &pIns_Addr[0];
+   1176          
+   1177          	#ifndef SUPPORT_N25Q_STEP_B
+   1178          		pIns_Addr[0]              = SPI_FLASH_INS_SE;
+   1179          	#endif
+   1180          	#ifdef SUPPORT_N25Q_STEP_B
+   1181          		pIns_Addr[0]              = SPI_FLASH_INS_SE4B;
+   1182          	#endif
+   1183          
+   1184          	fill_addr_vect(SectorAddr, pIns_Addr, fdo->Desc.NumAddrByte);
+   1185          
+   1186              // Step 5: Send the packet (Instruction & address) serially
+   1187              Serialize_SPI(&char_stream_send,
+                     ^
+Warning[Pe223]: function "Serialize_SPI" declared implicitly
+   1188                        NULL_PTR,
+   1189                        OpsWakeUp,
+                               ^
+Error[Pe020]: identifier "OpsWakeUp" is undefined
+   1190                        OpsEndTransfer);
+                               ^
+Error[Pe020]: identifier "OpsEndTransfer" is undefined
+
+  	ReturnType ret;
+  	           ^
+"E:\TRIO_MD\3.F_W\TRIO_MD_APPL_STM207_20140812\dev\SFlash\N25Q.c",1160  Warning[Pe550]: 
+          variable "ret" was set but never used
+   1191          
+   1192              // Step 6: Wait until the operation completes or a timeout occurs.
+   1193          	ret = WAIT_TILL_Instruction_EXECUTION_COMPLETE(SE_TIMEOUT);
+   1194          
+   1195          	FlashReadFlagStatusRegister(&fsr_value);
+   1196          	FlashClearFlagStatusRegister();
+   1197          
+   1198          	if((fsr_value & SPI_FSR_PROT) && (fsr_value & SPI_FSR_ERASE))
+   1199          		return Flash_SectorProtected;
+   1200          
+   1201          	return Flash_Success;
+   1202          }
+   1203          
+   1204          
+   1205          /*******************************************************************************
+   1206          Function:     ReturnType FlashSunSectorErase( uSectorType uscSectorNr )
+   1207          Arguments:    uSectorType is the number of the subSector to be erased.
+   1208          
+   1209          Return Values:
+   1210             Flash_SectorNrInvalid
+   1211             Flash_OperationOngoing
+   1212             Flash_OperationTimeOut
+   1213             Flash_Success
+   1214          
+   1215          Description:  This function erases the SubSector (4k) specified in uscSectorNr by sending an
+   1216                        SPI_FLASH_INS_SSE Instruction.
+   1217                        The function checks that the sub sector number is within the valid range
+   1218                        before issuing the erase Instruction. Once erase has completed the status
+   1219                        Flash_Success is returned.
+   1220          Note:
+   1221                        This function does not check whether the target memory area is in a Software
+   1222                        Protection Mode(SPM) or Hardware Protection Mode(HPM), in which case the PP
+   1223                        Instruction will be ignored.
+   1224                        The function assumes that the target memory area has previously been unprotected at both
+   1225                        the hardware and software levels.
+   1226                        To unprotect the memory, please call FlashWriteStatusRegister(NMX_uint8 ucStatusRegister),
+   1227                        and refer to the datasheet to set a proper ucStatusRegister value.
+   1228          
+   1229          Pseudo Code:
+   1230             Step 1: Validate the sub sector number input
+   1231             Step 2: Check whether any previous Write, Program or Erase cycle is on going
+   1232             Step 3: Disable Write protection (the Flash memory will automatically enable it
+   1233                     again after the execution of the Instruction)
+   1234             Step 4: Initialize the data (Instruction & address) packet to be sent serially
+   1235             Step 5: Send the packet (Instruction & address) serially
+   1236             Step 6: Wait until the operation completes or a timeout occurs.
+   1237          *******************************************************************************/
+   1238          ReturnType  FlashSubSectorErase( uSectorType uscSectorNr ) {
+   1239              CharStream char_stream_send;
+                     ^
+Error[Pe020]: identifier "CharStream" is undefined
+   1240              NMX_uint8  pIns_Addr[5];
+   1241              uAddrType SubSectorAddr;
+   1242          	NMX_uint8 fsr_value;
+   1243          	ReturnType ret;
+   1244          
+   1245              // Step 1: Validate the sector number input
+   1246              if(!(uscSectorNr < fdo->Desc.FlashSubSectorCount))
+   1247              	return Flash_SectorNrInvalid;
+   1248          
+   1249              SubSectorAddr = uscSectorNr << fdo->Desc.FlashSubSectorSize_bit;
+   1250          
+   1251              // Step 2: Check whether any previous Write, Program or Erase cycle is on going
+   1252              if(IsFlashBusy()) return Flash_OperationOngoing;
+   1253          
+   1254              // Step 3: Disable Write protection
+   1255              fdo->GenOp.WriteEnable();
+   1256          
+   1257              // Step 4: Initialize the data (Instruction & address) packet to be sent serially
+   1258              char_stream_send.length   = fdo->Desc.NumAddrByte + 1;;
+   1259              char_stream_send.pChar    = &pIns_Addr[0];
+   1260          
+   1261          	#ifndef SUPPORT_N25Q_STEP_B
+   1262              pIns_Addr[0]              = SPI_FLASH_INS_SSE;
+   1263          	#endif
+   1264          	#ifdef SUPPORT_N25Q_STEP_B
+   1265              pIns_Addr[0]              = SPI_FLASH_INS_SSE4B;
+   1266          	#endif
+   1267          
+   1268          	fill_addr_vect(SubSectorAddr, pIns_Addr, fdo->Desc.NumAddrByte);
+   1269          
+   1270              // Step 5: Send the packet (Instruction & address) serially
+   1271              Serialize_SPI(&char_stream_send,
+                     ^
+Warning[Pe223]: function "Serialize_SPI" declared implicitly
+   1272                        NULL_PTR,
+   1273                        OpsWakeUp,
+                               ^
+Error[Pe020]: identifier "OpsWakeUp" is undefined
+   1274                        OpsEndTransfer);
+                               ^
+Error[Pe020]: identifier "OpsEndTransfer" is undefined
+
+  	ReturnType ret;
+  	           ^
+"E:\TRIO_MD\3.F_W\TRIO_MD_APPL_STM207_20140812\dev\SFlash\N25Q.c",1243  Warning[Pe550]: 
+          variable "ret" was set but never used
+   1275          
+   1276              // Step 6: Wait until the operation completes or a timeout occurs.
+   1277          	ret = WAIT_TILL_Instruction_EXECUTION_COMPLETE(SE_TIMEOUT);
+   1278          
+   1279          	FlashReadFlagStatusRegister(&fsr_value);
+   1280          	FlashClearFlagStatusRegister();
+   1281          
+   1282          	if((fsr_value & SPI_FSR_PROT) && (fsr_value & SPI_FSR_ERASE))
+   1283          		return Flash_SectorProtected;
+   1284          
+   1285          	return Flash_Success;
+   1286          }
+   1287          
+   1288          
+   1289          /*******************************************************************************
+   1290          Function: FlashDieErase
+   1291          
+   1292          Arguments: uscDieNr
+   1293          
+   1294          Return Values: ReturnType
+   1295          
+   1296          Description:
+   1297          
+   1298          Note:
+   1299          
+   1300          Pseudo Code:
+   1301          
+   1302          *******************************************************************************/
+   1303          ReturnType  FlashDieErase( uSectorType uscDieNr )
+   1304          {
+   1305              CharStream char_stream_send;
+                     ^
+Error[Pe020]: identifier "CharStream" is undefined
+   1306              NMX_uint8  pIns_Addr[5];
+   1307              uAddrType DieAddr;
+   1308          	NMX_uint8 fsr_value;
+   1309          	ReturnType ret;
+   1310          
+   1311              // Step 1: Validate the sector number input
+   1312              if(!(uscDieNr < fdo->Desc.FlashDieCount))
+   1313              	return Flash_SectorNrInvalid;
+   1314          
+   1315              DieAddr = uscDieNr << fdo->Desc.FlashDieSize_bit;
+   1316          
+   1317              // Step 2: Check whether any previous Write, Program or Erase cycle is on going
+   1318              if(IsFlashBusy()) return Flash_OperationOngoing;
+   1319          
+   1320              // Step 3: Disable Write protection
+   1321              fdo->GenOp.WriteEnable();
+   1322          
+   1323              // Step 4: Initialize the data (Instruction & address) packet to be sent serially
+   1324              char_stream_send.length   = fdo->Desc.NumAddrByte + 1;;
+   1325              char_stream_send.pChar    = &pIns_Addr[0];
+   1326              pIns_Addr[0]              = SPI_FLASH_INS_DE;
+   1327          	fill_addr_vect(DieAddr, pIns_Addr, fdo->Desc.NumAddrByte);
+   1328          
+   1329              // Step 5: Send the packet (Instruction & address) serially
+   1330              Serialize_SPI(&char_stream_send,
+                     ^
+Warning[Pe223]: function "Serialize_SPI" declared implicitly
+   1331                        NULL_PTR,
+   1332                        OpsWakeUp,
+                               ^
+Error[Pe020]: identifier "OpsWakeUp" is undefined
+   1333                        OpsEndTransfer);
+                               ^
+Error[Pe020]: identifier "OpsEndTransfer" is undefined
+
+  	ReturnType ret;
+  	           ^
+"E:\TRIO_MD\3.F_W\TRIO_MD_APPL_STM207_20140812\dev\SFlash\N25Q.c",1309  Warning[Pe550]: 
+          variable "ret" was set but never used
+   1334          
+   1335              // Step 6: Wait until the operation completes or a timeout occurs.
+   1336          	ret = WAIT_TILL_Instruction_EXECUTION_COMPLETE(SE_TIMEOUT);
+   1337          
+   1338          	FlashReadFlagStatusRegister(&fsr_value);
+   1339          	FlashClearFlagStatusRegister();
+   1340          
+   1341          	if((fsr_value & SPI_FSR_PROT) && (fsr_value & SPI_FSR_ERASE))
+   1342          		return Flash_SectorProtected;
+   1343          
+   1344          	return Flash_Success;
+   1345          }
+   1346          
+   1347          /*******************************************************************************
+   1348          Function:     ReturnType FlashBulkErase( void )
+   1349          Arguments:    none
+   1350          
+   1351          Return Values:
+   1352             Flash_OperationOngoing
+   1353             Flash_OperationTimeOut
+   1354             Flash_Success
+   1355          
+   1356          Description:  This function erases the whole Flash memory by sending an
+   1357                        SPI_FLASH_INS_BE Instruction.
+   1358          Note:
+   1359          			  (Only for N25QxxxA8 devices)
+   1360          
+   1361                        This function does not check whether the target memory area (or part of it)
+   1362          			  is in a Software Protection Mode(SPM) or Hardware Protection Mode(HPM),
+   1363          			  in which case the PP Instruction will be ignored.
+   1364                        The function assumes that the target memory area has previously been unprotected at both
+   1365                        the hardware and software levels.
+   1366                        To unprotect the memory, please call FlashWriteStatusRegister(NMX_uint8 ucStatusRegister),
+   1367                        and refer to the datasheet to set a proper ucStatusRegister value.
+   1368          
+   1369          Pseudo Code:
+   1370             Step 1: Check whether any previous Write, Program or Erase cycle is on going
+   1371             Step 2: Disable the Write protection (the Flash memory will automatically enable it
+   1372                     again after the execution of the Instruction)
+   1373             Step 3: Initialize the data (Instruction & address) packet to be sent serially
+   1374             Step 4: Send the packet (Instruction & address) serially
+   1375             Step 5: Wait until the operation completes or a timeout occurs.
+   1376          *******************************************************************************/
+   1377          #ifdef SUPPORT_N25Q_STEP_B
+   1378          ReturnType FlashBulkErase( void ) {
+   1379              CharStream char_stream_send;
+   1380              NMX_uint8  cBE = SPI_FLASH_INS_BE;
+   1381          	NMX_uint8 fsr_value;
+   1382          	ReturnType ret;
+   1383          
+   1384              // Step 1: Check whether any previous Write, Program or Erase cycle is on going
+   1385              if(IsFlashBusy()) return Flash_OperationOngoing;
+   1386          
+   1387              // Step 2: Disable Write protection
+   1388              fdo->GenOp.WriteEnable();
+   1389          
+   1390              // Step 3: Initialize the data(Instruction & address) packet to be sent serially
+   1391              char_stream_send.length   = 1;
+   1392              char_stream_send.pChar    = &cBE;
+   1393          
+   1394              // Step 4: Send the packet(Instruction & address) serially
+   1395              Serialize_SPI(&char_stream_send,
+   1396                        NULL_PTR,
+   1397                        OpsWakeUp,
+   1398                        OpsEndTransfer);
+   1399          
+   1400              // Step 5: Wait until the operation completes or a timeout occurs.
+   1401          	ret = WAIT_TILL_Instruction_EXECUTION_COMPLETE(BE_TIMEOUT);
+   1402          
+   1403          	FlashReadFlagStatusRegister(&fsr_value);
+   1404          	FlashClearFlagStatusRegister();
+   1405          
+   1406          	if((fsr_value & SPI_FSR_PROT) && (fsr_value & SPI_FSR_ERASE))
+   1407          		return Flash_SectorProtected;
+   1408          
+   1409          	return ret;
+   1410          }
+   1411          #endif
+   1412          
+   1413          /*******************************************************************************
+   1414          Function:     IsFlashBusy( )
+   1415          Arguments:    none
+   1416          
+   1417          Return Value:
+   1418             TRUE
+   1419             FALSE
+   1420          
+   1421          Description:  This function checks the Write In Progress (WIP) bit to determine whether
+   1422                        the Flash memory is busy with a Write, Program or Erase cycle.
+   1423          
+   1424          Pseudo Code:
+   1425             Step 1: Read the Status Register.
+   1426             Step 2: Check the WIP bit.
+   1427          *******************************************************************************/
+   1428          BOOL IsFlashBusy() {
+   1429              NMX_uint8 ucSR;
+   1430          
+   1431              // Step 1: Read the Status Register.
+   1432              FlashReadStatusRegister(&ucSR);
+   1433          
+   1434              // Step 2: Check the WIP bit.
+   1435              if(ucSR & SPI_FLASH_WIP)
+   1436                  return TRUE;
+   1437              else
+   1438                  return FALSE;
+   1439          }
+   1440          
+   1441          /*******************************************************************************
+   1442          Function:     IsFlashWELBusy( )
+   1443          Arguments:    none
+   1444          
+   1445          Return Value:
+   1446             TRUE
+   1447             FALSE
+   1448          
+   1449          Description:  This function checks the Write Enable bit to determine whether
+   1450                        the Flash memory is busy with a Write Enable or Write Disable Op.
+   1451          
+   1452          Pseudo Code:
+   1453             Step 1: Read the Status Register.
+   1454             Step 2: Check the WEL bit.
+   1455          *******************************************************************************/
+   1456          BOOL IsFlashWELBusy() {
+   1457              NMX_uint8 ucSR;
+   1458          
+   1459              // Step 1: Read the Status Register.
+   1460              FlashReadStatusRegister(&ucSR);
+   1461          
+   1462              // Step 2: Check the WEL bit.
+   1463              if(ucSR & SPI_FLASH_WEL)
+   1464                  return TRUE;
+   1465              else
+   1466                  return FALSE;
+   1467          }
+   1468          
+   1469          /*******************************************************************************
+   1470          Function:     	FlashDataProgram( )
+   1471          *******************************************************************************/
+   1472          ReturnType FlashDataProgram(uAddrType udAddr, NMX_uint8 *pArray , NMX_uint16 udNrOfElementsInArray, NMX_uint8 ubSpiInstruction) {
+   1473          	ReturnType retValue = Flash_Success;
+   1474          	NMX_uint16 dataOffset;
+   1475          
+   1476          	// Enabling the Write
+   1477              fdo->GenOp.WriteEnable();
+   1478          
+   1479          	if (retValue != Flash_Success)
+   1480          		return retValue;
+   1481          
+   1482          	// Computing the starting alignment, i.e. the distance from the 64 bytes boundary
+   1483          	dataOffset = (fdo->Desc.FlashPageSize - (udAddr & fdo->Desc.FlashAddressMask) ) & fdo->Desc.FlashAddressMask;
+   1484          	if (dataOffset > udNrOfElementsInArray)
+   1485          		dataOffset = udNrOfElementsInArray;
+   1486          	if (dataOffset > 0) {
+   1487          		retValue = FlashGenProgram(udAddr, pArray, dataOffset, ubSpiInstruction);
+   1488          		if (Flash_Success != retValue)
+   1489          			return retValue;
+   1490          	}
+   1491          
+   1492          	for ( ; (dataOffset+fdo->Desc.FlashPageSize) < udNrOfElementsInArray; dataOffset += fdo->Desc.FlashPageSize) {
+   1493          		retValue = FlashGenProgram(udAddr+dataOffset, pArray+dataOffset, fdo->Desc.FlashPageSize, ubSpiInstruction);
+   1494          		if (Flash_Success != retValue)
+   1495          			return retValue;
+   1496          	}
+   1497          
+   1498          	if (udNrOfElementsInArray > dataOffset)
+   1499          		retValue = FlashGenProgram(udAddr+dataOffset, pArray+dataOffset, (udNrOfElementsInArray-dataOffset), ubSpiInstruction);
+   1500          
+   1501          	return retValue;
+   1502          }
+   1503          
+   1504          /*******************************************************************************
+   1505          Function:     ReturnType FlashProgramEraseResume( void )
+   1506          Arguments:    none
+   1507          
+   1508          Return Values:
+   1509             Flash_Success
+   1510          
+   1511          Description:  This function resumes the program/erase operation suspended by sending an
+   1512                        SPI_FLASH_INS_PER Instruction.
+   1513          Note:
+   1514          
+   1515          Pseudo Code:
+   1516             Step 1: Check whether any previous Write, Program or Erase cycle is suspended
+   1517             Step 2: Initialize the data (Instruction & address) packet to be sent serially
+   1518             Step 3: Send the packet (Instruction & address) serially
+   1519           ******************************************************************************/
+   1520          ReturnType  FlashProgramEraseResume( void ) {
+   1521              /* not implemented */
+   1522              return Flash_FunctionNotSupported;
+   1523          }
+   1524          
+   1525          /*******************************************************************************
+   1526          Function:     ReturnType FlashProgramEraseSuspend( void )
+   1527          Arguments:    none
+   1528          
+   1529          Return Values:
+   1530             Flash_Success
+   1531          
+   1532          Description:  This function resumes the program/erase operation suspended by sending an
+   1533                        SPI_FLASH_INS_PES Instruction.
+   1534          Note:
+   1535          
+   1536          Pseudo Code:
+   1537             Step 1: Initialize the data (Instruction) packet to be sent serially
+   1538             Step 2: Send the packet (Instruction) serially
+   1539           ******************************************************************************/
+   1540          ReturnType  FlashProgramEraseSuspend( void ) {
+   1541              /* not implemented */
+   1542              return Flash_FunctionNotSupported;
+   1543          }
+   1544          
+   1545          
+   1546          /*******************************************************************************
+   1547          Function:     FlashReadFlagStatusRegister( NMX_uint8 *ucpFlagStatusRegister)    ----ok
+   1548          Arguments:    ucpFlagStatusRegister, 8-bit buffer to hold the Flag Status Register value read
+   1549                        from the memory
+   1550          
+   1551          Return Value:
+   1552             Flash_Success
+   1553          
+   1554          Description:  This function reads the Status Register by sending an
+   1555                         SPI_FLASH_INS_CLFSR Instruction.
+   1556          
+   1557          Pseudo Code:
+   1558             Step 1: Initialize the data (i.e. Instruction) packet to be sent serially
+   1559             Step 2: Send the packet serially
+   1560          
+   1561          *******************************************************************************/
+   1562          ReturnType  FlashClearFlagStatusRegister( void ) {
+   1563              CharStream char_stream_send;
+                     ^
+Error[Pe020]: identifier "CharStream" is undefined
+   1564              NMX_uint8  cCLFSR = SPI_FLASH_INS_CLFSR;
+   1565          
+   1566              // Step 1: Initialize the data (i.e. Instruction) packet to be sent serially
+   1567              char_stream_send.length  = 1;
+   1568              char_stream_send.pChar   = &cCLFSR;
+   1569          
+   1570              // Step 2: Send the packet serially, get the Status Register content
+   1571                  Serialize_SPI(&char_stream_send,
+                         ^
+Warning[Pe223]: function "Serialize_SPI" declared implicitly
+   1572                        NULL_PTR,
+   1573                        OpsWakeUp,
+                               ^
+Error[Pe020]: identifier "OpsWakeUp" is undefined
+   1574                        OpsEndTransfer);
+                               ^
+Error[Pe020]: identifier "OpsEndTransfer" is undefined
+   1575          
+   1576              return Flash_Success;
+   1577          }
+   1578          
+   1579          /*******************************************************************************
+   1580          Function:     FlashReadNVConfigurationRegister( NMX_uint16 *ucpNVConfigurationRegister)
+   1581          Arguments:    ucpStatusRegister, 16-bit buffer to hold the Non Volatile Configuration Register
+   1582          		value read from the memory
+   1583          
+   1584          Return Value:
+   1585             Flash_Success
+   1586          
+   1587          Description:  This function reads the Non Volatile Configuration Register by sending an
+   1588                         SPI_FLASH_INS_RDNVCR Instruction.
+   1589          
+   1590          Pseudo Code:
+   1591             Step 1: Initialize the data (i.e. Instruction) packet to be sent serially
+   1592             Step 2: Send the packet serially, get the Configuration Register content
+   1593          
+   1594          *******************************************************************************/
+   1595          ReturnType  FlashReadNVConfigurationRegister( NMX_uint16 *ucpNVConfigurationRegister) {
+   1596              CharStream char_stream_send;
+                     ^
+Error[Pe020]: identifier "CharStream" is undefined
+   1597              CharStream char_stream_recv;
+                     ^
+Error[Pe020]: identifier "CharStream" is undefined
+   1598              NMX_uint8  cRDNVCR = SPI_FLASH_INS_RDNVCR;
+   1599          
+   1600          	// Step 1: Initialize the data (i.e. Instruction) packet to be sent serially
+   1601              char_stream_send.length  = 1;
+   1602              char_stream_send.pChar   = &cRDNVCR;
+   1603              char_stream_recv.length  = 2;
+   1604              char_stream_recv.pChar   = (NMX_uint8 *)ucpNVConfigurationRegister;
+   1605          
+   1606              // Step 2: Send the packet serially, get the Status Register content
+   1607              Serialize_SPI(&char_stream_send,
+                     ^
+Warning[Pe223]: function "Serialize_SPI" declared implicitly
+   1608                        &char_stream_recv,
+   1609                        OpsWakeUp,
+                               ^
+Error[Pe020]: identifier "OpsWakeUp" is undefined
+   1610                        OpsEndTransfer);
+                               ^
+Error[Pe020]: identifier "OpsEndTransfer" is undefined
+   1611          
+   1612              return Flash_Success;
+   1613          }
+   1614          
+   1615          /*******************************************************************************
+   1616          Function:     FlashReadVolatileConfigurationRegister( NMX_uint8 *ucpVolatileConfigurationRegister)
+   1617          Arguments:    ucpVolatileConfigurationRegister, 8-bit buffer to hold the Volatile Configuration Register
+   1618          		value read from the memory
+   1619          
+   1620          Return Value:
+   1621             Flash_Success
+   1622          
+   1623          Description:  This function reads the Volatile Register by sending an
+   1624                         SPI_FLASH_INS_RDVCR Instruction.
+   1625          
+   1626          Pseudo Code:
+   1627             Step 1: Initialize the data (i.e. Instruction) packet to be sent serially
+   1628             Step 2: Send the packet serially, get the Configuration Register content
+   1629          
+   1630          *******************************************************************************/
+   1631          ReturnType  FlashReadVolatileConfigurationRegister( NMX_uint8 *ucpVolatileConfigurationRegister) {
+   1632              CharStream char_stream_send;
+                     ^
+Error[Pe020]: identifier "CharStream" is undefined
+   1633              CharStream char_stream_recv;
+                     ^
+Error[Pe020]: identifier "CharStream" is undefined
+   1634              NMX_uint8  cRDVCR = SPI_FLASH_INS_RDVCR;
+   1635          
+   1636              // Step 1: Initialize the data (i.e. Instruction) packet to be sent serially
+   1637              char_stream_send.length  = 1;
+   1638              char_stream_send.pChar   = &cRDVCR;
+   1639              char_stream_recv.length  = 1;
+   1640              char_stream_recv.pChar   = ucpVolatileConfigurationRegister;
+   1641          
+   1642              // Step 2: Send the packet serially, get the Volatile Configuration Register content
+   1643              Serialize_SPI(&char_stream_send,
+                     ^
+Warning[Pe223]: function "Serialize_SPI" declared implicitly
+   1644                        &char_stream_recv,
+   1645                        OpsWakeUp,
+                               ^
+Error[Pe020]: identifier "OpsWakeUp" is undefined
+   1646                        OpsEndTransfer);
+                               ^
+Error[Pe020]: identifier "OpsEndTransfer" is undefined
+   1647          
+   1648              return Flash_Success;
+   1649          }
+   1650          
+   1651          /*******************************************************************************
+   1652          Function:     FlashReadVolatileEnhancedConfigurationRegister( NMX_uint8 *ucpVolatileEnhancedConfigurationRegister)
+   1653          Arguments:    ucpVolatileEnhancedRegister, 8-bit buffer to hold the Volatile Enhanced Configuration Register
+   1654          		value read from the memory
+   1655          
+   1656          Return Value:
+   1657             Flash_Success
+   1658          
+   1659          Description:  This function reads the Volatile Enhanced Register by sending an
+   1660                         SPI_FLASH_INS_RDVECR Instruction.
+   1661          
+   1662          Pseudo Code:
+   1663             Step 1: Initialize the data (i.e. Instruction) packet to be sent serially
+   1664             Step 2: Send the packet serially, get the Configuration Register content
+   1665          
+   1666          *******************************************************************************/
+   1667          ReturnType  FlashReadVolatileEnhancedConfigurationRegister( NMX_uint8 *ucpVolatileEnhancedConfigurationRegister) {
+   1668              CharStream char_stream_send;
+                     ^
+Error[Pe020]: identifier "CharStream" is undefined
+   1669              CharStream char_stream_recv;
+                     ^
+Error[Pe020]: identifier "CharStream" is undefined
+   1670              NMX_uint8  cRDVECR = SPI_FLASH_INS_RDVECR;
+   1671          
+   1672              // Step 1: Initialize the data (i.e. Instruction) packet to be sent serially
+   1673              char_stream_send.length  = 1;
+   1674              char_stream_send.pChar   = &cRDVECR;
+   1675              char_stream_recv.length  = 1;
+   1676              char_stream_recv.pChar   = ucpVolatileEnhancedConfigurationRegister;
+   1677          
+   1678              // Step 2: Send the packet serially, get the Volatile Enhanced Configuration Register content
+   1679              Serialize_SPI(&char_stream_send,
+                     ^
+Warning[Pe223]: function "Serialize_SPI" declared implicitly
+   1680                        &char_stream_recv,
+   1681                        OpsWakeUp,
+                               ^
+Error[Pe020]: identifier "OpsWakeUp" is undefined
+   1682                        OpsEndTransfer);
+                               ^
+Error[Pe020]: identifier "OpsEndTransfer" is undefined
+   1683          
+   1684              return Flash_Success;
+   1685          }
+   1686          
+   1687          /*******************************************************************************
+   1688          Function:     FlashReadFlagStatusRegister( NMX_uint8 *ucp FlagStatusRegister)
+   1689          Arguments:    ucpStatusRegister, 8-bit buffer to hold the Flag Status Register value read
+   1690                        from the memory
+   1691          
+   1692          Return Value:
+   1693             Flash_Success
+   1694          
+   1695          Description:  This function reads the Status Register by sending an
+   1696                         SPI_FLASH_INS_RFSR Instruction.
+   1697          
+   1698          Pseudo Code:
+   1699             Step 1: Initialize the data (i.e. Instruction) packet to be sent serially
+   1700             Step 2: Send the packet serially, get the Status Register content
+   1701          
+   1702          *******************************************************************************/
+   1703          ReturnType  FlashReadFlagStatusRegister( NMX_uint8 *ucpFlagStatusRegister) {
+   1704              CharStream char_stream_send;
+                     ^
+Error[Pe020]: identifier "CharStream" is undefined
+   1705              CharStream char_stream_recv;
+                     ^
+Error[Pe020]: identifier "CharStream" is undefined
+   1706              NMX_uint8  cRFSR = SPI_FLASH_INS_RFSR;
+   1707          
+   1708              // Step 1: Initialize the data (i.e. Instruction) packet to be sent serially
+   1709              char_stream_send.length  = 1;
+   1710              char_stream_send.pChar   = &cRFSR;
+   1711              char_stream_recv.length  = 1;
+   1712              char_stream_recv.pChar   = ucpFlagStatusRegister;
+   1713          
+   1714              // Step 2: Send the packet serially, get the Status Register content
+   1715              Serialize_SPI(&char_stream_send,
+                     ^
+Warning[Pe223]: function "Serialize_SPI" declared implicitly
+   1716                        &char_stream_recv,
+   1717                        OpsWakeUp,
+                               ^
+Error[Pe020]: identifier "OpsWakeUp" is undefined
+   1718                        OpsEndTransfer);
+                               ^
+Error[Pe020]: identifier "OpsEndTransfer" is undefined
+   1719          
+   1720              return Flash_Success;
+   1721          }
+   1722          
+   1723          /*******************************************************************************
+   1724          Function:     FlashWriteVolatileConfigurationRegister( NMX_uint8 ucVolatileConfigurationRegister)
+   1725          Arguments:    ucVolatileConfigurationRegister, an 8-bit new value to be written to the Volatile Configuration Register
+   1726          
+   1727          Return Value:
+   1728             Flash_Success
+   1729          
+   1730          Description:  This function modifies the Volatile Configuration Register by sending an
+   1731                        SPI_FLASH_INS_WRVCR Instruction.
+   1732                        The Write Volatile Configuration Register (WRVCR) Instruction has effect immediatly
+   1733          
+   1734          Pseudo Code:
+   1735             Step 1: Disable Write protection
+   1736             Step 2: Initialize the data (i.e. Instruction & value) packet to be sent serially
+   1737             Step 3: Send the packet serially
+   1738             Step 4: Wait until the operation completes or a timeout occurs.
+   1739          *******************************************************************************/
+   1740          ReturnType  FlashWriteVolatileConfigurationRegister( NMX_uint8 ucVolatileConfigurationRegister) {
+   1741              CharStream char_stream_send;
+                     ^
+Error[Pe020]: identifier "CharStream" is undefined
+   1742              NMX_uint8  pIns_Val[2];
+   1743          
+   1744              // Step 1: Disable Write protection
+   1745              FlashWriteEnable();
+   1746          
+   1747              // Step 2: Initialize the data (i.e. Instruction & value) packet to be sent serially
+   1748              char_stream_send.length = 2;
+   1749              char_stream_send.pChar  = pIns_Val;
+   1750              pIns_Val[0] = SPI_FLASH_INS_WRVCR;
+   1751              pIns_Val[1] = ucVolatileConfigurationRegister;
+   1752          
+   1753              // Step 3: Send the packet serially
+   1754              Serialize_SPI(&char_stream_send,
+                     ^
+Warning[Pe223]: function "Serialize_SPI" declared implicitly
+   1755                        NULL_PTR,
+   1756                        OpsWakeUp,
+                               ^
+Error[Pe020]: identifier "OpsWakeUp" is undefined
+   1757                        OpsEndTransfer);
+                               ^
+Error[Pe020]: identifier "OpsEndTransfer" is undefined
+   1758          
+   1759              //SPI_setXiPMode(ucVolatileConfigurationRegister);
+   1760          
+   1761              // Step 4: Wait until the operation completes or a timeout occurs.
+   1762              return WAIT_TILL_Instruction_EXECUTION_COMPLETE(1);
+   1763          }
+   1764          
+   1765          
+   1766          /*******************************************************************************
+   1767          Function:     FlashWriteVolatileEnhancedConfigurationRegister( NMX_uint8 ucVolatileEnhancedConfigurationRegister)
+   1768          Arguments:    ucVolatileConfigurationRegister, an 8-bit new value to be written to the Volatile Enhanced Configuration Register
+   1769          
+   1770          Return Value:
+   1771             Flash_Success
+   1772          
+   1773          Description:  This function modifies the Volatile Enhanced Configuration Register by sending an
+   1774                        SPI_FLASH_INS_WRVECR Instruction.
+   1775                        The Write Volatile Enhanced Configuration Register (WRVECR) Instruction has effect immediatly
+   1776          
+   1777          Pseudo Code:
+   1778             Step 1: Disable Write protection
+   1779             Step 2: Initialize the data (i.e. Instruction & value) packet to be sent serially
+   1780             Step 3: Send the packet serially
+   1781             Step 5: Wait until the operation completes or a timeout occurs.
+   1782          *******************************************************************************/
+   1783          ReturnType  FlashWriteVolatileEnhancedConfigurationRegister( NMX_uint8 ucVolatileEnhancedConfigurationRegister) {
+   1784              CharStream char_stream_send;
+                     ^
+Error[Pe020]: identifier "CharStream" is undefined
+   1785              NMX_uint8  pIns_Val[2];
+   1786          
+   1787              // Step 1: Disable Write protection
+   1788              FlashWriteEnable();
+   1789          
+   1790              // Step 2: Initialize the data (i.e. Instruction & value) packet to be sent serially
+   1791              char_stream_send.length = 2;
+   1792              char_stream_send.pChar  = pIns_Val;
+   1793              pIns_Val[0] = SPI_FLASH_INS_WRVECR;
+   1794              pIns_Val[1] = ucVolatileEnhancedConfigurationRegister;
+   1795          
+   1796              // Step 3: Send the packet serially
+   1797              Serialize_SPI(&char_stream_send,
+                     ^
+Warning[Pe223]: function "Serialize_SPI" declared implicitly
+   1798                        NULL_PTR,
+   1799                        OpsWakeUp,
+                               ^
+Error[Pe020]: identifier "OpsWakeUp" is undefined
+   1800                        OpsEndTransfer);
+                               ^
+Error[Pe020]: identifier "OpsEndTransfer" is undefined
+   1801          
+   1802          	// Step 5: Wait until the operation completes or a timeout occurs.
+   1803              return WAIT_TILL_Instruction_EXECUTION_COMPLETE(1);
+   1804          }
+   1805          
+   1806          /*******************************************************************************
+   1807          Function:     FlashWriteNVConfigurationRegister( NMX_uint16 ucNVConfigurationRegister)
+   1808          Arguments:    ucVolatileConfigurationRegister, an 8-bit new value to be written to the Non Volatile Configuration Register
+   1809          
+   1810          Return Value:
+   1811             Flash_Success
+   1812          
+   1813          Description:  This function modifies the Non Volatile Configuration Register by sending an
+   1814                        SPI_FLASH_INS_WRNVCR Instruction.
+   1815                        The Write Non Volatile Configuration Register (WRVECR) Instruction has effect at the next power-on
+   1816          
+   1817          Pseudo Code:
+   1818             Step 1: Disable Write protection
+   1819             Step 2: Initialize the data (i.e. Instruction & value) packet to be sent serially
+   1820             Step 3: Send the packet serially
+   1821             Step 4: Wait until the operation completes or a timeout occurs.
+   1822          *******************************************************************************/
+   1823          ReturnType  FlashWriteNVConfigurationRegister( NMX_uint16 ucNVConfigurationRegister) {
+   1824              CharStream char_stream_send;
+                     ^
+Error[Pe020]: identifier "CharStream" is undefined
+   1825              NMX_uint8  pIns_Val[2];
+   1826          
+   1827              // Step 1: Disable Write protection
+   1828              FlashWriteEnable();
+   1829          
+   1830              // Step 2: Initialize the data (i.e. Instruction & value) packet to be sent serially
+   1831              char_stream_send.length = 3;
+   1832              char_stream_send.pChar  = pIns_Val;
+   1833              pIns_Val[0] = SPI_FLASH_INS_WRNVCR;
+   1834              pIns_Val[1] = ucNVConfigurationRegister;
+   1835          
+   1836              // Step 3: Send the packet serially
+   1837              Serialize_SPI(&char_stream_send,
+                     ^
+Warning[Pe223]: function "Serialize_SPI" declared implicitly
+   1838                        NULL_PTR,
+   1839                        OpsWakeUp,
+                               ^
+Error[Pe020]: identifier "OpsWakeUp" is undefined
+   1840                        OpsEndTransfer);
+                               ^
+Error[Pe020]: identifier "OpsEndTransfer" is undefined
+   1841          
+   1842              // Step 4: Wait until the operation completes or a timeout occurs.
+   1843              return WAIT_TILL_Instruction_EXECUTION_COMPLETE(1);
+   1844          }
+   1845          
+   1846          
+   1847          #ifdef VERBOSE
+   1848          /*******************************************************************************
+   1849          Function:     FlashErrorStr( ReturnType rErrNum );
+   1850          Arguments:    rErrNum is the error number returned from other Flash memory Routines
+   1851          
+   1852          Return Value: A pointer to a string with the error message
+   1853          
+   1854          Description:  This function is used to generate a text string describing the
+   1855             error from the Flash memory. Call with the return value from other Flash memory routines.
+   1856          
+   1857          Pseudo Code:
+   1858             Step 1: Return the correct string.
+   1859          *******************************************************************************/
+   1860          NMX_sint8 *FlashErrorStr( ReturnType rErrNum )
+   1861          {
+   1862             switch(rErrNum)
+   1863             {
+   1864             case Flash_AddressInvalid:
+   1865                return "Flash - Address is out of Range";
+   1866             case Flash_MemoryOverflow:
+   1867                return "Flash - Memory Overflows";
+   1868             case Flash_PageEraseFailed:
+   1869                return "Flash - Page Erase failed";
+   1870             case Flash_PageNrInvalid:
+   1871                return "Flash - Page Number is out of Range";
+   1872             case Flash_SectorNrInvalid:
+   1873                return "Flash - Sector Number is out of Range";
+   1874            case Flash_FunctionNotSupported:
+   1875                return "Flash - Function not supported";
+   1876             case Flash_NoInformationAvailable:
+   1877                return "Flash - No Additional Information Available";
+   1878             case Flash_OperationOngoing:
+   1879                return "Flash - Operation ongoing";
+   1880             case Flash_OperationTimeOut:
+   1881                return "Flash - Operation TimeOut";
+   1882             case Flash_ProgramFailed:
+   1883                return "Flash - Program failed";
+   1884             case Flash_Success:
+   1885                return "Flash - Success";
+   1886             case Flash_WrongType:
+   1887                return "Flash - Wrong Type";
+   1888             default:
+   1889                return "Flash - Undefined Error Value";
+   1890             } /* EndSwitch */
+   1891          } /* EndFunction FlashErrorString */
+   1892          #endif /* VERBOSE Definition */
+   1893          
+   1894          
+   1895          /*******************************************************************************
+   1896          Function:     FlashTimeOut(NMX_uint32 udSeconds)
+   1897          Arguments:    udSeconds holds the number of seconds before TimeOut occurs
+   1898          
+   1899          Return Value:
+   1900             Flash_OperationTimeOut
+   1901             Flash_OperationOngoing
+   1902          
+   1903          Example:   FlashTimeOut(0)  // Initializes the Timer
+   1904          
+   1905                     While(1) {
+   1906                        ...
+   1907                        If (FlashTimeOut(5) == Flash_OperationTimeOut) break;
+   1908                        // The loop is executed for 5 Seconds before the operation is aborted
+   1909                     } EndWhile
+   1910          
+   1911          *******************************************************************************/
+   1912          #ifdef TIME_H_EXISTS
+   1913          /*-----------------------------------------------------------------------------
+   1914          Description:   This function provides a timeout for Flash polling actions or
+   1915             other operations which would otherwise never return.
+   1916             The Routine uses the function clock() inside ANSI C library "time.h".
+   1917          -----------------------------------------------------------------------------*/
+   1918          ReturnType FlashTimeOut(NMX_uint32 udSeconds){
+   1919             static clock_t clkReset,clkCount;
+   1920          
+   1921             if (udSeconds == 0) { /* Set Timeout to 0 */
+   1922                clkReset=clock();
+   1923             } /* EndIf */
+   1924          
+   1925             clkCount = clock() - clkReset;
+   1926          
+   1927             if (clkCount<(CLOCKS_PER_SEC*(clock_t)udSeconds))
+   1928                return Flash_OperationOngoing;
+   1929             else
+   1930          	  return Flash_OperationTimeOut;
+   1931          }/* EndFunction FlashTimeOut */
+   1932          
+   1933          #else
+   1934          
+   1935          /*-----------------------------------------------------------------------------
+   1936          Description:   This function provides a timeout for Flash polling actions or
+   1937             other operations which would otherwise never return.
+   1938             The Routine uses COUNT_FOR_A_SECOND which is considered to be a loop that
+   1939             counts for one second. It needs to be adapted to the target Hardware.
+   1940          -----------------------------------------------------------------------------*/
+   1941          ReturnType FlashTimeOut(NMX_uint32 udSeconds) {
+   1942          
+   1943             static NMX_uint32 udCounter = 0;
+   1944             if (udSeconds == 0) { /* Set Timeout to 0 */
+   1945               udCounter = 0;
+   1946             } /* EndIf */
+   1947          
+   1948             if (udCounter == (udSeconds * COUNT_FOR_A_SECOND)) {
+   1949                udCounter = 0;
+   1950                return Flash_OperationTimeOut;
+   1951             } else {
+   1952                udCounter++;
+   1953                return Flash_OperationOngoing;
+   1954             } /* Endif */
+   1955          
+   1956          } /* EndFunction FlashTimeOut */
+   1957          
+   1958          #endif
+   1959          
+   1960          /*-----------------------------------------------------------------------------
+   1961          Description:   This function fill the vector in according with address mode
+   1962          -----------------------------------------------------------------------------*/
+   1963          void fill_addr_vect(uAddrType udAddr, NMX_uint8* pIns_Addr, NMX_uint8 num_address_byte) {
+   1964          
+   1965          	/* 3-addr byte mode */
+   1966          	if(FLASH_3_BYTE_ADDR_MODE == num_address_byte)
+   1967          	{
+   1968          		pIns_Addr[1]              = udAddr>>16;
+   1969          		pIns_Addr[2]              = udAddr>>8;
+   1970          		pIns_Addr[3]              = udAddr;
+   1971          	}
+   1972          
+   1973          	/* 4-addr byte mode */
+   1974          	if(FLASH_4_BYTE_ADDR_MODE == num_address_byte)
+   1975          	{
+   1976          		pIns_Addr[1]              = udAddr>>24;
+   1977          		pIns_Addr[2]              = udAddr>>16;
+   1978          		pIns_Addr[3]              = udAddr>>8;
+   1979          		pIns_Addr[4]              = udAddr;
+   1980          	}
+   1981          	return;
+   1982          }
+   1983          
+   1984          /*-----------------------------------------------------------------------------
+   1985          Description:   This function wait till instruction execution is complete
+   1986          -----------------------------------------------------------------------------*/
+   1987          ReturnType WAIT_TILL_Instruction_EXECUTION_COMPLETE(NMX_sint16 second) {
+   1988              FlashTimeOut(0);
+   1989              while(IsFlashBusy())
+   1990              {
+   1991                  if(Flash_OperationTimeOut == FlashTimeOut(second))
+   1992                      return  Flash_OperationTimeOut;
+   1993              }
+   1994              return Flash_Success;
+   1995          }
+   1996          
+   1997          
+   1998          /*******************************************************************************
+   1999          Function:     ReturnType FlashEnter4ByteAddressMode(void)
+   2000          Arguments:
+   2001          
+   2002          Return Value:
+   2003             Flash_Success
+   2004          
+   2005          Description:  This function set the 4-byte-address mode
+   2006          
+   2007          Pseudo Code:
+   2008             Step 1: Write enable
+   2009             Step 2: Initialize the data (i.e. Instruction & value) packet to be sent serially
+   2010             Step 3: Send the packet serially
+   2011             Step 4: Wait until the operation completes or a timeout occurs.
+   2012          *******************************************************************************/
+   2013          ReturnType FlashEnter4ByteAddressMode(void) {
+   2014              CharStream char_stream_send;
+                     ^
+Error[Pe020]: identifier "CharStream" is undefined
+   2015              NMX_uint8 cPER = SPI_FLASH_4B_MODE_ENTER;
+   2016          	ReturnType ret;
+   2017          	NMX_uint8 flag;
+   2018          
+   2019          	#ifndef SUPPORT_N25Q_STEP_B
+   2020          	FlashWriteEnable();
+   2021          	#endif
+   2022          
+   2023              char_stream_send.length   = 1;
+   2024              char_stream_send.pChar    = &cPER;
+   2025          
+   2026              Serialize_SPI(&char_stream_send,
+                     ^
+Warning[Pe223]: function "Serialize_SPI" declared implicitly
+   2027                        NULL_PTR,
+   2028                        OpsWakeUp,
+                               ^
+Error[Pe020]: identifier "OpsWakeUp" is undefined
+   2029                        OpsEndTransfer);
+                               ^
+Error[Pe020]: identifier "OpsEndTransfer" is undefined
+   2030          
+   2031          	#ifdef DEBUG
+   2032          	printf("ENTER 4-byte-addr mode\n");
+   2033          	#endif
+   2034          
+   2035          	ret = WAIT_TILL_Instruction_EXECUTION_COMPLETE(1);
+   2036          
+   2037          	/* verify current addr mode */
+   2038          	fdo->GenOp.ReadFlagStatusRegister(&flag);
+   2039          	if (flag & 1)
+   2040          		fdo->Desc.NumAddrByte = FLASH_4_BYTE_ADDR_MODE;
+   2041          	else
+   2042          		fdo->Desc.NumAddrByte = FLASH_3_BYTE_ADDR_MODE;
+   2043          
+   2044              return ret;
+   2045          }
+   2046          
+   2047          /*******************************************************************************
+   2048          Function:     ReturnType FlashExit4ByteAddressMode(void)
+   2049          Arguments:
+   2050          
+   2051          Return Value:
+   2052             Flash_Success
+   2053          
+   2054          Description:  This function unset 4-byte-address mode
+   2055          
+   2056          Pseudo Code:
+   2057             Step 1: Write enable
+   2058             Step 2: Initialize the data (i.e. Instruction & value) packet to be sent serially
+   2059             Step 3: Send the packet serially
+   2060             Step 4: Wait until the operation completes or a timeout occurs.
+   2061          *******************************************************************************/
+   2062          ReturnType FlashExit4ByteAddressMode(void) {
+   2063              CharStream char_stream_send;
+                     ^
+Error[Pe020]: identifier "CharStream" is undefined
+   2064              NMX_uint8 cPER = SPI_FLASH_4B_MODE_EXIT;
+   2065          	ReturnType ret;
+   2066          	NMX_uint8 flag;
+   2067          
+   2068          	#ifndef SUPPORT_N25Q_STEP_B
+   2069          	FlashWriteEnable();
+   2070          	#endif
+   2071          
+   2072              char_stream_send.length   = 1;
+   2073              char_stream_send.pChar    = &cPER;
+   2074          
+   2075              Serialize_SPI(&char_stream_send,
+                     ^
+Warning[Pe223]: function "Serialize_SPI" declared implicitly
+   2076                        NULL_PTR,
+   2077                        OpsWakeUp,
+                               ^
+Error[Pe020]: identifier "OpsWakeUp" is undefined
+   2078                        OpsEndTransfer);
+                               ^
+Error[Pe020]: identifier "OpsEndTransfer" is undefined
+   2079          
+   2080          	#ifdef DEBUG
+   2081          	printf("EXIT 4-byte-addr mode\n");
+   2082          	#endif
+   2083          
+   2084          	ret = WAIT_TILL_Instruction_EXECUTION_COMPLETE(1);
+   2085          
+   2086          	/* verify current addr mode */
+   2087          	fdo->GenOp.ReadFlagStatusRegister(&flag);
+   2088          	if (flag & 1)
+   2089          		fdo->Desc.NumAddrByte = FLASH_4_BYTE_ADDR_MODE;
+   2090          	else
+   2091          		fdo->Desc.NumAddrByte = FLASH_3_BYTE_ADDR_MODE;
+   2092          
+   2093              return ret;
+   2094          }
+   2095          
+   2096          /*******************************************************************************
+   2097          Function: FlashLockSector
+   2098          
+   2099          Arguments: address, len
+   2100          
+   2101          Return Values: ReturnType
+   2102          
+   2103          Description:
+   2104          
+   2105          Note:
+   2106          
+   2107          Pseudo Code:
+   2108          
+   2109          *******************************************************************************/
+   2110          ReturnType FlashLockSector(uAddrType address,  NMX_uint32 len) {
+   2111          	NMX_uint8 reg_value;
+                 	          ^
+Warning[Pe177]: variable "reg_value" was declared but never referenced
+   2112          	NMX_uint8 TB, BP, SR;
+   2113          	int i, protected_area, start_sector;
+   2114          	int sector_size, num_of_sectors;
+   2115          
+   2116          	sector_size = fdo->Desc.FlashSectorSize;
+   2117          	num_of_sectors = fdo->Desc.FlashSectorCount;
+   2118          
+   2119          	FlashWriteEnable();
+   2120          
+   2121          	start_sector = address / sector_size;
+   2122          	protected_area = len / sector_size;
+   2123          
+   2124          	if (protected_area == 0 || protected_area > num_of_sectors)
+   2125          		return Flash_AddressInvalid;
+   2126          
+   2127          	//(pa & (pa - 1) == 0) verifica che pa sia una potenza di 2
+   2128          	if ((start_sector != 0 && (start_sector + protected_area) != num_of_sectors) || (protected_area & (protected_area - 1)) != 0)
+   2129          		return Flash_AddressInvalid;
+   2130          
+   2131          
+   2132          	if (address/sector_size < num_of_sectors/2) {
+   2133          		TB = 1;
+   2134          	} else {
+   2135          		TB = 0;
+   2136          	}
+   2137          
+   2138          	BP = 1;
+   2139          	for (i = 1; i <= num_of_sectors; i = i*2) {
+   2140          		if (protected_area == i) {
+   2141          			break;
+   2142          		}
+   2143          		BP++;
+   2144          	}
+   2145          
+   2146          	SR = (((BP & 8) >> 3) << 6) | (TB << 5) | ((BP & 7) << 2);
+   2147          
+   2148          	FlashWriteStatusRegister(SR);
+   2149          	return Flash_Success;
+   2150          
+   2151          }
+   2152          
+   2153          /*******************************************************************************
+   2154          Function: FlashUnlockAllSector
+   2155          
+   2156          Arguments: (none)
+   2157          
+   2158          Return Values: ReturnType
+   2159          
+   2160          Description:
+   2161          
+   2162          Note:
+   2163          
+   2164          Pseudo Code:
+   2165          
+   2166          *******************************************************************************/
+   2167          ReturnType FlashUnlockAllSector() {
+   2168          	NMX_uint8 SR = 0;
+   2169          
+   2170          	/* Set BP2, BP1, BP0 to 0 (all flash sectors unlocked) */
+   2171          	FlashWriteStatusRegister(SR);
+   2172          
+   2173          	return Flash_Success;
+   2174          }
+   2175          /* End of file */
+   2176          
+   2177          /*******************************************************************************
+   2178          Function: FlashOTPProgram
+   2179          
+   2180          Arguments: *pArray, udNrOfElementsInArray
+   2181          
+   2182          Return Values: ReturnType
+   2183          
+   2184          Description:
+   2185          
+   2186          Note:
+   2187          
+   2188          Pseudo Code:
+   2189          
+   2190          *******************************************************************************/
+   2191          ReturnType FlashOTPProgram(NMX_uint8 *pArray , NMX_uint32 udNrOfElementsInArray) {
+   2192              CharStream char_stream_send;
+                     ^
+Error[Pe020]: identifier "CharStream" is undefined
+   2193              NMX_uint8 i;
+   2194              NMX_uint8 pIns_Addr[5];
+   2195              NMX_uint8 sentBuffer[fdo->Desc.FlashOTPSize+1];
+                                             ^
+Error[Pe060]: this operator is not allowed in an integral constant expression
+
+      NMX_uint8 sentBuffer[fdo->Desc.FlashOTPSize+1];
+                                    ^
+"E:\TRIO_MD\3.F_W\TRIO_MD_APPL_STM207_20140812\dev\SFlash\N25Q.c",2195  Error[Pe060]: 
+          this operator is not allowed in an integral constant expression
+   2196              NMX_uint32 udAddr;
+   2197          	ReturnType ret;
+   2198          
+   2199              // Step 1: Validate address input
+   2200              if(udNrOfElementsInArray > fdo->Desc.FlashOTPSize)
+   2201          		return Flash_AddressInvalid;
+   2202          
+   2203          	/* Address is always 0x000000 */
+   2204          	udAddr = 0x000000;
+   2205          
+   2206          	/* Output buffer (with user data within) is fixed to 65 elements */
+   2207          	for(i=0; i<udNrOfElementsInArray; i++)
+   2208          		sentBuffer[i] = pArray[i];
+   2209          
+   2210          	/* Fill the others bytes with 00 */
+   2211          	for(i=udNrOfElementsInArray; i<fdo->Desc.FlashOTPSize; i++)
+   2212          		sentBuffer[i] = 0x00;
+   2213          
+   2214          	/* This is the byte 64, OTP Control byte (if bit 0 = 0 -> OTP Locked) */
+   2215          	sentBuffer[fdo->Desc.FlashOTPSize] = 0;
+   2216          
+   2217              // Step 2: Check whether any previous Write, Program or Erase cycle is on-going
+   2218              if(IsFlashBusy())
+   2219              	return Flash_OperationOngoing;
+   2220          
+   2221              // Step 3: Disable Write protection
+   2222              fdo->GenOp.WriteEnable();
+   2223          
+   2224              // Step 4: Initialize the data (Instruction & address only) packet to be sent serially
+   2225              char_stream_send.length   = fdo->Desc.NumAddrByte + 1;
+   2226              char_stream_send.pChar    = pIns_Addr;
+   2227          
+   2228              pIns_Addr[0]              = SPI_FLASH_INS_PROTP;
+   2229          
+   2230              /* Always use 3 bytes address and address is 0x000000 */
+   2231          	fill_addr_vect(udAddr, pIns_Addr, 3);
+   2232          
+   2233              // Step 5: Send the packet (Instruction & address only) serially
+   2234              Serialize_SPI(&char_stream_send,
+                     ^
+Warning[Pe223]: function "Serialize_SPI" declared implicitly
+   2235                        NULL_PTR,
+   2236                        OpsWakeUp,
+                               ^
+Error[Pe020]: identifier "OpsWakeUp" is undefined
+   2237                        OpsInitTransfer);
+                               ^
+Error[Pe020]: identifier "OpsInitTransfer" is undefined
+   2238          
+   2239              // Step 6: Initialize the data (data to be programmed) packet to be sent serially
+   2240              char_stream_send.length   = udNrOfElementsInArray;
+   2241              char_stream_send.pChar    = pArray;
+   2242          
+   2243              // Step 7: Send the packet (data to be programmed) serially
+   2244              Serialize_SPI(&char_stream_send,
+   2245                        NULL_PTR,
+   2246                        OpsWakeUp,
+   2247                        OpsEndTransfer);
+                               ^
+Error[Pe020]: identifier "OpsEndTransfer" is undefined
+   2248          
+   2249              // Step 8: Wait until the operation completes or a timeout occurs.
+   2250          	ret = WAIT_TILL_Instruction_EXECUTION_COMPLETE(1);
+   2251          
+   2252          	return ret;
+   2253          }
+   2254          
+   2255          /*******************************************************************************
+   2256          Function: FlashOTPRead
+   2257          
+   2258          Arguments: *ucpElements, udNrOfElementsToRead
+   2259          
+   2260          Return Values: ReturnType
+   2261          
+   2262          Description:
+   2263          
+   2264          Note:
+   2265          
+   2266          Pseudo Code:
+   2267          
+   2268          *******************************************************************************/
+   2269          ReturnType FlashOTPRead(NMX_uint8 *ucpElements, NMX_uint32 udNrOfElementsToRead) {
+   2270              CharStream char_stream_send;
+                     ^
+Error[Pe020]: identifier "CharStream" is undefined
+   2271              CharStream char_stream_recv;
+                     ^
+Error[Pe020]: identifier "CharStream" is undefined
+   2272          	NMX_uint8  pIns_Addr[5];
+   2273              NMX_uint32 udAddr;
+   2274          
+   2275              /* Address is always 0x000000 */
+   2276              udAddr = 0x000000;
+   2277          
+   2278              // Step 2: Initialize the data (i.e. Instruction) packet to be sent serially
+   2279          	char_stream_send.length   = fdo->Desc.NumAddrByte + 1;
+   2280              char_stream_send.pChar    = pIns_Addr;
+   2281              pIns_Addr[0]              = SPI_FLASH_INS_RDOTP;
+   2282          
+   2283          	fill_addr_vect(udAddr, pIns_Addr, 3);
+   2284          
+   2285              char_stream_recv.length   = udNrOfElementsToRead;
+   2286              char_stream_recv.pChar    = ucpElements;
+   2287          
+   2288              // Step 3: Send the packet serially, and fill the buffer with the data being returned
+   2289              Serialize_SPI(&char_stream_send,
+                     ^
+Warning[Pe223]: function "Serialize_SPI" declared implicitly
+   2290                        &char_stream_recv,
+   2291                        OpsWakeUp,
+                               ^
+Error[Pe020]: identifier "OpsWakeUp" is undefined
+   2292                        OpsEndTransfer);
+                               ^
+Error[Pe020]: identifier "OpsEndTransfer" is undefined
+   2293          
+   2294              return Flash_Success;
+   2295          }
+
+Errors: 81
+Warnings: 31

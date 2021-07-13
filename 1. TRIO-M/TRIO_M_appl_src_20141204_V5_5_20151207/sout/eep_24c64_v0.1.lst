@@ -1,0 +1,455 @@
+###############################################################################
+#                                                                             #
+# IAR ANSI C/C++ Compiler V5.30.2.51295/W32 for ARM     18/May/2012  17:34:59 #
+# Copyright 1999-2009 IAR Systems AB.                                         #
+#                                                                             #
+#    Cpu mode     =  thumb                                                    #
+#    Endian       =  little                                                   #
+#    Source file  =  D:\Project\TRIO\3.F_W\TRIO_appl_src_20120516\lib\at24c64 #
+#                    \eep_24c64_v0.1.c                                        #
+#    Command line =  D:\Project\TRIO\3.F_W\TRIO_appl_src_20120516\lib\at24c64 #
+#                    \eep_24c64_v0.1.c -D NDEBUG -lcN                         #
+#                    D:\Project\TRIO\3.F_W\TRIO_appl_src_20120516\sout\ -o    #
+#                    D:\Project\TRIO\3.F_W\TRIO_appl_src_20120516\sout\       #
+#                    --endian=little --cpu=Cortex-M3 -e                       #
+#                    --warnings_are_errors --fpu=None --dlib_config           #
+#                    "C:\Program Files\IAR Systems\Embedded Workbench         #
+#                    5.4\arm\INC\DLib_Config_Normal.h" -I                     #
+#                    D:\Project\TRIO\3.F_W\TRIO_appl_src_20120516\include\    #
+#                    -I D:\Project\TRIO\3.F_W\TRIO_appl_src_20120516\lib_stm3 #
+#                    2\inc\ -I D:\Project\TRIO\3.F_W\TRIO_appl_src_20120516\l #
+#                    ib_stm32\src\ -I D:\Project\TRIO\3.F_W\TRIO_appl_src_201 #
+#                    20516\uC-CPU\ -I D:\Project\TRIO\3.F_W\TRIO_appl_src_201 #
+#                    20516\uC-LIB\ -I D:\Project\TRIO\3.F_W\TRIO_appl_src_201 #
+#                    20516\uCOS-II\Ports\ -I D:\Project\TRIO\3.F_W\TRIO_appl_ #
+#                    src_20120516\uCOS-II\Source\ -I                          #
+#                    D:\Project\TRIO\3.F_W\TRIO_appl_src_20120516\uC-Probe\   #
+#                    -I "C:\Program Files\IAR Systems\Embedded Workbench      #
+#                    5.4\arm\INC\" -Oh                                        #
+#    List file    =  D:\Project\TRIO\3.F_W\TRIO_appl_src_20120516\sout\eep_24 #
+#                    c64_v0.1.lst                                             #
+#    Object file  =  D:\Project\TRIO\3.F_W\TRIO_appl_src_20120516\sout\eep_24 #
+#                    c64_v0.1.o                                               #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\Project\TRIO\3.F_W\TRIO_appl_src_20120516\lib\at24c64\eep_24c64_v0.1.c
+      1          /*******************************************************************************
+      2           *
+      3           * This module contains the function HMS39C7092 EEPROM(AT24C64) related, a function
+      4           * that is called before the 'main' function of the program.  Normally
+      5           * timer initializations - such as setting the prefered timer interrupt
+      6           * level or setting the watchdog - can be performed here.
+      7           *
+      8           * Note that this function is called before the data segments are
+      9           * initialized, this means that this function cannot rely on the
+     10           * values of global or static variables.
+     11           *
+     12           *
+     13           *
+     14           * $Revision: 0.1 $
+     15           * $Revision date: 2008.06
+     16           ******************************************************************************/
+     17          
+     18          #include "stm32f10x_conf.h"
+     19          #include "../include/eepext.h"
+     20          #include "eep_24c64_v0.1.h"
+     21          
+     22          //#define EEp_debug
+     23          unsigned long int USART3Printf( const char *format, ... );
+     24          
+     25          unsigned long int (*eprintf)( const char *format, ... ) = USART3Printf;
+     26          
+     27          void EEpromInit(void)
+     28          {
+     29          
+     30          	// This Fuction should be used after declare pio or expio init function.
+     31          	// Write Protecion Enable, Prohibit normal write operation
+     32          	// Low SCL, SDA: input access
+     33          	//
+     34          	// Port Initialization
+     35          #ifdef STM32FRxT6_USED
+     36          	// SCL
+     37          	GPIOB->CNF.B6 = __PB6_OU_PP; //__I2C1_SCL;			// AT24C64 SCL
+     38          
+     39          	// SDA
+     40          	GPIOB->CNF.B7 = __PB7_IN_FL; //__I2C1_SDA;			// AT24C64 SDA
+     41          #else
+     42          	// SCL
+     43          	GPIOB->CNF.B4 = __PB4_OU_PP; //__I2C1_SCL;			// AT24C64 SCL
+     44          	// SDA
+     45          	GPIOE->CNF.B2 = __PE2_IN_FL; //__I2C1_SDA;			// AT24C64 SDA
+     46          #endif
+     47          	RstSCL();
+     48          }
+     49          
+     50          INT16S WriteEEprom(INT16U ADDR, INT8U Data)
+     51          {
+     52          	INT8U cnt = EEpromWrTry;
+     53          	INT8U rVal = 0;
+     54          	INT16S pVal = (Data & 0xff);
+     55          	// 0: Write Fail
+     56          	// 1: Write Success
+     57          	rVal = Write_EEprom_16Addr_8Data(At24cDevID, ADDR, Data);
+     58          
+     59          	if(!rVal) return -1;
+     60          
+     61          	// Confirm Data
+     62          	while(cnt--)
+     63          	{
+     64          		OSTimeDly(1);
+     65          		if(Read_EEprom_16Addr_8Data(At24cDevID, ADDR) == pVal) return pVal;
+     66          	}
+     67          	return Data;
+     68          }
+     69          
+     70          INT8U ReadEEprom(INT16U ADDR)
+     71          {
+     72          	return Read_EEprom_16Addr_8Data(At24cDevID, ADDR);
+     73          }
+     74          
+     75          INT8U Write_EEprom_16Addr_8Data(INT8U DevAddr, INT16U Addr, INT8U Data)
+     76          {
+     77          	INT8U cnt = EEpromWrTry;
+     78          	// Start Condition
+     79          	// Write Protection Disable, Allows normal write operation
+     80          	//
+     81          	// output 1(SDATA)
+     82          	// START Conditon making
+     83          	while(cnt--)
+     84          	{
+     85          		StartEEprom();
+     86          		WriteEEpromData(DevAddr & (~0x01));
+     87          		#ifndef EEp_debug
+     88          			if(ACKEEprom()) continue;
+     89          		#else
+     90          		{
+     91          			INT8U _Ack = ACKEEprom();
+     92          			eprintf("ACK((0): %d \n", _Ack);
+     93          			if(_Ack) continue;
+     94          		}
+     95          		#endif
+     96          		WriteEEpromData((INT8U)(Addr >> 8));
+     97          		#ifndef EEp_debug
+     98          			if(ACKEEprom()) continue;
+     99          		#else
+    100          		{
+    101          			INT8U _Ack = ACKEEprom();
+    102          			eprintf("ACK(1): %d \n", _Ack);
+    103          			if(_Ack) continue;
+    104          		}
+    105          		#endif
+    106          		WriteEEpromData((INT8U)(Addr     ));
+    107          		#ifndef EEp_debug
+    108          			if(ACKEEprom()) continue;
+    109          		#else
+    110          		{
+    111          			INT8U _Ack = ACKEEprom();
+    112          			eprintf("ACK(2): %d \n", _Ack);
+    113          			if(_Ack) continue;
+    114          		}
+    115          		#endif
+    116          		WriteEEpromData(Data);
+    117          		#ifndef EEp_debug
+    118          			if(ACKEEprom()) continue;
+    119          		#else
+    120          		{
+    121          			INT8U _Ack = ACKEEprom();
+    122          			eprintf("ACK(3): %d \n", _Ack);
+    123          			if(_Ack) continue;
+    124          		}
+    125          		#endif
+    126          		StopEEprom();
+    127          
+    128          		return TRUE;
+    129          	}
+    130          	return FALSE;
+    131          }
+    132          
+    133          
+    134          INT16S Read_EEprom_16Addr_8Data(INT8U DevAddr, INT16U Addr)
+    135          {
+    136          	INT8U cnt = EEpromWrTry;
+    137          	INT8U rVal = 0;
+    138          
+    139          	// Device Address Writing
+    140          	while(cnt--)
+    141          	{
+    142          
+    143          		StartEEprom();
+    144          		WriteEEpromData(DevAddr & (~0x01));
+    145          		#ifndef EEp_debug
+    146          			if(ACKEEprom()) continue;
+    147          		#else
+    148          		{
+    149          			INT8U _Ack = ACKEEprom();
+    150          			eprintf("ACK(0): %d \n", _Ack);
+    151          			if(_Ack) continue;
+    152          		}
+    153          		#endif
+    154          		WriteEEpromData((INT8U)(Addr >> 8));
+    155          		#ifndef EEp_debug
+    156          			if(ACKEEprom()) continue;
+    157          		#else
+    158          		{
+    159          			INT8U _Ack = ACKEEprom();
+    160          			eprintf("ACK(1): %d \n", _Ack);
+    161          			if(_Ack) continue;
+    162          		}
+    163          		#endif
+    164          		WriteEEpromData((INT8U)(Addr     ));
+    165          		#ifndef EEp_debug
+    166          			if(ACKEEprom()) continue;
+    167          		#else
+    168          		{
+    169          			INT8U _Ack = ACKEEprom();
+    170          			eprintf("ACK(2): %d \n", _Ack);
+    171          			if(_Ack) continue;
+    172          		}
+    173          		#endif
+    174          		StartEEprom();
+    175          		WriteEEpromData(DevAddr | 0x01);
+    176          		#ifndef EEp_debug
+    177          			if(ACKEEprom()) continue;
+    178          		#else
+    179          		{
+    180          			INT8U _Ack = ACKEEprom();
+    181          			eprintf("ACK(3): %d \n", _Ack);
+    182          			if(_Ack) continue;
+    183          		}
+    184          		#endif
+    185          		rVal = ReadEEpromData();
+    186          
+    187          		NACKEEprom();
+    188          	 	StopEEprom();
+    189          
+    190          		return (rVal & 0xff);
+    191          	}
+    192          	return -1;
+    193          }
+    194          
+    195          INT8U ACKEEprom(void)
+    196          {
+    197          	INT8U Data;
+    198          
+    199           	SetSDAInMode();
+    200          	// ACK Check
+    201          	SetSCL();
+    202          	Data = ReadSDA();
+    203          	RstSCL();
+    204          	return Data;
+    205          }
+    206          
+    207          void NACKEEprom(void)
+    208          {
+    209          	// NACK
+    210           	SetSDAOutMode();
+    211          
+    212          	SetSDA();
+    213          	SetSCL();
+    214          	RstSCL();
+    215          }
+    216          
+    217          void WriteEEpromData(INT8U Data)
+    218          {
+    219          	INT8U i = 0;
+    220          
+    221           	SetSDAOutMode();
+    222          
+    223          	RstSCL();
+    224          	for(i = 0; i < 8; i++)
+    225          	{
+    226          		if((Data & 0x80)) 	SetSDA();
+    227          		else				RstSDA();
+    228          		SetSCL();
+    229          		RstSCL();
+    230          		Data <<= 1;
+    231          	}
+    232          }
+    233          
+    234          INT8U ReadEEpromData(void)
+    235          {
+    236          	INT8U Data = 0, i = 0;
+    237          
+    238          	SetSDAInMode();
+    239          
+    240          	for(i = 0; i < 8; i++)
+    241          	{
+    242                  Data = (Data << 1);
+    243                  SetSCL();
+    244                  if(ReadSDA())	Data |= 0x01;
+    245                  RstSCL();
+    246          	}
+    247          	return Data;
+    248          }
+    249          
+    250          
+    251          void StartEEprom(void)
+    252          {
+    253          	// START Conditon making
+    254          	SetSDAOutMode();
+    255          
+    256          	SetSDA();
+    257          
+    258          	SetSCL();
+    259          	RstSDA();
+    260          	RstSCL();
+    261          
+    262          }
+    263          void StopEEprom(void)
+    264          {
+    265          	// STOP
+    266          	SetSDAOutMode();
+    267          
+    268          	RstSDA();
+    269          	SetSCL();
+    270          	SetSDA();
+    271          	RstSCL();
+    272          }
+    273          
+    274          void SetSDAInMode(void)
+    275          {
+    276          #ifdef STM32FRxT6_USED
+    277          	GPIOB->ODR.B7 = __PB7_IN_FL; //__I2C1_SDA;			// AT24C64 SDA
+    278          #else
+    279          	GPIOE->ODR.B2 = __PE2_IN_FL; //__I2C1_SDA;			// AT24C64 SDA
+    280          #endif
+    281          }
+    282          
+    283          void SetSDAOutMode(void)
+    284          {
+    285          #ifdef STM32FRBT6_USED
+    286          	GPIOB->ODR.B7 = __PB7_OU_PP; //__I2C1_SDA;			// AT24C64 SDA
+    287          #else
+    288          	GPIOE->ODR.B2 = __PE2_OU_PP; //__I2C1_SDA;			// AT24C64 SDA
+    289          #endif
+    290          }
+    291          
+    292          void SetSCL(void)
+    293          {
+    294          #ifdef STM32FRxT6_USED
+    295          	GPIOB->ODR.B6 = 1;
+    296          #else
+    297          	GPIOB->ODR.B4 = 1;
+    298          #endif
+    299          	CLKDELAY;
+    300          }
+    301          void RstSCL(void)
+    302          {
+    303          #ifdef STM32FRxT6_USED
+    304          	GPIOB->ODR.B6 = 0;
+    305          #else
+    306          	GPIOB->ODR.B4 = 0;
+    307          #endif
+    308          	CLKDELAY;
+    309          }
+    310          
+    311          void SetSDA(void)
+    312          {
+    313          #ifdef STM32FRBT6_USED
+    314          	GPIOB->ODR.B7 = 1;
+    315          #else
+    316          	GPIOE->ODR.B2 = 1;	
+    317          #endif
+    318          	CLKDELAY;
+    319          }
+    320          
+    321          void RstSDA(void)
+    322          {
+    323          #ifdef STM32FRBT6_USED
+    324          	GPIOB->ODR.B7 = 0;
+    325          #else
+    326          	GPIOE->ODR.B2 = 0;
+    327          #endif
+    328          	CLKDELAY;
+    329          }
+    330          INT8U ReadSDA(void)
+    331          {
+    332          /////////////////////////////////////////	
+    333          	CLKDELAY;
+    334          #ifdef STM32FRBT6_USED
+    335          	return(GPIOB->IDR.B7);
+    336          #else
+    337          	return(GPIOE->IDR.B2);
+    338          #endif
+    339          }
+    340          void EnableWriteEEprom(void)
+    341          {
+    342          	// Low
+    343          }
+    344          void DisableWriteEEprom(void)
+    345          {
+    346          	// High
+    347          }
+    348          
+    349          ////////////////////////////////////////////////////////////////////////////////
+    350          // End of Source File
+    351          /////////////////////
+    352          
+
+   Maximum stack usage in bytes:
+
+     Function                  .cstack
+     --------                  -------
+     ACKEEprom                      8
+     DisableWriteEEprom             0
+     EEpromInit                     8
+     EnableWriteEEprom              0
+     NACKEEprom                     8
+     ReadEEprom                     8
+     ReadEEpromData                16
+     ReadSDA                        8
+     Read_EEprom_16Addr_8Data      24
+     RstSCL                         8
+     RstSDA                         8
+     SetSCL                         8
+     SetSDA                         8
+     SetSDAInMode                   0
+     SetSDAOutMode                  0
+     StartEEprom                    8
+     StopEEprom                     8
+     WriteEEprom                   24
+     WriteEEpromData               16
+     Write_EEprom_16Addr_8Data     24
+
+
+   Section sizes:
+
+     Function/Label            Bytes
+     --------------            -----
+     eprintf                      4
+     EEpromInit                  40
+     WriteEEprom                 58
+     ReadEEprom                  14
+     Write_EEprom_16Addr_8Data  100
+     Read_EEprom_16Addr_8Data   118
+     ACKEEprom                   30
+     NACKEEprom                  20
+     ?Subroutine0                 6
+     WriteEEpromData             52
+     ReadEEpromData              46
+     StartEEprom                 26
+     StopEEprom                  26
+     SetSDAInMode                12
+     SetSDAOutMode               12
+     SetSCL                      10
+     ?Subroutine1                 8
+     RstSCL                      10
+     SetSDA                       8
+     RstSDA                      10
+     ReadSDA                     24
+     EnableWriteEEprom            2
+     DisableWriteEEprom           2
+     ??DataTable9                 4
+     ??DataTable11                4
+
+ 
+   4 bytes in section .data
+ 642 bytes in section .text
+ 
+ 642 bytes of CODE memory
+   4 bytes of DATA memory
+
+Errors: none
+Warnings: none

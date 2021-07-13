@@ -1,0 +1,1296 @@
+###############################################################################
+#                                                                             #
+# IAR ANSI C/C++ Compiler V6.21.1.52794/W32 for ARM     01/Dec/2012  01:10:11 #
+# Copyright 1999-2011 IAR Systems AB.                                         #
+#                                                                             #
+#    Cpu mode     =  thumb                                                    #
+#    Endian       =  little                                                   #
+#    Source file  =  C:\user\project\FR-DB家屈\fw\appl_stm207_20121201\dev\W3 #
+#                    150A_v1.0.6\socket.c                                     #
+#    Command line =  C:\user\project\FR-DB家屈\fw\appl_stm207_20121201\dev\W3 #
+#                    150A_v1.0.6\socket.c -lC C:\user\project\FR-DB家屈\fw\ap #
+#                    pl_stm207_20121201\out\ -o C:\user\project\FR-DB家屈\fw\ #
+#                    appl_stm207_20121201\out\ --endian=little                #
+#                    --cpu=Cortex-M3 -e --fpu=None --dlib_config              #
+#                    "C:\compiler\ewarm 6.2\arm\INC\c\DLib_Config_Normal.h"   #
+#                    -I C:\user\project\FR-DB家屈\fw\appl_stm207_20121201\inc #
+#                    lude\ -I C:\user\project\FR-DB家屈\fw\appl_stm207_201212 #
+#                    01\STM32F2xx_StdPeriph_Driver_v1212\ -I                  #
+#                    C:\user\project\FR-DB家屈\fw\appl_stm207_20121201\STM32F #
+#                    2xx_StdPeriph_Driver_v1212\inc\ -I                       #
+#                    C:\user\project\FR-DB家屈\fw\appl_stm207_20121201\uC-CPU #
+#                    \ -I C:\user\project\FR-DB家屈\fw\appl_stm207_20121201\u #
+#                    C-LIB\ -I C:\user\project\FR-DB家屈\fw\appl_stm207_20121 #
+#                    201\uCOS-II\Ports\ -I C:\user\project\FR-DB家屈\fw\appl_ #
+#                    stm207_20121201\uCOS-II\Source\ -I                       #
+#                    C:\user\project\FR-DB家屈\fw\appl_stm207_20121201\uC-Pro #
+#                    be\ -Oh --use_c++_inline                                 #
+#    List file    =  C:\user\project\FR-DB家屈\fw\appl_stm207_20121201\out\so #
+#                    cket.lst                                                 #
+#    Object file  =  C:\user\project\FR-DB家屈\fw\appl_stm207_20121201\out\so #
+#                    cket.o                                                   #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+C:\user\project\FR-DB家屈\fw\appl_stm207_20121201\dev\W3150A_v1.0.6\socket.c
+      1          /*
+      2           * (c)COPYRIGHT
+      3           * ALL RIGHT RESERVED
+      4           *
+      5           * FileName : socket.c
+      6           * Last update : April. 2008
+      7           ---------------------------------------------------------------------------------------*/
+      8          //#include "../../../../STM32F2xx_StdPeriph_Driver/stm32f2xx_conf.h"
+      9          #include "stm32f2xx_1208.h"
+     10          #include "types.h"
+     11          #include "w3150a.h"
+     12          #include "socket.h"
+     13          
+
+   \                                 In section .data, align 4
+     14          unsigned long int (*dprintf)( const char *format, ... ) = USART1Printf;
+   \                     dprintf:
+   \   00000000   ........           DC32 USART1Printf
+
+   \                                 In section .bss, align 2
+     15          uint16 local_port;
+   \                     local_port:
+   \   00000000                      DS8 2
+     16          
+     17          /*
+     18          *********************************************************************
+     19          This Socket function initialize the channel in perticular mode, and set the port
+     20          and wait for W3150A+ done it.
+     21          And the Parameters "s" is for socket number, "protocol" is for socket protocol,
+     22          port is the source port for the socket and flag is the option for the socket.
+     23          This function return 1 for sucess else 0.
+     24          *********************************************************************
+     25          */
+     26          void setSHAR(uint32 nUSE, uint8 * addr);
+     27          void getSHAR(uint32 nUSE, uint8 * addr);
+     28          
+
+   \                                 In section .text, align 2, keep-with-next
+     29          uint8 socket(uint32 nUSE, SOCKET s, uint8 protocol, uint16 port, uint8 flag)
+     30          {
+   \                     socket:
+   \   00000000   2DE9F041           PUSH     {R4-R8,LR}
+   \   00000004   8046               MOV      R8,R0
+   \   00000006   0E46               MOV      R6,R1
+   \   00000008   1746               MOV      R7,R2
+   \   0000000A   1D46               MOV      R5,R3
+   \   0000000C   069C               LDR      R4,[SP, #+24]
+     31          	uint8 ret;
+     32          #ifdef __DEF_IINCHIP_DBG__
+     33          	dprintf("socket()\r\n");
+     34          #endif
+     35          	if ((protocol == Sn_MR_TCP) || (protocol == Sn_MR_UDP) || (protocol == Sn_MR_IPRAW) || (protocol == Sn_MR_MACRAW) || (protocol == Sn_MR_PPPOE))
+   \   0000000E   012F               CMP      R7,#+1
+   \   00000010   07D0               BEQ.N    ??socket_0
+   \   00000012   022F               CMP      R7,#+2
+   \   00000014   05D0               BEQ.N    ??socket_0
+   \   00000016   032F               CMP      R7,#+3
+   \   00000018   03D0               BEQ.N    ??socket_0
+   \   0000001A   042F               CMP      R7,#+4
+   \   0000001C   01D0               BEQ.N    ??socket_0
+   \   0000001E   052F               CMP      R7,#+5
+   \   00000020   33D1               BNE.N    ??socket_1
+     36          	{
+     37          		close(nUSE, s);
+   \                     ??socket_0:
+   \   00000022   ........           BL       close
+     38          		IINCHIP_WRITE(nUSE, Sn_MR(nUSE, s), protocol | flag);
+   \   00000026   3602               LSLS     R6,R6,#+8
+   \   00000028   44EA0702           ORR      R2,R4,R7
+   \   0000002C   06F58061           ADD      R1,R6,#+1024
+   \   00000030   4046               MOV      R0,R8
+   \   00000032   ........           BL       IINCHIP_WRITE
+   \   00000036   06F20544           ADDW     R4,R6,#+1029
+   \   0000003A   06F20441           ADDW     R1,R6,#+1028
+   \   0000003E   2DB1               CBZ.N    R5,??socket_2
+     39          		if (port != 0) {
+     40          			IINCHIP_WRITE(nUSE, (Sn_PORT0(nUSE, s) + 0), (uint8)((port & 0xff00) >> 8));
+   \   00000040   2A0A               LSRS     R2,R5,#+8
+   \   00000042   4046               MOV      R0,R8
+   \   00000044   ........           BL       IINCHIP_WRITE
+     41          			IINCHIP_WRITE(nUSE, (Sn_PORT0(nUSE, s) + 1), (uint8)((port & 0x00ff) >> 0));
+   \   00000048   EAB2               UXTB     R2,R5
+   \   0000004A   0BE0               B.N      ??socket_3
+     42          		} else {
+     43          			local_port++; // if don't set the source port, set local_port number.
+   \                     ??socket_2:
+   \   0000004C   ........           LDR.W    R7,??DataTable4
+   \   00000050   3888               LDRH     R0,[R7, #+0]
+   \   00000052   401C               ADDS     R0,R0,#+1
+   \   00000054   3880               STRH     R0,[R7, #+0]
+     44          			IINCHIP_WRITE(nUSE, (Sn_PORT0(nUSE, s) + 0), (uint8)((local_port & 0xff00) >> 8));
+   \   00000056   0004               LSLS     R0,R0,#+16
+   \   00000058   020E               LSRS     R2,R0,#+24
+   \   0000005A   4046               MOV      R0,R8
+   \   0000005C   ........           BL       IINCHIP_WRITE
+     45          			IINCHIP_WRITE(nUSE, (Sn_PORT0(nUSE, s) + 1), (uint8)((local_port & 0x00ff) >> 0));
+   \   00000060   3A88               LDRH     R2,[R7, #+0]
+   \   00000062   D2B2               UXTB     R2,R2
+   \                     ??socket_3:
+   \   00000064   2146               MOV      R1,R4
+   \   00000066   4046               MOV      R0,R8
+   \   00000068   ........           BL       IINCHIP_WRITE
+   \   0000006C   06F20144           ADDW     R4,R6,#+1025
+   \   00000070   0122               MOVS     R2,#+1
+   \   00000072   2146               MOV      R1,R4
+   \   00000074   4046               MOV      R0,R8
+     46          		}
+     47          		IINCHIP_WRITE(nUSE, Sn_CR(nUSE, s), Sn_CR_OPEN); // run sockinit Sn_CR
+   \   00000076   ........           BL       IINCHIP_WRITE
+     48          		/* +200804[woong]:wait to process the command... */
+     49          		while( IINCHIP_READ(nUSE, Sn_CR(nUSE, s)) );
+   \                     ??socket_4:
+   \   0000007A   2146               MOV      R1,R4
+   \   0000007C   4046               MOV      R0,R8
+   \   0000007E   ........           BL       IINCHIP_READ
+   \   00000082   0028               CMP      R0,#+0
+   \   00000084   F9D1               BNE.N    ??socket_4
+     50          		/* ------- */
+     51          		ret = 1;
+   \   00000086   0120               MOVS     R0,#+1
+   \   00000088   00E0               B.N      ??socket_5
+     52          	}
+     53          	else
+     54          	{
+     55          		ret = 0;
+   \                     ??socket_1:
+   \   0000008A   0020               MOVS     R0,#+0
+     56          	}
+     57          #ifdef __DEF_IINCHIP_DBG__
+     58          	dprintf("Sn_SR = %.2x , Protocol = %.2x\r\n", IINCHIP_READ(nUSE, Sn_SR(nUSE, s)), IINCHIP_READ(nUSE, Sn_MR(nUSE, s)));
+     59          #endif
+     60          	return ret;
+   \                     ??socket_5:
+   \   0000008C   BDE8F081           POP      {R4-R8,PC}       ;; return
+     61          }
+     62          /*
+     63          *********************************************************************
+     64          This function close the socket and parameter is "s" which represent the socket number
+     65          *********************************************************************
+     66          */
+     67          
+
+   \                                 In section .text, align 2, keep-with-next
+     68          void close(uint32 nUSE, SOCKET s)
+     69          {
+   \                     close:
+   \   00000000   70B5               PUSH     {R4-R6,LR}
+   \   00000002   0446               MOV      R4,R0
+     70          #ifdef __DEF_IINCHIP_DBG__
+     71          	dprintf("close()\r\n");
+     72          #endif
+     73          	IINCHIP_WRITE(nUSE, Sn_CR(nUSE, s), Sn_CR_CLOSE);
+   \   00000004   0D02               LSLS     R5,R1,#+8
+   \   00000006   05F20146           ADDW     R6,R5,#+1025
+   \   0000000A   1022               MOVS     R2,#+16
+   \   0000000C   3146               MOV      R1,R6
+   \   0000000E   ........           BL       IINCHIP_WRITE
+     74          
+     75          	/* +200804[woong]:wait to process the command... */
+     76          	while( IINCHIP_READ(nUSE, Sn_CR(nUSE, s)) );
+   \                     ??close_0:
+   \   00000012   3146               MOV      R1,R6
+   \   00000014   2046               MOV      R0,R4
+   \   00000016   ........           BL       IINCHIP_READ
+   \   0000001A   0028               CMP      R0,#+0
+   \   0000001C   F9D1               BNE.N    ??close_0
+     77          	/* ------- */
+     78          
+     79          	/* +2008.04[woong]: clear interrupt */	
+     80          	#ifdef __DEF_IINCHIP_INT__
+     81                /* m2008.04 [woong] : all clear */
+     82          	       setISR(nUSE, s, 0x00);
+     83          	#else
+     84                /* m2008.04 [woong] : all clear */
+     85          		IINCHIP_WRITE(nUSE, Sn_IR(nUSE, s), 0xFF);
+   \   0000001E   FF22               MOVS     R2,#+255
+   \   00000020   05F20241           ADDW     R1,R5,#+1026
+   \   00000024   2046               MOV      R0,R4
+   \   00000026   BDE87040           POP      {R4-R6,LR}
+   \   0000002A   ........           B.W      IINCHIP_WRITE
+     86          	#endif
+     87          	
+     88          }
+     89          
+     90          /*
+     91          *********************************************************************
+     92          This function established  the connection for the channel in passive (server) mode.
+     93          This function waits for the request from the peer. The parameter "s" is the socket number
+     94          This function return 1 for success else 0.
+     95          *********************************************************************
+     96          */
+     97          
+
+   \                                 In section .text, align 2, keep-with-next
+     98          uint8 listen(uint32 nUSE, SOCKET s)
+     99          {
+   \                     listen:
+   \   00000000   38B5               PUSH     {R3-R5,LR}
+   \   00000002   0446               MOV      R4,R0
+    100          	uint8 ret;
+    101          #ifdef __DEF_IINCHIP_DBG__
+    102          	dprintf("listen()\r\n");
+    103          #endif
+    104          	if (IINCHIP_READ(nUSE, Sn_SR(nUSE, s)) == SOCK_INIT)
+   \   00000004   0D02               LSLS     R5,R1,#+8
+   \   00000006   05F20341           ADDW     R1,R5,#+1027
+   \   0000000A   ........           BL       IINCHIP_READ
+   \   0000000E   1328               CMP      R0,#+19
+   \   00000010   0ED1               BNE.N    ??listen_0
+    105          	{
+    106          		IINCHIP_WRITE(nUSE, Sn_CR(nUSE, s),Sn_CR_LISTEN);
+   \   00000012   05F20145           ADDW     R5,R5,#+1025
+   \   00000016   0222               MOVS     R2,#+2
+   \   00000018   2946               MOV      R1,R5
+   \   0000001A   2046               MOV      R0,R4
+   \   0000001C   ........           BL       IINCHIP_WRITE
+    107          		/* +200804[woong]:wait to process the command... */
+    108          		while( IINCHIP_READ(nUSE, Sn_CR(nUSE, s)) );
+   \                     ??listen_1:
+   \   00000020   2946               MOV      R1,R5
+   \   00000022   2046               MOV      R0,R4
+   \   00000024   ........           BL       IINCHIP_READ
+   \   00000028   0028               CMP      R0,#+0
+   \   0000002A   F9D1               BNE.N    ??listen_1
+    109          		/* ------- */
+    110          		ret = 1;
+   \   0000002C   0120               MOVS     R0,#+1
+   \   0000002E   32BD               POP      {R1,R4,R5,PC}
+    111          	}
+    112          	else
+    113          	{
+    114          		ret = 0;
+   \                     ??listen_0:
+   \   00000030   0020               MOVS     R0,#+0
+    115          #ifdef __DEF_IINCHIP_DBG__
+    116          	dprintf("Fail[invalid ip,port]\r\n");
+    117          #endif
+    118          	}
+    119          	return ret;
+   \   00000032   32BD               POP      {R1,R4,R5,PC}    ;; return
+    120          }
+    121          
+    122          
+    123          /*
+    124          *********************************************************************
+    125          This function established  the connection for the channel in Active (client) mode. 
+    126          This function waits for the untill the connection is established. The parameter "s" is the socket number
+    127          This function return 1 for success else 0.
+    128          *********************************************************************
+    129          */
+    130          
+
+   \                                 In section .text, align 2, keep-with-next
+    131          uint8 connect(uint32 nUSE, SOCKET s, uint8 * addr, uint16 port)
+    132          {
+   \                     connect:
+   \   00000000   2DE9F041           PUSH     {R4-R8,LR}
+   \   00000004   8046               MOV      R8,R0
+   \   00000006   1546               MOV      R5,R2
+   \   00000008   1E46               MOV      R6,R3
+    133          	uint8 ret;
+    134          #ifdef __DEF_IINCHIP_DBG__
+    135          	dprintf("connect()\r\n");
+    136          #endif
+    137          	if 
+    138          		(
+    139          			((addr[0] == 0xFF) && (addr[1] == 0xFF) && (addr[2] == 0xFF) && (addr[3] == 0xFF)) ||
+    140          		 	((addr[0] == 0x00) && (addr[1] == 0x00) && (addr[2] == 0x00) && (addr[3] == 0x00)) ||
+    141          		 	(port == 0x00) 
+    142          		) 
+   \   0000000A   2A78               LDRB     R2,[R5, #+0]
+   \   0000000C   FF2A               CMP      R2,#+255
+   \   0000000E   09D1               BNE.N    ??connect_0
+   \   00000010   6878               LDRB     R0,[R5, #+1]
+   \   00000012   FF28               CMP      R0,#+255
+   \   00000014   0DD1               BNE.N    ??connect_1
+   \   00000016   A878               LDRB     R0,[R5, #+2]
+   \   00000018   FF28               CMP      R0,#+255
+   \   0000001A   0AD1               BNE.N    ??connect_1
+   \   0000001C   E878               LDRB     R0,[R5, #+3]
+   \   0000001E   FF28               CMP      R0,#+255
+   \   00000020   07D1               BNE.N    ??connect_1
+   \   00000022   07E0               B.N      ??connect_2
+   \                     ??connect_0:
+   \   00000024   2AB9               CBNZ.N   R2,??connect_1
+   \   00000026   6878               LDRB     R0,[R5, #+1]
+   \   00000028   18B9               CBNZ.N   R0,??connect_1
+   \   0000002A   A878               LDRB     R0,[R5, #+2]
+   \   0000002C   08B9               CBNZ.N   R0,??connect_1
+   \   0000002E   E878               LDRB     R0,[R5, #+3]
+   \   00000030   00B1               CBZ.N    R0,??connect_2
+   \                     ??connect_1:
+   \   00000032   1EB9               CBNZ.N   R6,??connect_3
+    143           	{
+    144           		ret = 0;
+   \                     ??connect_2:
+   \   00000034   0027               MOVS     R7,#+0
+    145          #ifdef __DEF_IINCHIP_DBG__
+    146          	dprintf("Fail[invalid ip,port]\r\n");
+    147          #endif
+    148          	}
+    149          	else
+    150          	{
+    151          
+    152          		ret = 1;
+    153          		// set destination IP
+    154          		IINCHIP_WRITE(nUSE, (Sn_DIPR0(nUSE, s) + 0), addr[0]);
+    155          		IINCHIP_WRITE(nUSE, (Sn_DIPR0(nUSE, s) + 1), addr[1]);
+    156          		IINCHIP_WRITE(nUSE, (Sn_DIPR0(nUSE, s) + 2), addr[2]);
+    157          		IINCHIP_WRITE(nUSE, (Sn_DIPR0(nUSE, s) + 3), addr[3]);
+    158          		IINCHIP_WRITE(nUSE, (Sn_DPORT0(nUSE, s) + 0),(uint8)((port & 0xff00) >> 8));
+    159          		IINCHIP_WRITE(nUSE, (Sn_DPORT0(nUSE, s) + 1),(uint8)((port & 0x00ff) >> 0));
+    160          		IINCHIP_WRITE(nUSE, Sn_CR(nUSE, s),Sn_CR_CONNECT);
+    161          		// wait for completion
+    162          		while (IINCHIP_READ(nUSE, Sn_CR(nUSE, s)))
+    163          		{
+    164          			if (IINCHIP_READ(nUSE, Sn_SR(nUSE, s)) == SOCK_CLOSED)
+    165          			{
+    166          #ifdef __DEF_IINCHIP_DBG__
+    167          			dprintf("SOCK_CLOSED.\r\n");
+    168          #endif
+    169          				ret = 0; break;
+    170          			}
+    171          		}
+    172          	}
+    173          
+    174          	return ret;
+   \                     ??connect_4:
+   \   00000036   3846               MOV      R0,R7
+   \   00000038   BDE8F081           POP      {R4-R8,PC}       ;; return
+   \                     ??connect_3:
+   \   0000003C   0127               MOVS     R7,#+1
+   \   0000003E   0C02               LSLS     R4,R1,#+8
+   \   00000040   04F20C41           ADDW     R1,R4,#+1036
+   \   00000044   4046               MOV      R0,R8
+   \   00000046   ........           BL       IINCHIP_WRITE
+   \   0000004A   6A78               LDRB     R2,[R5, #+1]
+   \   0000004C   04F20D41           ADDW     R1,R4,#+1037
+   \   00000050   4046               MOV      R0,R8
+   \   00000052   ........           BL       IINCHIP_WRITE
+   \   00000056   AA78               LDRB     R2,[R5, #+2]
+   \   00000058   04F20E41           ADDW     R1,R4,#+1038
+   \   0000005C   4046               MOV      R0,R8
+   \   0000005E   ........           BL       IINCHIP_WRITE
+   \   00000062   EA78               LDRB     R2,[R5, #+3]
+   \   00000064   04F20F41           ADDW     R1,R4,#+1039
+   \   00000068   4046               MOV      R0,R8
+   \   0000006A   ........           BL       IINCHIP_WRITE
+   \   0000006E   320A               LSRS     R2,R6,#+8
+   \   00000070   04F58261           ADD      R1,R4,#+1040
+   \   00000074   4046               MOV      R0,R8
+   \   00000076   ........           BL       IINCHIP_WRITE
+   \   0000007A   F2B2               UXTB     R2,R6
+   \   0000007C   04F21141           ADDW     R1,R4,#+1041
+   \   00000080   4046               MOV      R0,R8
+   \   00000082   ........           BL       IINCHIP_WRITE
+   \   00000086   04F20145           ADDW     R5,R4,#+1025
+   \   0000008A   0422               MOVS     R2,#+4
+   \   0000008C   2946               MOV      R1,R5
+   \   0000008E   4046               MOV      R0,R8
+   \   00000090   ........           BL       IINCHIP_WRITE
+   \   00000094   04F20346           ADDW     R6,R4,#+1027
+   \                     ??connect_5:
+   \   00000098   2946               MOV      R1,R5
+   \   0000009A   4046               MOV      R0,R8
+   \   0000009C   ........           BL       IINCHIP_READ
+   \   000000A0   0028               CMP      R0,#+0
+   \   000000A2   C8D0               BEQ.N    ??connect_4
+   \   000000A4   3146               MOV      R1,R6
+   \   000000A6   4046               MOV      R0,R8
+   \   000000A8   ........           BL       IINCHIP_READ
+   \   000000AC   0028               CMP      R0,#+0
+   \   000000AE   F3D1               BNE.N    ??connect_5
+   \   000000B0   C0E7               B.N      ??connect_2
+    175          }
+    176          
+    177          
+    178          /*
+    179          *********************************************************************
+    180          This function used for disconnect the socket and parameter is "s" which represent the socket number
+    181          *********************************************************************
+    182          */
+    183          
+
+   \                                 In section .text, align 2, keep-with-next
+    184          void disconnect(uint32 nUSE, SOCKET s)
+    185          {
+   \                     disconnect:
+   \   00000000   38B5               PUSH     {R3-R5,LR}
+   \   00000002   0446               MOV      R4,R0
+    186          #ifdef __DEF_IINCHIP_DBG__
+    187          	dprintf("disconnect()\r\n");
+    188          #endif
+    189          	IINCHIP_WRITE(nUSE, Sn_CR(nUSE, s), Sn_CR_DISCON);
+   \   00000004   0802               LSLS     R0,R1,#+8
+   \   00000006   00F20145           ADDW     R5,R0,#+1025
+   \   0000000A   0822               MOVS     R2,#+8
+   \   0000000C   2946               MOV      R1,R5
+   \   0000000E   2046               MOV      R0,R4
+   \   00000010   ........           BL       IINCHIP_WRITE
+    190          	/* +200804[woong]:wait to process the command... */
+    191          	while( IINCHIP_READ(nUSE, Sn_CR(nUSE, s)) );
+   \                     ??disconnect_0:
+   \   00000014   2946               MOV      R1,R5
+   \   00000016   2046               MOV      R0,R4
+   \   00000018   ........           BL       IINCHIP_READ
+   \   0000001C   0028               CMP      R0,#+0
+   \   0000001E   F9D1               BNE.N    ??disconnect_0
+    192          	/* ------- */
+    193          }
+   \   00000020   31BD               POP      {R0,R4,R5,PC}    ;; return
+    194          
+    195          /*
+    196          *********************************************************************
+    197          This function used to send the data in TCP mode and the parameter "s" represents
+    198          the socket number and "buf" a pointer to data and "len" is the data size to be send.
+    199          This function return 1 for success else 0.
+    200          *********************************************************************
+    201          */
+    202          
+
+   \                                 In section .text, align 2, keep-with-next
+    203          uint16 send(uint32 nUSE, SOCKET s, const uint8 * buf, uint16 len)
+    204          {
+   \                     send:
+   \   00000000   2DE9F84F           PUSH     {R3-R11,LR}
+   \   00000004   0446               MOV      R4,R0
+   \   00000006   8846               MOV      R8,R1
+   \   00000008   9146               MOV      R9,R2
+   \   0000000A   4746               MOV      R7,R8
+   \   0000000C   ........           LDR.W    R0,??DataTable4_1
+   \   00000010   00EBC400           ADD      R0,R0,R4, LSL #+3
+   \   00000014   30F81750           LDRH     R5,[R0, R7, LSL #+1]
+   \   00000018   9D42               CMP      R5,R3
+   \   0000001A   28BF               IT       CS 
+   \   0000001C   1D46               MOVCS    R5,R3
+    205          	uint8 status=0;
+    206          	uint16 ret=0;
+    207          	uint16 freesize=0;
+    208          #ifdef __DEF_IINCHIP_DBG__
+    209          	dprintf("send()\r\n");
+    210          #endif
+    211          
+    212          	if (len > getIINCHIP_TxMAX(nUSE, s)) ret = getIINCHIP_TxMAX(nUSE, s); // check size not to exceed MAX size.
+    213          	else ret = len;
+    214          
+    215          	// if freebuf is available, start.
+    216          	do 
+    217          	{
+    218          		freesize = getSn_TX_FSR(nUSE, s);
+   \                     ??send_0:
+   \   0000001E   4146               MOV      R1,R8
+   \   00000020   2046               MOV      R0,R4
+   \   00000022   ........           BL       getSn_TX_FSR
+   \   00000026   8346               MOV      R11,R0
+    219          		status = IINCHIP_READ(nUSE, Sn_SR(nUSE, s));
+   \   00000028   3E02               LSLS     R6,R7,#+8
+   \   0000002A   06F2034A           ADDW     R10,R6,#+1027
+   \   0000002E   5146               MOV      R1,R10
+   \   00000030   2046               MOV      R0,R4
+   \   00000032   ........           BL       IINCHIP_READ
+    220          		if ((status != SOCK_ESTABLISHED) && (status != SOCK_CLOSE_WAIT)) {ret = 0; break;}
+   \   00000036   1728               CMP      R0,#+23
+   \   00000038   03D0               BEQ.N    ??send_1
+   \   0000003A   1C28               CMP      R0,#+28
+   \   0000003C   18BF               IT       NE 
+   \   0000003E   0025               MOVNE    R5,#+0
+   \   00000040   01D1               BNE.N    ??send_2
+    221          #ifdef __DEF_IINCHIP_DBG__
+    222          		dprintf("socket %d freesize(%d) empty or error\r\n", s, freesize);
+    223          #endif
+    224          	} while (freesize < ret);
+   \                     ??send_1:
+   \   00000042   AB45               CMP      R11,R5
+   \   00000044   EBDB               BLT.N    ??send_0
+    225          
+    226          	// copy data
+    227          	send_data_processing(nUSE, s, (uint8 *)buf, ret);
+   \                     ??send_2:
+   \   00000046   2B46               MOV      R3,R5
+   \   00000048   4A46               MOV      R2,R9
+   \   0000004A   4146               MOV      R1,R8
+   \   0000004C   2046               MOV      R0,R4
+   \   0000004E   ........           BL       send_data_processing
+   \   00000052   06F20149           ADDW     R9,R6,#+1025
+   \   00000056   2022               MOVS     R2,#+32
+   \   00000058   4946               MOV      R1,R9
+   \   0000005A   2046               MOV      R0,R4
+    228          	IINCHIP_WRITE(nUSE, Sn_CR(nUSE, s),Sn_CR_SEND);
+   \   0000005C   ........           BL       IINCHIP_WRITE
+    229          	/* +200804[woong]:wait to process the command... */
+    230          	while( IINCHIP_READ(nUSE, Sn_CR(nUSE, s)) );
+   \                     ??send_3:
+   \   00000060   4946               MOV      R1,R9
+   \   00000062   2046               MOV      R0,R4
+   \   00000064   ........           BL       IINCHIP_READ
+   \   00000068   0028               CMP      R0,#+0
+   \   0000006A   F9D1               BNE.N    ??send_3
+   \                     ??send_4:
+   \   0000006C   06F20249           ADDW     R9,R6,#+1026
+   \   00000070   4946               MOV      R1,R9
+   \   00000072   2046               MOV      R0,R4
+    231          	/* ------- */
+    232          
+    233          /* +2008.04 [woong] */	
+    234          #ifdef __DEF_IINCHIP_INT__
+    235          	while ( (getISR(s) & Sn_IR_SEND_OK) != Sn_IR_SEND_OK ) 
+    236          #else
+    237          	while ( (IINCHIP_READ(nUSE, Sn_IR(nUSE, s)) & Sn_IR_SEND_OK) != Sn_IR_SEND_OK ) 
+   \   00000074   ........           BL       IINCHIP_READ
+   \   00000078   C006               LSLS     R0,R0,#+27
+   \   0000007A   0BD4               BMI.N    ??send_5
+    238          #endif
+    239          	{
+    240          		/* m2008.04 [woong] : reduce code */
+    241          		if ( IINCHIP_READ(nUSE, Sn_SR(nUSE, s)) == SOCK_CLOSED )
+   \   0000007C   5146               MOV      R1,R10
+   \   0000007E   2046               MOV      R0,R4
+   \   00000080   ........           BL       IINCHIP_READ
+   \   00000084   0028               CMP      R0,#+0
+   \   00000086   F1D1               BNE.N    ??send_4
+    242          		{
+    243          #ifdef __DEF_IINCHIP_DBG__
+    244          			dprintf("SOCK_CLOSED.\r\n");
+    245          #endif
+    246          			close(nUSE, s);
+   \   00000088   4146               MOV      R1,R8
+   \   0000008A   2046               MOV      R0,R4
+   \   0000008C   ........           BL       close
+    247          			return 0;
+   \   00000090   0020               MOVS     R0,#+0
+   \   00000092   05E0               B.N      ??send_6
+    248          		}
+    249            	}
+    250          /* +2008.04 [woong] */	
+    251          #ifdef __DEF_IINCHIP_INT__
+    252            	setISR(nUSE, s, getISR(nUSE, s) & (~Sn_IR_SEND_OK));
+    253          #else
+    254          	IINCHIP_WRITE(nUSE, Sn_IR(nUSE, s), Sn_IR_SEND_OK);
+   \                     ??send_5:
+   \   00000094   1022               MOVS     R2,#+16
+   \   00000096   4946               MOV      R1,R9
+   \   00000098   2046               MOV      R0,R4
+   \   0000009A   ........           BL       IINCHIP_WRITE
+    255          #endif
+    256            	return ret;
+   \   0000009E   2846               MOV      R0,R5
+   \                     ??send_6:
+   \   000000A0   BDE8F28F           POP      {R1,R4-R11,PC}   ;; return
+    257          }
+    258          
+    259          
+    260          /*
+    261          *********************************************************************
+    262          This function is an application I/F function which is used to receive the data in TCP mode.
+    263          It continues to wait for data as much as the application wants to receive and the 
+    264          parameter "s" represents the socket number and "buf" a pointer to copy the data
+    265          to be received and "len" is the data size to be read. This function return received data size
+    266          for success else -1.
+    267          *********************************************************************
+    268          */
+    269          
+
+   \                                 In section .text, align 2, keep-with-next
+    270          uint16 recv(uint32 nUSE, SOCKET s, uint8 * buf, uint16 len)
+    271          {
+   \                     recv:
+   \   00000000   70B5               PUSH     {R4-R6,LR}
+   \   00000002   0446               MOV      R4,R0
+   \   00000004   0D46               MOV      R5,R1
+   \   00000006   1E46               MOV      R6,R3
+    272          	uint16 ret=0;
+   \   00000008   0020               MOVS     R0,#+0
+    273          #ifdef __DEF_IINCHIP_DBG__
+    274          	dprintf("recv()\r\n");
+    275          #endif
+    276          
+    277          
+    278          	if ( len > 0 )
+   \   0000000A   8EB1               CBZ.N    R6,??recv_0
+    279          	{
+    280          		recv_data_processing(nUSE, s, buf, len);
+   \   0000000C   2046               MOV      R0,R4
+   \   0000000E   ........           BL       recv_data_processing
+    281          		IINCHIP_WRITE(nUSE, Sn_CR(nUSE, s),Sn_CR_RECV);
+   \   00000012   2802               LSLS     R0,R5,#+8
+   \   00000014   00F20145           ADDW     R5,R0,#+1025
+   \   00000018   4022               MOVS     R2,#+64
+   \   0000001A   2946               MOV      R1,R5
+   \   0000001C   2046               MOV      R0,R4
+   \   0000001E   ........           BL       IINCHIP_WRITE
+    282          		/* +200804[woong]:wait to process the command... */
+    283          		while( IINCHIP_READ(nUSE, Sn_CR(nUSE, s)) );
+   \                     ??recv_1:
+   \   00000022   2946               MOV      R1,R5
+   \   00000024   2046               MOV      R0,R4
+   \   00000026   ........           BL       IINCHIP_READ
+   \   0000002A   0028               CMP      R0,#+0
+   \   0000002C   F9D1               BNE.N    ??recv_1
+    284          		/* ------- */
+    285          		ret = len;
+   \   0000002E   3046               MOV      R0,R6
+    286          	}
+    287          	return ret;
+   \                     ??recv_0:
+   \   00000030   70BD               POP      {R4-R6,PC}       ;; return
+    288          }
+    289          
+    290          /*
+    291          *********************************************************************
+    292          This function is an application I/F function which is used to send the data for other then
+    293          TCP mode. Unlike TCP transmission, The peer's destination address and the port is needed.
+    294          and the parameter "s" represents the socket number and "buf" a pointer to the data 
+    295          and "len" is the data size to send and addr is the peer's Destination IP address and port is
+    296          the peer's destination port number. This function return send data size for success else -1.
+    297          *********************************************************************
+    298          */
+
+   \                                 In section .text, align 2, keep-with-next
+    299          uint16 sendto(uint32 nUSE, SOCKET s, const uint8 * buf, uint16 len, uint8 * addr, uint16 port)
+    300          {
+   \                     sendto:
+   \   00000000   2DE9F047           PUSH     {R4-R10,LR}
+   \   00000004   8046               MOV      R8,R0
+   \   00000006   8946               MOV      R9,R1
+   \   00000008   9246               MOV      R10,R2
+   \   0000000A   1E46               MOV      R6,R3
+   \   0000000C   089D               LDR      R5,[SP, #+32]
+   \   0000000E   099C               LDR      R4,[SP, #+36]
+   \   00000010   ....               LDR.N    R0,??DataTable4_1
+   \   00000012   00EBC800           ADD      R0,R0,R8, LSL #+3
+   \   00000016   30F81100           LDRH     R0,[R0, R1, LSL #+1]
+   \   0000001A   B042               CMP      R0,R6
+   \   0000001C   38BF               IT       CC 
+   \   0000001E   0646               MOVCC    R6,R0
+    301          	uint16 ret = 0;
+    302          	
+    303          #ifdef __DEF_IINCHIP_DBG__
+    304          	dprintf("sendto()\r\n");
+    305          #endif
+    306             if (len > getIINCHIP_TxMAX(nUSE, s)) ret = getIINCHIP_TxMAX(nUSE, s); // check size not to exceed MAX size.
+    307             else ret = len;
+    308          
+    309          	if
+    310          		(
+    311          		 	((addr[0] == 0x00) && (addr[1] == 0x00) && (addr[2] == 0x00) && (addr[3] == 0x00)) ||
+    312          		 	((port == 0x00)) ||(ret == 0)
+    313          		) 
+   \   00000020   2A78               LDRB     R2,[R5, #+0]
+   \   00000022   2AB9               CBNZ.N   R2,??sendto_0
+   \   00000024   6878               LDRB     R0,[R5, #+1]
+   \   00000026   18B9               CBNZ.N   R0,??sendto_0
+   \   00000028   A878               LDRB     R0,[R5, #+2]
+   \   0000002A   08B9               CBNZ.N   R0,??sendto_0
+   \   0000002C   E878               LDRB     R0,[R5, #+3]
+   \   0000002E   10B1               CBZ.N    R0,??sendto_1
+   \                     ??sendto_0:
+   \   00000030   A4B2               UXTH     R4,R4
+   \   00000032   04B1               CBZ.N    R4,??sendto_1
+   \   00000034   0EB9               CBNZ.N   R6,??sendto_2
+    314           	{
+    315           	  /* +2008.04 [woong] : added return value */
+    316           	  ret = 0; 
+   \                     ??sendto_1:
+   \   00000036   0026               MOVS     R6,#+0
+   \   00000038   62E0               B.N      ??sendto_3
+    317          #ifdef __DEF_IINCHIP_DBG__
+    318          	dprintf("%d Fail[%.2x.%.2x.%.2x.%.2x, %.d, %d]\r\n",s, addr[0], addr[1], addr[2], addr[3] , port, len);
+    319          	dprintf("Fail[invalid ip,port]\r\n");
+    320          #endif
+    321          	}
+    322          	else
+    323          	{
+    324          		IINCHIP_WRITE(nUSE, (Sn_DIPR0(nUSE, s)    ),addr[0]);
+   \                     ??sendto_2:
+   \   0000003A   0F02               LSLS     R7,R1,#+8
+   \   0000003C   07F20C41           ADDW     R1,R7,#+1036
+   \   00000040   4046               MOV      R0,R8
+   \   00000042   ........           BL       IINCHIP_WRITE
+    325          		IINCHIP_WRITE(nUSE, (Sn_DIPR0(nUSE, s) + 1),addr[1]);
+   \   00000046   6A78               LDRB     R2,[R5, #+1]
+   \   00000048   07F20D41           ADDW     R1,R7,#+1037
+   \   0000004C   4046               MOV      R0,R8
+   \   0000004E   ........           BL       IINCHIP_WRITE
+    326          		IINCHIP_WRITE(nUSE, (Sn_DIPR0(nUSE, s) + 2),addr[2]);
+   \   00000052   AA78               LDRB     R2,[R5, #+2]
+   \   00000054   07F20E41           ADDW     R1,R7,#+1038
+   \   00000058   4046               MOV      R0,R8
+   \   0000005A   ........           BL       IINCHIP_WRITE
+    327          		IINCHIP_WRITE(nUSE, (Sn_DIPR0(nUSE, s) + 3),addr[3]);
+   \   0000005E   EA78               LDRB     R2,[R5, #+3]
+   \   00000060   07F20F41           ADDW     R1,R7,#+1039
+   \   00000064   4046               MOV      R0,R8
+   \   00000066   ........           BL       IINCHIP_WRITE
+    328          		
+    329          		IINCHIP_WRITE(nUSE, (Sn_DPORT0(nUSE, s)    ),(uint8)((port & 0xff00) >> 8));
+   \   0000006A   220A               LSRS     R2,R4,#+8
+   \   0000006C   07F58261           ADD      R1,R7,#+1040
+   \   00000070   4046               MOV      R0,R8
+   \   00000072   ........           BL       IINCHIP_WRITE
+    330          		IINCHIP_WRITE(nUSE, (Sn_DPORT0(nUSE, s) + 1),(uint8)((port & 0x00ff) >> 0));
+   \   00000076   E2B2               UXTB     R2,R4
+   \   00000078   07F21141           ADDW     R1,R7,#+1041
+   \   0000007C   4046               MOV      R0,R8
+   \   0000007E   ........           BL       IINCHIP_WRITE
+    331          
+    332          		// copy data
+    333          		send_data_processing(nUSE, s, (uint8 *)buf, ret);
+   \   00000082   3346               MOV      R3,R6
+   \   00000084   5246               MOV      R2,R10
+   \   00000086   4946               MOV      R1,R9
+   \   00000088   4046               MOV      R0,R8
+   \   0000008A   ........           BL       send_data_processing
+   \   0000008E   07F20144           ADDW     R4,R7,#+1025
+   \   00000092   2022               MOVS     R2,#+32
+   \   00000094   2146               MOV      R1,R4
+   \   00000096   4046               MOV      R0,R8
+    334          		IINCHIP_WRITE(nUSE, Sn_CR(nUSE, s),Sn_CR_SEND);
+   \   00000098   ........           BL       IINCHIP_WRITE
+    335          		/* +200804[woong]:wait to process the command... */
+    336          		while(IINCHIP_READ(nUSE, Sn_CR(nUSE, s)));
+   \                     ??sendto_4:
+   \   0000009C   2146               MOV      R1,R4
+   \   0000009E   4046               MOV      R0,R8
+   \   000000A0   ........           BL       IINCHIP_READ
+   \   000000A4   0028               CMP      R0,#+0
+   \   000000A6   F9D1               BNE.N    ??sendto_4
+    337          		/* ------- */
+    338          		//USART1Printf("IINCHIP_READ(Sn_CR(s)) == %x \n", IINCHIP_READ(Sn_CR(s)));
+    339          		
+    340          /* +2008.04 [woong] */	
+    341          #ifdef __DEF_IINCHIP_INT__
+    342             		while ( (getISR(s) & Sn_IR_SEND_OK) != Sn_IR_SEND_OK ) 
+    343          #else
+    344          		{
+    345          			uint32 cnt = 10;
+   \   000000A8   0A24               MOVS     R4,#+10
+   \   000000AA   07F20249           ADDW     R9,R7,#+1026
+   \   000000AE   03E0               B.N      ??sendto_5
+    346          			while  ( (IINCHIP_READ(nUSE, Sn_IR(nUSE, s)) & Sn_IR_SEND_OK) != Sn_IR_SEND_OK ){
+    347          				if(cnt-- == 0) break;
+   \                     ??sendto_6:
+   \   000000B0   641E               SUBS     R4,R4,#+1
+    348          				OSTimeDly(10);
+   \   000000B2   0A20               MOVS     R0,#+10
+   \   000000B4   ........           BL       OSTimeDly
+   \                     ??sendto_5:
+   \   000000B8   4946               MOV      R1,R9
+   \   000000BA   4046               MOV      R0,R8
+   \   000000BC   ........           BL       IINCHIP_READ
+   \   000000C0   C006               LSLS     R0,R0,#+27
+   \   000000C2   01D4               BMI.N    ??sendto_7
+   \   000000C4   002C               CMP      R4,#+0
+   \   000000C6   F3D1               BNE.N    ??sendto_6
+    349          			}
+    350          		}
+    351          #endif
+    352          		{
+    353          #ifdef __DEF_IINCHIP_INT__
+    354                		if(getISR(s) & Sn_IR_TIMEOUT)
+    355          #else
+    356          			if(IINCHIP_READ(nUSE, Sn_IR(nUSE, s)) & Sn_IR_TIMEOUT)
+   \                     ??sendto_7:
+   \   000000C8   4946               MOV      R1,R9
+   \   000000CA   4046               MOV      R0,R8
+   \   000000CC   ........           BL       IINCHIP_READ
+   \   000000D0   0007               LSLS     R0,R0,#+28
+   \   000000D2   10D5               BPL.N    ??sendto_8
+    357          #endif
+    358          			{
+    359          	dprintf("send fail. %x\r\n", IINCHIP_READ(nUSE, Sn_IR(nUSE, s)));
+   \   000000D4   4946               MOV      R1,R9
+   \   000000D6   4046               MOV      R0,R8
+   \   000000D8   ........           BL       IINCHIP_READ
+   \   000000DC   0146               MOV      R1,R0
+   \   000000DE   ........           ADR.W    R0,`?<Constant "send fail. %x\\r\\n">`
+   \   000000E2   ....               LDR.N    R2,??DataTable4_2
+   \   000000E4   1268               LDR      R2,[R2, #+0]
+   \   000000E6   9047               BLX      R2
+    360          
+    361          #ifdef __DEF_IINCHIP_DBG__
+    362          				dprintf("send fail.\r\n");
+    363          #endif
+    364          /* +2008.04 [woong]: clear interrupt */
+    365          #ifdef __DEF_IINCHIP_INT__
+    366                   		setISR(nUSE, s, getISR(nUSE, s) & ~(Sn_IR_SEND_OK | Sn_IR_TIMEOUT));  /* clear SEND_OK & TIMEOUT */
+    367          #else
+    368                   		IINCHIP_WRITE(nUSE, Sn_IR(nUSE, s), (Sn_IR_SEND_OK | Sn_IR_TIMEOUT)); /* clear SEND_OK & TIMEOUT */
+   \   000000E8   1822               MOVS     R2,#+24
+   \   000000EA   4946               MOV      R1,R9
+   \   000000EC   4046               MOV      R0,R8
+   \   000000EE   ........           BL       IINCHIP_WRITE
+    369          
+    370          #endif
+    371          				return 0;
+   \   000000F2   0020               MOVS     R0,#+0
+   \   000000F4   05E0               B.N      ??sendto_9
+    372          			}
+    373          		}
+    374          
+    375          /* +2008.04 [woong] */	
+    376          #ifdef __DEF_IINCHIP_INT__
+    377               	setISR(nUSE, s, getISR(nUSE, s) & (~Sn_IR_SEND_OK));
+    378          #else
+    379          		IINCHIP_WRITE(nUSE, Sn_IR(nUSE, s), Sn_IR_SEND_OK);
+   \                     ??sendto_8:
+   \   000000F6   1022               MOVS     R2,#+16
+   \   000000F8   4946               MOV      R1,R9
+   \   000000FA   4046               MOV      R0,R8
+   \   000000FC   ........           BL       IINCHIP_WRITE
+    380          #endif
+    381          
+    382          	}
+    383          	return ret;
+   \                     ??sendto_3:
+   \   00000100   3046               MOV      R0,R6
+   \                     ??sendto_9:
+   \   00000102   BDE8F087           POP      {R4-R10,PC}      ;; return
+    384          }
+    385          
+    386          
+    387          /*
+    388          *********************************************************************
+    389          This function is an application I/F function which is used to receive the data in other then
+    390          TCP mode. This function is used to receive UDP, IP_RAW and MAC_RAW mode, and handle 
+    391          the header as well. 
+    392          The parameter "s" represents the socket number and "buf" a pointer to copy the data to be 
+    393          received and "len" is the data size to read and and addr is a pointer to store the peer's 
+    394          IP address and port is a pointer to store the peer's port number.
+    395          This function return received data size for success else -1.
+    396          *********************************************************************
+    397          */
+
+   \                                 In section .text, align 2, keep-with-next
+    398          uint16 recvfrom(uint32 nUSE, SOCKET s, uint8 *buf, uint16 len, uint8 *addr, uint16 *port)
+    399          {
+   \                     recvfrom:
+   \   00000000   2DE9F44F           PUSH     {R2,R4-R11,LR}
+   \   00000004   84B0               SUB      SP,SP,#+16
+   \   00000006   8246               MOV      R10,R0
+   \   00000008   0E46               MOV      R6,R1
+   \   0000000A   0E9F               LDR      R7,[SP, #+56]
+    400          	uint8 head[8];
+    401          	uint16 data_len=0;
+   \   0000000C   0024               MOVS     R4,#+0
+    402          	uint16 ptr = 0;
+    403          #ifdef __DEF_IINCHIP_DBG__
+    404          	dprintf("recvfrom()\r\n");
+    405          #endif
+    406          
+    407          	if(len > 0)
+   \   0000000E   002B               CMP      R3,#+0
+   \   00000010   00F09480           BEQ.W    ??recvfrom_0
+    408          	{
+    409          		ptr = IINCHIP_READ(nUSE, Sn_RX_RD0(nUSE, s));
+   \   00000014   4FEA062B           LSL      R11,R6,#+8
+   \   00000018   0BF58568           ADD      R8,R11,#+1064
+   \   0000001C   4146               MOV      R1,R8
+   \   0000001E   ........           BL       IINCHIP_READ
+   \   00000022   0546               MOV      R5,R0
+   \   00000024   0BF22949           ADDW     R9,R11,#+1065
+   \   00000028   4946               MOV      R1,R9
+   \   0000002A   5046               MOV      R0,R10
+    410          		ptr = ((ptr & 0x00ff) << 8) + IINCHIP_READ(nUSE, Sn_RX_RD0(nUSE, s) + 1);
+   \   0000002C   ........           BL       IINCHIP_READ
+   \   00000030   00EB0520           ADD      R0,R0,R5, LSL #+8
+   \   00000034   85B2               UXTH     R5,R0
+    411          #ifdef __DEF_IINCHIP_DBG__
+    412          		dprintf("ISR_RX: rd_ptr : %.4x\r\n", ptr);
+    413          #endif
+    414          		switch (IINCHIP_READ(nUSE, Sn_MR(nUSE, s)) & 0x07)
+   \   00000036   0BF58061           ADD      R1,R11,#+1024
+   \   0000003A   5046               MOV      R0,R10
+   \   0000003C   ........           BL       IINCHIP_READ
+   \   00000040   00F00700           AND      R0,R0,#0x7
+   \   00000044   0228               CMP      R0,#+2
+   \   00000046   04D0               BEQ.N    ??recvfrom_1
+   \   00000048   6BD3               BCC.N    ??recvfrom_2
+   \   0000004A   0428               CMP      R0,#+4
+   \   0000004C   44D0               BEQ.N    ??recvfrom_3
+   \   0000004E   2CD3               BCC.N    ??recvfrom_4
+   \   00000050   67E0               B.N      ??recvfrom_2
+    415          		{
+    416          			case Sn_MR_UDP :
+    417          				read_data(nUSE, s, (uint8 *)ptr, head, 0x08);
+   \                     ??recvfrom_1:
+   \   00000052   0820               MOVS     R0,#+8
+   \   00000054   0090               STR      R0,[SP, #+0]
+   \   00000056   01AB               ADD      R3,SP,#+4
+   \   00000058   2A46               MOV      R2,R5
+   \   0000005A   3146               MOV      R1,R6
+   \   0000005C   5046               MOV      R0,R10
+   \   0000005E   ........           BL       read_data
+    418          				ptr += 8;
+   \   00000062   05F10800           ADD      R0,R5,#+8
+   \   00000066   85B2               UXTH     R5,R0
+    419          				// read peer's IP address, port number.
+    420          				addr[0] = head[0];
+   \   00000068   9DF80400           LDRB     R0,[SP, #+4]
+   \   0000006C   3870               STRB     R0,[R7, #+0]
+    421          				addr[1] = head[1];
+   \   0000006E   01A8               ADD      R0,SP,#+4
+   \   00000070   4178               LDRB     R1,[R0, #+1]
+   \   00000072   7970               STRB     R1,[R7, #+1]
+    422          				addr[2] = head[2];
+   \   00000074   8178               LDRB     R1,[R0, #+2]
+   \   00000076   B970               STRB     R1,[R7, #+2]
+    423          				addr[3] = head[3];
+   \   00000078   C178               LDRB     R1,[R0, #+3]
+   \   0000007A   F970               STRB     R1,[R7, #+3]
+    424          				*port = head[4];
+   \   0000007C   0179               LDRB     R1,[R0, #+4]
+   \   0000007E   0F9A               LDR      R2,[SP, #+60]
+   \   00000080   1180               STRH     R1,[R2, #+0]
+    425          				*port = (*port << 8) + head[5];
+   \   00000082   4279               LDRB     R2,[R0, #+5]
+   \   00000084   02EB0121           ADD      R1,R2,R1, LSL #+8
+   \   00000088   0F9A               LDR      R2,[SP, #+60]
+   \   0000008A   1180               STRH     R1,[R2, #+0]
+    426          				data_len = head[6];
+    427          				data_len = (data_len << 8) + head[7];
+   \   0000008C   8179               LDRB     R1,[R0, #+6]
+   \   0000008E   C079               LDRB     R0,[R0, #+7]
+   \                     ??recvfrom_5:
+   \   00000090   00EB0120           ADD      R0,R0,R1, LSL #+8
+    428          				
+    429          #ifdef __DEF_IINCHIP_DBG__
+    430          				dprintf("UDP msg arrived\r\n");
+    431          				dprintf("source Port : %d\r\n", *port);
+    432          				dprintf("source IP : %d.%d.%d.%d\r\n", addr[0], addr[1], addr[2], addr[3]);
+    433          #endif
+    434          
+    435          				read_data(nUSE, s, (uint8 *)ptr, buf, data_len); // data copy.
+   \   00000094   84B2               UXTH     R4,R0
+   \   00000096   0094               STR      R4,[SP, #+0]
+   \   00000098   049B               LDR      R3,[SP, #+16]
+   \   0000009A   2A46               MOV      R2,R5
+   \   0000009C   3146               MOV      R1,R6
+   \   0000009E   5046               MOV      R0,R10
+   \   000000A0   ........           BL       read_data
+    436          				ptr += data_len;
+   \   000000A4   6519               ADDS     R5,R4,R5
+   \   000000A6   AEB2               UXTH     R6,R5
+    437          
+    438          	        	IINCHIP_WRITE(nUSE, (Sn_RX_RD0(nUSE, s)    ),(uint8)((ptr & 0xff00) >> 8));
+   \   000000A8   31E0               B.N      ??recvfrom_6
+    439          	        	IINCHIP_WRITE(nUSE, (Sn_RX_RD0(nUSE, s) + 1),(uint8)((ptr & 0x00ff)     ));
+    440          			break;
+    441          
+    442          			case Sn_MR_IPRAW :
+    443          				read_data(nUSE, s, (uint8 *)ptr, head, 0x06);
+   \                     ??recvfrom_4:
+   \   000000AA   0620               MOVS     R0,#+6
+   \   000000AC   0090               STR      R0,[SP, #+0]
+   \   000000AE   01AB               ADD      R3,SP,#+4
+   \   000000B0   2A46               MOV      R2,R5
+   \   000000B2   3146               MOV      R1,R6
+   \   000000B4   5046               MOV      R0,R10
+   \   000000B6   ........           BL       read_data
+    444          				ptr += 6;
+   \   000000BA   A81D               ADDS     R0,R5,#+6
+   \   000000BC   85B2               UXTH     R5,R0
+    445          
+    446          				addr[0] = head[0];
+   \   000000BE   9DF80400           LDRB     R0,[SP, #+4]
+   \   000000C2   3870               STRB     R0,[R7, #+0]
+    447          				addr[1] = head[1];
+   \   000000C4   01A8               ADD      R0,SP,#+4
+   \   000000C6   4178               LDRB     R1,[R0, #+1]
+   \   000000C8   7970               STRB     R1,[R7, #+1]
+    448          				addr[2] = head[2];
+   \   000000CA   8178               LDRB     R1,[R0, #+2]
+   \   000000CC   B970               STRB     R1,[R7, #+2]
+    449          				addr[3] = head[3];
+   \   000000CE   C178               LDRB     R1,[R0, #+3]
+   \   000000D0   F970               STRB     R1,[R7, #+3]
+    450          				data_len = head[4];
+    451          				data_len = (data_len << 8) + head[5];
+   \   000000D2   0179               LDRB     R1,[R0, #+4]
+   \   000000D4   4079               LDRB     R0,[R0, #+5]
+   \   000000D6   DBE7               B.N      ??recvfrom_5
+    452          		
+    453          #ifdef __DEF_IINCHIP_DBG__
+    454          				dprintf("IP RAW msg arrived\r\n");
+    455          				dprintf("source IP : %d.%d.%d.%d\r\n", addr[0], addr[1], addr[2], addr[3]);
+    456          #endif
+    457          				read_data(nUSE, s, (uint8 *)ptr, buf, data_len); // data copy.
+    458          				ptr += data_len;
+    459          
+    460          		        IINCHIP_WRITE(nUSE, (Sn_RX_RD0(nUSE, s) + 0), (uint8)((ptr & 0xff00) >> 8));
+    461          	            IINCHIP_WRITE(nUSE, (Sn_RX_RD0(nUSE, s) + 1), (uint8)(ptr & 0x00ff));
+    462          			break;
+    463          
+    464          			case Sn_MR_MACRAW :
+    465          				read_data(nUSE, s, (uint8*)ptr, head, 2);
+   \                     ??recvfrom_3:
+   \   000000D8   0220               MOVS     R0,#+2
+   \   000000DA   0090               STR      R0,[SP, #+0]
+   \   000000DC   01AB               ADD      R3,SP,#+4
+   \   000000DE   2A46               MOV      R2,R5
+   \   000000E0   3146               MOV      R1,R6
+   \   000000E2   5046               MOV      R0,R10
+   \   000000E4   ........           BL       read_data
+    466          				ptr+=2;
+   \   000000E8   AF1C               ADDS     R7,R5,#+2
+   \   000000EA   BFB2               UXTH     R7,R7
+    467          				data_len = head[0];
+    468          				data_len = (data_len<<8) + head[1] - 2;
+   \   000000EC   9DF80400           LDRB     R0,[SP, #+4]
+   \   000000F0   9DF80510           LDRB     R1,[SP, #+5]
+   \   000000F4   01EB0020           ADD      R0,R1,R0, LSL #+8
+   \   000000F8   801E               SUBS     R0,R0,#+2
+    469          
+    470          				read_data(nUSE, s, (uint8*)ptr, buf, data_len);
+   \   000000FA   84B2               UXTH     R4,R0
+   \   000000FC   0094               STR      R4,[SP, #+0]
+   \   000000FE   049B               LDR      R3,[SP, #+16]
+   \   00000100   3A46               MOV      R2,R7
+   \   00000102   3146               MOV      R1,R6
+   \   00000104   5046               MOV      R0,R10
+   \   00000106   ........           BL       read_data
+    471          				ptr += data_len;
+   \   0000010A   E019               ADDS     R0,R4,R7
+   \   0000010C   86B2               UXTH     R6,R0
+    472          				IINCHIP_WRITE(nUSE, (Sn_RX_RD0(nUSE, s) + 0), (uint8)((ptr & 0xff00) >> 8));
+   \                     ??recvfrom_6:
+   \   0000010E   320A               LSRS     R2,R6,#+8
+   \   00000110   4146               MOV      R1,R8
+   \   00000112   5046               MOV      R0,R10
+   \   00000114   ........           BL       IINCHIP_WRITE
+    473          				IINCHIP_WRITE(nUSE, (Sn_RX_RD0(nUSE, s) + 1), (uint8)(ptr & 0x00ff));
+   \   00000118   F2B2               UXTB     R2,R6
+   \   0000011A   4946               MOV      R1,R9
+   \   0000011C   5046               MOV      R0,R10
+   \   0000011E   ........           BL       IINCHIP_WRITE
+    474          				
+    475          #ifdef __DEF_IINCHIP_DGB__
+    476          			dprintf("MAC RAW msg arrived\r\n");
+    477          			dprintf("dest mac=%.2X.%.2X.%.2X.%.2X.%.2X.%.2X\r\n",buf[0],buf[1],buf[2],buf[3],buf[4],buf[5]);
+    478          			dprintf("src  mac=%.2X.%.2X.%.2X.%.2X.%.2X.%.2X\r\n",buf[6],buf[7],buf[8],buf[9],buf[10],buf[11]);
+    479          			dprintf("type    =%.2X%.2X\r\n",buf[12],buf[13]); 
+    480          #endif			
+    481          			break;
+   \                     ??recvfrom_2:
+   \   00000122   0BF2014B           ADDW     R11,R11,#+1025
+   \   00000126   4022               MOVS     R2,#+64
+   \   00000128   5946               MOV      R1,R11
+   \   0000012A   5046               MOV      R0,R10
+    482          
+    483          			default:
+    484          			break;
+    485          		}
+    486          		IINCHIP_WRITE(nUSE, Sn_CR(nUSE, s), Sn_CR_RECV);
+   \   0000012C   ........           BL       IINCHIP_WRITE
+    487          		/* +200804[woong]:wait to process the command... */
+    488          		while(IINCHIP_READ(nUSE, Sn_CR(nUSE, s)));
+   \                     ??recvfrom_7:
+   \   00000130   5946               MOV      R1,R11
+   \   00000132   5046               MOV      R0,R10
+   \   00000134   ........           BL       IINCHIP_READ
+   \   00000138   0028               CMP      R0,#+0
+   \   0000013A   F9D1               BNE.N    ??recvfrom_7
+    489          		/* ------- */
+    490          	}
+    491          #ifdef __DEF_IINCHIP_DBG__
+    492          	dprintf("recvfrom() end ..\r\n");
+    493          #endif
+    494           	return data_len;
+   \                     ??recvfrom_0:
+   \   0000013C   2046               MOV      R0,R4
+   \   0000013E   05B0               ADD      SP,SP,#+20
+   \   00000140   BDE8F08F           POP      {R4-R11,PC}      ;; return
+    495          }
+    496          
+
+   \                                 In section .text, align 2, keep-with-next
+    497          uint16 igmpsend(uint32 nUSE, SOCKET s, const uint8 *buf, uint16 len)
+    498          {
+   \                     igmpsend:
+   \   00000000   2DE9F041           PUSH     {R4-R8,LR}
+   \   00000004   0446               MOV      R4,R0
+   \   00000006   0D46               MOV      R5,R1
+   \   00000008   1E46               MOV      R6,R3
+   \   0000000A   2F46               MOV      R7,R5
+   \   0000000C   ....               LDR.N    R0,??DataTable4_1
+   \   0000000E   00EBC400           ADD      R0,R0,R4, LSL #+3
+   \   00000012   30F81700           LDRH     R0,[R0, R7, LSL #+1]
+   \   00000016   B042               CMP      R0,R6
+   \   00000018   38BF               IT       CC 
+   \   0000001A   0646               MOVCC    R6,R0
+    499          	uint8 status = 0;
+    500          	uint16 ret = 0;
+    501          	status = status;
+    502          #ifdef __DEF_IINCHIP_DBG__
+    503          	dprintf("igmpsend()\r\n");
+    504          #endif
+    505          	if (len > getIINCHIP_TxMAX(nUSE, s)) ret = getIINCHIP_TxMAX(nUSE, s); // check size not to exceed MAX size.
+    506          	else ret = len;
+    507          
+    508          	if(ret == 0) 
+   \   0000001C   7EB3               CBZ.N    R6,??igmpsend_0
+    509           	{
+    510          		#ifdef __DEF_IINCHIP_DBG__
+    511          			dprintf("%d Fail[%d]\r\n",len);
+    512          		#endif
+    513          	}
+    514          	else
+    515          	{
+    516          		// copy data
+    517          		send_data_processing(nUSE, s, (uint8 *)buf, ret);
+   \   0000001E   3346               MOV      R3,R6
+   \   00000020   2046               MOV      R0,R4
+   \   00000022   ........           BL       send_data_processing
+    518          		IINCHIP_WRITE(nUSE, Sn_CR(nUSE, s),Sn_CR_SEND);
+   \   00000026   3F02               LSLS     R7,R7,#+8
+   \   00000028   07F20148           ADDW     R8,R7,#+1025
+   \   0000002C   2022               MOVS     R2,#+32
+   \   0000002E   4146               MOV      R1,R8
+   \   00000030   2046               MOV      R0,R4
+   \   00000032   ........           BL       IINCHIP_WRITE
+    519          		/* +200804[woong]:wait to process the command... */
+    520          		while( IINCHIP_READ(nUSE, Sn_CR(nUSE, s)) );
+   \                     ??igmpsend_1:
+   \   00000036   4146               MOV      R1,R8
+   \   00000038   2046               MOV      R0,R4
+   \   0000003A   ........           BL       IINCHIP_READ
+   \   0000003E   0028               CMP      R0,#+0
+   \   00000040   F9D1               BNE.N    ??igmpsend_1
+   \                     ??igmpsend_2:
+   \   00000042   07F20248           ADDW     R8,R7,#+1026
+   \   00000046   4146               MOV      R1,R8
+   \   00000048   2046               MOV      R0,R4
+    521          		/* ------- */
+    522          
+    523          		#ifdef __DEF_IINCHIP_INT__
+    524             			while ( (getISR(s) & Sn_IR_SEND_OK) != Sn_IR_SEND_OK ) 
+    525          		#else
+    526          	   		while ( (IINCHIP_READ(nUSE, Sn_IR(nUSE, s)) & Sn_IR_SEND_OK) != Sn_IR_SEND_OK ) 
+   \   0000004A   ........           BL       IINCHIP_READ
+   \   0000004E   C006               LSLS     R0,R0,#+27
+   \   00000050   10D4               BMI.N    ??igmpsend_3
+    527          		#endif
+    528          		{
+    529          			status = IINCHIP_READ(nUSE, Sn_SR(nUSE, s));
+   \   00000052   07F20341           ADDW     R1,R7,#+1027
+   \   00000056   2046               MOV      R0,R4
+   \   00000058   ........           BL       IINCHIP_READ
+    530          			
+    531          			#ifdef __DEF_IINCHIP_INT__
+    532                			if(getISR(nUSE, s) & Sn_IR_TIMEOUT)
+    533          			#else
+    534          	     		if(IINCHIP_READ(nUSE, Sn_IR(nUSE, s)) & Sn_IR_TIMEOUT)
+   \   0000005C   4146               MOV      R1,R8
+   \   0000005E   2046               MOV      R0,R4
+   \   00000060   ........           BL       IINCHIP_READ
+   \   00000064   0007               LSLS     R0,R0,#+28
+   \   00000066   ECD5               BPL.N    ??igmpsend_2
+    535          			#endif
+    536          			{
+    537          				#ifdef __DEF_IINCHIP_DBG__
+    538          					dprintf("igmpsend fail.\r\n");
+    539          				#endif
+    540          			   /* in case of igmp, if send fails, then socket closed */
+    541          			   /* if you want change, remove this code. */
+    542          			   close(nUSE, s);
+   \   00000068   2946               MOV      R1,R5
+   \   0000006A   2046               MOV      R0,R4
+   \   0000006C   ........           BL       close
+    543          			   /* ----- */
+    544          			   
+    545          				return 0;
+   \   00000070   0020               MOVS     R0,#+0
+   \   00000072   05E0               B.N      ??igmpsend_4
+    546          			}
+    547          		}
+    548          		/* +2008.04 [woong] */	
+    549          		#ifdef __DEF_IINCHIP_INT__
+    550               		setISR(nUSE, s, getISR(nUSE, s) & (~Sn_IR_SEND_OK));
+    551          		#else
+    552          	   		IINCHIP_WRITE(nUSE, Sn_IR(nUSE, s), Sn_IR_SEND_OK);
+   \                     ??igmpsend_3:
+   \   00000074   1022               MOVS     R2,#+16
+   \   00000076   4146               MOV      R1,R8
+   \   00000078   2046               MOV      R0,R4
+   \   0000007A   ........           BL       IINCHIP_WRITE
+    553          		#endif
+    554             }
+    555          	return ret;
+   \                     ??igmpsend_0:
+   \   0000007E   3046               MOV      R0,R6
+   \                     ??igmpsend_4:
+   \   00000080   BDE8F081           POP      {R4-R8,PC}       ;; return
+    556          }
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable4:
+   \   00000000   ........           DC32     local_port
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable4_1:
+   \   00000000   ........           DC32     SSIZE
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable4_2:
+   \   00000000   ........           DC32     dprintf
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     `?<Constant "send fail. %x\\r\\n">`:
+   \   00000000   73656E642066       DC8 "send fail. %x\015\012"
+   \              61696C2E2025
+   \              780D0A00    
+    557          
+
+   Maximum stack usage in bytes:
+
+     Function   .cstack
+     --------   -------
+     close          16
+     connect        24
+     disconnect     16
+     igmpsend       24
+     listen         16
+     recv           16
+     recvfrom       56
+     send           40
+     sendto         32
+     socket         24
+
+
+   Section sizes:
+
+     Function/Label                  Bytes
+     --------------                  -----
+     dprintf                            4
+     local_port                         2
+     socket                           144
+     close                             46
+     listen                            52
+     connect                          178
+     disconnect                        34
+     send                             164
+     recv                              50
+     sendto                           262
+     recvfrom                         324
+     igmpsend                         132
+     ??DataTable4                       4
+     ??DataTable4_1                     4
+     ??DataTable4_2                     4
+     ?<Constant "send fail. %x\r\n">   16
+
+ 
+     2 bytes in section .bss
+     4 bytes in section .data
+ 1 414 bytes in section .text
+ 
+ 1 414 bytes of CODE memory
+     6 bytes of DATA memory
+
+Errors: none
+Warnings: none

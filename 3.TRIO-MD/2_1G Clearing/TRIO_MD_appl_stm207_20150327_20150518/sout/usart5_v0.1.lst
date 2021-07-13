@@ -1,0 +1,355 @@
+###############################################################################
+#                                                                             #
+# IAR ANSI C/C++ Compiler V5.50.0.51878/W32 for ARM     11/Aug/2012  17:25:06 #
+# Copyright (C) 1999-2010 IAR Systems AB.                                     #
+#                                                                             #
+#    Cpu mode     =  thumb                                                    #
+#    Endian       =  little                                                   #
+#    Source file  =  C:\user\project\FR-SSR\fw\appl_ssr_20120717\lib\uart5\us #
+#                    art5_v0.1.c                                              #
+#    Command line =  C:\user\project\FR-SSR\fw\appl_ssr_20120717\lib\uart5\us #
+#                    art5_v0.1.c -D NDEBUG -lcN C:\user\project\FR-SSR\fw\app #
+#                    l_ssr_20120717\sout\ -o C:\user\project\FR-SSR\fw\appl_s #
+#                    sr_20120717\sout\ --endian=little --cpu=Cortex-M3 -e     #
+#                    --warnings_are_errors --fpu=None --dlib_config           #
+#                    "C:\compiler\ewarm 5.5\arm\INC\DLib_Config_Normal.h" -I  #
+#                    C:\user\project\FR-SSR\fw\appl_ssr_20120717\include\ -I  #
+#                    C:\user\project\FR-SSR\fw\appl_ssr_20120717\lib_stm32\in #
+#                    c\ -I C:\user\project\FR-SSR\fw\appl_ssr_20120717\lib_st #
+#                    m32\src\ -I C:\user\project\FR-SSR\fw\appl_ssr_20120717\ #
+#                    uC-CPU\ -I C:\user\project\FR-SSR\fw\appl_ssr_20120717\u #
+#                    C-LIB\ -I C:\user\project\FR-SSR\fw\appl_ssr_20120717\uC #
+#                    OS-II\Ports\ -I C:\user\project\FR-SSR\fw\appl_ssr_20120 #
+#                    717\uCOS-II\Source\ -I C:\user\project\FR-SSR\fw\appl_ss #
+#                    r_20120717\uC-Probe\ -I "C:\compiler\ewarm               #
+#                    5.5\arm\INC\" -Oh                                        #
+#    List file    =  C:\user\project\FR-SSR\fw\appl_ssr_20120717\sout\usart5_ #
+#                    v0.1.lst                                                 #
+#    Object file  =  C:\user\project\FR-SSR\fw\appl_ssr_20120717\sout\usart5_ #
+#                    v0.1.o                                                   #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+C:\user\project\FR-SSR\fw\appl_ssr_20120717\lib\uart5\usart5_v0.1.c
+      1          
+      2          /******************** (C) COPYRIGHT 2008 PILOG, NSINFO *************************
+      3          * File Name          : USART5_vx.x.c
+      4          * Author             : Yoon Byong-Gyu(bgyoon@naver.com)
+      5          * Date First Issued  : 06/05/2008
+      6          * Description        : This file provides all the USART5 firmware functions.
+      7          * $Revision: 0.1 $
+      8          * $Revision date: 2008.06.__
+      9          ********************************************************************************/
+     10          #include "stm32f10x_conf.h"
+     11          #include "../include/USART5ext.h"
+     12          #include "usart5_v0.1.h"
+     13          
+     14          
+     15          void InitUSART5(INT32U nBps, INT8U nLCR)
+     16          {
+     17          	// Enable GPIOA and AFIO clocks */
+     18          	RCC->APB1ENR.UART5EN = ENABLE;
+     19          
+     20          	//USART5 Configuration
+     21          	Write_USART_BaudRate(USART5, nBps);	//Set BaudRate
+     22          	USART5->CR1.Bit.TXEIE = ENABLE;	
+     23          
+     24          	if(     ((nLCR >> 0) & 0x03) == (_NONPARITY >> 0))
+     25          	{
+     26          		USART5->CR1.Bit.PCE = 0;	//parity control disable
+     27          
+     28          		     if(((nLCR >> 4) & 0x03) ==  (_DATA8BIT >> 4))
+     29          		{
+     30          			USART5->CR1.Bit.M = 0;		//word length = 8
+     31          			USART5->CR2.Bit.STOP = ((nLCR >> 2) & 0x03);	//stop bit = 1
+     32          		}
+     33          		else //if( ((nLCR >> 4) & 0x03) ==  _DATA9BIT )
+     34          		{
+     35          			USART5->CR1.Bit.M = 1;		//word length = 9
+     36          			//USART5->CR2.Bit.STOP = ((nLCR >> 2) & 0x03);	//stop bit = 1
+     37          		}
+     38          	}
+     39          	else if(((nLCR >> 0) & 0x03) == (_ODDPARITY >> 0))
+     40          	{
+     41          		USART5->CR1.Bit.PCE = 1;	//parity control disable
+     42          		USART5->CR1.Bit.PS = 1;
+     43          		USART5->CR2.Bit.STOP = ((nLCR >> 2) & 0x03);	//stop bit = 1
+     44          
+     45          		 if( ((nLCR >> 4) & 0x03) ==  (_DATA7BIT >> 4)) 	USART5->CR1.Bit.M = 0;
+     46          		 else										        USART5->CR1.Bit.M = 1;
+     47          	}
+     48          	else //if(((nLCR >> 0) & 0x03) == _EVNPARITY)
+     49          	{
+     50          		USART5->CR1.Bit.PCE = 1;	//parity control disable
+     51          		USART5->CR1.Bit.PS = 0;
+     52          		USART5->CR2.Bit.STOP = ((nLCR >> 2) & 0x03);	//stop bit = 1		
+     53          
+     54          		if( ((nLCR >> 4) & 0x03) ==  (_DATA7BIT >> 4))   USART5->CR1.Bit.M = 0;
+     55          		else									         USART5->CR1.Bit.M = 1;
+     56          	}
+     57          	/**/
+     58          	USART5->CR3.Bit.RTSE = 0;	//RTS hardware flow control disabled
+     59          	USART5->CR3.Bit.CTSE = 0;	//CTS hardware flow control disabled
+     60          	USART5->CR1.Bit.TE = ENABLE;//Transmitter is enable
+     61          	USART5->CR1.Bit.RE = ENABLE;//Receiver is Enalbe
+     62          	USART5->CR2.Bit.CLKEN = 0;	//SCLK pin disabled
+     63          	USART5->CR2.Bit.CPOL = 0;	//Steady low value on SCLK pin outside transmission window
+     64          	USART5->CR2.Bit.CPHA = 1;	//The second clock transition is the first data capture edge
+     65          	USART5->CR2.Bit.LBCL = 0;	//The clock pulse of the last data bit is not output to the SCLK pin
+     66          
+     67          	USART_ITConfig(USART5, USART_IT_RXNE, ENABLE);
+     68          
+     69          	// Enable the USART5
+     70          	USART_Cmd(USART5, ENABLE);
+     71          	// Enable the USART5 Interrupt
+     72           	NVIC_Init(UART5_IRQChannel, ENABLE);	
+     73          
+     74          	pUSART5.sem = OSSemCreate(1);
+     75          	USART5Printf("\n");
+     76          
+     77          }
+     78          
+     79          /*******************************************************************************
+     80          * Function Name  : USART5_IRQHandler
+     81          * Description    : This function handles USART5 global interrupt request.
+     82          * Input          : None
+     83          * Output         : None
+     84          * Return         : None
+     85          *******************************************************************************/
+     86          
+     87          void USART5_IRQHandler(void)
+     88          {
+     89          
+     90          	INT16U tmp = USART5->SR.Data;
+     91          	INT32U cpu_sr;
+     92          
+     93              CPU_CRITICAL_ENTER();                                       // Tell uC/OS-II that we are starting an ISR
+     94              OSIntNesting++;
+     95              CPU_CRITICAL_EXIT();
+     96          
+     97          	// Rx Data Received
+     98          	if(tmp & ( 1 << __RXNE))
+     99          	{
+    100          		Rx5Buff[Rx5WrCnt++] = USART5->DR.Bit.DR;		// When the receive register is read, the RDR bit is automatically cleared.
+    101          		Rx5WrCnt %= Rx5BuffLen;
+    102          	}
+    103          	else if(tmp & ( 1 << __TXE))
+    104          	{
+    105          		if(Tx5RdCnt != Tx5WrCnt)
+    106          		{
+    107          			USART5->DR.Bit.DR = Tx5Buff[Tx5RdCnt++];
+    108          			Tx5RdCnt %= Tx5BuffLen;
+    109          		}
+    110          		else USART5->CR1.Bit.TXEIE = DISABLE;
+    111          	}
+    112          	else // error, dummy read
+    113          	{
+    114          		tmp =  USART5->DR.Bit.DR;
+    115          	}
+    116          
+    117          	OSIntExit();												// Tell uC/OS-II that we are leaving the ISR
+    118          
+    119          }
+    120          
+    121          unsigned char USART5PutToBuffer(unsigned char Data)
+    122          {
+    123          	INT8U err;
+    124          	//////////////////////////////////////////////////
+    125          
+    126          	OSSemPend(pUSART5.sem, 0, &err);
+    127          	
+    128          	//////////////////////////////////////////////////
+    129          	Tx5Buff[Tx5WrCnt++] = Data;
+    130          	Tx5WrCnt %= Tx5BuffLen;
+    131          	
+    132          	USART5->CR1.Bit.TXEIE = ENABLE;			
+    133          	///////////////////////////////////////////////////
+    134          	OSSemPost(pUSART5.sem);
+    135          	return 0;
+    136          }
+    137          
+    138          unsigned char USART5PutChar(unsigned char Data)
+    139          {
+    140          
+    141          
+    142          	USART5->DR.Bit.DR = Data;
+    143          	while(!USART5->SR.Bit.TXE);
+    144              
+    145              return Data;
+    146          }
+    147          
+    148          unsigned long int USART5Printf( const char *format, ... )
+    149          {
+    150              unsigned long int i, cnt;
+    151              char buf[128];
+    152           	va_list argptr;
+    153          
+    154              va_start(argptr, format);
+    155          	cnt = vsprintf(buf, format, argptr);
+    156          	va_end( argptr );
+    157          
+    158          	for(i = 0;;i++)
+    159          	{
+    160          		if(buf[i] == 0) break;
+    161          		if(buf[i] == '\n') USART5PutToBuffer('\r');
+    162          		USART5PutToBuffer(buf[i]);
+    163          	}
+    164          	while(!USART5TxCheckByte()) OSTimeDly(1);
+    165          	return cnt;
+    166          }
+    167          
+    168          void USART5PutStr(unsigned char *Str, unsigned short int Length, int iEn)
+    169          {
+    170          
+    171          	INT8U err;
+    172          	unsigned long int i;
+    173          
+    174          	OSSemPend(pUSART5.sem, 0, &err);
+    175          	
+    176          	for(i = 0; i < Length; i++)
+    177          	{
+    178          		Tx5Buff[Tx5WrCnt++] = Str[i];
+    179          		Tx5WrCnt %= Tx5BuffLen;
+    180          	}
+    181          
+    182          	if(iEn)
+    183          	{
+    184          		USART5->CR1.Bit.TXEIE = ENABLE;
+    185          	}	
+    186          
+    187          	OSSemPost(pUSART5.sem);
+    188          }
+    189          
+    190          
+    191          signed short int USART5RxGetByte( void )
+    192          {
+    193          	s16 RetVal = 0;
+    194          
+    195          #if (APPOFFSET == 0)
+    196          	while(Rx5RdCnt == Rx5WrCnt);
+    197          #else
+    198          	if(Rx5RdCnt == Rx5WrCnt) return -1;
+    199          #endif
+    200          	RetVal = Rx5Buff[Rx5RdCnt++];
+    201          	Rx5RdCnt %= Rx5BuffLen;
+    202          
+    203          	return (RetVal & 0xff);
+    204          }
+    205          
+    206          unsigned char USART5CheckByte(unsigned short int ByteCnt, unsigned short int *Recv)
+    207          {
+    208          	u32	i = 0, j = 0;
+    209          	u8	RetVal = TRUE;
+    210          
+    211          	*Recv = 0;
+    212          	i = (u32) Rx5RdCnt;
+    213          	j = (u32) Rx5WrCnt;
+    214          
+    215          	if		(i == j) RetVal = FALSE;
+    216          	else if (i < j)
+    217          	{
+    218          		*Recv = j - i;
+    219          		i = i + ByteCnt;
+    220          		if(i > j)	RetVal = FALSE;
+    221          	}
+    222          	else if (i > j)
+    223          	{
+    224          		*Recv = (Rx5BuffLen + j) - i;
+    225          		i = i + ByteCnt;
+    226          		j = j + Rx5BuffLen;
+    227          		if(i > j)	RetVal = FALSE;
+    228          	}
+    229          	return(RetVal);
+    230          }
+    231          
+    232          void USART5BuffClear( void )
+    233          {
+    234          	Rx5RdCnt = 0;
+    235          	Rx5WrCnt = 0;
+    236          	Tx5RdCnt = 0;
+    237          	Tx5WrCnt = 0;
+    238          }
+    239          
+    240          void USART5TxClear(void)
+    241          {
+    242          	Tx5RdCnt = 0;
+    243          	Tx5WrCnt = 0;
+    244          }
+    245          
+    246          
+    247          signed short int USART5TxCheckByte(void)
+    248          {
+    249          	if(!USART5->CR1.Bit.TXEIE) return TRUE;
+    250          	return FALSE;
+    251          }
+    252          
+    253          ////////////////////////////////////////////////////////////////////////////////
+    254          // End of Source File
+    255          /////////////////////
+    256          
+    257          
+
+   Maximum stack usage in bytes:
+
+     Function          .cstack
+     --------          -------
+     InitUSART5            16
+     USART5BuffClear        0
+     USART5CheckByte        8
+     USART5Printf         152
+     USART5PutChar          0
+     USART5PutStr          24
+     USART5PutToBuffer     16
+     USART5RxGetByte        0
+     USART5TxCheckByte      0
+     USART5TxClear          0
+     USART5_IRQHandler     16
+
+
+   Section sizes:
+
+     Function/Label    Bytes
+     --------------    -----
+     Rx5Buff           1024
+     Tx5Buff           1024
+     Rx5RdCnt             8
+     Rx5WrCnt
+     Tx5RdCnt
+     Tx5WrCnt
+     pUSART5             44
+     InitUSART5         300
+     USART5_IRQHandler  106
+     USART5PutToBuffer   52
+     USART5PutChar       18
+     USART5Printf        70
+     USART5PutStr        70
+     USART5RxGetByte     32
+     USART5CheckByte     58
+     USART5BuffClear     10
+     ?Subroutine0         6
+     USART5TxClear        4
+     USART5TxCheckByte   16
+     ??DataTable8         4
+     ??DataTable8_1       4
+     ??DataTable8_2       4
+     ??DataTable8_3       4
+     ??DataTable8_4       4
+     ??DataTable8_5       4
+     ??DataTable8_6       4
+     ??DataTable8_7       4
+     ??DataTable8_8       4
+     ?<Constant "\n">     2
+
+ 
+    44 bytes in section .data
+     2 bytes in section .rodata
+   778 bytes in section .text
+ 2 056 bytes in section iram
+ 
+   778 bytes of CODE  memory
+     2 bytes of CONST memory
+ 2 100 bytes of DATA  memory
+
+Errors: none
+Warnings: none

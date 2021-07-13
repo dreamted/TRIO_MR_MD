@@ -1,0 +1,49 @@
+/*###ICF### Section handled by ICF editor, don't touch! ****/
+/*-Editor annotation file-*/
+/* IcfEditorFile="$TOOLKIT_DIR$\config\ide\IcfEditor\a_v1_0.xml" */
+/*-Specials-*/
+
+define symbol __ICFEDIT_intvec_start__ = 0x08008000;
+/*-Memory Regions-*/
+define symbol __ICFEDIT_region_ROM_start__      = 0x08008000 ;
+define symbol __ICFEDIT_region_ROM_end__        = 0x08026FFF;
+define symbol __ICFEDIT_region_RAM_start__      = 0x20000000;
+define symbol __ICFEDIT_region_RAM_end__        = 0x2001FFFF;
+/*-Memory ext.Ram*/
+
+// 0x60780000 ~ 0x607FFFFF: 512K Bytes Size
+// 그러나 이부분을 다 사용하면 안된다.
+// Ext.Ram을 사용할 경우 다운로드 영역이 존재하므로, VCT6경우, 228K Bytes의 영역은 사용하지 말아야 한다.
+// 즉, 0x60780000 ~ 0x607C6FFF(0 ~ 512-228) 을 초과하여서는 안된다.
+// Ext.Ram이 존재하고, 내부 Flash를 이용한 다운로드의 경우, 모든 영역의 RAM을 사용이 가능하다.
+
+define symbol __ICFEDIT_region_EXTSRAM_start__  = 0x60780000;
+define symbol __ICFEDIT_region_EXTSRAM_end__    = 0x607FFFFF;
+
+/*-Sizes-*/
+define symbol __ICFEDIT_size_cstack__   = 0x500;
+define symbol __ICFEDIT_size_heap__     = 0x50;
+/**** End of ICF editor section. ###ICF###*/
+
+
+define memory mem with size = 4G;
+define region ROM_region        = mem:[from __ICFEDIT_region_ROM_start__   to __ICFEDIT_region_ROM_end__];
+define region RAM_region        = mem:[from __ICFEDIT_region_RAM_start__   to __ICFEDIT_region_RAM_end__] |
+                                  mem:[from __ICFEDIT_region_EXTSRAM_start__   to __ICFEDIT_region_EXTSRAM_end__];
+
+define region INT_RAM_region    = mem:[from __ICFEDIT_region_RAM_start__   to __ICFEDIT_region_RAM_end__];
+
+
+define block CSTACK    with alignment = 8, size = __ICFEDIT_size_cstack__   { };
+define block HEAP      with alignment = 8, size = __ICFEDIT_size_heap__     { };
+
+initialize by copy { rw };
+do not initialize  { section .noinit };
+
+place at address mem:__ICFEDIT_intvec_start__ { readonly section .intvec };
+
+place in ROM_region   { readonly };
+place in INT_RAM_region  { block HEAP, block CSTACK, rw section iram};
+place in RAM_region   {rw};
+// iram은 인터럽트를 사용하는 부분과 ucos를 사용하는 부분은 iram이라 선언하고 사용한다.
+// 단, 48K bytes를 초과하지 않는 부분은(VCT6)경우에는 의미가 없다.

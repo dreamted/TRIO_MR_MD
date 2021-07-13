@@ -1,0 +1,276 @@
+###############################################################################
+#                                                                             #
+# IAR ANSI C/C++ Compiler V5.30.2.51295/W32 for ARM     13/Mar/2011  23:22:17 #
+# Copyright 1999-2009 IAR Systems AB.                                         #
+#                                                                             #
+#    Cpu mode     =  thumb                                                    #
+#    Endian       =  little                                                   #
+#    Source file  =  C:\user\project\HFR OTM\fw\appl_otm_20110330\code\aa_otr #
+#                    u.c                                                      #
+#    Command line =  "C:\user\project\HFR OTM\fw\appl_otm_20110330\code\aa_ot #
+#                    ru.c" -lcN "C:\user\project\HFR                          #
+#                    OTM\fw\appl_otm_20110330\sout\" -lB                      #
+#                    "C:\user\project\HFR OTM\fw\appl_otm_20110330\sout\" -o  #
+#                    "C:\user\project\HFR OTM\fw\appl_otm_20110330\sout\"     #
+#                    --endian=little --cpu=Cortex-M3 -e --require_prototypes  #
+#                    --fpu=None --dlib_config "C:\compiler\EWARM              #
+#                    5.3\arm\INC\DLib_Config_Normal.h" -I                     #
+#                    "C:\user\project\HFR OTM\fw\appl_otm_20110330\include\"  #
+#                    -I "C:\user\project\HFR OTM\fw\appl_otm_20110330\lib_stm #
+#                    32\inc\" -I "C:\user\project\HFR                         #
+#                    OTM\fw\appl_otm_20110330\lib_stm32\src\" -I              #
+#                    "C:\user\project\HFR OTM\fw\appl_otm_20110330\uC-CPU\"   #
+#                    -I "C:\user\project\HFR OTM\fw\appl_otm_20110330\uC-LIB\ #
+#                    " -I "C:\user\project\HFR OTM\fw\appl_otm_20110330\uCOS- #
+#                    II\Ports\" -I "C:\user\project\HFR                       #
+#                    OTM\fw\appl_otm_20110330\uCOS-II\Source\" -I             #
+#                    "C:\user\project\HFR OTM\fw\appl_otm_20110330\uC-Probe\" #
+#                     -I "C:\compiler\EWARM 5.3\arm\INC\" -Oh                 #
+#    List file    =  C:\user\project\HFR OTM\fw\appl_otm_20110330\sout\aa_otr #
+#                    u.lst                                                    #
+#    Object file  =  C:\user\project\HFR OTM\fw\appl_otm_20110330\sout\aa_otr #
+#                    u.o                                                      #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+C:\user\project\HFR OTM\fw\appl_otm_20110330\code\aa_otru.c
+      1          /******************** (C) COPYRIGHT 2007 STMicroelectronics ********************
+      2          * File Name          : stm32f10x_bkp.c
+      3          * Author             : MCD Application Team
+      4          * Date First Issued  : 09/29/2006
+      5          * Description        : This file provides all the BKP firmware functions.
+      6          ********************************************************************************/
+      7          
+      8          #define OTRU_C
+      9          
+     10          #include "../include/main.h"
+     11          
+     12          void OTRUInit(void)
+     13          {
+     14           	OTRUSer->CheckByte = pUSART2.CheckByte;
+     15          	OTRUSer->RxGetByte = pUSART2.RxGetByte;
+     16          	OTRUSer->PutStr = pUSART2.PutStr;
+     17          	OTRUSer->TxCheckByte = pUSART2.TxCheckByte;
+     18          	
+     19          	OTRUSer->TimerRx = TimerOTRURx;
+     20          	OTRUSer->TimerEndWait = TimerOTRUEndWait;
+     21          	OTRUSer->WRCSRecv = &ROTRUsio;
+     22          	OTRUSer->WRCSSend = &SOTRUsio;
+     23          	OTRUSer->SendIng = FALSE;
+     24          
+     25          	OSTaskCreate(OTRUTask, (void *)NULL, (OS_STK *)&OTRUTaskStk[OTRU_START_STK_SIZE - 1], OTRU_TASK_PRIO);
+     26          }
+     27          
+     28          
+     29          void OTRUTask(void * pdata)
+     30          {
+     31              INT8U DnrID = 0;
+     32          	INT8U sID[3] = {0,0,0};
+     33          	INT16U tcnt;
+     34          	
+     35          	__ProtocolPtr *nPtr = (__ProtocolPtr *)OTRUSer;
+     36          
+     37          	OSTimeDly(100*OTRU_TASK_PRIO);
+     38          
+     39          	while(1)
+     40          	{
+     41          		// Only Downloading
+     42          		while((WRCS_DownLoadGiveupTimerSet(NULL)))
+     43          		{
+     44          			nPtr->WRCSRecv->cBody = 0;
+     45          			
+     46          			if(WRCS_ProtocolCheck(nPtr))
+     47          			{
+     48          			#if TWO_BODY >= 2
+     49          				while(nPtr->WRCSRecv->cBody  <=  nPtr->WRCSRecv->BodyNo)
+     50          				{
+     51          			#endif
+     52          					ProtocolComCheck(nPtr);
+     53          			#if TWO_BODY >= 2
+     54          					nPtr->WRCSRecv->cBody++;
+     55          				}
+     56          			#endif
+     57          				OTRULinkFailRst(DnrID);
+     58           			}
+     59          			DecOTRUSendCnt();
+     60          			OSTimeDly(200L);
+     61          		}
+     62          		while(!WRCS_DownLoadGiveupTimerSet(NULL) && !tTestFlag)
+     63          		{
+     64          			nPtr->WRCSRecv->cBody = 0;
+     65          ///////////////////////////////////////////////////////////////////////////////
+     66          			if(!IsItOTRUSent())
+     67          			{
+     68          				//	ModuleInformStsQue
+     69          				DnrID = OTRUCheckInstalltoNext(DnrID);
+     70          					
+     71          				if(OTRUInsertCheck(DnrID))
+     72          				{					
+     73          					SystemIDMake(sID, OTRUID, DnrID, NULL); 
+     74          					tcnt = GenOTRUAidMake(OTRUdptr, &DnrSts[DnrID], DnrID);
+     75          					OTRUTransmitData(sID[0], sID[1], sID[2], (INT8U *)OTRUdptr, tcnt, StatusQue, nPtr);
+     76          				}
+     77          			}
+     78          			OSTimeDly(100L);
+     79          			if(IsItOTRUSent() && WRCS_ProtocolCheck(nPtr))
+     80          			{
+     81          				DecOTRUSendCnt();
+     82          #if TWO_BODY >= 2
+     83          				while(nPtr->WRCSRecv->cBody  <=  nPtr->WRCSRecv->BodyNo)
+     84          				{
+     85          #endif
+     86          					ProtocolComCheck(nPtr);
+     87          #if TWO_BODY >= 2
+     88          					nPtr->WRCSRecv->cBody++;
+     89          				}
+     90          #endif
+     91          				OTRULinkFailRst(DnrID);
+     92          			}
+     93          			else DecOTRUSendCnt();
+     94          
+     95          			OSTimeDly(400L);
+     96          		}
+     97          		DecOTRUSendCnt();
+     98          		OSTimeDly(100L);
+     99          	}
+    100          }
+    101          
+    102          
+    103          void OTRUTransmitData(INT8U id0, INT8U id1, INT8U id2, INT8U *Data, INT16U Count, INT8U Comm, __ProtocolPtr *nPtr)
+    104          {
+    105          	TimerRegist(OTRUSer->TimerEndWait, Time1Sec*3L);
+    106          	
+    107          	while(IsItOTRUSent()) // waiting until finish current job
+    108          	{
+    109          		if(TimeOverCheck(OTRUSer->TimerEndWait)) return;
+    110          		OSTimeDly(10L);
+    111          	}
+    112          	OTRUSer->ctrlsrc = (INT32U)nPtr;
+    113          	OTRUDataAckTx(id0, id1, id2, Data, Count, Comm, OTRUSer);
+    114          }
+    115          
+    116          
+    117          void OTRUDataAckTx(INT8U id0, INT8U id1, INT8U id2, INT8U *Data, INT16U nCnt,
+    118          					INT8U Comm, __ProtocolPtr *nPtr)
+    119          {
+    120          	INT8U rSubID[3] = {id0, id1, id2};
+    121          	INT8S tmpBr  = (SystemIDCheck(rSubID) >> 4) & 0x03;
+    122          
+    123          	if(DnrSts[0].RepeaterType[1] == __DEOTYPE)
+    124          	{
+    125          		tmpBr = OTRUCheckInstalltoNext(tmpBr);
+    126          	}
+    127          	OTRUChannelSelect(tmpBr);
+    128          
+    129          	GenBodyFrame(id0, id1, id2, (INT8U *)Data, nCnt, DnrSts[tmpBr].RCode, Comm, nPtr, NULL);
+    130          
+    131          	WRCS_ProDataAckTx(nPtr);
+    132          	IncOTRUSendCnt();
+    133          	OTRULinkFailCheck(tmpBr);
+    134          }
+    135          
+    136          void OTRUChannelSelect(INT8U DnrID)
+    137          {
+    138          	switch(DnrID)
+    139          	{
+    140          		case 0:
+    141          			ExpioBitRst(nCON_EN1);
+    142          			ExpioBitRst(nCON_EN2);
+    143          		break;
+    144          
+    145          		case 1:
+    146          			ExpioBitSet(nCON_EN1);
+    147          			ExpioBitRst(nCON_EN2);
+    148          		break;
+    149          		
+    150          		case 2:
+    151          			ExpioBitRst(nCON_EN1);
+    152          			ExpioBitSet(nCON_EN2);
+    153          		break;
+    154          
+    155          	}
+    156          }
+    157          
+    158          INT8U OTRUInsertCheck(INT8U DnrID)
+    159          {
+    160          	return  (BitRead(DnrSts[DnrID].DnrInstall[DnrID], mInstall));	
+    161          }
+    162          
+    163          INT8U OTRUCheckInstalltoNext(INT8U DnrID)
+    164          {	
+    165          	INT32U i = 0;
+    166          
+    167          	for(i = 0; i < DnrMaxID; i++)
+    168          	{
+    169          		DnrID++;
+    170          		DnrID %= DnrMaxID;
+    171          		if(OTRUInsertCheck(DnrID)) return DnrID;
+    172          		else
+    173          		{
+    174          			if(DnrSts[0].RepeaterType[1] == __DEITYPE) OTRULinkFailRst(DnrID);
+    175          		}
+    176          	}
+    177          	return DnrID;
+    178          }
+    179          
+    180          
+    181          INT8U IsItOTRUSent(void)
+    182          {
+    183          	return OTRUTx;
+    184          }
+    185          
+    186          void IncOTRUSendCnt(void)
+    187          {
+    188          	OTRUTx++;
+    189          }
+    190          
+    191          void DecOTRUSendCnt(void)
+    192          {
+    193          	if(OTRUTx) OTRUTx--;
+    194          }
+    195          
+    196          
+    197          void OTRULinkFailCheck(INT8U DnrID)
+    198          {
+    199          	INT8U i = 0;
+    200          
+    201          	DnrID = DnrID%DnrMaxID;
+    202          	if(DnrSts[0].RepeaterType[1] == __DEOTYPE) DnrID = 0;
+    203          	
+    204          	if((++OTRULinkFailCnt[DnrID] > 5))
+    205          	{
+    206          		OTRULinkFailCnt[DnrID] = 10;
+    207          
+    208          		for(i = 0; i < DnrMaxID; i++)
+    209          		{
+    210          			BitSet(DnrSts[i].DnrInstall[DnrID], mLinkFail);
+    211          			BitSet(DnrSts[i].ODUInstall, mLinkFail);
+    212          		}
+    213          		DnrSts[DnrID].DnrAlm.LinkFail = SET;
+    214          	}
+    215          }
+    216          
+    217          void OTRULinkFailRst(INT8U DnrID)
+    218          {
+    219          	INT8U i = 0;
+    220          
+    221          	DnrID = DnrID%DnrMaxID;
+    222          	if(DnrSts[0].RepeaterType[1] == __DEOTYPE) DnrID = 0;
+    223          	
+    224          	OTRULinkFailCnt[DnrID] = 0;
+    225          	
+    226          	for(i = 0; i < DnrMaxID; i++)
+    227          	{
+    228          		BitRst(DnrSts[i].DnrInstall[DnrID], mLinkFail);
+    229          		BitRst(DnrSts[i].ODUInstall, mLinkFail);
+    230          	}
+    231          	DnrSts[DnrID].DnrAlm.LinkFail = RESET;
+    232          }
+    233          ////////////////////////////////////////////////////////////////////////////////
+    234          // End of Source File
+    235          /////////////////////////
+    236          
+
+Errors: 56
+Warnings: none

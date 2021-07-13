@@ -1,0 +1,508 @@
+###############################################################################
+#                                                                             #
+#                                                       08/Mar/2013  15:33:42 #
+# IAR ANSI C/C++ Compiler V5.50.5.21995/W32 EVALUATION for ARM                #
+# Copyright (C) 1999-2010 IAR Systems AB.                                     #
+#                                                                             #
+#    Cpu mode     =  thumb                                                    #
+#    Endian       =  little                                                   #
+#    Source file  =  D:\Project\TRIO\3.F_W\TRIO_appl_src_20121212_V5_5\dev\ee #
+#                    prom\eep_24c64_v1104.c                                   #
+#    Command line =  D:\Project\TRIO\3.F_W\TRIO_appl_src_20121212_V5_5\dev\ee #
+#                    prom\eep_24c64_v1104.c -D _MIMO_Type -D __2rd -D         #
+#                    __PLLEnToggle -lcN D:\Project\TRIO\3.F_W\TRIO_appl_src_2 #
+#                    0121212_V5_5\sout\ -o D:\Project\TRIO\3.F_W\TRIO_appl_sr #
+#                    c_20121212_V5_5\sout\ --endian=little --cpu=Cortex-M3    #
+#                    -e --require_prototypes --warnings_are_errors            #
+#                    --fpu=None --dlib_config "C:\Program Files\IAR           #
+#                    Systems\Embedded Workbench 5.4                           #
+#                    Evaluation\arm\INC\DLib_Config_Normal.h" -I              #
+#                    D:\Project\TRIO\3.F_W\TRIO_appl_src_20121212_V5_5\includ #
+#                    e\ -I D:\Project\TRIO\3.F_W\TRIO_appl_src_20121212_V5_5\ #
+#                    lib_stm32\inc\ -I D:\Project\TRIO\3.F_W\TRIO_appl_src_20 #
+#                    121212_V5_5\lib_stm32\src\ -I                            #
+#                    D:\Project\TRIO\3.F_W\TRIO_appl_src_20121212_V5_5\uC-CPU #
+#                    \ -I D:\Project\TRIO\3.F_W\TRIO_appl_src_20121212_V5_5\u #
+#                    C-LIB\ -I D:\Project\TRIO\3.F_W\TRIO_appl_src_20121212_V #
+#                    5_5\uCOS-II\Ports\ -I D:\Project\TRIO\3.F_W\TRIO_appl_sr #
+#                    c_20121212_V5_5\uCOS-II\Source\ -I                       #
+#                    D:\Project\TRIO\3.F_W\TRIO_appl_src_20121212_V5_5\uC-Pro #
+#                    be\ -I "C:\Program Files\IAR Systems\Embedded Workbench  #
+#                    5.4 Evaluation\arm\INC\" -Oh                             #
+#    List file    =  D:\Project\TRIO\3.F_W\TRIO_appl_src_20121212_V5_5\sout\e #
+#                    ep_24c64_v1104.lst                                       #
+#    Object file  =  D:\Project\TRIO\3.F_W\TRIO_appl_src_20121212_V5_5\sout\e #
+#                    ep_24c64_v1104.o                                         #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\Project\TRIO\3.F_W\TRIO_appl_src_20121212_V5_5\dev\eeprom\eep_24c64_v1104.c
+      1          /*******************************************************************************
+      2           *
+      3           * This module contains the function HMS39C7092 EEPROM(AT24C64) related, a function
+      4           * that is called before the 'main' function of the program.  Normally
+      5           * timer initializations - such as setting the prefered timer interrupt
+      6           * level or setting the watchdog - can be performed here.
+      7           *
+      8           * Note that this function is called before the data segments are
+      9           * initialized, this means that this function cannot rely on the
+     10           * values of global or static variables.
+     11           *
+     12           *
+     13           *
+     14           * $Revision: 0.1 $
+     15           * $Revision date: 2008.06
+     16           ******************************************************************************/
+     17          
+     18          #include "stm32f10x_conf.h"
+     19          #include "eep_24c64_v1104.h"
+     20          
+     21          //#define EEp_debug
+     22          //unsigned long int USART3Printf( const char *format, ... );
+     23          
+     24          unsigned long int (*eprintf)( const char *format, ... ) = USART1Printf;
+     25          
+     26          void AT24C64Init(void)
+     27          {
+     28          #if 1
+     29          	GPIOB->CNF.B8 = __PB8_OU_OD; //__I2C1_SCL;			// AT24C00 SCL
+     30          	// SDA
+     31          	GPIOB->CNF.B13 = __PB13_IN_FL; //__I2C1_SDA;		// AT24C00 SDA
+     32          	//WP
+     33          	GPIOB->CNF.B5 = __PB5_OU_PP; //__I2C1_WP;			// AT24C00 WP
+     34          	RstAT24C64SCL();
+     35          	DisableWriteAT24C64();
+     36          #endif
+     37          
+     38          #if 0
+     39          	// SCL
+     40          	GPIOB->CNF.B4 = __PB4_OU_PP; //__I2C1_SCL;			// AT24C64 SCL
+     41          	// SDA
+     42          	GPIOE->CNF.B2 = __PE2_IN_FL; //__I2C1_SDA;			// AT24C64 SDA
+     43          
+     44          	RstAT24C64SCL();
+     45          #endif
+     46          }
+     47          
+     48          INT16S WriteAT24C64(INT16U ADDR, INT8U Data)
+     49          {
+     50          	INT8U cnt = AT24C64WrTry;
+     51          	INT8U rVal = 0;
+     52          	INT16S pVal = (Data & 0xff);
+     53          	// 0: Write Fail
+     54          	// 1: Write Success
+     55          	EnableWriteAT24C64();
+     56          	rVal = Write_AT24C64_16Addr_8Data(AT24C64DevID, ADDR, Data);
+     57          	DisableWriteAT24C64();
+     58          
+     59          	if(!rVal) return -1;
+     60          
+     61          	// Confirm Data
+     62          	while(cnt--)
+     63          	{
+     64          		OSTimeDly(1);
+     65          		if(Read_AT24C64_16Addr_8Data(AT24C64DevID, ADDR) == pVal) return pVal;
+     66          	}
+     67          	return Data;
+     68          }
+     69          
+     70          INT16S Write_AT24C64(INT8U DevAddr,INT16U ADDR, INT8U Data)
+     71          {
+     72          	INT8U cnt = AT24C64WrTry;
+     73          	INT8U rVal = 0;
+     74          	INT16S pVal = (Data & 0xff);
+     75          	// 0: Write Fail
+     76          	// 1: Write Success
+     77          	EnableWriteAT24C64();
+     78          	rVal = Write_AT24C64_16Addr_8Data(DevAddr, ADDR, Data);
+     79          	DisableWriteAT24C64();
+     80          
+     81          	if(!rVal) return -1;
+     82          
+     83          	// Confirm Data
+     84          	while(cnt--)
+     85          	{
+     86          		OSTimeDly(1);
+     87          		if(Read_AT24C64_16Addr_8Data(DevAddr, ADDR) == pVal) return pVal;
+     88          	}
+     89          	return Data;
+     90          }
+     91          
+     92          INT8U Read_AT24C64(INT8U DevAddr,INT16U ADDR)
+     93          {
+     94          	return Read_AT24C64_16Addr_8Data(DevAddr, ADDR);
+     95          }
+     96          
+     97          
+     98          INT8U ReadAT24C64(INT16U ADDR)
+     99          {
+    100          	return Read_AT24C64_16Addr_8Data(AT24C64DevID, ADDR);
+    101          }
+    102          
+    103          INT8U Write_AT24C64_16Addr_8Data(INT8U DevAddr, INT16U Addr, INT8U Data)
+    104          {
+    105          	INT8U cnt = AT24C64WrTry;
+    106          	// Start Condition
+    107          	// Write Protection Disable, Allows normal write operation
+    108          	//
+    109          	// output 1(SDATA)
+    110          	// START Conditon making
+    111          	while(cnt--)
+    112          	{
+    113          		StartAT24C64();
+    114          		WriteAT24C64Data(DevAddr & (~0x01));
+    115          		#ifndef EEp_debug
+    116          			if(ACKAT24C64()) continue;
+    117          		#else
+    118          		{
+    119          			INT8U _Ack = ACKAT24C64();
+    120          			eprintf("ACK((0): %d \n", _Ack);
+    121          			if(_Ack) continue;
+    122          		}
+    123          		#endif
+    124          		WriteAT24C64Data((INT8U)(Addr >> 8));
+    125          		#ifndef EEp_debug
+    126          			if(ACKAT24C64()) continue;
+    127          		#else
+    128          		{
+    129          			INT8U _Ack = ACKAT24C64();
+    130          			eprintf("ACK(1): %d \n", _Ack);
+    131          			if(_Ack) continue;
+    132          		}
+    133          		#endif
+    134          		WriteAT24C64Data((INT8U)(Addr     ));
+    135          		#ifndef EEp_debug
+    136          			if(ACKAT24C64()) continue;
+    137          		#else
+    138          		{
+    139          			INT8U _Ack = ACKAT24C64();
+    140          			eprintf("ACK(2): %d \n", _Ack);
+    141          			if(_Ack) continue;
+    142          		}
+    143          		#endif
+    144          		WriteAT24C64Data(Data);
+    145          		#ifndef EEp_debug
+    146          			if(ACKAT24C64()) continue;
+    147          		#else
+    148          		{
+    149          			INT8U _Ack = ACKAT24C64();
+    150          			eprintf("ACK(3): %d \n", _Ack);
+    151          			if(_Ack) continue;
+    152          		}
+    153          		#endif
+    154          		StopAT24C64();
+    155          
+    156          		return TRUE;
+    157          	}
+    158          	return FALSE;
+    159          }
+    160          
+    161          
+    162          INT16S Read_AT24C64_16Addr_8Data(INT8U DevAddr, INT16U Addr)
+    163          {
+    164          	INT8U cnt = AT24C64WrTry;
+    165          	INT8U rVal = 0;
+    166          
+    167          	// Device Address Writing
+    168          	while(cnt--)
+    169          	{
+    170          
+    171          		StartAT24C64();
+    172          		WriteAT24C64Data(DevAddr & (~0x01));
+    173          		#ifndef EEp_debug
+    174          			if(ACKAT24C64()) continue;
+    175          		#else
+    176          		{
+    177          			INT8U _Ack = ACKAT24C64();
+    178          			eprintf("ACK(0): %d \n", _Ack);
+    179          			if(_Ack) continue;
+    180          		}
+    181          		#endif
+    182          		WriteAT24C64Data((INT8U)(Addr >> 8));
+    183          		#ifndef EEp_debug
+    184          			if(ACKAT24C64()) continue;
+    185          		#else
+    186          		{
+    187          			INT8U _Ack = ACKAT24C64();
+    188          			eprintf("ACK(1): %d \n", _Ack);
+    189          			if(_Ack) continue;
+    190          		}
+    191          		#endif
+    192          		WriteAT24C64Data((INT8U)(Addr     ));
+    193          		#ifndef EEp_debug
+    194          			if(ACKAT24C64()) continue;
+    195          		#else
+    196          		{
+    197          			INT8U _Ack = ACKAT24C64();
+    198          			eprintf("ACK(2): %d \n", _Ack);
+    199          			if(_Ack) continue;
+    200          		}
+    201          		#endif
+    202          		StartAT24C64();
+    203          		WriteAT24C64Data(DevAddr | 0x01);
+    204          		#ifndef EEp_debug
+    205          			if(ACKAT24C64()) continue;
+    206          		#else
+    207          		{
+    208          			INT8U _Ack = ACKAT24C64();
+    209          			eprintf("ACK(3): %d \n", _Ack);
+    210          			if(_Ack) continue;
+    211          		}
+    212          		#endif
+    213          		rVal = ReadAT24C64Data();
+    214          
+    215          		NACKAT24C64();
+    216          	 	StopAT24C64();
+    217          
+    218          		return (rVal & 0xff);
+    219          	}
+    220          	return -1;
+    221          }
+    222          
+    223          INT8U ACKAT24C64(void)
+    224          {
+    225          	INT8U Data;
+    226          
+    227           	SetAT24C64SDAInMode();
+    228          	// ACK Check
+    229          	SetAT24C64SCL();
+    230          	Data = ReadAT24C64SDA();
+    231          	RstAT24C64SCL();
+    232          	return Data;
+    233          }
+    234          
+    235          void NACKAT24C64(void)
+    236          {
+    237          	// NACK
+    238           	SetAT24C64SDAOutMode();
+    239          
+    240          	SetAT24C64SDA();
+    241          	SetAT24C64SCL();
+    242          	RstAT24C64SCL();
+    243          }
+    244          
+    245          void WriteAT24C64Data(INT8U Data)
+    246          {
+    247          	INT8U i = 0;
+    248          
+    249           	SetAT24C64SDAOutMode();
+    250          
+    251          	RstAT24C64SCL();
+    252          	for(i = 0; i < 8; i++)
+    253          	{
+    254          		if((Data & 0x80)) 	SetAT24C64SDA();
+    255          		else				RstAT24C64SDA();
+    256          		SetAT24C64SCL();
+    257          		RstAT24C64SCL();
+    258          		Data <<= 1;
+    259          	}
+    260          }
+    261          
+    262          INT8U ReadAT24C64Data(void)
+    263          {
+    264          	INT8U Data = 0, i = 0;
+    265          
+    266          	SetAT24C64SDAInMode();
+    267          
+    268          	for(i = 0; i < 8; i++)
+    269          	{
+    270                  Data = (Data << 1);
+    271                  SetAT24C64SCL();
+    272                  if(ReadAT24C64SDA())	Data |= 0x01;
+    273                  RstAT24C64SCL();
+    274          	}
+    275          	return Data;
+    276          }
+    277          
+    278          
+    279          void StartAT24C64(void)
+    280          {
+    281          	// START Conditon making
+    282          	SetAT24C64SDAOutMode();
+    283          
+    284          	SetAT24C64SDA();
+    285          
+    286          	SetAT24C64SCL();
+    287          	RstAT24C64SDA();
+    288          	RstAT24C64SCL();
+    289          
+    290          }
+    291          void StopAT24C64(void)
+    292          {
+    293          	// STOP
+    294          	SetAT24C64SDAOutMode();
+    295          	RstAT24C64SDA();
+    296          	SetAT24C64SCL();
+    297          	SetAT24C64SDA();
+    298          	RstAT24C64SCL();
+    299          }
+    300          
+    301          void SetAT24C64SDAInMode(void)
+    302          {
+    303          #if 1
+    304          	GPIOB->CNF.B13 = __PB13_IN_FL; //__I2C1_SDA;			// AT24C64 SDA
+    305          #endif
+    306          #if 0
+    307          	GPIOE->ODR.B2 = __PE2_IN_FL; //__I2C1_SDA;			// AT24C64 SDA
+    308          #endif
+    309          }
+    310          
+    311          void SetAT24C64SDAOutMode(void)
+    312          {
+    313          #if 1
+    314          //	GPIOB->CNF.B13 = __PB13_OU_OD; //__I2C1_SDA;			// AT24C64 SDA
+    315          	GPIOB->CNF.B13 = __PB13_OU_PP; //__I2C1_SDA;			// AT24C64 SDA
+    316          #endif
+    317          #if 0
+    318          	GPIOE->ODR.B2 = __PE2_OU_PP; //__I2C1_SDA;			// AT24C64 SDA
+    319          #endif
+    320          }
+    321          
+    322          void SetAT24C64SCL(void)
+    323          {
+    324          #if 1
+    325          	GPIOB->ODR.B8 = SET;
+    326          	CLK24C64DELAY;
+    327          #endif
+    328          #if 0
+    329          	GPIOB->ODR.B4 = 1;
+    330          	CLK24C64DELAY;
+    331          #endif	
+    332          }
+    333          
+    334          void RstAT24C64SCL(void)
+    335          {
+    336          #if 1
+    337          	GPIOB->ODR.B8 = RESET;
+    338          	CLK24C64DELAY;
+    339          #endif
+    340          #if 0
+    341          	GPIOB->ODR.B4 = 0;
+    342          	CLK24C64DELAY;
+    343          #endif	
+    344          }
+    345          
+    346          void SetAT24C64SDA(void)
+    347          {
+    348          #if 1
+    349          	GPIOB->ODR.B13 = SET;
+    350          	CLK24C64DELAY;
+    351          #endif
+    352          
+    353          #if 0
+    354          	GPIOE->ODR.B2 = 1;	
+    355          	CLK24C64DELAY;
+    356          #endif	
+    357          }
+    358          
+    359          void RstAT24C64SDA(void)
+    360          {
+    361          #if 1
+    362          	GPIOB->ODR.B13 = RESET;
+    363          	CLK24C64DELAY;
+    364          #endif
+    365          
+    366          #if 0
+    367          	GPIOE->ODR.B2 = 0;
+    368          	CLK24C64DELAY;
+    369          #endif	
+    370          }
+    371          INT8U ReadAT24C64SDA(void)
+    372          {
+    373          /////////////////////////////////////////	
+    374          #if 1
+    375          	CLK24C64DELAY;
+    376          	return(GPIOB->IDR.B13);
+    377          #endif	
+    378          #if 0
+    379          	return(GPIOE->IDR.B2);
+    380          #endif
+    381          }
+    382          
+    383          void EnableWriteAT24C64(void)
+    384          {
+    385          	GPIOB->ODR.B5 = RESET;
+    386          }
+    387          void DisableWriteAT24C64(void)
+    388          {
+    389          	GPIOB->ODR.B5 = SET;
+    390          }
+    391          
+    392          ////////////////////////////////////////////////////////////////////////////////
+    393          // End of Source File
+    394          /////////////////////
+    395          
+
+   Maximum stack usage in bytes:
+
+     Function                   .cstack
+     --------                   -------
+     ACKAT24C64                      8
+     AT24C64Init                     8
+     DisableWriteAT24C64             0
+     EnableWriteAT24C64              0
+     NACKAT24C64                     8
+     ReadAT24C64                     8
+     ReadAT24C64Data                16
+     ReadAT24C64SDA                  8
+     Read_AT24C64                    8
+     Read_AT24C64_16Addr_8Data      24
+     RstAT24C64SCL                   8
+     RstAT24C64SDA                   8
+     SetAT24C64SCL                   8
+     SetAT24C64SDA                   8
+     SetAT24C64SDAInMode             0
+     SetAT24C64SDAOutMode            0
+     StartAT24C64                    8
+     StopAT24C64                     8
+     WriteAT24C64                   24
+     WriteAT24C64Data               16
+     Write_AT24C64                  32
+     Write_AT24C64_16Addr_8Data     24
+
+
+   Section sizes:
+
+     Function/Label             Bytes
+     --------------             -----
+     eprintf                       4
+     AT24C64Init                  54
+     WriteAT24C64                 74
+     Write_AT24C64                76
+     Read_AT24C64                  4
+     ?Subroutine0                  8
+     ReadAT24C64                   6
+     Write_AT24C64_16Addr_8Data   90
+     Read_AT24C64_16Addr_8Data   108
+     ACKAT24C64                   24
+     NACKAT24C64                  16
+     ?Subroutine1                  6
+     WriteAT24C64Data             44
+     ReadAT24C64Data              40
+     StartAT24C64                 18
+     StopAT24C64                  20
+     SetAT24C64SDAInMode          16
+     SetAT24C64SDAOutMode         16
+     SetAT24C64SCL                12
+     ?Subroutine2                  8
+     RstAT24C64SCL                 8
+     SetAT24C64SDA                10
+     RstAT24C64SDA                10
+     ReadAT24C64SDA               18
+     EnableWriteAT24C64           12
+     DisableWriteAT24C64          12
+     ??DataTable10                 4
+     ??DataTable10_1               4
+     ??DataTable10_2               4
+     ??DataTable10_3               4
+
+ 
+   4 bytes in section .data
+ 726 bytes in section .text
+ 
+ 726 bytes of CODE memory
+   4 bytes of DATA memory
+
+Errors: none
+Warnings: none

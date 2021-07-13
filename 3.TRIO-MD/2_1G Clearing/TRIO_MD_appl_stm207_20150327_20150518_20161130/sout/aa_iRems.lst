@@ -1,0 +1,1297 @@
+###############################################################################
+#                                                                             #
+# IAR ANSI C/C++ Compiler V5.50.0.51878/W32 for ARM     23/Aug/2012  00:33:34 #
+# Copyright (C) 1999-2010 IAR Systems AB.                                     #
+#                                                                             #
+#    Cpu mode     =  thumb                                                    #
+#    Endian       =  little                                                   #
+#    Source file  =  C:\user\project\FR-SSR\fw\appl_ssr_20120717\code\aa_iRem #
+#                    s.c                                                      #
+#    Command line =  C:\user\project\FR-SSR\fw\appl_ssr_20120717\code\aa_iRem #
+#                    s.c -lcN C:\user\project\FR-SSR\fw\appl_ssr_20120717\sou #
+#                    t\ -lB C:\user\project\FR-SSR\fw\appl_ssr_20120717\sout\ #
+#                     -o C:\user\project\FR-SSR\fw\appl_ssr_20120717\sout\    #
+#                    --endian=little --cpu=Cortex-M3 -e --require_prototypes  #
+#                    --fpu=None --dlib_config "C:\compiler\ewarm              #
+#                    5.5\arm\INC\DLib_Config_Normal.h" -I                     #
+#                    C:\user\project\FR-SSR\fw\appl_ssr_20120717\include\ -I  #
+#                    C:\user\project\FR-SSR\fw\appl_ssr_20120717\lib_stm32\in #
+#                    c\ -I C:\user\project\FR-SSR\fw\appl_ssr_20120717\lib_st #
+#                    m32\src\ -I C:\user\project\FR-SSR\fw\appl_ssr_20120717\ #
+#                    uC-CPU\ -I C:\user\project\FR-SSR\fw\appl_ssr_20120717\u #
+#                    C-LIB\ -I C:\user\project\FR-SSR\fw\appl_ssr_20120717\uC #
+#                    OS-II\Ports\ -I C:\user\project\FR-SSR\fw\appl_ssr_20120 #
+#                    717\uCOS-II\Source\ -I C:\user\project\FR-SSR\fw\appl_ss #
+#                    r_20120717\uC-Probe\ -I "C:\compiler\ewarm               #
+#                    5.5\arm\INC\" -Oh                                        #
+#    List file    =  C:\user\project\FR-SSR\fw\appl_ssr_20120717\sout\aa_iRem #
+#                    s.lst                                                    #
+#    Object file  =  C:\user\project\FR-SSR\fw\appl_ssr_20120717\sout\aa_iRem #
+#                    s.o                                                      #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+C:\user\project\FR-SSR\fw\appl_ssr_20120717\code\aa_iRems.c
+      1          /******************** (C) COPYRIGHT 2007 STMicroelectronics ********************
+      2          * File Name          : stm32f10x_bkp.c
+      3          * Author             : MCD Application Team
+      4          * Date First Issued  : 09/29/2006
+      5          * Description        : This file provides all the BKP firmware functions.
+      6          ********************************************************************************/
+      7          
+      8          #define IREMS_C
+      9          
+     10          #include "../include/main.h"
+     11          
+     12          void iRemsInit(void)
+     13          {
+     14          
+     15          	iRemsSer[0] = &iRemsSerB[0];
+     16           	iRemsSer[0]->CheckByte = pUSART2.CheckByte;
+     17          	iRemsSer[0]->RxGetByte = pUSART2.RxGetByte;
+     18          	iRemsSer[0]->PutStr = pUSART2.PutStr;
+     19          	iRemsSer[0]->TxCheckByte = pUSART2.TxCheckByte;
+     20          	iRemsSer[0]->TxClear = pUSART2.TxClear;
+     21          	iRemsSer[0]->printf = pUSART2.printf;
+     22          	
+     23          	iRemsSer[0]->TimerRx = TimeriRemsRx0;
+     24          	iRemsSer[0]->TimerTx = TimeriRemsTx0;
+     25          	iRemsSer[0]->TimerEndWait = TimeriRemsRx0;
+     26          	
+     27          	iRemsSer[0]->chan = L_PATH;
+     28          	iRemsSer[0]->Send = &Srms[0];
+     29          	iRemsSer[0]->Recv = &Rrms[0];
+     30          	iRemsSer[0]->OSSem = OSSemCreate(1);
+     31          
+     32          	iRemsSer[1] = &iRemsSerB[1];
+     33           	iRemsSer[1]->CheckByte = pUSART3.CheckByte;
+     34          	iRemsSer[1]->RxGetByte = pUSART3.RxGetByte;
+     35          	iRemsSer[1]->PutStr = pUSART3.PutStr;
+     36          	iRemsSer[1]->TxCheckByte = pUSART3.TxCheckByte;
+     37          	iRemsSer[1]->TxClear = pUSART3.TxClear;
+     38          	iRemsSer[1]->printf = pUSART3.printf;
+     39          	
+     40          	iRemsSer[1]->TimerRx = TimeriRemsRx1;
+     41          	iRemsSer[1]->TimerTx = TimeriRemsTx1;
+     42          	iRemsSer[1]->TimerEndWait = TimeriRemsRx1;
+     43          	
+     44          	iRemsSer[1]->chan = W_PATH;
+     45          	iRemsSer[1]->Send = &Srms[1];
+     46          	iRemsSer[1]->Recv = &Rrms[1];
+     47          	iRemsSer[1]->OSSem = OSSemCreate(1);
+     48          
+     49          	
+     50          	iRemsStatus = &iRemsStatusB;
+     51          
+     52          	OSTaskCreate(IRemsTask, (void *)iRemsSer[0], (OS_STK *)&iRemsTaskStk[0][IREMS_START_STK_SIZE - 1], IREMS_TASK_PRIO_0);
+     53          	OSTaskCreate(IRemsTask, (void *)iRemsSer[1], (OS_STK *)&iRemsTaskStk[1][IREMS_START_STK_SIZE - 1], IREMS_TASK_PRIO_1);
+     54          }
+     55          
+     56          void IRemsTask(void * pdata)
+     57          {
+     58              __IRemsPtr *nPtr = (__IRemsPtr *)pdata;
+     59          
+     60          	OSTimeDly(100*(IREMS_TASK_PRIO_0 + nPtr->chan));
+     61          
+     62          	//SerPtr->printf("iRems PATH[%d] Start!!\n", nPtr->chan);
+     63          
+     64          	while(1)
+     65          	{
+     66          		while(!tTestFlag)
+     67          		{
+     68          			iRemsFunction(nPtr);
+     69          			iRemsResetFunc(nPtr);
+     70          			
+     71          			OSTimeDly(200L);
+     72          		}
+     73          		OSTimeDly(500L);
+     74          	}
+     75          
+     76          }
+     77          
+     78          void iRemsReset(__IRemsPtr *nPtr)
+     79          {
+     80          	
+     81          	if(nPtr->chan == L_PATH) 	_4G_REMS_EN = 1;	// off
+     82          	else 						_3G_REMS_EN = 1;
+     83          
+     84          	OSTimeDly(3000L);
+     85          
+     86          	if(nPtr->chan == L_PATH)	_4G_REMS_EN = 0;	// on
+     87          	else						_3G_REMS_EN = 0;
+     88          }
+     89          
+     90          void iRemsFunction(__IRemsPtr *nPtr)
+     91          {
+     92          	//===================//
+     93          	// Modem Reset Check //
+     94          	//========================================================================//
+     95          	if(!DownLoadGiveupTimerSet(NULL)){
+     96          		if(TimeOverCheck(nPtr->TimerTx))
+     97          		{
+     98          			if ( ModemRstCnt[nPtr->chan] >= 4 )
+     99          			{
+    100          				Booting[nPtr->chan] = 0xff;
+    101          			}
+    102          			else if(ModemTime(nPtr))
+    103          			{
+    104          				ModemRstCnt[nPtr->chan] = 0;
+    105          #ifdef IREMS_TEST
+    106          				TimerRegist( nPtr->TimerTx, Time1Sec*20);		// normally 3hours waiting...
+    107          #else
+    108          				TimerRegist( nPtr->TimerTx, Time1Sec*60*60*3);		// normally 3hours waiting...
+    109          #endif
+    110          			}
+    111          			else
+    112          			{
+    113          
+    114          #ifdef IREMS_TEST
+    115          				if ( ++ModemRstCnt[nPtr->chan] >= 4 )
+    116          					 TimerRegist( nPtr->TimerTx, Time1Sec*60);		// reset 1min waiting...
+    117          				else TimerRegist( nPtr->TimerTx, Time1Sec*60);		// retry 30min waiting...
+    118          #else
+    119          				if ( ++ModemRstCnt[nPtr->chan] >= 4 )
+    120          					 TimerRegist( nPtr->TimerTx, Time1Sec*60);		// reset 1min waiting...
+    121          				else TimerRegist( nPtr->TimerTx, Time1Sec*60*30);	// retry 30min waiting...
+    122          #endif
+    123          			}
+    124          		}
+    125          	}
+    126          	//========================================================================//
+    127          	switch ( iRemsReceiveCheck(nPtr))
+    128          	{
+    129          		case 1:
+    130          			if(iRemsRecieveNMS(nPtr))
+    131          			{
+    132          				iRemsComCheck(nPtr);
+    133          			}
+    134          		break;
+    135          		
+    136          		case 2:
+    137          			if(iRemsRecieveACK(nPtr)) 	iRemsDownloadFunc(nPtr);
+    138          		break;
+    139          
+    140          		case 3:
+    141          		break;
+    142          	}
+    143          	//========================================================================//
+    144          }
+    145          
+    146          
+    147          void iRemsResetFunc(__IRemsPtr *nPtr)
+    148          {
+    149          	//=============//
+    150          	// Modem Reset //
+    151          	//========================================================================//
+    152          	if(Booting[nPtr->chan] == 0xff )
+    153          	{
+    154          		ModemCommand("AT$KTFRESET", nPtr);
+    155          
+    156          		iRemsReset(nPtr);
+    157          
+    158          		TimerRegist( nPtr->TimerTx, Time1Sec*60);
+    159          		ModemRstCnt[nPtr->chan] = 0;
+    160          		Booting[nPtr->chan] = 0;
+    161          	}
+    162          }
+    163          
+    164          
+    165          INT8U ModemReset(__IRemsPtr *nPtr)
+    166          {
+    167          	ModemCommand("AT$KTFRESET", nPtr);
+    168          	return(TRUE);
+    169          }
+    170          
+    171          INT8S iRemsReceiveCheck(__IRemsPtr *nPtr)
+    172          {
+    173          	INT16U	n, nCnt;
+    174          	INT8U 	RetVal;
+    175          
+    176          	n = 3;
+    177          	if(!nPtr->CheckByte(n, &nCnt)) return(-1);		// 2005-09-01 6:10오후
+    178          
+    179          	//======================//
+    180          	// "$16" or "$FW" check //
+    181          	//=======================================================================//
+    182          	TimerRegist(nPtr->TimerRx, Time1Sec);
+    183          	RetVal = FALSE;
+    184          	
+    185          	while (RetVal == FALSE)
+    186          	{
+    187          		if (TRUE == TimeOverCheck(nPtr->TimerRx))
+    188          		{
+    189          			return FALSE;
+    190          		}
+    191          
+    192          		if (nPtr->CheckByte(n, &nCnt))
+    193          		{
+    194          			INT8U Data[3];
+    195          
+    196          			if( (Data[0] = nPtr->RxGetByte()) == '$')
+    197          			{
+    198          				Data[1] = nPtr->RxGetByte();
+    199          	
+    200          				if(Data[1] == '1' || Data[1] == 'F')
+    201          				{
+    202          					Data[2] = nPtr->RxGetByte();
+    203          
+    204          					     if(Data[1] == '1' && Data[2] == '6') return 1;
+    205          					else if(Data[1] == 'F' && Data[2] == 'W') return 2;
+    206          				}
+    207          			}
+    208          		}
+    209          		else OSTimeDly(100);
+    210          	}
+    211          	return(-1);
+    212          
+    213          }
+    214          
+    215          INT8U iRemsRecieveNMS(__IRemsPtr *nPtr)
+    216          {
+    217          	INT16U	i = 0, n = 0, nCnt = 0;
+    218          	INT8U BuffH, BuffL;
+    219          
+    220          	RMS *Recv = nPtr->Recv;
+    221          
+    222          	Recv->Command = NODATA;		/* RX Command Clear */
+    223          
+    224          	//====================//
+    225          	// Sync Check 2 bytes //
+    226          	//======================================================================//
+    227          	n = 2;
+    228          
+    229          	TimerRegist(nPtr->TimerRx, Time1Sec);
+    230          	
+    231          	while(!nPtr->CheckByte(n, &nCnt))
+    232          	{
+    233          		if (TRUE == TimeOverCheck(nPtr->TimerRx) ) return(FALSE);
+    234          		OSTimeDly(100L);
+    235          	}
+    236          	
+    237          	if ( !(('1' == nPtr->RxGetByte())&&('6' == nPtr->RxGetByte())) ) return FALSE;
+    238          	
+    239          	TimerRegist(nPtr->TimerRx, Time1Sec);
+    240          
+    241          	//======================//
+    242          	// Header Check 6 bytes //
+    243          	//======================================================================//
+    244          	n = 6;
+    245          	while (!nPtr->CheckByte(n, &nCnt))
+    246          	{
+    247          		if (TRUE == TimeOverCheck(nPtr->TimerRx) ) return(FALSE);
+    248          		OSTimeDly(100L);
+    249          	}
+    250          
+    251          	BuffH = nPtr->RxGetByte();
+    252          	BuffL = nPtr->RxGetByte();
+    253          	Recv->Command = Ascii2Hex(BuffL, BuffH);
+    254          	BuffH = nPtr->RxGetByte();
+    255          	BuffL = nPtr->RxGetByte();
+    256          	Recv->RCode = Ascii2Hex(BuffL, BuffH);
+    257          	BuffH = nPtr->RxGetByte();
+    258          	BuffL = nPtr->RxGetByte();
+    259          	Recv->DataLength = Ascii2Hex(BuffL, BuffH);
+    260          
+    261          	//====================//
+    262          	// Data Check n bytes //
+    263          	//======================================================================//
+    264          	n =  2 * Recv->DataLength;
+    265          	
+    266          	if ( n > RMSrxdNO ) return(FALSE);
+    267          	while ( !nPtr->CheckByte( n+4, &nCnt) )
+    268          	{
+    269          		if (TRUE == TimeOverCheck(nPtr->TimerRx) ) return(FALSE);
+    270          		OSTimeDly(100L);
+    271          	}
+    272          	n = Recv->DataLength;
+    273          
+    274          	for(i = 0; i < n+2; i++ )
+    275          	{
+    276          		BuffH = nPtr->RxGetByte();
+    277          		BuffL = nPtr->RxGetByte();
+    278          		Recv->Data[i] = Ascii2Hex(BuffL,BuffH);
+    279          	}
+    280          
+    281          	//===========//
+    282          	// CRC Check //
+    283          	{
+    284          		//======================================================================//
+    285          		INT8U CrcHigh = Recv->Data[n+0];
+    286          		INT8U CrcLow = Recv->Data[n+1];
+    287          		Recv->Crc = Crc16Calc ( &(Recv->Command), n + 3 , NULL);
+    288          
+    289          		Recv->CrcErr	= TRUE;
+    290          		if ( (INT8U)(Recv->Crc >> 8 & 0xff)	!= CrcHigh ) Recv->CrcErr = FALSE;
+    291          		if ( (INT8U)(Recv->Crc >> 0 & 0xff)	!= CrcLow  ) Recv->CrcErr = FALSE;
+    292          		if ( Recv->CrcErr == FALSE )
+    293          		{
+    294          			return FALSE;
+    295          		}
+    296          	}
+    297          	
+    298          	return TRUE;
+    299          
+    300          }
+    301          
+    302          void iRemsComCheck(__IRemsPtr *nPtr)
+    303          {
+    304          	RMS *Recv = nPtr->Recv;
+    305          
+    306          	switch(Recv->Command)
+    307          	{
+    308          		case MStatusRQST:
+    309          			iRemsStatusUpdate();
+    310          			iRemsDataAckTx((INT8U*)iRemsStatus, sizeof(IREMSSTATUS), MStatusRSPS, nPtr);
+    311          		break;
+    312          
+    313          		case MControlRQST:
+    314          			
+    315          			iRemsSetDataCopy((IREMSCONTROL *)Recv->Data);
+    316          			iRemsDataAckTx((INT8U*)iRemsStatus, sizeof(IREMSSTATUS), MControlRSPS, nPtr);
+    317          		break;
+    318          
+    319          		case MResetRQST:
+    320          			iRemsDataAckTx((INT8U*)"", NULL, MControlRSPS, nPtr);
+    321          		
+    322          			OSTimeDly(10L);
+    323          			ResetCaseBackup(1);
+    324          			DownLoadBootingJump();
+    325          		break;
+    326          	}
+    327          }
+    328          
+    329          
+    330          INT8U iRemsRecieveACK(__IRemsPtr *nPtr)
+    331          {
+    332          	INT16U DataCnt=0;
+    333              INT16U nCnt = 0;
+    334              
+    335          	TimerRegist(nPtr->TimerRx, Time1Sec*2);
+    336          
+    337          	while(1)
+    338              {
+    339          		while(!nPtr->CheckByte(1, &nCnt))
+    340          		{
+    341          			if(TimeOverCheck(nPtr->TimerRx)) return FALSE;
+    342          			OSTimeDly(100L);
+    343          	    }
+    344          		
+    345          		DataBuff[DataCnt] = nPtr->RxGetByte();
+    346          
+    347          		if((DataCnt == 0) && ( (DataBuff[DataCnt] == 0x0d) || ( DataBuff[DataCnt] == 0x0a)) ) continue;
+    348          
+    349          		if(DataBuff[DataCnt++] == 0x0d )
+    350          		{
+    351          			DataBuff[DataCnt++] = 0x0a;
+    352          			DataBuffLength = DataCnt;
+    353          
+    354          			return TRUE;
+    355          		}
+    356          		if ( DataCnt >= DataBuff_MAX ) break;
+    357              }
+    358          	
+    359          	return(FALSE);
+    360          }
+    361          
+    362          void iRemsDownloadFunc(__IRemsPtr *nPtr)
+    363          {
+    364          	INT16U i = 0, cnt = 0, TempIndex = 0;
+    365          	INT8U BuffH, BuffL;
+    366          	RMS *Recv = nPtr->Recv;
+    367          
+    368          	DownLoadGiveupTimerSet((INT32U)nPtr);
+    369          
+    370          	//======================================================================//
+    371          	// Command Check														//
+    372          	//======================================================================//
+    373          	if(!strncmp("DLOAD",(char *)DataBuff, 5))
+    374          	{
+    375          		if(FLASHpAPBK_Check_Erase()){
+    376          			OSTimeDly(10);
+    377          			ModemCommand("AT$FWINFO?", nPtr);
+    378          		}
+    379          	}
+    380          	else if( !strncmp("INFO:",(char *)DataBuff,5))
+    381          	{
+    382          		// Receive File Infomation //
+    383          		//=====================================================//
+    384          		cnt = 5;
+    385          		for(i = 0; i < 8; i++) FileName[i] = DataBuff[cnt++];
+    386          
+    387          		DataBuff[cnt++];							// ','
+    388          
+    389          		FileSize  = (DataBuff[cnt++]&0x0f)*100000L;
+    390          		FileSize += (DataBuff[cnt++]&0x0f)*10000L;
+    391          		FileSize += (DataBuff[cnt++]&0x0f)*1000L;
+    392          		FileSize += (DataBuff[cnt++]&0x0f)*100L;
+    393          		FileSize += (DataBuff[cnt++]&0x0f)*10L;
+    394          		FileSize += (DataBuff[cnt++]&0x0f)*1L;
+    395          
+    396          		DataBuff[cnt++];							// ','
+    397          
+    398          		BuffH = DataBuff[cnt++];
+    399          		BuffL = DataBuff[cnt++];
+    400          
+    401          		iRemsTotalCrc = Ascii2Hex(BuffL, BuffH);
+    402          
+    403          		BuffH = DataBuff[cnt++];
+    404          		BuffL = DataBuff[cnt++];
+    405          
+    406          		iRemsTotalCrc = (iRemsTotalCrc << 8) + Ascii2Hex(BuffL,BuffH);
+    407          		iRemsFrameCount = FileSize/248;
+    408          		iRemsFrameLastC = FileSize%248;
+    409          		if(iRemsFrameLastC) iRemsFrameCount++;
+    410          
+    411          		// Long Firmware
+    412          		//=====================================================//
+    413          		if(FileSize >= 102400L)		// 100K UNDER.
+    414          		{
+    415          			ModemCommand("AT$FWEND=7", nPtr);
+    416          			ResetStart(Time1Min);
+    417          			return;
+    418          		}
+    419          
+    420          		// File Name Check //
+    421          		//=====================================================//
+    422          		{
+    423          			char *ptr;
+    424          			if(MainStatus->TransceiveMaker == ACE) ptr = JMAtrixACE;
+    425          			if(MainStatus->TransceiveMaker == DONGWON) ptr = JMAtrixDONGWON;
+    426          			if(MainStatus->TransceiveMaker == FRTEK) ptr = JMAtrixFRTEK;
+    427          			if(MainStatus->TransceiveMaker == GTNT) ptr = JMAtrixGTNT;
+    428          			if(MainStatus->TransceiveMaker == YOUNGWOO) ptr = JMAtrixGTNT;
+    429          
+    430          			if ( strncmp(FileName, ptr, 4))
+    431          			{
+    432          				ModemCommand("AT$FWEND=2", nPtr);
+    433          				DownRstFlag[nPtr->chan] = 0;
+    434          				ResetStart(Time1Min);
+    435          				return;
+    436          			}
+    437          		}
+    438          		// Data Request //
+    439          		//=====================================================//
+    440          		iRemsFrameIndex = 0;
+    441          		iRemsFrameRetry = 0;
+    442          		iRemsSwcrc16 = 0x0000;
+    443          		iRemsDataCount = 0;
+    444          		FrameRequest(iRemsFrameIndex, nPtr);
+    445          	}
+    446          	else if ( !strncmp("RD:",(char *)DataBuff,3) )
+    447          	{
+    448          		// Receive Data //
+    449          		//=====================================================//
+    450          		cnt = 3;
+    451          		TempIndex  = (DataBuff[cnt++]&0x0f)*1000L;
+    452          		TempIndex += (DataBuff[cnt++]&0x0f)*100L;
+    453          		TempIndex += (DataBuff[cnt++]&0x0f)*10L;
+    454          		TempIndex += (DataBuff[cnt++]&0x0f)*1L;
+    455          
+    456          		if(TempIndex != iRemsFrameIndex)
+    457          		{
+    458          			iRemsFrameRetry++;
+    459          		}
+    460          		else
+    461          		{
+    462          			if(TempIndex == 0) // first frame
+    463          			{
+    464          				for(i = 0; i < 248; i++ )
+    465          				{
+    466          					BuffH = DataBuff[cnt++];
+    467          					BuffL = DataBuff[cnt++];
+    468          					Recv->Data[i] = Ascii2Hex(BuffL, BuffH);
+    469          				}
+    470          				
+    471          				// String Check Load //
+    472          				{
+    473          					INT32U *tmp = (INT32U *)Recv->Data;
+    474          
+    475          					if(tmp[7] != (INT32U)_pilog)
+    476          					{
+    477          						ModemCommand("AT$FWEND=7", nPtr);
+    478          						ResetStart(Time1Min);
+    479          						return;
+    480          					}
+    481          				}
+    482          			}
+    483          			else if(TempIndex < iRemsFrameCount - 1)				// middle frame
+    484          			{
+    485          				for(i = 0; i < 248; i++ )
+    486          				{
+    487          					BuffH = DataBuff[cnt++];
+    488          					BuffL = DataBuff[cnt++];
+    489          					Recv->Data[i] = Ascii2Hex(BuffL,BuffH);
+    490          				}
+    491          			}
+    492          			else										// final frame
+    493          			{
+    494          				for(i = 0; i < iRemsFrameLastC; i++ )
+    495          				{
+    496          					BuffH = DataBuff[cnt++];
+    497          					BuffL = DataBuff[cnt++];
+    498          					Recv->Data[i] = Ascii2Hex(BuffL,BuffH);
+    499          				}
+    500          			}
+    501          			// CRC Check //
+    502          			//====================================================================//
+    503          			BuffH = DataBuff[cnt++];
+    504          			BuffL = DataBuff[cnt++];
+    505          	 		Recv->Data[i++] = Ascii2Hex(BuffL,BuffH);
+    506          			BuffH = DataBuff[cnt++];
+    507          			BuffL = DataBuff[cnt++];
+    508          	 		Recv->Data[i++] = Ascii2Hex(BuffL,BuffH);
+    509          			Recv->Crc = Crc16Calc (Recv->Data, i-2, NULL);
+    510          			Recv->CrcErr = TRUE;
+    511          
+    512          			if( (INT8U)((Recv->Crc >> 8) & 0xff) != Recv->Data[i-2] ) Recv->CrcErr = FALSE;
+    513          			if( (INT8U)((Recv->Crc >> 0) & 0xff) != Recv->Data[i-1] ) Recv->CrcErr = FALSE;
+    514          
+    515          			if ( Recv->CrcErr == TRUE ) iRemsFrameRetry = 0;
+    516          			else 						iRemsFrameRetry++;
+    517          
+    518          			// Data Store //
+    519          			//====================================================================//
+    520          			if(iRemsFrameRetry == 0 )
+    521          			{
+    522          				INT32S err = iRemsDataCount = UpLoadData(__pAPBKAddr, (INT8U *)&Recv->Data[0], i-2, iRemsDataCount);
+    523          
+    524          				iRemsSwcrc16 = Crc16Calc((INT8U*)&Recv->Data[0], i-2, iRemsSwcrc16);
+    525          				
+    526          				if(err == -1) iRemsFrameRetry = 10;			
+    527          			}
+    528          		}
+    529          
+    530          		{
+    531          			if(iRemsFrameRetry == 0)					// Next Frame Send
+    532          			{
+    533          				if(iRemsFrameIndex < iRemsFrameCount -1)
+    534          				{
+    535          					FrameRequest(++iRemsFrameIndex, nPtr);
+    536          				}
+    537          				else								// Last Frame Received
+    538          				{				
+    539          					if(iRemsSwcrc16 != iRemsTotalCrc)
+    540          					{
+    541          						ModemCommand("AT$FWEND=3", nPtr);
+    542          						ResetStart(Time1Min);
+    543          						return;
+    544          					}
+    545          					else
+    546          					{
+    547          						{
+    548          #ifdef __EXT_RAM_USED
+    549          							INT32U t = *((INT32U *)(__pAPBK_SRAMAddr + 40));	// jump base addr + selfaddinfo address
+    550          							INT32U s = *((INT32U *)(__pAPBK_SRAMAddr + 36));	// jump base addr!!
+    551          							selfinfo *p = (selfinfo *)(__pAPBK_SRAMAddr + (t-s));
+    552          #else
+    553          							INT32U t = *((INT32U *)(__pAPBKAddr + 40)); // jump base addr + selfaddinfo address
+    554          							INT32U s = *((INT32U *)(__pAPBKAddr + 36)); // jump base addr!!
+    555          							selfinfo *p = (selfinfo *)(__pAPBKAddr + (t-s));
+    556          #endif
+    557          						
+    558          						
+    559          							if(!memcmp(p->infor[0], convinfo.infor[0], strlen(convinfo.infor[0])))
+    560          							{
+    561          							
+    562          								ModemCommand("AT$FWEND=0", nPtr);
+    563          								for(i = 0; i < 20; i++) OSTimeDly(1000L);
+    564          #ifdef __EXT_RAM_USED
+    565          								DownloadFlagSetExtSRAM(iRemsDataCount);
+    566          #else
+    567          								DownloadFlagSet(iRemsDataCount);
+    568          #endif
+    569          								
+    570          								Booting[nPtr->chan] = 0xff;
+    571          								iRemsResetFunc(nPtr);
+    572          								DownLoadBootingJump();
+    573          							}
+    574          							else
+    575          							{
+    576          								ModemCommand("AT$FWEND=7", nPtr);
+    577          
+    578          								ResetStart(Time1Min);
+    579          								return;
+    580          							}
+    581          						}
+    582          					}
+    583          				}
+    584          			}
+    585          			else if(iRemsFrameRetry <= 3)
+    586          			{
+    587          				FrameRequest(iRemsFrameIndex, nPtr);
+    588          			}
+    589          			else
+    590          			{
+    591          				ModemCommand("AT$FWEND=6", nPtr);
+    592          				ResetStart(Time1Min);
+    593          				return;
+    594          			}
+    595          		}
+    596          	}
+    597          }
+    598          
+    599          void FrameRequest(INT16U TempIndex, __IRemsPtr *nPtr)
+    600          {
+    601          	char  Command[] = "AT$FWRD=1234";
+    602          
+    603          	Command[8]  = '0' + TempIndex/1000;	TempIndex %= 1000;
+    604          	Command[9]  = '0' + TempIndex/100;	TempIndex %= 100;
+    605          	Command[10] = '0' + TempIndex/10;	TempIndex %= 10;
+    606          	Command[11] = '0' + TempIndex;
+    607          
+    608          	ModemCommand(Command, nPtr);
+    609          }
+    610          
+    611          void ModemCommand(char *ptr, __IRemsPtr *nPtr)
+    612          {
+    613          	INT8U i;
+    614          	INT8S Command[50];
+    615          
+    616          	for(i = 0; i < strlen(ptr); i++)
+    617          	{
+    618          		Command[i] = *(ptr+i);
+    619          		if ( i >= (50-2) ) break;
+    620          	}
+    621          	Command[i++] = 0x0d;
+    622          	Command[i++] = 0x0a;
+    623          
+    624          	nPtr->PutStr( (INT8U *)Command, i, TRUE);
+    625          }
+    626          
+    627          INT8U ModemTime(__IRemsPtr *nPtr)
+    628          {
+    629          	nPtr->TxClear();
+    630          	ModemCommand("AT$KTFTIME?", nPtr);
+    631          
+    632          	if ( !iRemsRecieveACK(nPtr) ) return(FALSE);
+    633          	if ( !iRemsRecieveACK(nPtr) ) return(FALSE);
+    634          	if ( (DataBuff[0] == 'O')&&(DataBuff[1] == 'K') ) return(TRUE);
+    635          	return(FALSE);
+    636          }
+    637          
+    638          
+    639          
+    640          INT8U MTxBuff[1024];
+    641          
+    642          void iRemsDataAckTx(INT8U *Status, INT8U Count, INT8U Comm, __IRemsPtr *nPtr)
+    643          {
+    644          	INT16U i = 0, cnt = 0;
+    645              
+    646              RMS *Send = nPtr->Send;    
+    647          
+    648          	iRemsDataAck(Status, Count, Comm, nPtr);
+    649          
+    650          	MTxBuff[cnt++] = 'A';
+    651          	MTxBuff[cnt++] = 'T';
+    652          	MTxBuff[cnt++] = '$';
+    653          	MTxBuff[cnt++] = 'K';
+    654          	MTxBuff[cnt++] = 'T';
+    655          	MTxBuff[cnt++] = 'F';
+    656          	MTxBuff[cnt++] = '=';
+    657          	MTxBuff[cnt++] = '\"';
+    658          
+    659          	//for(i = 0; i < 5; i++)
+    660          	//{
+    661          	//	MTxBuff[cnt++] = Hex2Ascii( HIGH, *((INT8U *)Send + i) );
+    662          	//	MTxBuff[cnt++] = Hex2Ascii( LOW , *((INT8U *)Send + i) );
+    663          	//}
+    664          	
+    665          	//for(     ; i < Count+5; i++)  MTxBuff[cnt++] = *((INT8U *)Send + i);
+    666          
+    667          	for(i = 0; i < Count+7; i++)
+    668          	{
+    669          		MTxBuff[cnt++] = Hex2Ascii( HIGH, *((INT8U *)Send + i) );
+    670          		MTxBuff[cnt++] = Hex2Ascii( LOW , *((INT8U *)Send + i) );
+    671          	}
+    672              
+    673          	MTxBuff[cnt++] = '\"';
+    674          	MTxBuff[cnt++] = 0x0d;
+    675          	MTxBuff[cnt++] = 0x0a;
+    676          
+    677          	nPtr->PutStr((INT8U *)MTxBuff, cnt, TRUE);
+    678          }
+    679          
+    680          void iRemsDataAck(INT8U *Status, INT8U Count, INT8U Comm, __IRemsPtr *nPtr)
+    681          {
+    682          	INT16U	i;//, cnt=0;
+    683          
+    684          	RMS *Send = nPtr->Send;
+    685          
+    686          	Send->Sync[0]		= STX;
+    687          	Send->Sync[1] 		= STX;
+    688          	Send->Command		= Comm;
+    689          	if(MainStatus->TransceiveType == SMALL) Send->RCode = 0x02;
+    690          	else									Send->RCode = 0x01;
+    691          	
+    692          	Send->DataLength	= Count;
+    693          
+    694          	for( i = 0; i < Count; i++ )
+    695          	{
+    696          		Send->Data[i] = *(Status + i);
+    697          	}
+    698          	Send->Crc = Crc16Calc(&Send->Command, Count + 3, NULL);
+    699          	
+    700          	Send->Data[Count] 	= (INT8U)(((Send->Crc) >> 8) & 0xff);
+    701          	Send->Data[Count+1] = (INT8U)(((Send->Crc) >> 0) & 0xff);	/* SIO CRC HIGH */
+    702          }
+    703          
+    704          void iRemsStatusUpdate(void)
+    705          {
+    706              iRemsStatus->Manufacture = iRemsFRTEK;
+    707          	iRemsStatus->SystemVersion	= SystemVer;
+    708          
+    709          	//----------------------------------------------------------------------//
+    710          	// State1 & Alarm
+    711          	if(MainStatus->IsolationLevel1 < ISO_MAX_GAIN)	BitSet(iRemsStatus->AlarmStatus, 7);// 0x80;
+    712          	else											BitRst(iRemsStatus->AlarmStatus, 7);// ~0x80;
+    713          	
+    714          	if(MainStatus->IsolationLevel2 < ISO_MAX_GAIN)	BitSet(iRemsStatus->AlarmStatus, 6);// 0x40;
+    715          	else											BitRst(iRemsStatus->AlarmStatus, 6);// ~0x40;
+    716          		
+    717          	if(MainStatus->SleepMode2 & 0x01) BitSet(iRemsStatus->AlarmStatus, 5);							// 0x20;
+    718          	else							  BitRst(iRemsStatus->AlarmStatus, 5);							// ~0x20;
+    719          	
+    720          	if(MainStatus->SleepMode & 0x01)  BitSet(iRemsStatus->AlarmStatus, 4);							// 0x10;
+    721          	else							  BitRst(iRemsStatus->AlarmStatus, 4);							// ~0x10;
+    722          	
+    723          	if(MainStatus->AlarmFlag.PCSOSCAlarm)	BitSet(iRemsStatus->AlarmStatus, 3);					// 0x08;
+    724          	else									BitRst(iRemsStatus->AlarmStatus, 3);					// ~0x08;
+    725          	
+    726          	if(MainStatus->AlarmFlag.WCDMAOSCAlarm)	BitSet(iRemsStatus->AlarmStatus, 2);					// 0x04;
+    727          	else									BitRst(iRemsStatus->AlarmStatus, 2);					// ~0x04; 
+    728          
+    729          	iRemsStatus->AlarmStatus &= ~ 0x02;
+    730          	iRemsStatus->AlarmStatus &= ~ 0x01;
+    731          
+    732          	iRemsStatus->PCSFwdPower = MainStatus->PCSFwdPower/5;
+    733          	iRemsStatus->WCDMAFwdPower = MainStatus->WCDMAFwdPower/5;
+    734          	iRemsStatus->PCSRvsPower = MainStatus->PCSRvsPower;
+    735          	iRemsStatus->WCDMARvsPower = MainStatus->WCDMARvsPower;
+    736          	iRemsStatus->CurrentTemp = MainStatus->ENVTemp;
+    737          
+    738          	iRemsStatus->FwdGain2G = SYSTEM_GAIN -(MainStatus->FwdAttn_4G);
+    739          	iRemsStatus->FwdGain3G = SYSTEM_GAIN -(MainStatus->FwdAttn_3G);
+    740          	iRemsStatus->RvsGain2G = SYSTEM_GAIN -(MainStatus->RvsAttn_4G);
+    741          	iRemsStatus->RvsGain3G = SYSTEM_GAIN -(MainStatus->RvsAttn_3G);
+    742          		
+    743          	//----------------------------------------------------------------------//
+    744          	iRemsStatus->FwdRssi2G = iRemsStatus->PCSFwdPower - iRemsStatus->FwdGain2G; 	//0x80;	// Sleep Mode사용으로 Fwd 입력 사용하지 않음.
+    745          	iRemsStatus->FwdRssi3G = iRemsStatus->WCDMAFwdPower - iRemsStatus->FwdGain3G; 	//0x80;	// Sleep Mode사용으로 Fwd 입력 사용하지 않음.
+    746          
+    747          	iRemsStatus->RvsRssi2G	= MainStatus->NoSleepTime1;
+    748          	iRemsStatus->RvsRssi3G	= MainStatus->NoSleepTime2;
+    749          
+    750          	//----------------------------------------------------------------------//
+    751          	if(MainStatus->AGCOnOff & 0x01)		BitSet(iRemsStatus->AGC_OnOff, 7);	// 0x80;
+    752          	else								BitRst(iRemsStatus->AGC_OnOff, 7);	// ~0x80;
+    753          
+    754          	BitRst(iRemsStatus->AGC_OnOff, 6);										// ~0x40;
+    755          
+    756          
+    757          	if(MainStatus->ALCOnOff & 0x01)		BitSet(iRemsStatus->AGC_OnOff, 5);	// 0x20;
+    758          	else								BitRst(iRemsStatus->AGC_OnOff, 5);	// ~0x20;
+    759          
+    760          	BitRst(iRemsStatus->AGC_OnOff, 4);										// ~0x10;
+    761          
+    762          	if(MainStatus->TxSWOnOff_4G & 0x01)		BitSet(iRemsStatus->AGC_OnOff, 3);	// 0x08;
+    763          	else								BitRst(iRemsStatus->AGC_OnOff, 3);	// ~0x08;
+    764          
+    765          	if(MainStatus->TxSWOnOff_3G & 0x01)		BitSet(iRemsStatus->AGC_OnOff, 2);	// 0x04;
+    766          	else									BitRst(iRemsStatus->AGC_OnOff, 2);	// ~0x04;
+    767          	
+    768          	if(MainStatus->RxSWOnOff_4G & 0x01)		BitSet(iRemsStatus->AGC_OnOff, 1);	// 0x02;
+    769          	else								BitRst(iRemsStatus->AGC_OnOff, 1);	// ~0x02;
+    770          
+    771          	if(MainStatus->RxSWOnOff_3G & 0x01)		BitSet(iRemsStatus->AGC_OnOff, 0);	// 0x01;
+    772          	else									BitRst(iRemsStatus->AGC_OnOff, 0);	// ~0x01;
+    773          
+    774          	//----------------------------------------------------------------------//
+    775          	iRemsStatus->AgcLevel2GFwd = MainStatus->AGCLimit1;
+    776          	iRemsStatus->AgcLevel3GFwd = MainStatus->AGCLimit3;
+    777          	
+    778          	iRemsStatus->AgcLevel2GRvs_Offset = MainStatus->AGCLimit2;
+    779          	iRemsStatus->AgcLevel3GRvs_Offset = MainStatus->AGCLimit4;
+    780          	
+    781          	//----------------------------------------------------------------------//
+    782          	iRemsStatus->AgcTime2G[0] = MainStatus->AGCTimeLower1;
+    783          	iRemsStatus->AgcTime2G[1] = MainStatus->AGCTimeUpper1;
+    784          	iRemsStatus->AgcTime3G[0] = MainStatus->AGCTimeLower2;
+    785          	iRemsStatus->AgcTime3G[1] = MainStatus->AGCTimeUpper2;
+    786          
+    787          	//----------------------------------------------------------------------//
+    788          	iRemsStatus->Reserved = 0;
+    789          	
+    790          	iRemsStatus->AlcLevel2GHigh = MainStatus->ALC_Phigh;
+    791          	iRemsStatus->AlcLevel3GHigh = MainStatus->ALC_Whigh;
+    792          	iRemsStatus->AlcLevel2GLow_Offset = MainStatus->ALC_Plow;
+    793          	iRemsStatus->AlcLevel3GLow_Offset = MainStatus->ALC_Wlow;
+    794          	
+    795          }
+    796          
+    797          
+    798          void iRemsSetDataCopy(IREMSCONTROL *ptr)
+    799          {
+    800          	EE_BACK1 *tptr;
+    801          	INT32U cpu_sr;
+    802          
+    803          	INT8U i = 0; 
+    804          	INT8U rval = 0;
+    805          
+    806          	while( ModemCtrlFlag == 0x01 )	OSTimeDly(100L);
+    807          	
+    808          	ModemCtrlFlag = 0x01;
+    809          
+    810          	for(i = 0; i < sizeof(ptr->ControlSet.Data); i++) rval |= ptr->ControlSet.Data[i];
+    811          
+    812          	if(ptr->TxRx_OnOff >> 4)	rval++;
+    813          
+    814          	if(rval != 0)
+    815          	{
+    816          		OS_ENTER_CRITICAL();
+    817          
+    818          		tptr = (EE_BACK1 *)RoadBackuptobuffer(vEE_BACK1Addr); // Load 1st Area	
+    819          
+    820          		//==================================================
+    821          		// ControlSet 1 : GainSetFlag
+    822          		if(ptr->ControlSet.FGain2GFlag)
+    823          		{
+    824          			MainStatus->FwdAttn_4G = (SYSTEM_GAIN - ptr->FwdGain2G);
+    825          			
+    826          			if( MainStatus->FwdAttn_4G <= MinAttn4G) MainStatus->FwdAttn_4G = MinAttn4G;
+    827          			tptr->BackUp.FwdAttn_4G = MainStatus->FwdAttn_4G;
+    828          		}
+    829          
+    830          		if(ptr->ControlSet.FGain3GFlag)
+    831          		{
+    832          			MainStatus->FwdAttn_3G = (SYSTEM_GAIN - ptr->FwdGain3G);
+    833          
+    834          			if(MainStatus->FwdAttn_3G <= MinAttn3G) MainStatus->FwdAttn_3G = MinAttn3G;
+    835          			tptr->BackUp.FwdAttn_3G = MainStatus->FwdAttn_3G;
+    836          		}
+    837          
+    838          		if(ptr->ControlSet.RGain2GFlag)
+    839          		{
+    840          			MainStatus->RvsAttn_4G = (SYSTEM_GAIN - ptr->RvsGain2G);
+    841          
+    842          			if(MainStatus->RvsAttn_4G <= MinAttn4G) MainStatus->RvsAttn_4G = MinAttn4G;
+    843          			tptr->BackUp.RvsAttn_4G = MainStatus->RvsAttn_4G;
+    844          		}
+    845          
+    846          		if(ptr->ControlSet.RGain3GFlag)
+    847          		{
+    848          			MainStatus->RvsAttn_3G = (SYSTEM_GAIN - ptr->RvsGain3G);
+    849          
+    850          			if(MainStatus->RvsAttn_3G <= MinAttn3G) MainStatus->RvsAttn_3G = MinAttn3G;
+    851          			tptr->BackUp.RvsAttn_3G = MainStatus->RvsAttn_3G;
+    852          		}
+    853          		//==================================================
+    854          		// ControlSet 3 : AgcAlcSetFlag
+    855          		if(ptr->ControlSet.AgcLevel2GFFlag)
+    856          		{
+    857          			MainStatus->AGCLimit1 = ptr->AgcLevel2GFwd;
+    858          			tptr->BackUp.AGCLimit1 = MainStatus->AGCLimit1;
+    859          		}
+    860          
+    861          		if(ptr->ControlSet.AgcLevel3GFFlag)
+    862          		{
+    863          			MainStatus->AGCLimit3 = ptr->AgcLevel3GFwd;
+    864          			tptr->BackUp.AGCLimit3 = MainStatus->AGCLimit3;
+    865          		}
+    866          
+    867          		if(ptr->ControlSet.AgcLevel2GrFlag)
+    868          		{
+    869          			MainStatus->AGCLimit2 = ptr->AgcLevel2GRvs_Offset;
+    870          			tptr->BackUp.AGCLimit2 = MainStatus->AGCLimit2;
+    871          		}
+    872          
+    873          		if(ptr->ControlSet.AgcLevel3GrFlag)
+    874          		{
+    875          			MainStatus->AGCLimit4 = ptr->AgcLevel3GRvs_Offset;
+    876          			tptr->BackUp.AGCLimit4 = MainStatus->AGCLimit4;
+    877          		}
+    878          ////////////////////////////////////////////////////////////////////////////////
+    879          		if(ptr->ControlSet.AlcLevel2GhFlag)
+    880          		{
+    881          			MainStatus->ALC_Phigh = ptr->AlcLevel2GHigh;
+    882          			tptr->BackUp.ALC_Phigh = MainStatus->ALC_Phigh;
+    883          		}
+    884          
+    885          		if(ptr->ControlSet.AlcLevel3GhFlag)
+    886          		{
+    887          			MainStatus->ALC_Whigh = ptr->AlcLevel3GHigh;
+    888          			tptr->BackUp.ALC_Whigh = MainStatus->ALC_Whigh;
+    889          		}
+    890          
+    891          		if(ptr->ControlSet.AlcLevel2GlFlag)
+    892          		{
+    893          			MainStatus->ALC_Plow = ptr->AlcLevel2GLow_Offset;
+    894          			tptr->BackUp.ALC_Plow = MainStatus->ALC_Plow;
+    895          		}
+    896          
+    897          		if(ptr->ControlSet.AlcLevel3GlFlag)
+    898          		{
+    899          			MainStatus->ALC_Wlow = ptr->AlcLevel3GLow_Offset;
+    900          			tptr->BackUp.ALC_Wlow = MainStatus->ALC_Wlow;
+    901          		}
+    902          
+    903          		//==================================================
+    904          		// ControlSet 4 : AgcTimeSetFlag
+    905          		if(ptr->ControlSet.AgcTime2Flag)
+    906          		{
+    907          			MainStatus->AGCTimeLower1 = ptr->AgcTime2G[0];
+    908          			MainStatus->AGCTimeUpper1 = ptr->AgcTime2G[1];
+    909          			tptr->BackUp.AGCTimeLower1 = MainStatus->AGCTimeLower1;
+    910          			tptr->BackUp.AGCTimeUpper1 = MainStatus->AGCTimeUpper1;
+    911          		}
+    912          
+    913          		if(ptr->ControlSet.AgcTime3Flag)
+    914          		{
+    915          			MainStatus->AGCTimeLower2 = ptr->AgcTime3G[0];
+    916          			MainStatus->AGCTimeUpper2 = ptr->AgcTime3G[1];
+    917          			tptr->BackUp.AGCTimeLower2 = MainStatus->AGCTimeLower2;
+    918          			tptr->BackUp.AGCTimeUpper2 = MainStatus->AGCTimeUpper2;
+    919          		}
+    920          
+    921          		//==================================================
+    922          		// ControlSet 2 : AgcAlcEnableFlag
+    923          		if(ptr->ControlSet.AGC_EnFlag)
+    924          		{
+    925          			if(ptr->AGC_OnOff & 0x01) 	MainStatus->AGCOnOff = '1';
+    926          			else 						MainStatus->AGCOnOff = '0';
+    927          
+    928          			tptr->BackUp.AGCOnOff = MainStatus->AGCOnOff;
+    929          			
+    930          			if(MainStatus->AGCOnOff & 0x01)
+    931          			{
+    932          				MainStatus->ALCOnOff = '0';
+    933          				tptr->BackUp.ALCOnOff = MainStatus->ALCOnOff;
+    934          			}
+    935          		}
+    936          
+    937          		if(ptr->ControlSet.ALC_EnFlag)
+    938          		{
+    939          			if(ptr->ALC_OnOff & 0x01) 	MainStatus->ALCOnOff = '1';
+    940          			else 						MainStatus->ALCOnOff = '0';
+    941          			
+    942          			tptr->BackUp.ALCOnOff = MainStatus->ALCOnOff;
+    943          
+    944          			if(MainStatus->ALCOnOff & 0x01)
+    945          			{
+    946          				MainStatus->AGCOnOff = '0';
+    947          				tptr->BackUp.AGCOnOff = MainStatus->AGCOnOff;
+    948          			}
+    949          		}
+    950          
+    951          		if(ptr->ControlSet.SleepOnOff2GFlag)
+    952          		{
+    953          			if(ptr->ControlSet.SleepOnOff2G & 0x01)	MainStatus->SleepMode = '1';
+    954          			else									MainStatus->SleepMode = '0';
+    955          			
+    956          			tptr->BackUp.SleepMode = MainStatus->SleepMode;
+    957          		}
+    958          
+    959          		if(ptr->ControlSet.SleepOnOff3GFlag)
+    960          		{
+    961          			if(ptr->ControlSet.SleepOnOff3G & 0x01)	MainStatus->SleepMode2 = '1';
+    962          			else									MainStatus->SleepMode2 = '0';
+    963          			
+    964          			tptr->BackUp.SleepMode = MainStatus->SleepMode;
+    965          		}
+    966          
+    967          		//==================================================
+    968          		// TxRx_OnOff
+    969          		if(BitRead(ptr->TxRx_OnOff, mPwr_tx_2G_Flag))
+    970          		{
+    971          			if(BitRead(ptr->TxRx_OnOff, mPwr_tx_2G_Bit))	MainStatus->TxSWOnOff_4G = '1';
+    972          			else											MainStatus->TxSWOnOff_4G = '0';
+    973          			
+    974          			tptr->BackUp.SWOnOff1 = MainStatus->TxSWOnOff_4G;
+    975          		}
+    976          
+    977          		if(BitRead(ptr->TxRx_OnOff, mPwr_tx_3G_Flag))
+    978          		{
+    979          			if(BitRead(ptr->TxRx_OnOff, mPwr_tx_3G_Bit))	MainStatus->TxSWOnOff_3G = '1';
+    980          			else											MainStatus->TxSWOnOff_3G = '0';
+    981          			tptr->BackUp.TxSWOnOff_3G = MainStatus->TxSWOnOff_3G;
+    982          		}
+    983          
+    984          		if(BitRead(ptr->TxRx_OnOff, mPwr_rx_2G_Flag))
+    985          		{
+    986          			if(BitRead(ptr->TxRx_OnOff, mPwr_rx_2G_Bit))	MainStatus->RxSWOnOff_4G = '1';
+    987          			else											MainStatus->RxSWOnOff_4G = '0';
+    988          			tptr->BackUp.SWOnOff2 = MainStatus->RxSWOnOff_4G;
+    989          		}
+    990          
+    991          		if(BitRead(ptr->TxRx_OnOff, mPwr_rx_3G_Flag))
+    992          		{
+    993          			if(BitRead(ptr->TxRx_OnOff, mPwr_rx_3G_Bit))	MainStatus->RxSWOnOff_3G = '1';
+    994          			else											MainStatus->RxSWOnOff_3G = '0';
+    995          			tptr->BackUp.RxSWOnOff_3G = MainStatus->RxSWOnOff_3G;
+    996          		}	
+    997          		
+    998          		//==================================================
+    999          		WriteBuffertoBackup(vEE_BACK1Addr, sizeof(EE_BACK1));	
+   1000          		OS_EXIT_CRITICAL();
+   1001          	}
+   1002          
+   1003          	iRemsStatusUpdate();
+   1004          
+   1005          	ModemCtrlFlag = 0x00;
+   1006          }
+   1007          
+   1008          
+   1009          
+   1010          INT8U JMatrixConversion ( void *tmpptr )
+   1011          {
+   1012          	//INT8U	i;
+   1013              INT8U RetVal = 0;
+   1014          	//INT8S	sTempCopy;
+   1015          
+   1016          	//if ( tmpptr == &CCTVStatus->ID[0] )
+   1017          	//{
+   1018          	//	for ( i=0; i<10; i++ )
+   1019          	//	{	if ( (CCTVStatus->ID[i] < '0')||(CCTVStatus->ID[i] > 'Z') )
+   1020          	//			break;
+   1021          	//		iRemsStatus->R_RepeaterID[i]	= CCTVStatus->ID[i];
+   1022          	//	}
+   1023          	//	for ( ; i<10; i++ ) iRemsStatus->R_RepeaterID[i]	= JM_NAC;
+   1024          	//	RetVal = iRemsStatus->R_RepeaterID[0];
+   1025          	//	return RetVal;
+   1026          	//}
+   1027          	
+   1028          	//else if ( (tmpptr == &CCTVStatus->PCSALCLimit)||(tmpptr == &CCTVStatus->WCDMAALCLimit) )
+   1029          	//{
+   1030          	//	sTempCopy = *(INT8S *)tmpptr/2;
+   1031          
+   1032          	//	if		( sTempCopy >= 60 ) RetVal = JM_STR;
+   1033          	//	else if ( sTempCopy <=-29 ) RetVal = JM_END-2;
+   1034          	//	else						RetVal = JM_STR + (-1)*(sTempCopy) + 60;
+   1035          	//}
+   1036          	//else if ( (tmpptr == &CCTVStatus->Fwd_2G_MainAttn)||(tmpptr == &CCTVStatus->Fwd_3G_MainAttn)||
+   1037          	//		  (tmpptr == &CCTVStatus->Rvs_2G_MainAttn)||(tmpptr == &CCTVStatus->Rvs_3G_MainAttn) )
+   1038          	//{
+   1039          	//	sTempCopy = *(INT8S *)tmpptr/2; 	// 2007-04-25 4:44오후
+   1040          	//	if		( sTempCopy >= 89 ) RetVal = JM_END-2;
+   1041          	//	else						RetVal = JM_STR + sTempCopy;
+   1042          	//}
+   1043              
+   1044          	//else if ( (tmpptr == &CCTVStatus->PCSALCOffsetLimit)||(tmpptr == &CCTVStatus->WCDMAALCOffsetLimit) )
+   1045          	//{
+   1046          	//	sTempCopy = *(INT8S *)tmpptr/2;
+   1047          	//	RetVal = JM_STR + (-1)*sTempCopy;
+   1048          	//}
+   1049              
+   1050          	//else if ( (tmpptr == &CCTVStatus->PCSSDNFwdLimit)||(tmpptr == &CCTVStatus->WCDMASDNFwdLimit) )
+   1051          	//{
+   1052          	//	sTempCopy = *(INT8S *)tmpptr/2;
+   1053          	//	if		( sTempCopy >= 50 ) RetVal = JM_STR;
+   1054          	//	else if ( sTempCopy <=-39 ) RetVal = JM_END-2;
+   1055          	//	else						RetVal = JM_STR + (-1)*(sTempCopy) + 50;
+   1056          	//}
+   1057          	//else if ( (tmpptr == &CCTVStatus->PCSSDNRvsLimit)||(tmpptr == &CCTVStatus->WCDMASDNRvsLimit) )
+   1058          	//{
+   1059          	//	sTempCopy = *(INT8S *)tmpptr/2;
+   1060                  
+   1061          	//	if		( sTempCopy >= 30 ) RetVal = JM_STR;
+   1062          	//	else if ( sTempCopy <=-59 ) RetVal = JM_END-2;
+   1063          	//	else						RetVal = JM_STR + (-1)*(sTempCopy) + 30;
+   1064          	//}
+   1065          	//else if ( tmpptr == &CCTVStatus->ENVTemp )
+   1066          	//{
+   1067          	//	sTempCopy = *(INT8S *)tmpptr;
+   1068          	//	if		( sTempCopy >= 127) RetVal = JM_STR;
+   1069          	//	else if ( sTempCopy <=-47 ) RetVal = JM_END-2;
+   1070          	//	else						RetVal = JM_STR + ((-1)*(sTempCopy) + 130)/2;
+   1071          	//}
+   1072          	//else if ( (tmpptr == &CCTVStatus->PCSFwdPower)||(tmpptr == &CCTVStatus->WCDMAFwdPower) )
+   1073          	//{
+   1074          	//	sTempCopy = *((INT16S *)tmpptr)/2;
+   1075          
+   1076          	//	if		( sTempCopy >= 50 ) RetVal = JM_STR;
+   1077          	//	else if ( sTempCopy <=-39 ) RetVal = JM_END-2;
+   1078          	//	else						RetVal = JM_STR + (-1)*(sTempCopy) + 50;
+   1079          	//}
+   1080          	//else if ( (tmpptr == &CCTVStatus->PCSRvsPower) || (tmpptr == &CCTVStatus->WCDMARvsPower))
+   1081          	//{
+   1082          	//	sTempCopy = *((INT16S *)tmpptr)/2;
+   1083          
+   1084          	//	if		( sTempCopy >= 30 ) RetVal = JM_STR;
+   1085          	//	else if ( sTempCopy <=-59 ) RetVal = JM_END-2;
+   1086          	//	else						RetVal = JM_STR + (-1)*(sTempCopy) + 30;
+   1087          	//}
+   1088          	//else
+   1089          	//{
+   1090          	//	RetVal = JM_NAC;
+   1091          	//}
+   1092          
+   1093          	//if		( RetVal >= JM_ESC ) RetVal = RetVal+1;
+   1094          	//if		( RetVal <	JM_STR ) RetVal = JM_NAC;
+   1095          	//else if ( RetVal >	JM_END ) RetVal = JM_NAC;
+   1096          	return RetVal;
+   1097          }
+   1098          
+   1099          
+   1100          INT8U Hex2Ascii(INT8U HighLow, INT8U Value )
+   1101          {
+   1102          	INT8U Digit10;
+   1103          	INT8U Digit1;
+   1104          
+   1105          	Digit1 = (Value & 0x0f) + 0x30;
+   1106          	Digit10 = ((Value >> 4) & 0x0f) + 0x30;
+   1107          
+   1108              if(Digit1 >= 0x3a) Digit1 += 0x07;
+   1109              if(Digit10 >= 0x3a) Digit10 += 0x07;
+   1110          
+   1111              if(HighLow == HIGH) return( Digit10 );
+   1112              if(HighLow == LOW) return( Digit1 );
+   1113          	return(0);
+   1114          }
+   1115          
+   1116          INT8U Ascii2Hex(INT8U Lower, INT8U Upper)
+   1117          {
+   1118          	if ( Upper >= 'A' ) Upper = (Upper+9)&0x0f;
+   1119          	else Upper = Upper&0x0f;
+   1120          
+   1121          	if ( Lower >= 'A' ) Lower = (Lower+9)&0x0f;
+   1122          	else Lower = Lower&0x0f;
+   1123          
+   1124          	return ( (Upper<<4)|Lower );
+   1125          }
+   1126          
+   1127          ////////////////////////////////////////////////////////////////////////////////
+   1128          // End of Source File
+   1129          /////////////////////////
+   1130          
+
+   Maximum stack usage in bytes:
+
+     Function          .cstack
+     --------          -------
+     Ascii2Hex              0
+     FrameRequest          40
+     Hex2Ascii              0
+     IRemsTask             16
+     JMatrixConversion      0
+     ModemCommand          80
+     ModemReset             8
+     ModemTime              8
+     iRemsComCheck          8
+     iRemsDataAck          16
+     iRemsDataAckTx        32
+     iRemsDownloadFunc     40
+     iRemsFunction         16
+     iRemsInit             16
+     iRemsReceiveCheck     24
+     iRemsRecieveACK       24
+     iRemsRecieveNMS       40
+     iRemsReset            16
+     iRemsResetFunc        16
+     iRemsSetDataCopy      24
+     iRemsStatusUpdate      4
+
+
+   Section sizes:
+
+     Function/Label             Bytes
+     --------------             -----
+     iRemsTaskStk               2048
+     iRemsSerB                  1212
+     iRemsSer
+     iRemsStatus
+     Srms
+     Rrms
+     iRemsStatusB
+     RMS_RESET_FLAG                1
+     MStatusRSPS_Flag              1
+     MControlRSPS_Flag             1
+     ModemRstCnt                   2
+     Rem_ResetStep                 2
+     ModemCtrlFlag                 1
+     DataBuff                    520
+     DataBuffLength                2
+     iRemsFrameRetry              36
+     DownRstFlag
+     FileName
+     iRemsTotalCrc
+     iRemsFrameCount
+     iRemsFrameLastC
+     iRemsFrameIndex
+     iRemsSwcrc16
+     FileSize
+     iRemsDataCount
+     iRemsInit                   204
+     IRemsTask                    56
+     iRemsReset                   58
+     iRemsFunction               154
+     iRemsResetFunc               64
+     ModemReset                   16
+     iRemsReceiveCheck           138
+     iRemsRecieveNMS             346
+     iRemsComCheck                84
+     iRemsRecieveACK             118
+     iRemsDownloadFunc          1102
+     FrameRequest                 90
+     ModemCommand                 74
+     ModemTime                    62
+     MTxBuff                    1024
+     iRemsDataAckTx              134
+     iRemsDataAck                 84
+     iRemsStatusUpdate           632
+     iRemsSetDataCopy            908
+     JMatrixConversion             4
+     Hex2Ascii                    50
+     Ascii2Hex                    26
+     ??DataTable7                  4
+     ??DataTable9                  4
+     ??DataTable13                 4
+     ??DataTable13_1               4
+     ??DataTable13_2               4
+     ??DataTable13_3               4
+     ??DataTable13_4               4
+     ??DataTable13_5               4
+     ??DataTable13_6               4
+     ??DataTable13_7               4
+     ??DataTable13_8               4
+     ??DataTable13_9               4
+     ??DataTable13_10              4
+     ??DataTable13_11              4
+     ??DataTable14                 4
+     ??DataTable14_1               4
+     ??DataTable14_2               4
+     ??DataTable14_3               4
+     ??DataTable14_4               4
+     ??DataTable14_5               4
+     ??DataTable14_6               4
+     ??DataTable14_7               4
+     ??DataTable14_8               4
+     ??DataTable14_9               4
+     ??DataTable14_10              4
+     ??DataTable14_11              4
+     ??DataTable14_12              4
+     ??DataTable14_13              4
+     ??DataTable14_14              4
+     ??DataTable14_15              4
+     ??DataTable14_16              4
+     ??DataTable14_17              4
+     ??DataTable14_18              4
+     ?<Constant "AT$KTFRESET">    12
+     ?<Constant "">                1
+     ?<Constant "AT$FWINFO?">    136
+     ?<Constant "RD:">             4
+     ?<Constant "AT$FWRD=1234">   16
+     ?<Constant "AT$KTFTIME?">    12
+
+ 
+ 2 766 bytes in section .bss
+    36 bytes in section .data
+   181 bytes in section .rodata
+ 4 536 bytes in section .text
+ 2 048 bytes in section iram
+ 
+ 4 536 bytes of CODE  memory
+   181 bytes of CONST memory
+ 4 850 bytes of DATA  memory
+
+Errors: none
+Warnings: none

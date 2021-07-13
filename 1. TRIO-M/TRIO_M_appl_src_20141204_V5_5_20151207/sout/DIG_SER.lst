@@ -1,0 +1,333 @@
+###############################################################################
+#                                                                             #
+# IAR ANSI C/C++ Compiler V5.30.2.51295/W32 for ARM     02/Jan/2012  21:08:25 #
+# Copyright 1999-2009 IAR Systems AB.                                         #
+#                                                                             #
+#    Cpu mode     =  thumb                                                    #
+#    Endian       =  little                                                   #
+#    Source file  =  D:\Project\TRIO\3.F_W\TRIO_appl_src_20120102\code\DIG_SE #
+#                    R.c                                                      #
+#    Command line =  D:\Project\TRIO\3.F_W\TRIO_appl_src_20120102\code\DIG_SE #
+#                    R.c -lcN D:\Project\TRIO\3.F_W\TRIO_appl_src_20120102\so #
+#                    ut\ -lB D:\Project\TRIO\3.F_W\TRIO_appl_src_20120102\sou #
+#                    t\ -o D:\Project\TRIO\3.F_W\TRIO_appl_src_20120102\sout\ #
+#                     --endian=little --cpu=Cortex-M3 -e                      #
+#                    --require_prototypes --warnings_are_errors --fpu=None    #
+#                    --dlib_config "C:\Program Files\IAR Systems\Embedded     #
+#                    Workbench 5.4\arm\INC\DLib_Config_Normal.h" -I           #
+#                    D:\Project\TRIO\3.F_W\TRIO_appl_src_20120102\include\    #
+#                    -I D:\Project\TRIO\3.F_W\TRIO_appl_src_20120102\lib_stm3 #
+#                    2\inc\ -I D:\Project\TRIO\3.F_W\TRIO_appl_src_20120102\l #
+#                    ib_stm32\src\ -I D:\Project\TRIO\3.F_W\TRIO_appl_src_201 #
+#                    20102\uC-CPU\ -I D:\Project\TRIO\3.F_W\TRIO_appl_src_201 #
+#                    20102\uC-LIB\ -I D:\Project\TRIO\3.F_W\TRIO_appl_src_201 #
+#                    20102\uCOS-II\Ports\ -I D:\Project\TRIO\3.F_W\TRIO_appl_ #
+#                    src_20120102\uCOS-II\Source\ -I                          #
+#                    D:\Project\TRIO\3.F_W\TRIO_appl_src_20120102\uC-Probe\   #
+#                    -I "C:\Program Files\IAR Systems\Embedded Workbench      #
+#                    5.4\arm\INC\" -Oh                                        #
+#    List file    =  D:\Project\TRIO\3.F_W\TRIO_appl_src_20120102\sout\DIG_SE #
+#                    R.lst                                                    #
+#    Object file  =  D:\Project\TRIO\3.F_W\TRIO_appl_src_20120102\sout\DIG_SE #
+#                    R.o                                                      #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\Project\TRIO\3.F_W\TRIO_appl_src_20120102\code\DIG_SER.c
+      1          /******************** (C) COPYRIGHT 2007 STMicroelectronics ********************
+      2          * File Name          : stm32f10x_bkp.c
+      3          * Author             : MCD Application Team
+      4          * Date First Issued  : 09/29/2006
+      5          * Description        : This file provides all the BKP firmware functions.
+      6          ********************************************************************************/
+      7          
+      8          #define DIG_C
+      9          
+     10          #include "../include/main.h"
+     11          
+     12          void DigInit(void)
+     13          {
+     14            	DigSer->CheckByte 	= pUSART3.CheckByte;
+     15          	DigSer->RxGetByte 	= pUSART3.RxGetByte;
+     16          	DigSer->PutStr 		= pUSART3.PutStr;
+     17          	DigSer->TxCheckByte = pUSART3.TxCheckByte;
+     18          	
+     19          	DigSer->TimerRx 	= TimerDigRx;
+     20          	DigSer->TimerEndWait = TimerDigEndWait;
+     21          	DigSer->WRCSRecv 	= &RDigSio;
+     22          	DigSer->WRCSSend 	= &SDigSio;
+     23          	
+     24          	DigSer->Sem = OSSemCreate(1);
+     25          	OSTaskCreate(DigTask, (void *)NULL, (OS_STK *)&DigTaskStk[Dig_START_STK_SIZE - 1], DigTASK_PRIO);
+     26           }
+     27          
+     28          
+     29          void DigTask(void * pdata)
+     30          {
+     31          	INT8U DigPollwait = 0;
+     32              INT8U DigID = 0;
+     33          	__ProtocolPtr *nPtr = (__ProtocolPtr *)DigSer;
+     34          
+     35          	ExpioBitSet(Dig_Reset);
+     36          	ExpioBitSet(FSK_EN);
+     37          
+     38           	//USART1Printf("DigTask %s %s\n", __DATE__, __TIME__);
+     39          	OSTimeDly(1000L*5L);
+     40          
+     41          	while(1)
+     42          	{
+     43          		// Only Downloading
+     44          		while((DownLoadGiveupTimerSet(NULL)))
+     45          		{
+     46          			nPtr->WRCSRecv->cBody = 0;
+     47          			
+     48          			if(ProtocolCheck(nPtr))
+     49          			{
+     50          			#if TWO_BODY >= 2
+     51          				while(nPtr->WRCSRecv->cBody  <=  nPtr->WRCSRecv->BodyNo)
+     52          				{
+     53          			#endif
+     54          					ProtocolComCheck(nPtr);
+     55          			#if TWO_BODY >= 2
+     56          					nPtr->WRCSRecv->cBody++;
+     57          				}
+     58          			#endif
+     59          				DigLinkFailRst(DigID);
+     60           			}
+     61          			DecDigSendCnt();
+     62          			OSTimeDly(200L);
+     63          		}
+     64          		while(!DownLoadGiveupTimerSet(NULL) && !tTestFlag)
+     65          		{
+     66          			nPtr->WRCSRecv->cBody = 0;
+     67          
+     68          			if(!IsItDigSent() && (++DigPollwait >= DigInt))
+     69          			{
+     70          				INT8U *dptr = nPtr->WRCSSend->BodyFrame[0].SubData;
+     71          				if((tRmtSts->CommCnt.Dig_RxCnt.Data > 1)&& CFRInit)
+     72          				{
+     73          					INT16S len = GenMCUtoDigSts(dptr, tRmtSts,0);
+     74          					DigTransmitData(0xFF, 0xFF, CFRModule , (INT8U *)dptr, len, ModuleInformStsQue, nPtr);
+     75          				}
+     76          				else
+     77          				{
+     78          					if(ASK_Test)	
+     79          					{
+     80          						ASK_ReturnOnOff();
+     81          						TimerRegist(Timer_ASK, Time100mSec*10L);
+     82          						DelayChk = SET;
+     83          					}
+     84          					else
+     85          					{
+     86          						INT16S len = GenMCUtoDigSts(dptr, tRmtSts,0);
+     87          						DigTransmitData(0xFF, 0xFF, CFRModule , (INT8U *)dptr, len, StatusQue, nPtr);
+     88          					}
+     89          				}
+     90          
+     91          				DigPollwait = 0;
+     92          			}
+     93          			if(IsItDigSent() && ProtocolCheck(nPtr))
+     94          			{
+     95          				DecDigSendCnt();
+     96          			#if TWO_BODY >= 2
+     97          				while(nPtr->WRCSRecv->cBody  <=  nPtr->WRCSRecv->BodyNo)
+     98          				{
+     99          			#endif
+    100          					ProtocolComCheck(nPtr);
+    101          			#if TWO_BODY >= 2
+    102          					nPtr->WRCSRecv->cBody++;
+    103          				}
+    104          			#endif
+    105          				DigLinkFailRst(DigID);
+    106           			}
+    107          			else DecDigSendCnt();
+    108          			
+    109          			OSTimeDly(200L);
+    110          		}
+    111          		DecDigSendCnt();
+    112          		OSTimeDly(100L);
+    113          	}
+    114          }
+    115          
+    116          void DigTransmitData(INT8U id0, INT8U id1, INT8U id2, INT8U *Data, INT16U Count, INT8U Comm, __ProtocolPtr *nPtr)
+    117          {
+    118          
+    119          	TimerRegist(DigSer->TimerEndWait, Time1Sec*3L);
+    120          	while(IsItDigSent()) // waiting until finish current job
+    121          	{
+    122          		if(TimeOverCheck(DigSer->TimerEndWait)) return;
+    123          		OSTimeDly(10L);
+    124          	}
+    125          
+    126          	if(Comm == ControlQue)
+    127          	{
+    128          		DigSer->ctrlsrc = (INT32U)nPtr;
+    129          		if(tRmtSts->TestMode== Debug_Test8)SerPtr->printf("3 : DigSer Comm[%d][%d]\n",Comm,DigSer->ctrlsrc);
+    130          	}
+    131          	DigDataAckTx(id0, id1, id2, Data, Count, Comm, DigSer);
+    132          
+    133          	if(ChkDigCtrl)ChkDigCtrl = RESET;
+    134          }
+    135          
+    136          
+    137          void DigDataAckTx(INT8U id0, INT8U id1, INT8U id2, INT8U *Data, INT16U nCnt,
+    138          					INT8U Comm, __ProtocolPtr *nPtr)
+    139          {
+    140          	GenBodyFrame(id0, id1, id2, (INT8U *)Data, nCnt, Comm, nPtr, 0);
+    141          	WRCS_ProDataAckTx(nPtr);
+    142           
+    143          	IncDigSendCnt();
+    144          	DigLinkFailCheck(id2);
+    145          }
+    146          
+    147          INT8U IsItDigSent(void)
+    148          {
+    149          	return DigTx;
+    150          }
+    151          
+    152          void IncDigSendCnt(void)
+    153          {
+    154          	DigTx++;
+    155          }
+    156          
+    157          void DecDigSendCnt(void)
+    158          {
+    159          	if(DigTx) DigTx--;
+    160          }
+    161          
+    162          void DigLinkFailCheck(INT8U DigID)
+    163          {
+    164          	if((++DigLinkFailCnt > 10))
+    165          	{
+    166          		DigLinkFailCnt = 11;
+    167          		tRmtSts->DEI_DnrAlm.Etc.DigLnkFail = 1;
+    168             	}
+    169          }
+    170          
+    171          
+    172          void DigLinkFailRst(INT8U DigID)
+    173          {
+    174           	DigLinkFailCnt--;
+    175           	DigLinkFailCnt--;
+    176          	if(DigLinkFailCnt < 0) DigLinkFailCnt = 0;
+    177          	if(DigLinkFailCnt < 5) tRmtSts->DEI_DnrAlm.Etc.DigLnkFail = 0;
+    178          }
+    179          
+    180          void Dig_BandSelect(INT8U Val)
+    181          {
+    182          	INT8U tmpData[30] = {0,};
+    183          	INT8U tmpLen = 0;
+    184          
+    185          	tmpData[tmpLen++] = (Aid_BandSelect_LTE >> 8) & 0xff;
+    186          	tmpData[tmpLen++] = (Aid_BandSelect_LTE >> 0) & 0xff;
+    187          	tmpData[tmpLen++] = 1;
+    188          	tmpData[tmpLen++] = Val;
+    189          
+    190          	ChkDigCtrl = SET;
+    191          	DigTransmitData(0xFF, 0xFF, CFRModule , (INT8U *)tmpData, tmpLen, ControlQue, DigSer);
+    192          }
+    193          
+    194          
+    195          
+    196          void ODU_Reset_Ctrl(void)
+    197          {
+    198          	INT8U tmpData[10] = {0,};
+    199          	INT8U tmpLen = 0;
+    200          
+    201          	tmpData[tmpLen++] = (Aid_OptReset >> 8) & 0xff;
+    202          	tmpData[tmpLen++] = (Aid_OptReset >> 0) & 0xff;
+    203          	tmpData[tmpLen++] = 1;
+    204          	tmpData[tmpLen++] = 0;
+    205          	ChkDigCtrl = SET;
+    206          
+    207          	DigTransmitData(0xFF, 0xFF, CFRModule , (INT8U *)tmpData, tmpLen, ControlQue, DigSer);
+    208           
+    209          	ExpioBitRst(Dig_Reset);
+    210          	OSTimeDly(400);
+    211          	ExpioBitSet(Dig_Reset);
+    212           }
+    213          
+    214          
+    215          void DigControl(INT16U AID_Command,INT8U Index)
+    216          {
+    217           	INT8U tmpData[20] = {0,};
+    218          	INT8U tmpLen = 0;
+    219          
+    220          	tmpData[tmpLen++] = (AID_Command >> 8) & 0xff;
+    221          	tmpData[tmpLen++] = (AID_Command >> 0) & 0xff;
+    222          	tmpData[tmpLen++] = 1;
+    223          	tmpData[tmpLen++] = Index;
+    224          
+    225          	DigTransmitData(0xFF, 0xFF, CFRModule , (INT8U *)tmpData, tmpLen, ControlQue, DigSer);
+    226           }
+    227          
+    228          
+    229          ////////////////////////////////////////////////////////////////////////////////
+    230          // End of Source File
+    231          /////////////////////////
+    232          
+
+   Maximum stack usage in bytes:
+
+     Function         .cstack
+     --------         -------
+     DecDigSendCnt         0
+     DigControl           48
+     DigDataAckTx         40
+     DigInit               8
+     DigLinkFailCheck      0
+     DigLinkFailRst        0
+     DigTask              48
+     DigTransmitData      56
+     Dig_BandSelect       56
+     IncDigSendCnt         0
+     IsItDigSent           0
+     ODU_Reset_Ctrl       32
+
+
+   Section sizes:
+
+     Function/Label                          Bytes
+     --------------                          -----
+     DigLinkFailCnt                             1
+     DigSerB                                   40
+     DigTx                                   3128
+     CFRInit
+     DigSer
+     DigTaskStk
+     SDigSio
+     RDigSio
+     DigInit                                   84
+     DigTask                                  280
+     DigTransmitData                          164
+     DigDataAckTx                              60
+     IsItDigSent                                6
+     IncDigSendCnt                             10
+     DecDigSendCnt                             12
+     DigLinkFailCheck                          32
+     DigLinkFailRst                            38
+     Dig_BandSelect                            70
+     ODU_Reset_Ctrl                            90
+     DigControl                                66
+     ??DataTable12                              4
+     ??DataTable13                              4
+     ??DataTable16                              4
+     ??DataTable18                              4
+     ?<Constant "3 : DigSer Comm[%d][%d]\n">   28
+     ?<Constant {0}>                           32
+     ?<Constant {0}>_1                         12
+     ?<Constant {0}>_2                         20
+
+ 
+    41 bytes in section .bss
+ 3 128 bytes in section .data
+    92 bytes in section .rodata
+   928 bytes in section .text
+ 
+   928 bytes of CODE  memory
+    92 bytes of CONST memory
+ 3 169 bytes of DATA  memory
+
+Errors: none
+Warnings: none

@@ -1,0 +1,1538 @@
+###############################################################################
+#                                                                             #
+#                                                       09/Nov/2010  11:33:57 #
+# IAR ANSI C/C++ Compiler V5.20.0.20892/W32 EVALUATION for ARM                #
+# Copyright 1999-2008 IAR Systems AB.                                         #
+#                                                                             #
+#    Cpu mode     =  thumb                                                    #
+#    Endian       =  little                                                   #
+#    Source file  =  C:\user\project\HK-DEI\fw\appl_rcub_20101101\code\c_prot #
+#                    ocol.c                                                   #
+#    Command line =  C:\user\project\HK-DEI\fw\appl_rcub_20101101\code\c_prot #
+#                    ocol.c -lcN C:\user\project\HK-DEI\fw\appl_rcub_20101101 #
+#                    \sout\ -lB C:\user\project\HK-DEI\fw\appl_rcub_20101101\ #
+#                    sout\ -o C:\user\project\HK-DEI\fw\appl_rcub_20101101\so #
+#                    ut\ --endian=little --cpu=Cortex-M3 -e                   #
+#                    --require_prototypes --fpu=None --dlib_config            #
+#                    "C:\compiler\EWARM 5.20\ARM\INC\DLib_Config_Normal.h"    #
+#                    -I C:\user\project\HK-DEI\fw\appl_rcub_20101101\include\ #
+#                     -I C:\user\project\HK-DEI\fw\appl_rcub_20101101\lib_stm #
+#                    32\inc\ -I C:\user\project\HK-DEI\fw\appl_rcub_20101101\ #
+#                    lib_stm32\src\ -I C:\user\project\HK-DEI\fw\appl_rcub_20 #
+#                    101101\uC-CPU\ -I C:\user\project\HK-DEI\fw\appl_rcub_20 #
+#                    101101\uC-LIB\ -I C:\user\project\HK-DEI\fw\appl_rcub_20 #
+#                    101101\uCOS-II\Ports\ -I C:\user\project\HK-DEI\fw\appl_ #
+#                    rcub_20101101\uCOS-II\Source\ -I                         #
+#                    C:\user\project\HK-DEI\fw\appl_rcub_20101101\uC-Probe\   #
+#                    -I "C:\compiler\EWARM 5.20\ARM\INC\" -Oh                 #
+#    List file    =  C:\user\project\HK-DEI\fw\appl_rcub_20101101\sout\c_prot #
+#                    ocol.lst                                                 #
+#    Object file  =  C:\user\project\HK-DEI\fw\appl_rcub_20101101\sout\c_prot #
+#                    ocol.o                                                   #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+C:\user\project\HK-DEI\fw\appl_rcub_20101101\code\c_protocol.c
+      1          /******************** (C) COPYRIGHT 2008 STMicroelectronics ********************
+      2          * File Name          : fsmc_sram.h
+      3          * Author             : MCD Application Team
+      4          * Version            : V2.0.2
+      5          * Date               : 07/11/2008
+      6          * Description        : Header for fsmc_sram.c file.
+      7          ********************************************************************************
+      8          * THE PRESENT FIRMWARE WHICH IS FOR GUIDANCE ONLY AIMS AT PROVIDING CUSTOMERS
+      9          * WITH CODING INFORMATION REGARDING THEIR PRODUCTS IN ORDER FOR THEM TO SAVE TIME.
+     10          * AS A RESULT, STMICROELECTRONICS SHALL NOT BE HELD LIABLE FOR ANY DIRECT,
+     11          * INDIRECT OR CONSEQUENTIAL DAMAGES WITH RESPECT TO ANY CLAIMS ARISING FROM THE
+     12          * CONTENT OF SUCH FIRMWARE AND/OR THE USE MADE BY CUSTOMERS OF THE CODING
+     13          * INFORMATION CONTAINED HEREIN IN CONNECTION WITH THEIR PRODUCTS.
+     14          *******************************************************************************/
+     15          #define Protocol_C
+     16          #define DDR_Protocol_C
+     17          
+     18          #include "../include/main.h"
+     19          
+     20          
+     21          INT16U 	GenRepAidSts(INT8U *dptr, __BeaconStsStr *Sts, __ProtocolPtr *nPtr)
+     22          {
+     23          	INT16U rlen = 0;
+     24          	INT16U i = 0;
+     25              INT8U tmp[2];
+     26          	__BeaconAlarmDataStr Flag = Sts->Flag;
+     27          	// alarm !!
+     28          	if(nPtr == Wrcs0){
+     29          		Flag.FwdAmpLinkFail_3G = 0;
+     30          	}
+     31          	else{
+     32          
+     33          	}
+     34          	/////////////////////////////////
+     35          	if(Sts->RepeaterType[1] == __COPY_RACK || Sts->RepeaterType[1] == __GEN_RACK) {
+     36          		Flag.ACFail = 0;
+     37          		Flag.DCFail = 0;
+     38          		Flag.BatteryLow = 0;
+     39          		Flag.DoorOpen = 0;
+     40          	}
+     41          	else if(Sts->RepeaterType[1] == __COPY_IN || Sts->RepeaterType[1] == __GEN_IN) {
+     42          		Flag.ACFail = 0;
+     43          		Flag.BatteryLow = 0;
+     44          	}
+     45          
+     46          	dptr[rlen++] = (Aid_RepeaterAlarm >> 8) & 0xff;
+     47          	dptr[rlen++] = (Aid_RepeaterAlarm >> 0) & 0xff;
+     48          	dptr[rlen++] = 2 *(sizeof(__BeaconAlarmDataStr));
+     49          	for(i = 0; i < (sizeof(__BeaconAlarmDataStr)); i++)	dptr[rlen++] = *((INT8U *)&(Flag) + i);
+     50          	for(i = 0; i < (sizeof(__BeaconAlarmDataStr)); i++)	dptr[rlen++] = *((INT8U *)&(Sts->BeaconAlm) + i);
+     51          
+     52          
+     53          	// Manufacture !!
+     54          	rlen += GenAidData(Aid_Manufacture, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->Manufacture), 1);
+     55          	// Supplier !!
+     56          	rlen += GenAidData(Aid_Supplier, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->Supplier), 1);
+     57          	// RepeaterType !!
+     58          	rlen += GenAidData(Aid_RepeaterType, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->RepeaterType[0]), 2);
+     59          
+     60          	rlen += GenAidData(Aid_SystemVer, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->SWVer), 1);
+     61          	rlen += GenAidData(Aid_ManufactureDate, (INT8U *)&dptr[rlen], (INT8U *)&(ModuleInform->Manufacture_Date[0]), 3);
+     62          	
+     63          
+     64          	//tmp = !CWPllLD;
+     65          	//rlen += GenAidData(Aid_CurrentTemp, (INT8U *)&dptr[rlen], (INT8U *)&(tmp), 1);
+     66          	rlen += GenAidData(Aid_CurrentTemp, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->CurrentTemp), 1);
+     67          
+     68          	rlen += GenAidData(Aid_TempUpperLmt, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->TempUpperLmt), 1);
+     69          	rlen += GenAidData(Aid_BatteryIns, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->BatteryIns), 1);
+     70          	rlen += GenAidData(Aid_BatteryType, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->BatteryType), 1);
+     71          	tmp[0] = Sts->BeaconAlm.DrvFwdAmpOnOff_3G;
+     72          	rlen += GenAidData(Aid_DrvFwdAmpOnOff_3G, (INT8U *)&dptr[rlen], (INT8U *)&(tmp[0]), 1); 
+     73          	tmp[0] = Sts->BeaconAlm.DrvRvsAmpOnOff_3G;
+     74          	rlen += GenAidData(Aid_DrvRvsAmpOnOff_3G, (INT8U *)&dptr[rlen], (INT8U *)&(tmp[0]), 1); 
+     75          	
+     76          	rlen += GenAidData(Aid_FwdInPwr_3G, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->FwdInPwr_3G), 1);
+     77          	rlen += GenAidData(Aid_FwdInUpperLmt_3G, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->FwdInUpperLmt_3G), 1);
+     78          	rlen += GenAidData(Aid_FwdInLowerLmt_3G, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->FwdInLowerLmt_3G), 1);
+     79          	rlen += GenAidData(Aid_FwdPwr_3G, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->FwdPwr_3G), 2);
+     80          
+     81          /**
+     82          	if(Sts->FwdOutUpperLmt_3G[0] < 0){
+     83          		tmp[0] = abs(Sts->FwdOutUpperLmt_3G[0]) | 0x10;
+     84          		tmp[1] = abs(Sts->FwdOutUpperLmt_3G[1]) | 0x10;
+     85          	}
+     86          	**/
+     87          	rlen += GenAidData(Aid_FwdOutUpperLmt_3G, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->FwdOutUpperLmt_3G[0]), 2);
+     88          	rlen += GenAidData(Aid_FwdOutLowerLmt_3G, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->FwdOutLowerLmt_3G[0]), 2);
+     89          	rlen += GenAidData(Aid_FwdOutAttn_3G, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->FwdOutAttn_3G), 1);
+     90          	rlen += GenAidData(Aid_FwdInAttn_3G, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->FwdInAttn_3G), 1);
+     91          
+     92              rlen += GenAidData(Aid_Rvs0Gain_3G, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->Rvs0Gain_3G), 1);
+     93          	rlen += GenAidData(Aid_Rvs0Attn_3G, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->Rvs0Attn_3G), 1); 
+     94          	rlen += GenAidData(Aid_RvsInPwr_3G, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->RvsInPwr_3G), 1); 
+     95          	rlen += GenAidData(Aid_RvsInUpperLmt_3G, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->RvsInUpperLmt_3G), 1); 
+     96          	rlen += GenAidData(Aid_RvsInLowerLmt_3G, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->RvsInLowerLmt_3G), 1); 
+     97          	rlen += GenAidData(Aid_Rvs0OutPwr_3G, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->Rvs0OutPwr_3G[0]), 2); 
+     98          	rlen += GenAidData(Aid_Rvs0OutUpperLmt_3G, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->Rvs0OutUpperLmt_3G[0]), 2); 
+     99          	rlen += GenAidData(Aid_Rvs0OutLowerLmt_3G, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->Rvs0OutLowerLmt_3G[0]), 2); 
+    100          
+    101          	rlen += GenAidData(Aid_AmpCapability_3G, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->AmpCapability_3G), 1); 
+    102          	rlen += GenAidData(Aid_AmpManufacture_3G, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->AmpManufacture_3G), 1); 
+    103          	//rlen += GenAidData(Aid_AmpSerial_3G, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->AmpSerial_3G), 4); 
+    104          	rlen += GenAidData(Aid_AmpOffCase_3G, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->AmpOffCase_3G), 1); 
+    105          
+    106          	rlen += GenAidData(Aid_CW0OnOff_3G, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->CW0OnOff_3G), 1); 
+    107          	rlen += GenAidData(Aid_FANo_3G, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->FANo_3G), 1); 
+    108          	rlen += GenAidData(Aid_RFPathLossResult_3G, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->RFPathLossResult_3G), 1);	
+    109          	rlen += GenAidData(Aid_CFRLvl, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->CFRLvl), 1);
+    110          	rlen += GenAidData(Aid_FwdInALCLvl, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->FwdInALCLvl), 1);
+    111          	
+    112          
+    113          	rlen += GenAidData(Aid_FwdPwr_REP_3G, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->FwdPwrREP_3G), 2);
+    114          	rlen += GenAidData(Aid_FwdOut_REPUpperLmt_3G, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->FwdOut_REPUpperLmt_3G[0]), 2);
+    115          	rlen += GenAidData(Aid_FwdOut_REPLowerLmt_3G, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->FwdOut_REPLowerLmt_3G[0]), 2);
+    116          	rlen += GenAidData(Aid_FwdOutAttn_REP_3G, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->FwdOutAttn_REP_3G), 1);
+    117          	rlen += GenAidData(Aid_FwdInFA_3G, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->FwdInFA_3G), 1);
+    118          	rlen += GenAidData(Aid_FwdOutFA1_3G, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->FwdOutFA1_3G), 1);
+    119          	rlen += GenAidData(Aid_FwdOutFA2_3G, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->FwdOutFA2_3G), 1);
+    120          
+    121          	tmp[0] = Sts->OutSwitchTime_3G.Byte.High;
+    122          	tmp[1] = Sts->OutSwitchTime_3G.Byte.Low;
+    123          	rlen += GenAidData(Aid_OutSwitchTime_3G, (INT8U *)&dptr[rlen], (INT8U *)&(tmp), 2);
+    124          	
+    125          	rlen += GenAidData(Aid_OutSwitchAttnOnOff_3G, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->OutSwitchAttnOnOff_3G), 1);	
+    126          
+    127          	rlen += GenAidData(Aid_RFPathLossLvl_3G, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->Rvs0Gain_3G), 1);
+    128          	rlen += GenAidData(Aid_StsConSts, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->StsConFail), 1);
+    129          	rlen += GenAidData(Aid_AlarmMask, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->AlarmMask), 1);
+    130          	rlen += GenAidData(Aid_TPTL_OnOff, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->TPTL_OnOff), 1);
+    131          	rlen += GenAidData(Aid_TempOffset, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->TempOffset), 1);
+    132          	rlen += GenAidData(Aid_RCUAddVer, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->RCUAddVer), 1);
+    133          	
+    134          	// Adc_Value
+    135          	dptr[rlen++] = (Aid_MhuDetVoltage >> 8) & 0xff;
+    136          	dptr[rlen++] = (Aid_MhuDetVoltage >> 0) & 0xff;
+    137          	dptr[rlen++] = sizeof(__CMHUDETVOLT);
+    138          	{
+    139          		__TBL16 r;
+    140          		
+    141          		for(i = 0; i < sizeof(__CMHUDETVOLT)/2; i++)
+    142          		{
+    143          			r.Data = *((INT16U *)&Sts->_Det + i);
+    144          		
+    145          			dptr[rlen++] = r.Byte.High;
+    146          			dptr[rlen++] = r.Byte.Low;
+    147          		}
+    148          	}
+    149          	rlen += GenAidData(Aid_FwdInPwrOffset_3G, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->FwdInPwrOffset_3G), 1); 
+    150          	rlen += GenAidData(Aid_FwdOutPwrOffset_3G, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->FwdOutPwrOffset_3G), 1); 
+    151          	rlen += GenAidData(Aid_FwdPwrREPOffset_3G, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->FwdPwrREPOffset_3G), 1); 
+    152          	rlen += GenAidData(Aid_RvsInPwrOffset_3G, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->RvsInPwrOffset_3G), 1); 
+    153          	rlen += GenAidData(Aid_Rvs0OutPwrOffset_3G, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->Rvs0OutPwrOffset_3G), 1); 
+    154          	rlen += GenAidData(Aid_FwdInAttnTemp_3G, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->FwdInAttnTemp_3G), 1); 
+    155          	rlen += GenAidData(Aid_Rvs0AttnTemp_3G, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->Rvs0AttnTemp_3G), 1); 
+    156          	rlen += GenAidData(Aid_FwdInPllFreqOffset_3G, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->FwdInPllFreqOffset_3G), 1); 
+    157          	rlen += GenAidData(Aid_FwdOut1PllFreqOffset_3G, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->FwdOut1PllFreqOffset_3G), 1); 
+    158          	rlen += GenAidData(Aid_FwdOut2PllFreqOffset_3G, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->FwdOut2PllFreqOffset_3G), 1); 
+    159          	rlen += GenAidData(Aid_RvsIn1PllFreqOffset_3G, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->RvsIn1PllFreqOffset_3G), 1); 
+    160          	rlen += GenAidData(Aid_RvsIn2PllFreqOffset_3G, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->RvsIn2PllFreqOffset_3G), 1); 
+    161          	rlen += GenAidData(Aid_RvsOutPllFreqOffset_3G, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->RvsOutPllFreqOffset_3G), 1); 
+    162          
+    163          	rlen += GenAidData(Aid_Fwd10MHzSelect_3G, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->Fwd10MHzSelect_3G), 1);
+    164          	rlen += GenAidData(Aid_CFROnOff, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->CFROnOff), 1);
+    165          
+    166          	dptr[rlen++] = (Aid_FwdInPllFreqTemp_3G >> 8) & 0xff;
+    167          	dptr[rlen++] = (Aid_FwdInPllFreqTemp_3G >> 0) & 0xff;
+    168          	dptr[rlen++] = 2;
+    169          	dptr[rlen++] = Sts->FwdInPllFreqTemp_3G.Byte.High;
+    170          	dptr[rlen++] = Sts->FwdInPllFreqTemp_3G.Byte.Low;
+    171          
+    172          	dptr[rlen++] = (Aid_FwdOut1PllFreqTemp_3G >> 8) & 0xff;
+    173          	dptr[rlen++] = (Aid_FwdOut1PllFreqTemp_3G >> 0) & 0xff;
+    174          	dptr[rlen++] = 2;
+    175          	dptr[rlen++] = Sts->FwdOut1PllFreqTemp_3G.Byte.High;
+    176          	dptr[rlen++] = Sts->FwdOut1PllFreqTemp_3G.Byte.Low;
+    177          
+    178          	dptr[rlen++] = (Aid_FwdOut2PllFreqTemp_3G >> 8) & 0xff;
+    179          	dptr[rlen++] = (Aid_FwdOut2PllFreqTemp_3G >> 0) & 0xff;
+    180          	dptr[rlen++] = 2;
+    181          	dptr[rlen++] = Sts->FwdOut2PllFreqTemp_3G.Byte.High;
+    182          	dptr[rlen++] = Sts->FwdOut2PllFreqTemp_3G.Byte.Low;
+    183          
+    184          	dptr[rlen++] = (Aid_RvsIn1PllFreqTemp_3G >> 8) & 0xff;
+    185          	dptr[rlen++] = (Aid_RvsIn1PllFreqTemp_3G >> 0) & 0xff;
+    186          	dptr[rlen++] = 2;
+    187          	dptr[rlen++] = Sts->RvsIn1PllFreqTemp_3G.Byte.High;
+    188          	dptr[rlen++] = Sts->RvsIn1PllFreqTemp_3G.Byte.Low;
+    189          
+    190          	dptr[rlen++] = (Aid_RvsIn2PllFreqTemp_3G >> 8) & 0xff;
+    191          	dptr[rlen++] = (Aid_RvsIn2PllFreqTemp_3G >> 0) & 0xff;
+    192          	dptr[rlen++] = 2;
+    193          	dptr[rlen++] = Sts->RvsIn2PllFreqTemp_3G.Byte.High;
+    194          	dptr[rlen++] = Sts->RvsIn2PllFreqTemp_3G.Byte.Low;
+    195          
+    196          	dptr[rlen++] = (Aid_RvsOutPllFreqTemp_3G >> 8) & 0xff;
+    197          	dptr[rlen++] = (Aid_RvsOutPllFreqTemp_3G >> 0) & 0xff;
+    198          	dptr[rlen++] = 2;
+    199          	dptr[rlen++] = Sts->RvsOutPllFreqTemp_3G.Byte.High;
+    200          	dptr[rlen++] = Sts->RvsOutPllFreqTemp_3G.Byte.Low;
+    201          
+    202          #ifdef __SUNWAVE
+    203          	rlen += GenAidData(Aid_SCRNum, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->SCRNum[0]), 2); 
+    204          	rlen += GenAidData(Aid_CPICHPwr, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->CPICHPwr), 1); 
+    205          	rlen += GenAidData(Aid_PSCHPwr, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->PSCHPwr), 1); 
+    206          	rlen += GenAidData(Aid_SSCHPwr, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->SSCHPwr), 1); 
+    207          	rlen += GenAidData(Aid_PCCPCHPwr, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->PCCPCHPwr), 1); 
+    208          	rlen += GenAidData(Aid_CellBarred, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->CellBarred), 1); 
+    209          	rlen += GenAidData(Aid_ResBarred, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->ResBarred), 1); 
+    210          	rlen += GenAidData(Aid_T_Barred, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->T_Barred), 1); 
+    211          	rlen += GenAidData(Aid_T_Cell, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->T_Cell), 1); 
+    212          	rlen += GenAidData(Aid_MeasureSts, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->MeasureSts), 1); 
+    213          	rlen += GenAidData(Aid_MeasurePeriod, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->MeasurePeriod), 1); 
+    214          #endif	
+    215          	rlen += GenAidData(Aid_RvsInFA1_3G, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->RvsInFA1_3G), 1);
+    216          	rlen += GenAidData(Aid_RvsInFA2_3G, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->RvsInFA2_3G), 1);
+    217          	rlen += GenAidData(Aid_RvsOutFA_3G, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->RvsOutFA_3G), 1);
+    218          #ifdef __SUNWAVE
+    219          	rlen += GenAidData(Aid_TXCUSWVer, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->TXCUSWVer), 1); 
+    220          #endif
+    221          	rlen += GenAidData(Aid_TXCUModel, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->TXCUModel), 1); 
+    222          #ifdef __SUNWAVE
+    223          	rlen += GenAidData(Aid_SGCUSWVer, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->SGCUSWVer), 1);
+    224          #endif
+    225          
+    226          	rlen += GenAidData(Aid_FwdAttn1_3G, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->FwdAttn1_3G), 1);
+    227          	rlen += GenAidData(Aid_FwdAttn2_3G, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->FwdAttn2_3G), 1);
+    228          	rlen += GenAidData(Aid_FwdAttn3_3G, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->FwdAttn3_3G), 1);
+    229          	rlen += GenAidData(Aid_FwdAttn4_3G, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->FwdAttn4_3G), 1);
+    230          
+    231          	rlen += GenAidData(Aid_RvsAttn1_3G, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->RvsAttn1_3G), 1);
+    232          	rlen += GenAidData(Aid_RvsAttn2_3G, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->RvsAttn2_3G), 1);
+    233          	rlen += GenAidData(Aid_RvsAttn3_3G, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->RvsAttn3_3G), 1);
+    234          	rlen += GenAidData(Aid_RvsAttn4_3G, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->RvsAttn4_3G), 1);
+    235          
+    236          	rlen += GenAidData(Aid_Rvs0AttnOffset_3G, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->Rvs0AttnOffset_3G), 1); 
+    237          	rlen += GenAidData(Aid_FwdPwr_NODEB_3G, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->FwdPwr_NODEB_3G), 2);
+    238          	rlen += GenAidData(Aid_FwdPwr_HPA_3G, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->FwdPwrHPA_3G), 2);
+    239          
+    240          	rlen += GenAidData(Aid_RvsOscLvl, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->RvsOscLvl), 1);	
+    241          	rlen += GenAidData(Aid_CurrentHPATemp, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->CurrentHPATemp), 1);
+    242          	rlen += GenAidData(Aid_FwdInAttnOffset_3G, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->FwdInAttnOffset_3G), 1); 
+    243          	rlen += GenAidData(Aid_FwdOutAttnOffset_3G, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->FwdOutAttnOffset_3G), 1); 
+    244          	rlen += GenAidData(Aid_FwdOutAttnREPOffset_3G, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->FwdOutAttnREPOffset_3G), 1); 
+    245          	rlen += GenAidData(Aid_FwdOutAttnTemp_3G, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->FwdOutAttnTemp_3G), 1); 
+    246          	rlen += GenAidData(Aid_FwdOutREPTempAttn_3G, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->FwdOutREPTempAttn_3G), 1); 
+    247          	rlen += GenAidData(Aid_TotalPwrOnOff_3G, (INT8U *)&dptr[rlen], (INT8U *)&(Sts->TotalPwrOnOff_3G), 1); 
+    248          
+    249          	return rlen;
+    250          }
+    251          
+    252          INT8U ItitReallyUnknown(INT16U AID_Command)
+    253          {
+    254          	INT8U rval = TRUE;
+    255          	
+    256          	switch(AID_Command)
+    257          	{
+    258          		case Aid_RepeaterAlarm:
+    259          			rval = FALSE;
+    260          		break;
+    261          	}
+    262          	return rval;
+    263          }
+    264          
+    265          
+    266          
+    267          INT8U SetCtrlData(INT16U AID_Command, INT8U *AID_Value, INT8U Length, EE_BACK1 *tptr)
+    268          {
+    269          	INT8U rval = 0;
+    270          	
+    271          	__BeaconStsStr *Sts = BeaconSts;
+    272          
+    273          	switch(AID_Command)
+    274          	{
+    275          		case Aid_TempUpperLmt:
+    276          			Sts->TempUpperLmt = AID_Value[0];
+    277          			tptr->BackUp.TempUpperLmt = Sts->TempUpperLmt;
+    278          			rval = TRUE;
+    279          		break;
+    280          		
+    281          		case Aid_TXCUModel:
+    282          #ifdef __SUNWAVE
+    283          			TXCUCtrl->Type = AID_Value[0];
+    284          			TXCUCtrl->Ctrl.Type = SET;
+    285          #endif
+    286          			{
+    287          				Sts->TXCUModel = AID_Value[0];
+    288          				tptr->BackUp.TXCUModel = Sts->TXCUModel;
+    289          
+    290          				
+    291          				switch(AID_Value[0])
+    292          				{
+    293          					case 1:		Sts->RepeaterType[1] = __COPY_IN;	break;
+    294          					case 2:		Sts->RepeaterType[1] = __COPY_OUT;	break;
+    295          					case 3:		Sts->RepeaterType[1] = __GEN_IN;	break;
+    296          					case 4:		Sts->RepeaterType[1] = __GEN_OUT;	break;
+    297          					case 5:		Sts->RepeaterType[1] = __COPY_RACK;	break;
+    298          					case 6:		Sts->RepeaterType[1] = __GEN_RACK;	break;
+    299          					default:	Sts->RepeaterType[1] = __COPY_IN;	break;
+    300          				}
+    301          				tptr->BackUp.RepeaterType = Sts->RepeaterType[1];
+    302          			}
+    303          			rval = TRUE;
+    304          		break;
+    305          		
+    306          		case Aid_FwdInUpperLmt_3G:
+    307          			Sts->FwdInUpperLmt_3G = AID_Value[0];
+    308          			tptr->BackUp.FwdInUpperLmt_3G = Sts->FwdInUpperLmt_3G;
+    309          			rval = TRUE;			
+    310          		break;
+    311          
+    312          		case Aid_FwdInLowerLmt_3G:
+    313          			Sts->FwdInLowerLmt_3G = AID_Value[0];
+    314          			tptr->BackUp.FwdInLowerLmt_3G = Sts->FwdInLowerLmt_3G;
+    315          			rval = TRUE;			
+    316          		break;
+    317          		
+    318          		case Aid_FwdOutUpperLmt_3G:
+    319          			Sts->FwdOutUpperLmt_3G[0] = AID_Value[0];
+    320          			Sts->FwdOutUpperLmt_3G[1] = AID_Value[1];
+    321          			
+    322          			tptr->BackUp.FwdOutUpperLmt_3G[0] = Sts->FwdOutUpperLmt_3G[0];
+    323          			tptr->BackUp.FwdOutUpperLmt_3G[1] = Sts->FwdOutUpperLmt_3G[1];
+    324          			rval = TRUE;			
+    325          		break;
+    326          
+    327          		case Aid_FwdOutLowerLmt_3G:
+    328          			Sts->FwdOutLowerLmt_3G[0] = AID_Value[0];
+    329          			Sts->FwdOutLowerLmt_3G[1] = AID_Value[1];
+    330          			
+    331          			tptr->BackUp.FwdOutLowerLmt_3G[0] = Sts->FwdOutLowerLmt_3G[0];
+    332          			tptr->BackUp.FwdOutLowerLmt_3G[1] = Sts->FwdOutLowerLmt_3G[1];
+    333          			rval = TRUE;			
+    334          		break;
+    335          
+    336          		case Aid_FwdOut_REPUpperLmt_3G:
+    337          			Sts->FwdOut_REPUpperLmt_3G[0] = AID_Value[0];
+    338          			Sts->FwdOut_REPUpperLmt_3G[1] = AID_Value[1];
+    339          			
+    340          			tptr->BackUp.FwdOut_REPUpperLmt_3G[0] = Sts->FwdOut_REPUpperLmt_3G[0];
+    341          			tptr->BackUp.FwdOut_REPUpperLmt_3G[1] = Sts->FwdOut_REPUpperLmt_3G[1];
+    342          			rval = TRUE;			
+    343          		break;
+    344          		
+    345          		case Aid_FwdOut_REPLowerLmt_3G:
+    346          			Sts->FwdOut_REPLowerLmt_3G[0] = AID_Value[0];
+    347          			Sts->FwdOut_REPLowerLmt_3G[1] = AID_Value[1];
+    348          			
+    349          			tptr->BackUp.FwdOut_REPLowerLmt_3G[0] = Sts->FwdOut_REPLowerLmt_3G[0];
+    350          			tptr->BackUp.FwdOut_REPLowerLmt_3G[1] = Sts->FwdOut_REPLowerLmt_3G[1];
+    351          			rval = TRUE;			
+    352          		break;
+    353          
+    354          		case Aid_FwdInAttn_3G:
+    355          #ifdef __SUNWAVE
+    356          			TXCUCtrl->FwdInAttn_3G = AID_Value[0];
+    357          			TXCUCtrl->Ctrl.FwdInAttn_3G = SET;
+    358          #else
+    359          			Sts->FwdInAttn_3G = AID_Value[0];
+    360          			tptr->BackUp.FwdInAttn_3G = Sts->FwdInAttn_3G;
+    361          			rval = TRUE;			
+    362          #endif
+    363          		break;
+    364          
+    365          		case Aid_FwdOutAttn_3G:
+    366          #ifdef __SUNWAVE
+    367          			TXCUCtrl->FwdOut1Attn_3G = AID_Value[0];
+    368          			TXCUCtrl->Ctrl.FwdOut1Attn_3G = SET;
+    369          			TXCUCtrl->Ctrl.FwdOut1AttnALC_3G = 0;
+    370          #else
+    371          			Sts->FwdOutAttn_3G = AID_Value[0];
+    372          			tptr->BackUp.FwdOutAttn_3G = Sts->FwdOutAttn_3G;
+    373          			rval = TRUE;
+    374          #endif
+    375          			Sts->FwdOutAttnInit = AID_Value[0];		
+    376          		break;
+    377          
+    378              case Aid_FwdAmpOff_3G:
+    379          #ifdef __SUNWAVE
+    380          			PauCtrl->FwdAmpOff_3G = AID_Value[0];
+    381          			PauCtrl->Ctrl.Bit.FwdAmpOff_3G = SET;
+    382          #else
+    383          
+    384          #endif			
+    385          			if(AID_Value[0] == Enable)
+    386          			{
+    387          				Sts->BeaconAlm.FwdAmpHighTempFail_3G = 0;
+    388          				Sts->BeaconAlm.FwdAmpOvrPwrFail_3G = 0;
+    389          				Sts->BeaconAlm.FwdAmpVSWRFail_3G = 0;
+    390          			}
+    391          			
+    392          			RvsOSCStep_3G = 0;
+    393          			RvsShutCnt_3G = 0;
+    394          			Sts->BeaconAlm.RvsOsc_3G = 0;
+    395          			Sts->BeaconAlm.RvsOsc_3G_LED = 0;
+    396          			Sts->FwdAmpOff_3G = AID_Value[0];
+    397          			Sts->BeaconAlm.FwdAmpOff_3G = AID_Value[0];
+    398          			Sts->FwdAmpOff_3G = AID_Value[0];
+    399          			tptr->BackUp.FwdAmpOff_3G = AID_Value[0];
+    400          			rval = TRUE;
+    401          		break;
+    402          		
+    403          		case Aid_FwdOutAttn_REP_3G:
+    404          #ifdef __SUNWAVE
+    405          			TXCUCtrl->FwdOut2Attn_3G = AID_Value[0];
+    406          			TXCUCtrl->Ctrl.FwdOut2Attn_3G = SET;
+    407          			TXCUCtrl->Ctrl.FwdOut2AttnALC_3G = 0;
+    408          #else
+    409          			Sts->FwdOutAttn_REP_3G = AID_Value[0];
+    410          			tptr->BackUp.FwdOutAttn_REP_3G = Sts->FwdOutAttn_REP_3G;
+    411          			rval = TRUE;
+    412          #endif
+    413          			Sts->FwdOutAttnREPInit = AID_Value[0];
+    414          		break;
+    415          
+    416          		case Aid_FwdInFA_3G:
+    417          		case Aid_RvsOutFA_3G:
+    418          #ifdef __SUNWAVE
+    419          			TXCUCtrl->FwdInFA_3G = AID_Value[0];
+    420          			TXCUCtrl->Ctrl.FwdInFA_3G = SET;
+    421          #endif
+    422          // 공통상황
+    423          			Sts->FwdInFA_3G = AID_Value[0];
+    424          			Sts->RvsOutFA_3G = AID_Value[0];
+    425          			tptr->BackUp.FwdInFA_3G = Sts->RvsOutFA_3G;
+    426          			rval = TRUE;
+    427          
+    428          			if(AID_Value[0] != 0x00)	// offcase
+    429          			{
+    430          				TimerRegist(TimerPllRefresh, Time100mSec*3L);
+    431          				Sts->BeaconAlm.LocalFail_3G = 0;
+    432          			}
+    433          		break;
+    434          
+    435          		case Aid_FwdOutFA1_3G:
+    436          		case Aid_RvsInFA1_3G:
+    437          #ifdef __SUNWAVE
+    438          			TXCUCtrl->FwdOutFA1_3G = AID_Value[0];
+    439          			TXCUCtrl->Ctrl.FwdOutFA1_3G = SET;
+    440          #endif
+    441          // 공통상황
+    442          			Sts->FwdOutFA1_3G = AID_Value[0];
+    443          			Sts->RvsInFA1_3G = AID_Value[0];
+    444          			tptr->BackUp.FwdOutFA1_3G = Sts->RvsInFA1_3G;
+    445          			rval = TRUE;
+    446          
+    447          			if(AID_Value[0] != 0x00)	// offcase
+    448          			{
+    449          				TimerRegist(TimerPllRefresh, Time100mSec*3L);
+    450          				Sts->BeaconAlm.LocalFail_3G = 0;
+    451          			}
+    452          		break;
+    453          
+    454          		case Aid_FwdOutFA2_3G:
+    455          		case Aid_RvsInFA2_3G:
+    456          #ifdef __SUNWAVE
+    457          			TXCUCtrl->FwdOutFA2_3G = AID_Value[0];
+    458          			TXCUCtrl->Ctrl.FwdOutFA2_3G = SET;
+    459          #endif
+    460          // 공통상황
+    461          			Sts->FwdOutFA2_3G = AID_Value[0];
+    462          			Sts->RvsInFA2_3G = AID_Value[0];
+    463          			tptr->BackUp.FwdOutFA2_3G = Sts->RvsInFA2_3G;
+    464          			rval = TRUE;
+    465          			
+    466          			if(AID_Value[0] != 0x00)	// offcase
+    467          			{
+    468          				TimerRegist(TimerPllRefresh, Time100mSec*3L);
+    469          				Sts->BeaconAlm.LocalFail_3G = 0;
+    470          			}
+    471          		break;
+    472          
+    473          		case Aid_Fwd10MHzSelect_3G:
+    474          			Sts->Fwd10MHzSelect_3G = AID_Value[0];
+    475          #ifdef __SUNWAVE
+    476          			TXCUCtrl->Fwd10MHzSelect_3G = AID_Value[0];
+    477          			TXCUCtrl->Ctrl.Fwd10MHzSelect_3G = SET;
+    478          #endif
+    479          		break; 
+    480          
+    481          		case Aid_OutSwitchTime_3G:
+    482          #ifdef __SUNWAVE
+    483          			TXCUCtrl->OutSwitchTime_3G[0] = AID_Value[0];
+    484          			TXCUCtrl->OutSwitchTime_3G[1] = AID_Value[1];
+    485          			TXCUCtrl->Ctrl.OutSwitchTime_3G = SET;
+    486          #elif defined(__GT_T)
+    487          			Sts->OutSwitchTime_3G.Byte.High = AID_Value[0];
+    488                      Sts->OutSwitchTime_3G.Byte.Low = AID_Value[1];
+    489          			if(Sts->OutSwitchTime_3G.Data == 0) Sts->OutSwitchTime_3G.Data = 1;
+    490          			tptr->BackUp.OutSwitchTime_3G = Sts->OutSwitchTime_3G;
+    491          			rval = TRUE;
+    492          #endif
+    493          		break;
+    494          
+    495          #ifdef __SUNWAVE
+    496          		case Aid_CellBarred:
+    497          			SGCUCtrl->CellBarred = AID_Value[0];
+    498          			SGCUCtrl->Ctrl.CellBarred = SET;
+    499          		break;
+    500          
+    501          		case Aid_ResBarred:
+    502          			SGCUCtrl->ResBarred = AID_Value[0];
+    503          			SGCUCtrl->Ctrl.ResBarred = SET;
+    504          		break;
+    505          		
+    506          		case Aid_T_Barred:
+    507          			SGCUCtrl->T_Barred = AID_Value[0];
+    508          			SGCUCtrl->Ctrl.T_Barred = SET;
+    509          		break;
+    510          		
+    511          		case Aid_T_Cell:
+    512          			SGCUCtrl->T_Cell = AID_Value[0];
+    513          			SGCUCtrl->Ctrl.T_Cell = SET;
+    514          		break;
+    515          		
+    516          		case Aid_MeasurePeriod:
+    517          			SGCUCtrl->MeasurePeriod = AID_Value[0];
+    518          			SGCUCtrl->Ctrl.MeasurePeriod = SET;
+    519          		break;
+    520          #endif
+    521          		case Aid_RFPassLossOnoff_3G:
+    522          			if(FA_Aloc_AutoMode_Set(NULL))
+    523          			{
+    524          				TimerRegist(Timer_ALC, Time100mSec*20L);
+    525          				TimerRegist(TimerCWOff, Time1Sec*10L);
+    526          				Sts->CW0OnOff_3G = Enable;
+    527          				Sts->RFPathLossResult_3G = PathIng;
+    528          			}
+    529          		break;
+    530          
+    531          		case Aid_OutSwitchAttnOnOff_3G:
+    532          			Sts->OutSwitchAttnOnOff_3G = AID_Value[0];
+    533          			tptr->BackUp.OutSwitchAttnOnOff_3G = Sts->OutSwitchAttnOnOff_3G;
+    534          			rval = TRUE;
+    535          		break;
+    536                  
+    537          		case Aid_FwdInALCLvl:
+    538          			Sts->FwdInALCLvl = AID_Value[0];
+    539          			tptr->BackUp.FwdInALCLvl = Sts->FwdInALCLvl;
+    540          			rval = TRUE;
+    541          		break;
+    542          			
+    543          		case Aid_Rvs0Attn_3G:
+    544          			Sts->Rvs0Attn_3G = AID_Value[0];
+    545          			tptr->BackUp.Rvs0Attn_3G = Sts->Rvs0Attn_3G;
+    546          			rval = TRUE;
+    547          		break;
+    548          
+    549          		case Aid_RvsInUpperLmt_3G:
+    550          			Sts->RvsInUpperLmt_3G = AID_Value[0];
+    551          			tptr->BackUp.RvsInUpperLmt_3G = Sts->RvsInUpperLmt_3G;
+    552          			rval = TRUE;
+    553          		break;
+    554          
+    555          		case Aid_RvsInLowerLmt_3G:
+    556          			Sts->RvsInLowerLmt_3G = AID_Value[0];
+    557          			tptr->BackUp.RvsInLowerLmt_3G = Sts->RvsInLowerLmt_3G;
+    558          			rval = TRUE;
+    559          		break;
+    560          
+    561          		case Aid_Rvs0OutUpperLmt_3G:
+    562          			Sts->Rvs0OutUpperLmt_3G[0] = AID_Value[0];
+    563          			Sts->Rvs0OutUpperLmt_3G[1] = AID_Value[1];
+    564          			tptr->BackUp.Rvs0OutUpperLmt_3G[0] = Sts->Rvs0OutUpperLmt_3G[0];
+    565          			tptr->BackUp.Rvs0OutUpperLmt_3G[1] = Sts->Rvs0OutUpperLmt_3G[1];
+    566          			rval = TRUE;
+    567          		break;
+    568          
+    569          		case Aid_Rvs0OutLowerLmt_3G:
+    570          			Sts->Rvs0OutLowerLmt_3G[0] = AID_Value[0];
+    571          			Sts->Rvs0OutLowerLmt_3G[1] = AID_Value[1];
+    572          			tptr->BackUp.Rvs0OutLowerLmt_3G[0] = Sts->Rvs0OutLowerLmt_3G[0];
+    573          			tptr->BackUp.Rvs0OutLowerLmt_3G[1] = Sts->Rvs0OutLowerLmt_3G[1];
+    574          			rval = TRUE;
+    575          		break;
+    576          
+    577              	case Aid_FwdInPllFreqOffset_3G:
+    578          #ifdef __GT_T			
+    579          		case Aid_RvsOutPllFreqOffset_3G:
+    580          #endif
+    581          #ifdef __SUNWAVE
+    582          			TXCUCtrl->FwdInPLLOffsetFreq_3G = AID_Value[0];
+    583          			TXCUCtrl->Ctrl.FwdInPLLOffsetFreq_3G = SET;
+    584          #endif
+    585          
+    586          #ifdef __GT_T
+    587          			Sts->FwdInPllFreqOffset_3G = AID_Value[0];
+    588          			tptr->BackUp.FwdInPllFreqOffset_3G = Sts->FwdInPllFreqOffset_3G;
+    589          
+    590          			Sts->RvsOutPllFreqOffset_3G = AID_Value[0];
+    591          			tptr->BackUp.RvsOutPllFreqOffset_3G = Sts->RvsOutPllFreqOffset_3G;
+    592          			rval = TRUE;
+    593          #endif
+    594          		break;
+    595          #ifdef __SUNWAVE
+    596          		case Aid_RvsOutPllFreqOffset_3G:
+    597          			Sts->RvsOutPllFreqOffset_3G = AID_Value[0];
+    598          			tptr->BackUp.RvsOutPllFreqOffset_3G = Sts->RvsOutPllFreqOffset_3G;
+    599          			rval = TRUE;
+    600          
+    601          		break;
+    602          #endif
+    603          
+    604              	case Aid_FwdOut1PllFreqOffset_3G:
+    605          #ifdef __GT_T			
+    606          		case Aid_RvsIn1PllFreqOffset_3G:
+    607          #endif
+    608          
+    609          #ifdef __GT_T
+    610          			Sts->FwdOut1PllFreqOffset_3G = AID_Value[0];
+    611          			tptr->BackUp.FwdOut1PllFreqOffset_3G = Sts->FwdOut1PllFreqOffset_3G;
+    612          
+    613          			Sts->RvsIn1PllFreqOffset_3G = AID_Value[0];
+    614          			tptr->BackUp.RvsIn1PllFreqOffset_3G = Sts->RvsIn1PllFreqOffset_3G;
+    615          			rval = TRUE;
+    616          #endif
+    617          		break;
+    618          
+    619          #ifdef __SUNWAVE
+    620          		case Aid_RvsIn1PllFreqOffset_3G:
+    621          			Sts->RvsIn1PllFreqOffset_3G = AID_Value[0];
+    622          			tptr->BackUp.RvsIn1PllFreqOffset_3G = Sts->RvsIn1PllFreqOffset_3G;
+    623          			rval = TRUE;
+    624          		break;
+    625          #endif
+    626              	case Aid_FwdOut2PllFreqOffset_3G:
+    627          #ifdef __GT_T			
+    628          		case Aid_RvsIn2PllFreqOffset_3G:
+    629          #endif
+    630          
+    631          #ifdef __GT_T
+    632          			Sts->FwdOut2PllFreqOffset_3G = AID_Value[0];
+    633          			tptr->BackUp.FwdOut2PllFreqOffset_3G = Sts->FwdOut2PllFreqOffset_3G;
+    634          
+    635          			Sts->RvsIn2PllFreqOffset_3G = AID_Value[0];
+    636          			tptr->BackUp.RvsIn2PllFreqOffset_3G = Sts->RvsIn2PllFreqOffset_3G;
+    637          			rval = TRUE;
+    638          #endif
+    639          		break;					
+    640          
+    641          #ifdef __SUNWAVE
+    642          		case Aid_RvsIn2PllFreqOffset_3G:
+    643          			Sts->RvsIn2PllFreqOffset_3G = AID_Value[0];
+    644          			tptr->BackUp.RvsIn2PllFreqOffset_3G = Sts->RvsIn2PllFreqOffset_3G;
+    645          			rval = TRUE;
+    646          		break;
+    647          #endif
+    648          
+    649          		case Aid_FwdOutPwrOffset_3G:
+    650          			Sts->FwdOutPwrOffset_3G = AID_Value[0];
+    651          			
+    652          			tptr->BackUp.FwdOutPwrOffset_3G = Sts->FwdOutPwrOffset_3G;
+    653          			rval = TRUE;
+    654          		break;
+    655          		
+    656          		case Aid_FwdInPwrOffset_3G:
+    657          			Sts->FwdInPwrOffset_3G = AID_Value[0];
+    658          			tptr->BackUp.FwdInPwrOffset_3G = Sts->FwdInPwrOffset_3G;
+    659          			rval = TRUE;
+    660          		break;
+    661          
+    662          		case Aid_FwdPwrREPOffset_3G:
+    663          			Sts->FwdPwrREPOffset_3G = AID_Value[0];
+    664          			tptr->BackUp.FwdPwr_REPOffset_3G = Sts->FwdPwrREPOffset_3G;
+    665          			rval = TRUE;
+    666          		break;
+    667          
+    668          		case Aid_Rvs0OutPwrOffset_3G:
+    669          			Sts->Rvs0OutPwrOffset_3G = AID_Value[0];
+    670          			tptr->BackUp.Rvs0OutPwrOffset_3G = Sts->Rvs0OutPwrOffset_3G;
+    671          			rval = TRUE;
+    672          		break;
+    673          		
+    674          		case Aid_RvsInPwrOffset_3G:
+    675          			Sts->RvsInPwrOffset_3G = AID_Value[0];
+    676          			tptr->BackUp.RvsInPwrOffset_3G = Sts->RvsInPwrOffset_3G;
+    677          			rval = TRUE;
+    678          		break;
+    679          
+    680          		case Aid_FwdOutAttnOffset_3G:
+    681          #ifdef __SUNWAVE
+    682          			TXCUCtrl->FwdOutAttnOffset_3G = AID_Value[0];
+    683          			TXCUCtrl->Ctrl.FwdOutAttnOffset_3G = SET;
+    684          #else
+    685          			Sts->FwdOutAttnOffset_3G = AID_Value[0];
+    686          			tptr->BackUp.FwdOutAttnOffset_3G = Sts->FwdOutAttnOffset_3G;
+    687          			rval = TRUE;
+    688          #endif
+    689          		break;
+    690          
+    691          		case Aid_FwdOutAttnREPOffset_3G:
+    692          #ifdef __SUNWAVE
+    693          			TXCUCtrl->FwdOutAttnREPOffset_3G = AID_Value[0];
+    694          			TXCUCtrl->Ctrl.FwdOutAttnREPOffset_3G = SET;
+    695          #else
+    696          			Sts->FwdOutAttnREPOffset_3G = AID_Value[0];
+    697          			tptr->BackUp.FwdOutAttnREPOffset_3G = Sts->FwdOutAttnREPOffset_3G;
+    698          			rval = TRUE;
+    699          #endif
+    700          		break;
+    701          
+    702          
+    703          		case Aid_FwdOutAttnTemp_3G:
+    704          #ifdef __SUNWAVE
+    705          
+    706          #else
+    707          			Sts->FwdOutAttnTemp_3G = AID_Value[0];
+    708          			tptr->BackUp.FwdOutAttnTemp_3G = Sts->FwdOutAttnTemp_3G;
+    709          			rval = TRUE;
+    710          #endif
+    711          		break;
+    712          		
+    713          		case Aid_FwdOutREPTempAttn_3G:
+    714          #ifdef __SUNWAVE
+    715          			
+    716          #else
+    717          			Sts->FwdOutREPTempAttn_3G = AID_Value[0];
+    718          			tptr->BackUp.FwdOutREPTempAttn_3G = Sts->FwdOutREPTempAttn_3G;
+    719          			rval = TRUE;
+    720          #endif
+    721          		break;
+    722          		case Aid_FwdInAttnOffset_3G:
+    723          #ifdef __SUNWAVE
+    724          			TXCUCtrl->FwdInAttnOffset_3G = AID_Value[0];
+    725          			TXCUCtrl->Ctrl.FwdInAttnOffset_3G = SET;
+    726          #else
+    727          			Sts->FwdInAttnOffset_3G = AID_Value[0];
+    728          			tptr->BackUp.FwdInAttnOffset_3G = Sts->FwdInAttnOffset_3G;
+    729          			rval = TRUE;
+    730          #endif
+    731          		break;
+    732          
+    733          		case Aid_Rvs0AttnOffset_3G:
+    734          			Sts->Rvs0AttnOffset_3G = AID_Value[0];
+    735          			tptr->BackUp.Rvs0AttnOffset_3G = Sts->Rvs0AttnOffset_3G;
+    736          			rval = TRUE;
+    737          		break;
+    738          
+    739          		case Aid_TotalPwrOnOff_3G:
+    740          			Sts->TotalPwrOnOff_3G = AID_Value[0];
+    741          		break;
+    742          
+    743          		case Aid_TPTL_OnOff:
+    744          			Sts->TPTL_OnOff = AID_Value[0];
+    745          		break;
+    746          		
+    747          		case Aid_TempOffset:
+    748          			Sts->TempOffset = AID_Value[0];
+    749          			tptr->BackUp.TempOffset = Sts->TempOffset;
+    750          			rval = TRUE;
+    751          		break;
+    752                  
+    753          		case Aid_FwdInAttnTemp_3G:
+    754          #ifdef __SUNWAVE
+    755          
+    756          #else
+    757          			Sts->FwdInAttnTemp_3G = AID_Value[0];
+    758          			tptr->BackUp.FwdInAttnTemp_3G = Sts->FwdInAttnTemp_3G;
+    759          			rval = TRUE;
+    760          #endif			
+    761          		break;
+    762          		
+    763          		case Aid_Rvs0AttnTemp_3G:
+    764          			Sts->Rvs0AttnTemp_3G = AID_Value[0];
+    765          			tptr->BackUp.Rvs0AttnTemp_3G = Sts->Rvs0AttnTemp_3G;
+    766          			rval = TRUE;
+    767          		break;
+    768          
+    769          
+    770          
+    771          		case Aid_FwdInPllFreqTemp_3G:
+    772          #ifdef __GT_T
+    773          		case Aid_RvsOutPllFreqTemp_3G:
+    774          #endif
+    775          			Sts->FwdInPllFreqTemp_3G.Byte.High = AID_Value[0];
+    776          			Sts->FwdInPllFreqTemp_3G.Byte.Low = AID_Value[1];
+    777          			tptr->BackUp.FwdInPllFreqTemp_3G.Byte.High = Sts->FwdInPllFreqTemp_3G.Byte.High;
+    778          			tptr->BackUp.FwdInPllFreqTemp_3G.Byte.Low = Sts->FwdInPllFreqTemp_3G.Byte.Low;
+    779          #ifdef __GT_T
+    780          			Sts->RvsOutPllFreqTemp_3G.Byte.High = AID_Value[0];
+    781          			Sts->RvsOutPllFreqTemp_3G.Byte.Low = AID_Value[1];
+    782          			tptr->BackUp.RvsOutPllFreqTemp_3G.Byte.High = Sts->RvsOutPllFreqTemp_3G.Byte.High;
+    783          			tptr->BackUp.RvsOutPllFreqTemp_3G.Byte.Low = Sts->RvsOutPllFreqTemp_3G.Byte.Low;
+    784          #endif
+    785          			rval = TRUE;
+    786          		break;
+    787          		
+    788          		case Aid_FwdOut1PllFreqTemp_3G:
+    789          #ifdef __GT_T
+    790          		case Aid_RvsIn1PllFreqTemp_3G:
+    791          #endif
+    792          			Sts->FwdOut1PllFreqTemp_3G.Byte.High = AID_Value[0];
+    793          			Sts->FwdOut1PllFreqTemp_3G.Byte.Low = AID_Value[1];
+    794          			tptr->BackUp.FwdOut1PllFreqTemp_3G.Byte.High = Sts->FwdOut1PllFreqTemp_3G.Byte.High;
+    795          			tptr->BackUp.FwdOut1PllFreqTemp_3G.Byte.Low = Sts->FwdOut1PllFreqTemp_3G.Byte.Low;
+    796          #ifdef __GT_T
+    797          			Sts->RvsIn1PllFreqTemp_3G.Byte.High = AID_Value[0];
+    798          			Sts->RvsIn1PllFreqTemp_3G.Byte.Low = AID_Value[1];
+    799          			tptr->BackUp.RvsIn1PllFreqTemp_3G.Byte.High = Sts->RvsIn1PllFreqTemp_3G.Byte.High;
+    800          			tptr->BackUp.RvsIn1PllFreqTemp_3G.Byte.Low = Sts->RvsIn1PllFreqTemp_3G.Byte.Low;
+    801          #endif
+    802          			rval = TRUE;
+    803          		break;
+    804          
+    805          		case Aid_FwdOut2PllFreqTemp_3G:
+    806          #ifdef	__GT_T
+    807          		case Aid_RvsIn2PllFreqTemp_3G:
+    808          #endif
+    809          			Sts->FwdOut2PllFreqTemp_3G.Byte.High = AID_Value[0];
+    810          			Sts->FwdOut2PllFreqTemp_3G.Byte.Low = AID_Value[1];
+    811          			tptr->BackUp.FwdOut2PllFreqTemp_3G.Byte.High = Sts->FwdOut2PllFreqTemp_3G.Byte.High;
+    812          			tptr->BackUp.FwdOut2PllFreqTemp_3G.Byte.Low = Sts->FwdOut2PllFreqTemp_3G.Byte.Low;
+    813          #ifdef __GT_T
+    814          			Sts->RvsIn2PllFreqTemp_3G.Byte.High = AID_Value[0];
+    815          			Sts->RvsIn2PllFreqTemp_3G.Byte.Low = AID_Value[1];
+    816          			tptr->BackUp.RvsIn2PllFreqTemp_3G.Byte.High = Sts->RvsIn2PllFreqTemp_3G.Byte.High;
+    817          			tptr->BackUp.RvsIn2PllFreqTemp_3G.Byte.Low = Sts->RvsIn2PllFreqTemp_3G.Byte.Low;
+    818          #endif
+    819          		break;
+    820          
+    821          
+    822          		case Aid_DrvFwdAmpOnOff_3G:
+    823          			RvsOSCStep_3G = 0;
+    824          			RvsShutCnt_3G = 0;
+    825          			Sts->BeaconAlm.RvsOsc_3G = 0;
+    826          			Sts->BeaconAlm.RvsOsc_3G_LED = 0;
+    827          			Sts->BeaconAlm.LocalFail_3G = 0;
+    828          			Sts->DrvFwdAmpOnOff_3G = AID_Value[0];
+    829           		break;
+    830          
+    831          		case Aid_DrvRvsAmpOnOff_3G:
+    832          			RvsOSCStep_3G = 0;
+    833          			RvsShutCnt_3G = 0;
+    834          			Sts->BeaconAlm.RvsOsc_3G = 0;
+    835          			Sts->BeaconAlm.LocalFail_3G = 0;
+    836          			Sts->BeaconAlm.RvsOsc_3G_LED = 0;
+    837          			Sts->DrvRvsAmpOnOff_3G = AID_Value[0];
+    838           		break;
+    839          
+    840          		case Aid_CW0OnOff_3G:
+    841          			Sts->CW0OnOff_3G = AID_Value[0];
+    842          			TimerRegist(TimerCWOff, Time1Sec*10L);
+    843           		break;
+    844          
+    845          		case Aid_RvsOscLvl:
+    846          			Sts->RvsOscLvl = AID_Value[0];
+    847          			tptr->BackUp.RvsOscLvl = Sts->RvsOscLvl;
+    848          			rval = TRUE;
+    849          		break;
+    850          
+    851          		case Aid_RCUReset:
+    852          			if(AID_Value[0] == SET){
+    853          				ResetCaseBackup(0x01);
+    854          				ResetStart();
+    855          			}			
+    856          		break;
+    857          
+    858          		case Aid_AlarmMask:
+    859          			Sts->AlarmMask = AID_Value[0] & 0x01;
+    860          			tptr->BackUp.AlarmMask = Sts->AlarmMask & 0x01;
+    861          			rval = TRUE;
+    862          		break;
+    863          
+    864          		case Aid_FwdAttn1_3G:
+    865          			FPGA_LED_Buff &= ~(0x07 << 0);
+    866          			FPGA_LED_Buff |= (AID_Value[0] & 0x07) << 0;
+    867          		break;
+    868          
+    869                  case Aid_FwdAttn2_3G:
+    870          			FPGA_LED_Buff &= ~(0x07 << 3);
+    871          			FPGA_LED_Buff |= (AID_Value[0] & 0x07) << 3;
+    872          		break;
+    873          	/////////////////////////////////////////////////////////////
+    874          		//case Aid_FwdInAttn_2G:
+    875          			//Sts->FwdALCInit_2G = 0;
+    876          			//TimerRegist(Timer_ALC, Time1Sec*2L);
+    877                  default:
+    878          			//if(!ItitReallyUnknown(AID_Command)) break;
+    879                    
+    880                    /**
+    881          			if(Ctrl && Udc2InsertCheck(1))
+    882          			{				
+    883          				if((Digital_CtrlCnt + 2 + 1 + Length) < sizeof(Digital_CtrlData))
+    884          				{
+    885          					Digital_CtrlCnt += GenAidData(AID_Command, (INT8U *)&Digital_CtrlData[Digital_CtrlCnt], (INT8U *)&AID_Value[0], Length);
+    886          				}
+    887          			}
+    888                    ***/
+    889          		break;
+    890          	}
+    891            	return rval;
+    892          }
+    893          
+    894          INT8U AnalyzeAidData(__ProtocolPtr *nPtr, INT8U Ctrl)
+    895          {
+    896          	INT8U i = 0;
+    897          	INT8U A_ID[2];
+    898          	INT8U rAID_Value[40];
+    899          	INT8U Length;
+    900          
+    901          	INT16U Cnt = 0;
+    902          	INT16U AID_Command;
+    903          	INT32U cpu_sr;
+    904          	__WRCSSIO *Recv = nPtr->WRCSRecv;
+    905          	__BODYFRAME *BodyFrame = &Recv->BodyFrame[Recv->cBody%2];
+    906          
+    907          	INT8U rval = FALSE;
+    908          
+    909          	if(Ctrl)
+    910          	{
+    911          #ifdef __SUNWAVE	
+    912          		TXCUSendCnt = 0;
+    913          		TXCURecvCnt = 0;
+    914          		SGCUSendCnt = 0;
+    915          		SGCURecvCnt = 0;
+    916          		PAUSendCnt = 0;
+    917          		PAURecvCnt = 0;
+    918          #endif		
+    919          	}
+    920          	OS_ENTER_CRITICAL();
+    921          	{
+    922          		EE_BACK1 *tptr = (EE_BACK1 *)RoadBackuptobuffer(vEE_BACK1Addr);
+    923          
+    924          		while(BodyFrame->SubLength > Cnt)
+    925          		{
+    926          			A_ID[0] = (INT8U)(BodyFrame->SubData[Cnt++]);
+    927          			A_ID[1] = (INT8U)(BodyFrame->SubData[Cnt++]);
+    928          
+    929          			AID_Command = ((INT16U)(A_ID[0] << 8)& 0xff00) | ((INT16U)(A_ID[1] & 0x00ff));
+    930          			Length = BodyFrame->SubData[Cnt++];
+    931          			if( Length >= sizeof(rAID_Value)) break;
+    932          			for (i = 0; i < Length; i++) rAID_Value[i] = (INT8U)(BodyFrame->SubData[Cnt++]);
+    933          
+    934          			rval += SetCtrlData(AID_Command, rAID_Value, Length, tptr);
+    935          
+    936          			if(Cnt >= BodyFrame->SubLength) break;
+    937          		}
+    938          
+    939          		if(rval)
+    940          		{
+    941          			//write eeprom!!
+    942          			WriteBuffertoBackup(vEE_BACK1Addr, sizeof(EE_BACK1));
+    943          		}
+    944          	}
+    945          	OS_EXIT_CRITICAL();
+    946          	
+    947          	return TRUE;
+    948          }
+    949          
+    950          
+    951          void Initialize(void)
+    952          {
+    953          	__BeaconStsStr *Sts = BeaconSts;
+    954          
+    955          	memcpy(Sts->Flag.Data, 0, sizeof(Sts->Flag));
+    956          
+    957          	Sts->Flag.StsConFail = 1;
+    958          	Sts->Flag.BatteryLow = 1;
+    959          	Sts->Flag.DCFail = 1;
+    960          	Sts->Flag.ACFail = 1;
+    961          	Sts->Flag.TempUpperLmt = 1;
+    962          	Sts->Flag.DoorOpen = 1;
+    963          	Sts->Flag.LocalFail_3G = 1;
+    964          	Sts->Flag.DrvFwdAmpOnOff_3G = 1;
+    965          	Sts->Flag.DrvRvsAmpOnOff_3G = 1;
+    966          	Sts->Flag.FwdOut_REPLowerLmt_3G = 1;
+    967          	Sts->Flag.FwdOut_REPUpperLmt_3G = 1;
+    968          	Sts->Flag.FwdInLowerLmt_3G = 1;
+    969          	Sts->Flag.FwdInUpperLmt_3G = 1;
+    970          	Sts->Flag.FwdOutLowerLmt_3G = 1;
+    971          	Sts->Flag.FwdOutUpperLmt_3G = 1;
+    972          	Sts->Flag.RvsOutLowerLmt_3G = 1;
+    973          	Sts->Flag.RvsOutUpperLmt_3G = 1;
+    974          	Sts->Flag.RvsInLowerLmt_3G = 1;
+    975          	Sts->Flag.RvsInUpperLmt_3G = 1;
+    976          	Sts->Flag.RvsOsc_3G = 1;
+    977          	Sts->Flag.FwdAmpDCFail_3G = 1;
+    978          	Sts->Flag.FwdAmpLinkFail_3G = 1;
+    979          	Sts->Flag.FwdAmpOff_3G = 1;
+    980          	Sts->Flag.FwdAmpDevFail_3G = 1;
+    981          	Sts->Flag.FwdAmpVSWRFail_3G = 1;
+    982          	Sts->Flag.FwdAmpHighTempFail_3G = 1;
+    983          	Sts->Flag.FwdAmpOvrPwrFail_3G = 1;
+    984          
+    985          	Sts->Flag.RvsOsc_3G_LED = 1;
+    986          	Sts->Flag.PwrSupplyLow = 1;
+    987          
+    988          	Sts->Manufacture = __Gtnt;
+    989          	Sts->Supplier = __Gtnt;
+    990          	Sts->AmpManufacture_3G = AmpNCL;
+    991          	Sts->AmpCapability_3G = 45;
+    992          	Sts->RepeaterType[0] = 0x01;
+    993          
+    994          	if( Sts->RepeaterType[1] != __COPY_OUT &&
+    995          		Sts->RepeaterType[1] != __COPY_IN &&
+    996          		Sts->RepeaterType[1] != __GEN_IN &&
+    997          		Sts->RepeaterType[1] != __GEN_OUT &&
+    998          		Sts->RepeaterType[1] != __COPY_RACK &&
+    999          		Sts->RepeaterType[1] != __GEN_RACK ) {
+   1000          
+   1001          		Sts->RepeaterType[1] = __COPY_IN;
+   1002          	}
+   1003          	
+   1004          	Sts->SWVer = SystemVer;
+   1005          	Sts->RCUAddVer = PROGRAMVER;
+   1006          
+   1007          	Sts->DrvFwdAmpOnOff_3G = Enable;
+   1008          	Sts->DrvRvsAmpOnOff_3G = Enable;
+   1009          	Sts->CW0OnOff_3G = Disable;
+   1010          
+   1011          	Sts->CurrFwdAttn1_3G = 0xFF;
+   1012          	Sts->CurrFwdAttn2_3G = 0xFF;
+   1013          	Sts->CurrFwdAttn3_3G = 0xFF;
+   1014          	Sts->CurrFwdAttn4_3G = 0xFF;
+   1015          	
+   1016          	Sts->CurrRvsAttn1_3G = 0xFF;
+   1017          	Sts->CurrRvsAttn2_3G = 0xFF;
+   1018          
+   1019          	Sts->FwdInPwr_3G	 = (-60*2L);
+   1020          	Sts->TPTL_OnOff = Enable;
+   1021          	Sts->TotalPwrOnOff_3G = Enable;
+   1022          	Sts->RFPathLossResult_3G = PathLossEnd;
+   1023          	Sts->StsConFail = 0x00;
+   1024          	Sts->FwdOutAttnInit = Sts->FwdOutAttn_3G;
+   1025          	Sts->FwdOutAttnREPInit = Sts->FwdOutAttn_REP_3G;
+   1026          
+   1027          	if(Sts->RvsOutFA_3G >= 7) Sts->RvsOutFA_3G = 0x00;
+   1028          	if(Sts->RvsInFA1_3G >= 7) Sts->RvsInFA1_3G = 0x00;
+   1029          	if(Sts->RvsInFA2_3G >= 7) Sts->RvsInFA2_3G = 0x00;
+   1030          	if(Sts->FwdInFA_3G >= 7) Sts->FwdInFA_3G = 0x00;
+   1031          	if(Sts->FwdOutFA1_3G >= 7) Sts->FwdOutFA1_3G = 0x00;
+   1032          	if(Sts->FwdOutFA2_3G >= 7) Sts->FwdOutFA2_3G = 0x00;
+   1033          	if(Sts->OutSwitchTime_3G.Data > 400) Sts->OutSwitchTime_3G.Data = 400;
+   1034          	if(Sts->OutSwitchTime_3G.Data == 0) Sts->OutSwitchTime_3G.Data = 1;
+   1035          	if(Sts->Rvs0Gain_3G > (47*2L)) Sts->Rvs0Gain_3G = 47*2L;
+   1036          
+   1037          	Sts->FwdInAttn_3G = (30*2L);
+   1038          
+   1039          	Sts->BeaconAlm.FwdAmpOff_3G = Enable;
+   1040          	Sts->ModuleAlarm.AmpShutDn = Enable;
+   1041          	Sts->BeaconAlm.FwdPllLock_3G = 0;
+   1042          
+   1043          	ModuleInform->Kind = 0xB0;
+   1044          	ModuleInform->SW_Verion = SystemVer;
+   1045          	ModuleInform->Supplier = Sts->Supplier;
+   1046          	ModuleInform->Manufacture = Sts->Manufacture;	// winy_RF
+   1047          	ModuleInform->Type[0] = Sts->RepeaterType[0];
+   1048          	ModuleInform->Type[1] = Sts->RepeaterType[1];
+   1049          }
+   1050          
+   1051          
+   1052          INT16U GenModuleInformSts(INT8U *dptr)
+   1053          {
+   1054          	 INT8U i = 0;
+   1055          	 INT16U rlen = 0;
+   1056          
+   1057          	 dptr[rlen++] = ModuleInform->Kind; 
+   1058          	 dptr[rlen++] = ModuleInform->Type[0];
+   1059          	 dptr[rlen++] = ModuleInform->Type[1];
+   1060          	 dptr[rlen++] = ModuleInform->Supplier; 
+   1061          	 dptr[rlen++] = ModuleInform->Manufacture; 
+   1062          	 dptr[rlen++] = BeaconSts->SWVer; 
+   1063          
+   1064          	 for(i = 0; i < 4; i++)
+   1065          	 {
+   1066           		 dptr[rlen++] = ModuleInform->SerialNo[i];
+   1067          	 }	 
+   1068          
+   1069          	 for(i = 0; i < 3; i++)
+   1070          	 {
+   1071           		 dptr[rlen++] = ModuleInform->Manufacture_Date[i];
+   1072          	 }	 
+   1073          
+   1074          	 for(i = 0; i < 15; i++)
+   1075          	 {
+   1076           		 dptr[rlen++] = ModuleInform->ERP_Code[i];
+   1077          	 }	 
+   1078          
+   1079          	 for(i = 0; i < 4; i++)
+   1080          	 {
+   1081           		 dptr[rlen++] = ModuleInform->Manufacture_Mode[i];
+   1082          	 }	 
+   1083          	 return rlen;
+   1084          
+   1085          }
+   1086          
+   1087          INT16U GenModuleAutoInformSts(INT8U *dptr)
+   1088          {
+   1089          	INT8U i = 0;
+   1090          	INT16U rlen = 0;
+   1091          
+   1092          	for(i = 0; i < sizeof(__ModuleInform); i++)
+   1093          	{
+   1094          		dptr[rlen++] = *((INT8U *)&(ModuleInform->Kind) + i);
+   1095          	}
+   1096          	/************
+   1097          	for(i = 0; i < sizeof(__ModuleInform); i++)
+   1098          	{
+   1099          		dptr[rlen++] = *((INT8U *)&(ModuleInform_2G->Kind) + i);
+   1100          	}	
+   1101          
+   1102          	for(i = 0; i < sizeof(__ModuleInform); i++)
+   1103          	{
+   1104          		dptr[rlen++] = *((INT8U *)&(ModuleInform_3G->Kind) + i);
+   1105          	}	
+   1106          	for(i = 0; i < sizeof(__ModuleInform); i++)
+   1107          	{
+   1108          		dptr[rlen++] = *((INT8U *)&(ModuleInform_WI->Kind) + i);
+   1109          	}	
+   1110          	for(i = 0; i < sizeof(__ModuleInform); i++)
+   1111          	{
+   1112          		dptr[rlen++] = *((INT8U *)&(ModuleInform_Opt->Kind) + i);
+   1113          	}	
+   1114          	****/
+   1115          	return rlen;
+   1116          
+   1117          }
+   1118          
+   1119          void LocalMacCtrlData(__MacAddrStr *ptr)
+   1120          {
+   1121          	INT32U cpu_sr;
+   1122          
+   1123          	OS_ENTER_CRITICAL();
+   1124          	{
+   1125          		INT8U i = 0;
+   1126          		EE_BACK1 *tptr = (EE_BACK1 *)RoadBackuptobuffer(vEE_BACK1Addr);
+   1127          
+   1128          
+   1129          		for(i = 0; i < 6; i++){
+   1130          			tptr->BackUp.MacAddr[i] = ptr->MacAddr[i];
+   1131          		}
+   1132          
+   1133          		WriteBuffertoBackup(vEE_BACK1Addr, sizeof(EE_BACK1));
+   1134          	}
+   1135          	OS_EXIT_CRITICAL();
+   1136          }
+   1137          
+   1138          void LocalIPCtrlData(__IPAddrStr *ptr)
+   1139          {
+   1140          	INT32U cpu_sr;
+   1141          
+   1142          	OS_ENTER_CRITICAL();
+   1143          	{
+   1144          		INT8U i = 0;
+   1145          		
+   1146          		EE_BACK1 *tptr = (EE_BACK1 *)RoadBackuptobuffer(vEE_BACK1Addr);
+   1147          
+   1148          		for(i = 0; i < 4; i++){
+   1149          			tptr->BackUp.IpAddr[i] = ptr->IpAddr[i];
+   1150          			tptr->BackUp.GatewayAddr[i] = ptr->GatewayAddr[i];
+   1151          			tptr->BackUp.SubnetAddr[i] = ptr->SubnetAddr[i];
+   1152          		}
+   1153          
+   1154          		WriteBuffertoBackup(vEE_BACK1Addr, sizeof(EE_BACK1));
+   1155          	}
+   1156          	OS_EXIT_CRITICAL();
+   1157          }
+   1158          
+   1159          void Inform_CtrlDataCopy(__ModuleInformCtrl *mptr)
+   1160          {
+   1161          	INT32U cpu_sr;
+   1162          
+   1163          	OS_ENTER_CRITICAL();
+   1164          	{
+   1165          		INT8U i = 0;	
+   1166          		EE_BACK1 *ptr = (EE_BACK1 *)RoadBackuptobuffer(vEE_BACK1Addr);
+   1167          
+   1168          		//if(mptr->Flag.Bit.Kind)
+   1169          		//{
+   1170          		//	ModuleInform->Kind = mptr->Kind;
+   1171          		//	ret++;
+   1172          		//}
+   1173          
+   1174          		//if(mptr->Flag.Bit.Type)
+   1175          		//{
+   1176          		//	ModuleInform->Type[0] = mptr->Type[0];
+   1177          		//	ModuleInform->Type[1] = mptr->Type[1];
+   1178          		//	ret++;
+   1179          		//}
+   1180          
+   1181          		//if(mptr->Flag.Bit.Supplier)
+   1182          		//{
+   1183          		//	ModuleInform->Supplier = mptr->Supplier;
+   1184          		//	ret++;
+   1185          		//}
+   1186          		//if(mptr->Flag.Bit.Manufacture)
+   1187          		//{
+   1188          		//	ModuleInform->Manufacture = mptr->Manufacture;
+   1189          		//	ret++;
+   1190          		//}
+   1191          	//	if(mptr->Flag.Bit.SW_Verion)
+   1192          	//	{
+   1193          	//		ModuleInform->SW_Verion = mptr->SW_Verion;
+   1194          	//		ret++;
+   1195          	//	}
+   1196          
+   1197          		if(mptr->Flag.Bit.SerialNo)
+   1198          		{
+   1199          			for(i = 0; i < 4; i++)
+   1200          			{
+   1201          				ModuleInform->SerialNo[i] = mptr->SerialNo[i];
+   1202          			}	
+   1203          		}
+   1204          
+   1205          		if(mptr->Flag.Bit.Manufacture_Date)
+   1206          		{
+   1207          			for(i = 0; i < 3; i++)
+   1208          			{
+   1209          				ModuleInform->Manufacture_Date[i] = mptr->Manufacture_Date[i];
+   1210          			}	
+   1211          		}
+   1212          
+   1213          		if(mptr->Flag.Bit.ERP_Code)
+   1214          		{
+   1215          			for(i = 0; i < 15 ; i ++)
+   1216          			{
+   1217          				ModuleInform->ERP_Code[i] = mptr->ERP_Code[i];
+   1218          			}
+   1219          		}
+   1220          
+   1221          		if(mptr->Flag.Bit.Manufacture_Mode)
+   1222          		{
+   1223          			for(i = 0; i < sizeof(ModuleInform->Manufacture_Mode); i ++)
+   1224          			{
+   1225          				ModuleInform->Manufacture_Mode[i] = mptr->Manufacture_Mode[i];
+   1226          			}
+   1227          		}
+   1228          		
+   1229          		ptr->BackUp.mInform = *ModuleInform;
+   1230          
+   1231          		WriteBuffertoBackup(vEE_BACK1Addr, sizeof(EE_BACK1));
+   1232          
+   1233          		//for(i = 0; i < sizeof(__ModuleInform); i++)
+   1234          		//{
+   1235          			//WriteEEprom(ModuleInformBp + i, *((INT8U *)ModuleInform + i));
+   1236          		//}
+   1237          	}
+   1238          	OS_EXIT_CRITICAL();
+   1239          }
+   1240          
+   1241          void LoadBackupData(void)
+   1242          {
+   1243          	INT32U cpu_sr;
+   1244          	INT32U mDate;
+   1245          	__BeaconStsStr *Sts = BeaconSts;
+   1246          
+   1247          	RUNLEDSEL ^= 1;
+   1248          
+   1249          	OS_ENTER_CRITICAL();
+   1250          	{
+   1251          		EE_BACK1 *tptr = (EE_BACK1 *)RoadBackuptobuffer(vEE_BACK1Addr);	// Load 1st Area	
+   1252          		INT8U iDataFlag = tptr->BackUp.IsDataFlag;
+   1253          		INT8U IsFirstFlag = tptr->BackUp.IsFirstFlag;	// 처음 생산시...인가!!
+   1254          		
+   1255          		if(iDataFlag != ISDATA)
+   1256          		{
+   1257          			// default set!!
+   1258          	        tptr->BackUp.RepeaterType = __COPY_IN;
+   1259          	        tptr->BackUp.TempOffset = 0;
+   1260          			tptr->BackUp.FwdInFA_3G = 1;
+   1261          			tptr->BackUp.FwdOutFA1_3G = 5;
+   1262          			tptr->BackUp.FwdOutFA2_3G = 6;
+   1263          
+   1264          			tptr->BackUp.FwdInPwrOffset_3G = 0;
+   1265          			tptr->BackUp.RvsInPwrOffset_3G = 0;
+   1266          			tptr->BackUp.Rvs0OutPwrOffset_3G = 0;
+   1267          			tptr->BackUp.Rvs0AttnOffset_3G = 0;
+   1268          			tptr->BackUp.FwdInAttnOffset_3G = 0;
+   1269          			tptr->BackUp.FwdOutAttnOffset_3G = 0;
+   1270          			tptr->BackUp.FwdOutAttnREPOffset_3G = 0;
+   1271          			
+   1272          			tptr->BackUp.TempUpperLmt = 70;
+   1273          
+   1274          			tptr->BackUp.OutSwitchTime_3G.Data = 2000*5; 
+   1275          		    tptr->BackUp.OutSwitchAttnOnOff_3G = Disable;
+   1276          
+   1277          			tptr->BackUp.FwdInPllFreqOffset_3G = 0;
+   1278          			tptr->BackUp.FwdOut1PllFreqOffset_3G = 0;
+   1279          			tptr->BackUp.FwdOut2PllFreqOffset_3G = 0;
+   1280          			tptr->BackUp.RvsIn1PllFreqOffset_3G = 0;
+   1281          			tptr->BackUp.RvsIn2PllFreqOffset_3G = 0;
+   1282          			tptr->BackUp.RvsOutPllFreqOffset_3G = 0;
+   1283          
+   1284          			tptr->BackUp.FwdInAttn_3G = 0;
+   1285          			tptr->BackUp.FwdOutAttn_3G = 0;
+   1286          			tptr->BackUp.FwdOutAttn_REP_3G = 0;
+   1287          			tptr->BackUp.Rvs0Attn_3G = 0;
+   1288          			tptr->BackUp.Rvs0Gain_3G = (47*2L);
+   1289          
+   1290          			tptr->BackUp.FwdAmpOff_3G = Enable;
+   1291          			tptr->BackUp.FwdInUpperLmt_3G = (-23*2L);
+   1292          			tptr->BackUp.FwdInLowerLmt_3G = (-29*2L);
+   1293          
+   1294          			tptr->BackUp.FwdOutUpperLmt_3G[0] = 48;
+   1295          			tptr->BackUp.FwdOutUpperLmt_3G[1] = 0;
+   1296          
+   1297          			tptr->BackUp.FwdOutLowerLmt_3G[0] = 42;
+   1298          			tptr->BackUp.FwdOutLowerLmt_3G[1] = 0;
+   1299          		
+   1300          			tptr->BackUp.FwdOut_REPUpperLmt_3G[0] = -2;
+   1301          			tptr->BackUp.FwdOut_REPUpperLmt_3G[1] = 0;
+   1302          
+   1303          			tptr->BackUp.FwdOut_REPLowerLmt_3G[0] = -8;
+   1304          			tptr->BackUp.FwdOut_REPLowerLmt_3G[1] = 0;
+   1305          
+   1306          			tptr->BackUp.FwdInALCLvl = (-30*2L);
+   1307          
+   1308          			tptr->BackUp.RvsInUpperLmt_3G = (-42*2L);
+   1309          			tptr->BackUp.RvsInLowerLmt_3G = (-48*2L);
+   1310          
+   1311          			tptr->BackUp.Rvs0OutUpperLmt_3G[0] = 5;
+   1312          			tptr->BackUp.Rvs0OutUpperLmt_3G[1] = 0;
+   1313          
+   1314          			tptr->BackUp.Rvs0OutLowerLmt_3G[0] = -1;
+   1315          			tptr->BackUp.Rvs0OutLowerLmt_3G[1] = 0;
+   1316          
+   1317          			tptr->BackUp.AlarmMask = 0;
+   1318          
+   1319          	        tptr->BackUp.IsDataFlag = ISDATA;
+   1320          	RUNLEDSEL ^= 1;
+   1321          			WriteBuffertoBackup(vEE_BACK1Addr, sizeof(EE_BACK1));
+   1322          	RUNLEDSEL ^= 1;
+   1323          
+   1324          			while(1);
+   1325          		}
+   1326          
+   1327          		if(IsFirstFlag != ISFIRST)
+   1328          		{
+   1329          		
+   1330          			mDate = DATEtoInt(SystemDate);
+   1331          			tptr->BackUp.mInform.Manufacture_Date[0] = ((mDate >> 16) & 0xffff) - 2000;
+   1332          			tptr->BackUp.mInform.Manufacture_Date[1] = ((mDate >>  8) & 0xff);
+   1333          			tptr->BackUp.mInform.Manufacture_Date[2] = ((mDate >>  0) & 0xff);
+   1334          
+   1335          			memcpy(tptr->BackUp.IpAddr, defaultip.IPAddr, 4);
+   1336          			memcpy(tptr->BackUp.GatewayAddr, defaultip.GatewayAddr, 4);
+   1337          			memcpy(tptr->BackUp.SubnetAddr, defaultip.SubnetAddr, 4);
+   1338          			memcpy(tptr->BackUp.MacAddr, defaultip.MacAddr, 6);
+   1339          	
+   1340          			tptr->BackUp.IsFirstFlag = ISFIRST;
+   1341          
+   1342          	RUNLEDSEL ^= 1;
+   1343          			WriteBuffertoBackup(vEE_BACK1Addr, sizeof(EE_BACK1));
+   1344          	RUNLEDSEL ^= 1;
+   1345          			while(1);
+   1346          		}
+   1347          #ifdef __PWR_BACKUP_USED
+   1348          			Sts->ResetCase = BKP_ReadBackupRegister(BKP_DR1);
+   1349          #endif
+   1350          		Sts->ResetCase = rambackup[0];
+   1351          		rambackup[0] = 0;
+   1352          		destport[0]  = (rambackup[1] << 0);
+   1353          		destport[1] |= (rambackup[2] << 8);
+   1354          		
+   1355          		if( destport[0] == 0xffff) destport[0] = 0;
+   1356          		if( (returnip[0][0] = (INT8U)rambackup[3]) == 0xff ) returnip[0][0] = 0;
+   1357          		if( (returnip[0][1] = (INT8U)rambackup[4]) == 0xff ) returnip[0][1] = 0;
+   1358          		if( (returnip[0][2] = (INT8U)rambackup[5]) == 0xff ) returnip[0][2] = 0;
+   1359          		if( (returnip[0][3] = (INT8U)rambackup[6]) == 0xff ) returnip[0][3] = 0;
+   1360          		
+   1361          		if(Sts->ResetCase != 0x01 && Sts->ResetCase != 0x02 && Sts->ResetCase != 0x04)
+   1362          			Sts->ResetCase = 0x03;
+   1363          
+   1364          		Sts->RepeaterType[1] = tptr->BackUp.RepeaterType;
+   1365          		Sts->TXCUModel = tptr->BackUp.TXCUModel;
+   1366          		Sts->Rvs0Attn_3G = tptr->BackUp.Rvs0Attn_3G;
+   1367          
+   1368          		Sts->TempOffset = tptr->BackUp.TempOffset;
+   1369          		Sts->TempUpperLmt = tptr->BackUp.TempUpperLmt;
+   1370          		Sts->FwdInUpperLmt_3G = tptr->BackUp.FwdInUpperLmt_3G;	
+   1371          		Sts->FwdInLowerLmt_3G = tptr->BackUp.FwdInLowerLmt_3G;
+   1372          		Sts->FwdOutUpperLmt_3G[0] = tptr->BackUp.FwdOutUpperLmt_3G[0];
+   1373          		Sts->FwdOutUpperLmt_3G[1] = tptr->BackUp.FwdOutUpperLmt_3G[1];
+   1374          		Sts->FwdOutLowerLmt_3G[0] = tptr->BackUp.FwdOutLowerLmt_3G[0];
+   1375          		Sts->FwdOutLowerLmt_3G[1] = tptr->BackUp.FwdOutLowerLmt_3G[1];
+   1376          		Sts->FwdOut_REPUpperLmt_3G[0] = tptr->BackUp.FwdOut_REPUpperLmt_3G[0];
+   1377          		Sts->FwdOut_REPUpperLmt_3G[1] = tptr->BackUp.FwdOut_REPUpperLmt_3G[1];
+   1378          		Sts->FwdOut_REPLowerLmt_3G[0] = tptr->BackUp.FwdOut_REPLowerLmt_3G[0];
+   1379          		Sts->FwdOut_REPLowerLmt_3G[1] = tptr->BackUp.FwdOut_REPLowerLmt_3G[1];
+   1380          
+   1381          		Sts->Rvs0OutUpperLmt_3G[0] = tptr->BackUp.Rvs0OutUpperLmt_3G[0];
+   1382          		Sts->Rvs0OutUpperLmt_3G[1] = tptr->BackUp.Rvs0OutUpperLmt_3G[1];
+   1383          		Sts->Rvs0OutLowerLmt_3G[0] = tptr->BackUp.Rvs0OutLowerLmt_3G[0];
+   1384          		Sts->Rvs0OutLowerLmt_3G[1] = tptr->BackUp.Rvs0OutLowerLmt_3G[1]; 
+   1385          
+   1386          		Sts->FwdInPwrOffset_3G = tptr->BackUp.FwdInPwrOffset_3G;
+   1387          		Sts->RvsInPwrOffset_3G = tptr->BackUp.RvsInPwrOffset_3G;
+   1388          		Sts->Rvs0OutPwrOffset_3G = tptr->BackUp.Rvs0OutPwrOffset_3G;
+   1389          		Sts->Rvs0AttnOffset_3G = tptr->BackUp.Rvs0AttnOffset_3G;
+   1390          
+   1391          		Sts->FwdInFA_3G = tptr->BackUp.FwdInFA_3G;
+   1392          		Sts->FwdOutFA1_3G = tptr->BackUp.FwdOutFA1_3G;
+   1393          		Sts->FwdOutFA2_3G = tptr->BackUp.FwdOutFA2_3G;
+   1394          
+   1395          		Sts->RvsOutFA_3G = tptr->BackUp.FwdInFA_3G;
+   1396          		Sts->RvsInFA1_3G = tptr->BackUp.FwdOutFA1_3G;
+   1397          		Sts->RvsInFA2_3G = tptr->BackUp.FwdOutFA2_3G;
+   1398          
+   1399          		Sts->Rvs0AttnTemp_3G = tptr->BackUp.Rvs0AttnTemp_3G;
+   1400          		Sts->TempUpperLmt = tptr->BackUp.TempUpperLmt;
+   1401          		Sts->FwdOutPwrOffset_3G = tptr->BackUp.FwdOutPwrOffset_3G;
+   1402          		Sts->FwdPwrREPOffset_3G = tptr->BackUp.FwdPwr_REPOffset_3G;
+   1403          		
+   1404          		Sts->FwdAmpOff_3G = tptr->BackUp.FwdAmpOff_3G;			// 제어로 인한 ..!!! ON/OFF check..
+   1405          		Sts->RvsOscLvl = tptr->BackUp.RvsOscLvl;
+   1406          
+   1407          		Sts->FwdInAttnTemp_3G = tptr->BackUp.FwdInAttnTemp_3G;
+   1408          		Sts->FwdInAttn_3G = tptr->BackUp.FwdInAttn_3G;
+   1409          		Sts->FwdOutAttn_3G = tptr->BackUp.FwdOutAttn_3G;
+   1410          		Sts->FwdOutAttn_REP_3G = tptr->BackUp.FwdOutAttn_REP_3G;
+   1411          
+   1412          		Sts->FwdInPllFreqTemp_3G.Data = tptr->BackUp.FwdInPllFreqTemp_3G.Data;
+   1413          		Sts->FwdOut1PllFreqTemp_3G.Data = tptr->BackUp.FwdOut1PllFreqTemp_3G.Data;
+   1414          		Sts->FwdOut2PllFreqTemp_3G.Data = tptr->BackUp.FwdOut2PllFreqTemp_3G.Data;
+   1415          		Sts->RvsIn1PllFreqTemp_3G.Data = tptr->BackUp.RvsIn1PllFreqTemp_3G.Data;
+   1416          		Sts->RvsIn2PllFreqTemp_3G.Data = tptr->BackUp.RvsIn2PllFreqTemp_3G.Data;
+   1417          		Sts->RvsOutPllFreqTemp_3G.Data = tptr->BackUp.RvsOutPllFreqTemp_3G.Data;
+   1418          
+   1419          		Sts->FwdInPllFreqOffset_3G = tptr->BackUp.FwdInPllFreqOffset_3G;
+   1420          		Sts->FwdOut1PllFreqOffset_3G = tptr->BackUp.FwdOut1PllFreqOffset_3G;
+   1421          		Sts->FwdOut2PllFreqOffset_3G = tptr->BackUp.FwdOut2PllFreqOffset_3G;
+   1422          		Sts->OutSwitchTime_3G = tptr->BackUp.OutSwitchTime_3G;
+   1423          		Sts->OutSwitchAttnOnOff_3G = tptr->BackUp.OutSwitchAttnOnOff_3G & 0x01;
+   1424          		Sts->RvsIn1PllFreqOffset_3G = tptr->BackUp.RvsIn1PllFreqOffset_3G;
+   1425          		Sts->RvsIn2PllFreqOffset_3G = tptr->BackUp.RvsIn2PllFreqOffset_3G;
+   1426          		Sts->RvsOutPllFreqOffset_3G = tptr->BackUp.RvsOutPllFreqOffset_3G;
+   1427          
+   1428          		Sts->FwdInAttnOffset_3G = tptr->BackUp.FwdInAttnOffset_3G;
+   1429          		Sts->FwdOutAttnOffset_3G = tptr->BackUp.FwdOutAttnOffset_3G;
+   1430          		Sts->FwdOutAttnREPOffset_3G = tptr->BackUp.FwdOutAttnREPOffset_3G;
+   1431          		Sts->FwdOutAttnTemp_3G = tptr->BackUp.FwdOutAttnTemp_3G;
+   1432          		Sts->FwdOutREPTempAttn_3G = tptr->BackUp.FwdOutREPTempAttn_3G;
+   1433          		Sts->RvsInUpperLmt_3G = tptr->BackUp.RvsInUpperLmt_3G;
+   1434          		Sts->RvsInLowerLmt_3G = tptr->BackUp.RvsInLowerLmt_3G;
+   1435          		Sts->AlarmMask = tptr->BackUp.AlarmMask & 0x01;
+   1436          		Sts->Rvs0Gain_3G = tptr->BackUp.Rvs0Gain_3G;
+   1437          		Sts->FwdInALCLvl = tptr->BackUp.FwdInALCLvl;		
+   1438          
+   1439          		*ModuleInform = tptr->BackUp.mInform;
+   1440          	}	
+   1441          
+   1442          	OS_EXIT_CRITICAL();
+   1443          
+   1444          	SerPtr->printf("BEACON Ver[%02x].[%02x]\n",SystemVer, PROGRAMVER);
+   1445          	SerPtr->printf("SystemDate[%s]\n", SystemDate);
+   1446          	SerPtr->printf("SystemTime[%s]\n", SystemTime);
+   1447          	SerPtr->printf("Resetcase[%d]\n", Sts->ResetCase);
+   1448          
+   1449          }
+   1450          
+   1451          ////////////////////////////////////////////////////////////////////////////////
+   1452          // End of Source File
+   1453          ////////////////////////
+   1454          
+
+   Maximum stack usage in bytes:
+
+     Function               .cstack
+     --------               -------
+     AnalyzeAidData              0
+     GenModuleAutoInformSts      0
+     GenModuleInformSts          0
+     GenRepAidSts                0
+     Inform_CtrlDataCopy         0
+     Initialize                  0
+     ItitReallyUnknown           0
+     LoadBackupData              0
+     LocalIPCtrlData             0
+     LocalMacCtrlData            0
+     SetCtrlData                 0
+
+
+   Section sizes:
+
+     Function/Label            Bytes
+     --------------            -----
+     rambackup                    4
+     GenRepAidSts              2492
+     ItitReallyUnknown           12
+     SetCtrlData               1700
+     AnalyzeAidData             188
+     Initialize                 376
+     GenModuleInformSts         200
+     GenModuleAutoInformSts      52
+     LocalMacCtrlData            68
+     LocalIPCtrlData             92
+     Inform_CtrlDataCopy        212
+     LoadBackupData            1084
+     ??DataTable0                 4
+     ?<Constant "Nov  9 2010">  100
+
+ 
+     4 bytes in section .data
+   100 bytes in section .rodata
+ 6 480 bytes in section .text
+ 
+ 6 480 bytes of CODE  memory
+   100 bytes of CONST memory
+     4 bytes of DATA  memory
+
+Errors: none
+Warnings: none

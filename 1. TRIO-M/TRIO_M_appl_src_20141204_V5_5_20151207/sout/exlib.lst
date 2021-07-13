@@ -1,0 +1,291 @@
+###############################################################################
+#                                                                             #
+#                                                       19/May/2017  23:29:47 #
+# IAR ANSI C/C++ Compiler V5.50.5.21995/W32 EVALUATION for ARM                #
+# Copyright (C) 1999-2010 IAR Systems AB.                                     #
+#                                                                             #
+#    Cpu mode     =  thumb                                                    #
+#    Endian       =  little                                                   #
+#    Source file  =  D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V5_5_ #
+#                    20151207\code\exlib.c                                    #
+#    Command line =  "D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V5_5 #
+#                    _20151207\code\exlib.c" -D _MIMO_Type -D __2rd -D        #
+#                    __PLLEnToggle -lcN "D:\Project\TRIO\1.                   #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\sout\" -o  #
+#                    "D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V5_5 #
+#                    _20151207\sout\" --endian=little --cpu=Cortex-M3 -e      #
+#                    --require_prototypes --warnings_are_errors --fpu=None    #
+#                    --dlib_config "D:\Program Files (x86)\IAR                #
+#                    Systems\Embedded Workbench 5.4                           #
+#                    Evaluation\arm\INC\DLib_Config_Normal.h" -I              #
+#                    "D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V5_5 #
+#                    _20151207\include\" -I "D:\Project\TRIO\1.               #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\lib_stm32\ #
+#                    inc\" -I "D:\Project\TRIO\1.                             #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\lib_stm32\ #
+#                    src\" -I "D:\Project\TRIO\1.                             #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\uC-CPU\"   #
+#                    -I "D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V #
+#                    5_5_20151207\uC-LIB\" -I "D:\Project\TRIO\1.             #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\uCOS-II\Po #
+#                    rts\" -I "D:\Project\TRIO\1.                             #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\uCOS-II\So #
+#                    urce\" -I "D:\Project\TRIO\1.                            #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\uC-Probe\" #
+#                     -I "D:\Program Files (x86)\IAR Systems\Embedded         #
+#                    Workbench 5.4 Evaluation\arm\INC\" -Oh                   #
+#    List file    =  D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V5_5_ #
+#                    20151207\sout\exlib.lst                                  #
+#    Object file  =  D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V5_5_ #
+#                    20151207\sout\exlib.o                                    #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\code\exlib.c
+      1          
+      2          /*********************************************
+      3          * File Name          : exlib.c
+      4          * Author             :
+      5          * Date First Issued  : 02/01/2008
+      6          * Description        : This file provides all the port/input/update firmware functions.
+      7          * $Revision: 0.1 $
+      8          * $Revision date: 2008.01.__
+      9          ********************************************************************************/
+     10          
+     11          #define EXLIB_C
+     12          
+     13          #include "../include/main.h"
+     14          
+     15          
+     16          void ExpioModeChanege(INT8U tmode)
+     17          {
+     18          #ifdef STM32FRxT6_USED
+     19          	GPIOC->CNF.B6 = tmode;
+     20          	GPIOC->CNF.B7 = tmode;
+     21          	GPIOC->CNF.B8 = tmode;
+     22          	GPIOC->CNF.B9 = tmode;
+     23          	GPIOC->CNF.B10 = tmode;
+     24          	GPIOC->CNF.B11 = tmode;
+     25          	GPIOC->CNF.B12 = tmode;
+     26          	GPIOD->CNF.B2 = tmode;
+     27          #else
+     28          	GPIOD->CNF.B14 = tmode;
+     29          	GPIOD->CNF.B15 = tmode;
+     30          	GPIOD->CNF.B0 = tmode;
+     31          	GPIOD->CNF.B1 = tmode;
+     32          	GPIOE->CNF.B7 = tmode;
+     33          	GPIOE->CNF.B8 = tmode;
+     34          	GPIOE->CNF.B9 = tmode;
+     35          	GPIOE->CNF.B10 = tmode;
+     36          #endif
+     37          }
+     38          
+     39          
+     40          void ExpioWriteData(INT8U SEL, INT16U Data)
+     41          {
+     42          	INT8U err;
+     43          	
+     44          	OSSemPend(ExpioSem, 0, &err);
+     45          	EXPIOrawData[SEL] = Data;
+     46          
+     47          #ifdef __FSMC_SRAM_H
+     48          		*(vu8 *)(EXPIOptr + SEL*EXPIOsize) = Data;
+     49          #else
+     50          	{
+     51          	
+     52          		INT32U Addr = ExpioCS[SEL]/16;
+     53          		INT32U BitAddr = ExpioCS[SEL]%16;
+     54          
+     55          		ExpioModeChanege(__PC6_OU_PP);
+     56          
+     57          #ifdef STM32FRxT6_USED
+     58          		GPIOC->ODR.B6  = (Data >> 0) & 0x01;
+     59          		GPIOC->ODR.B7  = (Data >> 1) & 0x01;
+     60          		GPIOC->ODR.B8  = (Data >> 2) & 0x01;
+     61          		GPIOC->ODR.B9  = (Data >> 3) & 0x01;
+     62          		GPIOC->ODR.B10 = (Data >> 4) & 0x01;
+     63          		GPIOC->ODR.B11 = (Data >> 5) & 0x01;
+     64          		GPIOC->ODR.B12 = (Data >> 6) & 0x01;
+     65          		GPIOD->ODR.B2  = (Data >> 7) & 0x01;
+     66          #else
+     67          		GPIOD->ODR.B14	= (Data >> 0) & 0x01;
+     68          		GPIOD->ODR.B15	= (Data >> 1) & 0x01;
+     69          		GPIOD->ODR.B0	= (Data >> 2) & 0x01;
+     70          		GPIOD->ODR.B1	= (Data >> 3) & 0x01;
+     71          		GPIOE->ODR.B7	= (Data >> 4) & 0x01;
+     72          		GPIOE->ODR.B8	= (Data >> 5) & 0x01;
+     73          		GPIOE->ODR.B9	= (Data >> 6) & 0x01;
+     74          		GPIOE->ODR.B10	= (Data >> 7) & 0x01;
+     75          #endif
+     76          
+     77          		// low
+     78          		*(volatile INT32U *)(APB2PERIPH_BASE + Addr + 0x0C) &=	~(1 << BitAddr);
+     79          		// high
+     80          		*(volatile INT32U *)(APB2PERIPH_BASE + Addr + 0x0C) |=	 (1 << BitAddr);
+     81          
+     82          		ExpioModeChanege(__PC6_IN_FL);
+     83          	}
+     84          #endif
+     85          	
+     86          	OSSemPost(ExpioSem);
+     87          }
+     88          
+     89          
+     90          INT16U ExpioReadData(INT8U SEL)
+     91          {
+     92          	INT16U ret = 0;
+     93          	INT8U err;
+     94          	
+     95          	OSSemPend(ExpioSem, 0, &err);
+     96          
+     97          #ifdef __FSMC_SRAM_H
+     98          		ret = EXPIOrawData[SEL] = *(vu8 *)(EXPIOptr + SEL*EXPIOsize);
+     99          #else
+    100          	{
+    101          		INT32U Addr = ExpioCS[SEL]/16;
+    102          		INT32U BitAddr = ExpioCS[SEL]%16;
+    103          
+    104          		*(volatile INT32U *)(APB2PERIPH_BASE + Addr + 0x0C) &=	~(1 << BitAddr);
+    105          		ExpioModeChanege(__PC6_IN_FL);
+    106          
+    107          		// low
+    108          #ifdef STM32FRxT6_USED
+    109          
+    110          		ret = (ret << 1) | (GPIOD->IDR.B2);
+    111          		ret = (ret << 1) | (GPIOC->IDR.B12);
+    112          		ret = (ret << 1) | (GPIOC->IDR.B11);
+    113          		ret = (ret << 1) | (GPIOC->IDR.B10);
+    114          		ret = (ret << 1) | (GPIOC->IDR.B9);
+    115          		ret = (ret << 1) | (GPIOC->IDR.B8);
+    116          		ret = (ret << 1) | (GPIOC->IDR.B7);
+    117          		ret = (ret << 1) | (GPIOC->IDR.B6);
+    118          #else
+    119          		ret = (ret << 1) | (GPIOE->IDR.B10);
+    120          		ret = (ret << 1) | (GPIOE->IDR.B9);
+    121          		ret = (ret << 1) | (GPIOE->IDR.B8);
+    122          		ret = (ret << 1) | (GPIOE->IDR.B7);
+    123          		ret = (ret << 1) | (GPIOD->IDR.B1);
+    124          		ret = (ret << 1) | (GPIOD->IDR.B0);
+    125          		ret = (ret << 1) | (GPIOD->IDR.B15);
+    126          		ret = (ret << 1) | (GPIOD->IDR.B14);
+    127          #endif
+    128          		// SEL
+    129          		// high
+    130          		*(volatile INT32U *)(APB2PERIPH_BASE + Addr + 0x0C) |=	 (1 << BitAddr);
+    131          
+    132          		EXPIOrawData[SEL] = ret;
+    133          	}
+    134          #endif
+    135          	OSSemPost(ExpioSem);
+    136          
+    137          	return ret;
+    138          }
+    139          
+    140          
+    141          unsigned short int ExpioBitRead (unsigned short int Bitaddr)
+    142          {
+    143          	INT16U	ExselNo;
+    144          	INT16U	BitNumber;
+    145          
+    146          	ExselNo = (Bitaddr/16);
+    147          	BitNumber = (Bitaddr % 16);
+    148          
+    149          	ExpioReadData(ExselNo);
+    150          	return BitRead(EXPIOrawData[ExselNo], BitNumber);	
+    151          }
+    152          void ExpioBitSet (unsigned short int Bitaddr)
+    153          {
+    154          	INT16U	ExselNo;
+    155          	INT16U	BitNumber;
+    156          
+    157          	ExselNo = (Bitaddr/16);
+    158          	BitNumber = (Bitaddr % 16);
+    159           	EXPIOrawData[ExselNo] = ( EXPIOrawData[ExselNo] |(1 << BitNumber) );
+    160          	ExpioWriteData(ExselNo, EXPIOrawData[ExselNo]);
+    161          }
+    162          
+    163          void ExpioBitRst(unsigned short int Bitaddr)
+    164          {
+    165          	INT16U	ExselNo;
+    166          	INT16U	BitNumber;
+    167          
+    168          	ExselNo = (Bitaddr/16);
+    169          	BitNumber = (Bitaddr % 16);
+    170          	EXPIOrawData[ExselNo] = ( EXPIOrawData[ExselNo] & ~(1 << BitNumber) );
+    171          	ExpioWriteData(ExselNo, EXPIOrawData[ExselNo]);
+    172          }
+    173          
+    174          INT8U atoh (INT8U value )
+    175          {
+    176          	INT16U	num;
+    177          
+    178          	// isdigit() 는 입력값이 '0' ~ '9' 일경우 True
+    179          	if( isdigit(value) ) num = value - '0';
+    180          	else if( (value >= 'a') && (value <= 'f') ) num = 10 + value - 'a';
+    181          	else if( (value >= 'A') && (value <= 'F') ) num = 10 + value - 'A';
+    182          	else										num = 0x0100;
+    183          
+    184          	return (INT8U)num;
+    185          }
+    186          
+    187          INT16U ByteToWord(INT8U HighByte, INT8U LowByte)
+    188          {
+    189          	INT16U WordByte = 0;
+    190          	
+    191          	WordByte = (INT16U)HighByte;
+    192          	WordByte = (WordByte << 8)& 0xff00;
+    193          	WordByte = WordByte |(INT16U)LowByte;
+    194          	return(WordByte);
+    195          }
+    196          
+    197          ///////////////////////////////////////////////////////////////////////////////
+    198          // End of Source File
+    199          ////////////////////////
+    200          
+
+   Maximum stack usage in bytes:
+
+     Function         .cstack
+     --------         -------
+     ByteToWord            0
+     ExpioBitRead         16
+     ExpioBitRst           8
+     ExpioBitSet           8
+     ExpioModeChanege      0
+     ExpioReadData        24
+     ExpioWriteData       24
+     atoh                  0
+
+
+   Section sizes:
+
+     Function/Label   Bytes
+     --------------   -----
+     ExpioCS            80
+     EXPIOrawData       40
+     ExpioModeChanege   70
+     ExpioWriteData     42
+     ExpioReadData      42
+     ExpioBitRead       30
+     ExpioBitSet        30
+     ?Subroutine0        6
+     ExpioBitRst        32
+     atoh               46
+     ByteToWord          6
+     ??DataTable4        4
+     ??DataTable4_1      4
+     ??DataTable4_2      4
+     ??DataTable4_3      4
+
+ 
+  40 bytes in section .bss
+  80 bytes in section .rodata
+ 320 bytes in section .text
+ 
+ 320 bytes of CODE  memory
+  80 bytes of CONST memory
+  40 bytes of DATA  memory
+
+Errors: none
+Warnings: none

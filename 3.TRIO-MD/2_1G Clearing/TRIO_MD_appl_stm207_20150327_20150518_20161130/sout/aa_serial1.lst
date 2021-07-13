@@ -1,0 +1,404 @@
+###############################################################################
+#                                                                             #
+# IAR ANSI C/C++ Compiler V6.21.1.52794/W32 for ARM     30/Aug/2012  21:29:29 #
+# Copyright 1999-2011 IAR Systems AB.                                         #
+#                                                                             #
+#    Cpu mode     =  thumb                                                    #
+#    Endian       =  little                                                   #
+#    Source file  =  D:\Work\Project\2012\NL_INBUILD\FW\MU\code\aa_serial1.c  #
+#    Command line =  D:\Work\Project\2012\NL_INBUILD\FW\MU\code\aa_serial1.c  #
+#                    -D OS_INCLUDED -D APPL_SRC -lcN                          #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\sout\ -lB          #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\sout\ -o           #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\sout\              #
+#                    --endian=little --cpu=Cortex-M3 -e --fpu=None            #
+#                    --dlib_config "C:\Programming\IAR Systems\Embedded       #
+#                    Workbench 6.0\arm\INC\c\DLib_Config_Normal.h" -I         #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\include\ -I        #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\..\..\STM32F2xx_St #
+#                    dPeriph_Driver\ -I D:\Work\Project\2012\NL_INBUILD\FW\MU #
+#                    \..\..\STM32F2xx_StdPeriph_Driver\inc\ -I                #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\uC-CPU\ -I         #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\uC-LIB\ -I         #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\uCOS-II\Ports\ -I  #
+#                    D:\Work\Project\2012\NL_INBUILD\FW\MU\uCOS-II\Source\    #
+#                    -I D:\Work\Project\2012\NL_INBUILD\FW\MU\uC-Probe\ -Oh   #
+#                    --use_c++_inline --require_prototypes                    #
+#    List file    =  D:\Work\Project\2012\NL_INBUILD\FW\MU\sout\aa_serial1.ls #
+#                    t                                                        #
+#    Object file  =  D:\Work\Project\2012\NL_INBUILD\FW\MU\sout\aa_serial1.o  #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\Work\Project\2012\NL_INBUILD\FW\MU\code\aa_serial1.c
+      1          
+      2          /******************** (C) COPYRIGHT 2008 PILOG, NSINFO *************************
+      3          * File Name          : usart1_vx.x.c
+      4          * Author             : Yoon Byong-Gyu(bgyoon@naver.com)
+      5          * Date First Issued  : 01/17/2008
+      6          * Description        : This file provides all the USART0 firmware functions.
+      7          * $Revision: 0.1 $
+      8          * $Revision date: 2008.01.__
+      9          ********************************************************************************/
+     10          
+     11          #define SER1INT_C
+     12          
+     13          #include "../include/main.h"
+     14          #include "download.c"
+     15          
+     16          
+     17          void Ser1Init(void)
+     18          {
+     19           	PcSer->CheckByte = pUSART1.CheckByte;
+     20          	PcSer->RxGetByte = pUSART1.RxGetByte;
+     21          	PcSer->PutStr = pUSART1.PutStr;
+     22          	PcSer->TxCheckByte = pUSART1.TxCheckByte;
+     23          	PcSer->BuffClear = pUSART1.BuffClear;
+     24          
+     25          	PcSer->TimerRx = TimerSioRx;
+     26          
+     27          	PcSer->Recv = &Rsio;
+     28          	PcSer->Send = &Ssio;
+     29          
+     30          	PcSer->OSSem = OSSemCreate(1);
+     31          
+     32          	MuStatus = &MuStatusB;
+     33          	HuStatus = &HuStatusB;
+     34          	RuStatus = &RuStatusB;
+     35          
+     36          	Initialize();
+     37          	
+     38          	OSTaskCreate(Ser1Task, (void *)PcSer, (OS_STK *)&Ser1TaskStk[SER1_STK_SIZE - 1], SER1TASK_PRIO);
+     39          }
+     40          
+     41          void Ser1Task(void *pdata)
+     42          {
+     43          	__ProtocolPtr *nPtr = (__ProtocolPtr *)pdata;
+     44          
+     45              nPtr = nPtr;
+     46          	pdata = pdata;
+     47          	OSTimeDly(100*SER1TASK_PRIO);
+     48          
+     49          	while(1)
+     50          	{
+     51          		if(!tTestFlag)
+     52          		{
+     53          			if(ProtocolCheck(nPtr))
+     54          			{
+     55          				ProtocolComCheck(nPtr);
+     56          			}
+     57          		}
+     58          		DownLoadGiveupTimerChk(nPtr);
+     59          		OSTimeDly(200L);
+     60          	}
+     61          }
+     62          
+     63          
+     64          INT32U ProtocolCheck(__ProtocolPtr *nPtr)
+     65          {
+     66          	INT16U nCnt;
+     67          	INT16U i = 0, n = 0;
+     68          	INT32U RetVal;
+     69          	INT8U Data;
+     70          	
+     71          	SIO *Recv = nPtr->Recv;
+     72          
+     73          	TimerRegist(nPtr->TimerRx, Time1Sec*2L);
+     74          	Recv->Command = NULLcomm;	// RX Command Clear
+     75          
+     76          	//====================//
+     77          	// Sync Check 4 bytes //
+     78          	//======================================================================//
+     79          	n = 4;
+     80          	
+     81          	RetVal = FALSE;
+     82          	while (RetVal == FALSE)
+     83          	{
+     84          		if(TimeOverCheck(nPtr->TimerRx)) return FALSE;
+     85          
+     86          		if(nPtr->CheckByte(1, &nCnt))
+     87          		{
+     88          			Data = nPtr->RxGetByte();
+     89          			
+     90          			if(STX == Data/*nPtr->RxGetByte()*/)
+     91          			{
+     92          				if(nPtr->CheckByte(1, &nCnt))
+     93          				{
+     94          					if(STX == nPtr->RxGetByte())
+     95          					{
+     96          						if(nPtr->CheckByte(1, &nCnt))
+     97          						{
+     98          							if(STX == nPtr->RxGetByte())
+     99          							{
+    100          								if(nPtr->CheckByte(1, &nCnt))
+    101          								{
+    102          									if(STX == nPtr->RxGetByte())
+    103          									{
+    104          										Recv->Sync[0] = STX;
+    105          										Recv->Sync[1] = STX;
+    106          										Recv->Sync[2] = STX;
+    107          										Recv->Sync[3] = STX;
+    108          
+    109          										RetVal = TRUE;
+    110          									}
+    111          								}
+    112          								else OSTimeDly(100L);
+    113          							}
+    114          						}
+    115          						else OSTimeDly(100L);
+    116          					}
+    117          				} 
+    118          				else OSTimeDly(100L);
+    119          			}
+    120          			////////////////////////////////////////////////////////////////////
+    121          			else
+    122          			{
+    123          				if((nPtr == PcSer) && (downloadFlag == 0))
+    124          				{
+    125          					if((Data == 'x')||(Data == 'X'))
+    126          					{
+    127          						iDebugCnt++;
+    128          						
+    129          						if(iDebugCnt > 20)
+    130          						{
+    131          							nPtr->BuffClear();
+    132          							
+    133          							SerPtr->printf("\n H/W Test Mode...\n");
+    134          							iUser_Value2 = __ChangeDebug;
+    135          							TestInit();
+    136          							tTestFlag = TRUE;
+    137          						}
+    138          					}
+    139          					else
+    140          					{
+    141          						//KeyProc(Data, SPICommand);
+    142          					}
+    143          				}
+    144          			}
+    145          		} else OSTimeDly(100L);
+    146          	}
+    147          	
+    148          	TimerRegist(nPtr->TimerRx, Time1Sec);
+    149          
+    150          	//======================//
+    151          	// Header Check 5 bytes //
+    152          	//======================================================================//
+    153          	n = 6;
+    154          	while ( !nPtr->CheckByte(n, &nCnt) )
+    155          	{
+    156          		if (TRUE == TimeOverCheck(nPtr->TimerRx) ) return(FALSE);
+    157          		OSTimeDly(100L);
+    158          	}
+    159          	Recv->SrcID.MuID	= nPtr->RxGetByte();
+    160          	Recv->SrcID.HuID	= nPtr->RxGetByte();
+    161          	Recv->SrcID.RuID	= nPtr->RxGetByte();
+    162          	Recv->DstID.MuID	= nPtr->RxGetByte();
+    163          	Recv->DstID.HuID	= nPtr->RxGetByte();
+    164          	Recv->DstID.RuID	= nPtr->RxGetByte();
+    165          	Recv->Command	 	= nPtr->RxGetByte();
+    166          	Recv->DataLength[0]   = nPtr->RxGetByte();
+    167          	Recv->DataLength[1]   = nPtr->RxGetByte();
+    168          	Recv->SubDataLength = (((INT16U)Recv->DataLength[0])<<8) + (((INT16U)Recv->DataLength[1])&0xff);
+    169          	n = Recv->SubDataLength;
+    170          	
+    171          //	if ( Recv->Command == DownLoadData ) n = 514;
+    172          
+    173          	//====================//
+    174          	// Data Check n bytes //
+    175          	//======================================================================//
+    176          	if ( n > BODYSIZEMAX ) return(FALSE);
+    177          	while ( !nPtr->CheckByte(n + 2, &nCnt) )
+    178          	{
+    179          		if(TimeOverCheck(nPtr->TimerRx)) return(FALSE);
+    180          		OSTimeDly(100L);
+    181          	}
+    182          	for(i = 0; i < n+2; i++ )	Recv->Data[i] = nPtr->RxGetByte();
+    183          
+    184          	//===========//
+    185          	// CRC Check //
+    186          	//======================================================================//
+    187          	Recv->Crc = Crc16Calc( &Recv->SrcID.MuID, n + 9, NULL);
+    188          	if ( (INT8U)(Recv->Crc>>8)	!= Recv->Data[n+0] ) RetVal = FALSE;
+    189          	if ( (INT8U)(Recv->Crc) 	!= Recv->Data[n+1] ) RetVal = FALSE;
+    190          	//======================================================================//
+    191          	if ( RetVal == FALSE )
+    192          	{
+    193          		return FALSE;
+    194          	}
+    195          	return TRUE;
+    196          }
+    197          
+    198          
+    199          void ProtocolComCheck (__ProtocolPtr *nPtr)
+    200          {
+    201          	SIO *Recv = nPtr->Recv;
+    202          //	SIO *Send = nPtr->Send;
+    203          	
+    204          	switch(Recv->Command) //command üũ
+    205          	{
+    206          		//-----------------------------------------------------------------------//
+    207          		case StatusRQST:
+    208          			SioDataAckTx(Recv->DstID, Recv->SrcID, (INT8U*)MuStatus, sizeof(__MU_STS), StatusRSPS, nPtr);
+    209          		break;
+    210          
+    211          		case ControlRQST:
+    212          			if(Recv->SubDataLength != sizeof(__MU_CTRL)) break;
+    213          
+    214          			SetDnrCtrlData((__MU_CTRL*)Recv->Data);
+    215          			SioDataAckTx(Recv->DstID, Recv->SrcID, (INT8U*)MuStatus, sizeof(__MU_STS), ControlRSPS, nPtr);
+    216          		break;
+    217          		
+    218          
+    219          /*		
+    220          		//-----------------------------------------------------------------------//
+    221          		case ResetCMD :
+    222          			SioDataAckTx(Recv->SUBID1, Recv->SUBID2, (INT8U *)"", 0, ResetCMD, nPtr);
+    223          			OSTimeDly(10L);
+    224          			//ResetCaseBackup(1);
+    225          			DownLoadBootingJump();
+    226          		break;
+    227          */
+    228          		//-----------------------------------------------------------------------//
+    229          		//	The End User Protocol..... Start DownLoad(Firmware)
+    230          		//	Down Load Protocol
+    231          		//-----------------------------------------------------------------------//
+    232          		case DownloadRQST:
+    233          		case DownDataRQST:
+    234          		case DownConfirmRQST:
+    235          			DownLoadGiveupTimerSet((INT32U)nPtr);
+    236          			DownloadFunc(nPtr);
+    237          		break;
+    238          		
+    239          		//-----------------------------------------------------------------------//
+    240          	}
+    241          }
+    242          
+    243          void SioDataAckTx(SubIDStr SrcID, SubIDStr DstID, INT8U *Data, INT16U nCnt, INT8U Comm, __ProtocolPtr *toPtr)
+    244          {
+    245          	INT8U	err = 0;
+    246          	INT16U	i = 0;
+    247          	
+    248          	SIO *Send = toPtr->Send;
+    249          	
+    250          	OSSemPend(toPtr->OSSem, 0, &err );
+    251          
+    252          	if( nCnt > BODYSIZEMAX ) {
+    253          		OSSemPost(toPtr->OSSem);
+    254          		return;
+    255          	}
+    256          
+    257          	for(i=0; i<4; i++)
+    258          		Send->Sync[i]	= STX;
+    259          	Send->SrcID.MuID	= SrcID.MuID;
+    260          	Send->SrcID.HuID	= SrcID.HuID;
+    261          	Send->SrcID.RuID	= SrcID.RuID;
+    262          	Send->DstID.MuID	= DstID.MuID;
+    263          	Send->DstID.HuID	= DstID.HuID;
+    264          	Send->DstID.RuID	= DstID.RuID;
+    265          	Send->Command		= Comm;
+    266          	Send->SubDataLength = nCnt;
+    267          	Send->DataLength[0] = (INT8U)(Send->SubDataLength>>8);
+    268          	Send->DataLength[1] = (INT8U)(Send->SubDataLength&0xff);
+    269          
+    270          	for(i=0; i<nCnt && i < BODYSIZEMAX; i++)
+    271          		Send->Data[i]	= *((INT8U *)Data + i);
+    272          	
+    273          	Send->Crc = Crc16Calc((INT8U*)&Send->SrcID.MuID, i+9, NULL);
+    274          	Send->Data[i++] = (INT8U)(Send->Crc>>8);
+    275          	Send->Data[i++] = (INT8U)(Send->Crc);  
+    276          
+    277          	toPtr->PutStr((INT8U *)Send, i+13, ENABLE);
+    278          
+    279          	
+    280          	OSSemPost(toPtr->OSSem);
+    281          }
+    282          
+    283          
+    284          
+    285          
+    286          
+    287          ////////////////////////////////////////////////////////////////////////////////
+    288          // End of Source File
+    289          /////////////////////
+    290          
+
+   Maximum stack usage in bytes:
+
+     Function               .cstack
+     --------               -------
+     DnReceiveData              24
+     DownLoadGiveupTimerChk      8
+     DownLoadGiveupTimerRst      0
+     DownLoadGiveupTimerSet      8
+     DownloadFunc               56
+     ProtocolCheck              40
+     ProtocolComCheck           32
+     Ser1Init                    8
+     Ser1Task                   16
+     SioDataAckTx               40
+
+
+   Section sizes:
+
+     Function/Label                      Bytes
+     --------------                      -----
+     Ser1TaskStk                         1200
+     PcSerB                                48
+     FlashEraseChk                          1
+     iDebugCnt                           5668
+     iUser_Value2
+     PcSer
+     MuStatus
+     HuStatus
+     RuStatus
+     downloadFlag
+     MuStatusB
+     HuStatusB
+     RuStatusB
+     Ssio
+     Rsio
+     iResetCase                             1
+     Booting                                2
+     FrameCounterOld                        2
+     FrameCounter                           2
+     scriptIndex                            1
+     DownLoadGiveupTimerSet                24
+     DownLoadGiveupTimerRst                10
+     DownLoadGiveupTimerChk                34
+     FrameCnt                              16
+     TotFrame
+     Swcrc16
+     DataCount
+     APEraseFlag
+     DownloadFunc                         312
+     DnReceiveData                         94
+     Ser1Init                              94
+     Ser1Task                              46
+     ProtocolCheck                        454
+     ProtocolComCheck                     132
+     SioDataAckTx                         196
+     ??DataTable10                          4
+     ??DataTable10_1                        4
+     ??DataTable10_2                        4
+     ??DataTable10_3                        4
+     ??DataTable10_4                        4
+     ??DataTable10_5                        4
+     ??DataTable10_6                        4
+     ??DataTable10_7                        4
+     ?<Constant "\n H/W Test Mode...\n">   20
+     ?<Constant {0}>                       12
+
+ 
+    53 bytes in section .bss
+ 5 688 bytes in section .data
+    12 bytes in section .rodata
+ 1 448 bytes in section .text
+ 1 200 bytes in section iram
+ 
+ 1 448 bytes of CODE  memory
+    12 bytes of CONST memory
+ 6 941 bytes of DATA  memory
+
+Errors: none
+Warnings: 2

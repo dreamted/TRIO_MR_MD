@@ -1,0 +1,3 @@
+---- _PllOut_LTE Matches (2 in 2 files) ----
+Adf411x.h (d:\project\trio\1. trio-m\trio_m_appl_src_20141204_v5_5_20151207\dev\adf411x):#define _PllOut_LTE(fvco)		Pll411x_Output(fvco, pLoCpll)
+Expio.c (d:\project\trio\1. trio-m\trio_m_appl_src_20141204_v5_5_20151207\code):		_PllOut_LTE(tLocal*1000);

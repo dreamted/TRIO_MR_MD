@@ -1,0 +1,132 @@
+###############################################################################
+#                                                                             #
+# IAR ANSI C/C++ Compiler V6.21.1.52794/W32 for ARM     19/Oct/2013  23:38:31 #
+# Copyright 1999-2011 IAR Systems AB.                                         #
+#                                                                             #
+#    Cpu mode     =  thumb                                                    #
+#    Endian       =  little                                                   #
+#    Source file  =  C:\Project\TRIO\2차버전\3.F_W\appl_stm207_20131019\code\ #
+#                    DDR_WRCS.c                                               #
+#    Command line =  C:\Project\TRIO\2차버전\3.F_W\appl_stm207_20131019\code\ #
+#                    DDR_WRCS.c -lC C:\Project\TRIO\2차버전\3.F_W\appl_stm207 #
+#                    _20131019\out\ -o C:\Project\TRIO\2차버전\3.F_W\appl_stm #
+#                    207_20131019\out\ --endian=little --cpu=Cortex-M3 -e     #
+#                    --fpu=None --dlib_config "C:\Program Files (x86)\IAR     #
+#                    Systems\Embedded Workbench 6.0\arm\INC\c\DLib_Config_Nor #
+#                    mal.h" -I C:\Project\TRIO\2차버전\3.F_W\appl_stm207_2013 #
+#                    1019\include\ -I C:\Project\TRIO\2차버전\3.F_W\appl_stm2 #
+#                    07_20131019\STM32F2xx_StdPeriph_Driver_v1212\ -I         #
+#                    C:\Project\TRIO\2차버전\3.F_W\appl_stm207_20131019\STM32 #
+#                    F2xx_StdPeriph_Driver_v1212\inc\ -I                      #
+#                    C:\Project\TRIO\2차버전\3.F_W\appl_stm207_20131019\uC-CP #
+#                    U\ -I C:\Project\TRIO\2차버전\3.F_W\appl_stm207_20131019 #
+#                    \uC-LIB\ -I C:\Project\TRIO\2차버전\3.F_W\appl_stm207_20 #
+#                    131019\uCOS-II\Ports\ -I C:\Project\TRIO\2차버전\3.F_W\a #
+#                    ppl_stm207_20131019\uCOS-II\Source\ -I                   #
+#                    C:\Project\TRIO\2차버전\3.F_W\appl_stm207_20131019\uC-Pr #
+#                    obe\ -Oh --use_c++_inline                                #
+#    List file    =  C:\Project\TRIO\2차버전\3.F_W\appl_stm207_20131019\out\D #
+#                    DR_WRCS.lst                                              #
+#    Object file  =  C:\Project\TRIO\2차버전\3.F_W\appl_stm207_20131019\out\D #
+#                    DR_WRCS.o                                                #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+C:\Project\TRIO\2차버전\3.F_W\appl_stm207_20131019\code\DDR_WRCS.c
+      1          
+      2          /*********************************************
+      3          * File Name          : usart1_vx.x.c
+      4          * Author             : 
+      5          * Date First Issued  : 01/17/2008
+      6          * Description        : This file provides all the USART0 firmware functions.
+      7          * $Revision: 0.1 $
+      8          * $Revision date: 2008.01.__
+      9          ********************************************************************************/
+     10          
+     11          #define SER0INT_C
+     12          
+     13          #include "../include/main.h"
+     14          //#include "download.c"
+     15          
+     16          
+     17          
+     18          
+     19          
+     20          
+     21          
+     22          
+     23          
+     24          
+     25          
+     26          
+     27          #if 0
+     28          unsigned char Check_Data_Image( unsigned char *_Dat )
+     29          {
+     30          	unsigned char i;
+     31          	
+     32          	INT8U Img_Sum = 0;
+     33          
+     34          	
+     35          	Img_Sum = (REMOTE_IMG + Rmt_FPGA_IMG + Rmt_FPGA_APP_IMG);
+     36          
+     37          	for( i = 0; i < 32; i++ )
+     38          	{
+     39          		if (Img_Sum & REMOTE_IMG)
+     40          		{
+     41          			if( RmtCode_Image[i] != _Dat[i] ) Img_Sum &= (~REMOTE_IMG); 
+     42          		}
+     43           	}
+     44          	
+     45          	ImgKind = Img_Sum;
+     46          
+     47          	return ImgKind;
+     48          
+     49          }
+     50          #endif
+     51          #if 0
+     52          char ustrcmp(char *sbuff,char *dbuff, INT8U len)
+     53          {
+     54          	while(*dbuff){
+     55          		if(toupper(*sbuff++)!=*dbuff++)
+     56          			return(1);
+     57          	}
+     58          	return(0);
+     59          }
+     60          
+     61          unsigned long int pPrintf(INT8U	Command, const char *format, ...)
+     62          {
+     63          	INT8U tmpData[512];
+     64              OS_CPU_SR  cpu_sr;
+     65          
+     66          	OS_ENTER_CRITICAL();
+     67          	va_list argptr;	
+     68          	va_start(argptr, format);
+     69          	vsprintf((char *)tmpData, format, argptr);
+     70          	va_end( argptr );
+     71          
+     72          	{
+     73          		INT8U tid[3] = {0x00, 0xff, 0xff};
+     74          		GenBodyFrame(tid, (INT8U *)tmpData, strlen((const char *)tmpData), Command, PcSer, 0);
+     75          		WRCS_ProDataAckTx(PcSer);
+     76          	}
+     77          
+     78          	OS_EXIT_CRITICAL();
+     79          	return FALSE;
+     80          }
+     81          #endif
+     82          
+     83          
+     84          
+     85          ////////////////////////////////////////////////////////////////////////////////
+     86          // End of Source File
+     87          /////////////////////
+     88          
+
+
+ 
+ 
+ 0 bytes of memory
+
+Errors: none
+Warnings: none

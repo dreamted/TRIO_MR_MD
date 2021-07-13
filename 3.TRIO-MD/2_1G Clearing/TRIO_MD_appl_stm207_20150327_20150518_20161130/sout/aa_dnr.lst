@@ -1,0 +1,285 @@
+###############################################################################
+#                                                                             #
+# IAR ANSI C/C++ Compiler V5.30.2.51295/W32 for ARM     09/Jun/2011  18:42:02 #
+# Copyright 1999-2009 IAR Systems AB.                                         #
+#                                                                             #
+#    Cpu mode     =  thumb                                                    #
+#    Endian       =  little                                                   #
+#    Source file  =  C:\user\project\HFR OTM-L12\fw\appl_otmL12_20110505_v1.0 #
+#                    \code\aa_dnr.c                                           #
+#    Command line =  "C:\user\project\HFR OTM-L12\fw\appl_otmL12_20110505_v1. #
+#                    0\code\aa_dnr.c" -lcN "C:\user\project\HFR               #
+#                    OTM-L12\fw\appl_otmL12_20110505_v1.0\sout\" -lB          #
+#                    "C:\user\project\HFR OTM-L12\fw\appl_otmL12_20110505_v1. #
+#                    0\sout\" -o "C:\user\project\HFR                         #
+#                    OTM-L12\fw\appl_otmL12_20110505_v1.0\sout\"              #
+#                    --endian=little --cpu=Cortex-M3 -e --require_prototypes  #
+#                    --fpu=None --dlib_config "C:\compiler\ewarm              #
+#                    5.3\arm\INC\DLib_Config_Normal.h" -I                     #
+#                    "C:\user\project\HFR OTM-L12\fw\appl_otmL12_20110505_v1. #
+#                    0\include\" -I "C:\user\project\HFR                      #
+#                    OTM-L12\fw\appl_otmL12_20110505_v1.0\lib_stm32\inc\" -I  #
+#                    "C:\user\project\HFR OTM-L12\fw\appl_otmL12_20110505_v1. #
+#                    0\lib_stm32\src\" -I "C:\user\project\HFR                #
+#                    OTM-L12\fw\appl_otmL12_20110505_v1.0\uC-CPU\" -I         #
+#                    "C:\user\project\HFR OTM-L12\fw\appl_otmL12_20110505_v1. #
+#                    0\uC-LIB\" -I "C:\user\project\HFR                       #
+#                    OTM-L12\fw\appl_otmL12_20110505_v1.0\uCOS-II\Ports\" -I  #
+#                    "C:\user\project\HFR OTM-L12\fw\appl_otmL12_20110505_v1. #
+#                    0\uCOS-II\Source\" -I "C:\user\project\HFR               #
+#                    OTM-L12\fw\appl_otmL12_20110505_v1.0\uC-Probe\" -I       #
+#                    "C:\compiler\ewarm 5.3\arm\INC\" -Oh                     #
+#    List file    =  C:\user\project\HFR OTM-L12\fw\appl_otmL12_20110505_v1.0 #
+#                    \sout\aa_dnr.lst                                         #
+#    Object file  =  C:\user\project\HFR OTM-L12\fw\appl_otmL12_20110505_v1.0 #
+#                    \sout\aa_dnr.o                                           #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+C:\user\project\HFR OTM-L12\fw\appl_otmL12_20110505_v1.0\code\aa_dnr.c
+      1          /******************** (C) COPYRIGHT 2007 STMicroelectronics ********************
+      2          * File Name          : stm32f10x_bkp.c
+      3          * Author             : MCD Application Team
+      4          * Date First Issued  : 09/29/2006
+      5          * Description        : This file provides all the BKP firmware functions.
+      6          ********************************************************************************/
+      7          
+      8          #define DNR_C
+      9          
+     10          #include "../include/main.h"
+     11          
+     12          void DnrInit(void)
+     13          {
+     14          	DnrSer0 = &DnrSer0B;
+     15           	DnrSer0->CheckByte = pUSART3.CheckByte;
+     16          	DnrSer0->RxGetByte = pUSART3.RxGetByte;
+     17          	DnrSer0->PutStr = pUSART3.PutStr;
+     18          	DnrSer0->TxCheckByte = pUSART3.TxCheckByte;
+     19          	
+     20          	DnrSer0->TimerRx = TimerDnr0Rx;
+     21          	DnrSer0->TimerEndWait = TimerDnr0EndWait;
+     22          	DnrSer0->WRCSRecv = &RDnr0sio;
+     23          	DnrSer0->WRCSSend = &SDnr0sio;
+     24          	DnrSer0->PRIO = DNR0_TASK_PRIO;
+     25          	DnrSer0->OSSem = OSSemCreate(1);
+     26          
+     27          
+     28          	DnrSer1 = &DnrSer1B;
+     29           	DnrSer1->CheckByte = pUSART5.CheckByte;
+     30          	DnrSer1->RxGetByte = pUSART5.RxGetByte;
+     31          	DnrSer1->PutStr = pUSART5.PutStr;
+     32          	DnrSer1->TxCheckByte = pUSART5.TxCheckByte;
+     33          	
+     34          	DnrSer1->TimerRx = TimerDnr1Rx;
+     35          	DnrSer1->TimerEndWait = TimerDnr1EndWait;
+     36          	DnrSer1->WRCSRecv = &RDnr1sio;
+     37          	DnrSer1->WRCSSend = &SDnr1sio;
+     38          	DnrSer1->PRIO = DNR1_TASK_PRIO;
+     39          	DnrSer1->OSSem = OSSemCreate(1);
+     40          
+     41          	if(SystemTypeInfo < 2) // DONOR CASE
+     42          	{
+     43          		OSTaskCreate(DnrTask, (void *)DnrSer0, (OS_STK *)&DNR0TaskStk[DNR_START_STK_SIZE - 1], DNR0_TASK_PRIO);
+     44          		OSTaskCreate(WRCSTask, (void *)DnrSer1, (OS_STK *)&DNR1TaskStk[DNR_START_STK_SIZE - 1], DNR1_TASK_PRIO);
+     45          	}
+     46          }
+     47          
+     48          
+     49          void DnrTask(void * pdata)
+     50          {
+     51              __ProtocolPtr *nPtr = (__ProtocolPtr *)pdata;
+     52          	INT8U tmpID = 0;
+     53          	INT16U Recv = 0;
+     54          	
+     55          /////////////////////////////////////////////		
+     56          	OSTimeDly(100*nPtr->PRIO);
+     57          
+     58          	nPtr->WRCSRecv->cBody = 0;
+     59          
+     60          	while(1)
+     61          	{
+     62          		if(!tTestFlag)
+     63          		{
+     64          			if((nPtr->CheckByte(1, &Recv)) && WRCS_ProtocolCheck(nPtr))
+     65          			{
+     66          			#if TWO_BODY >= 2
+     67          				while(nPtr->WRCSRecv->cBody  <=  nPtr->WRCSRecv->BodyNo)
+     68          				{
+     69          			#endif
+     70          					ProtocolComCheck(nPtr);
+     71          			#if TWO_BODY >= 2
+     72          					nPtr->WRCSRecv->cBody++;
+     73          				}
+     74          			#endif
+     75          				DnrLinkFailRst();
+     76          			}
+     77          			else
+     78          			{
+     79          				tmpID = DnrCheckInstalltoNext(nPtr, tmpID);
+     80          			}
+     81          		}
+     82          		OSTimeDly(300L);
+     83          	}
+     84          }
+     85          
+     86          
+     87          INT8U DnrInsertCheck(void)
+     88          {
+     89          	INT8U rval = 0;
+     90          	
+     91          	if(DNR_INSERT || MySts->RingType == 2){
+     92          		BitRst(DnrSts[MyDnrID ^ 1][0].COTInfo, mInstall);
+     93          		BitRst(DnrSts[MyDnrID ^ 1][0].RTInfo, mInstall);
+     94          
+     95          		BitRst(DnrSts[MyDnrID ^ 1][1].COTInfo, mInstall);
+     96          		BitRst(DnrSts[MyDnrID ^ 1][1].RTInfo, mInstall);
+     97          
+     98          		rval = FALSE;
+     99          	}
+    100          	else
+    101          	{
+    102          		BitSet(DnrSts[MyDnrID ^ 1][0].COTInfo, mInstall);
+    103          		BitSet(DnrSts[MyDnrID ^ 1][0].RTInfo, mInstall);
+    104          
+    105          
+    106          		BitSet(DnrSts[MyDnrID ^ 1][1].COTInfo, mInstall);
+    107          		BitSet(DnrSts[MyDnrID ^ 1][1].RTInfo, mInstall);		
+    108          
+    109          		rval = TRUE;
+    110          	}
+    111          	return rval;
+    112          }
+    113          
+    114          
+    115          INT8U DnrCheckInstalltoNext(__ProtocolPtr *nPtr, INT8U tmpID)
+    116          {
+    117          	INT8U tmpDnr = 0, tmpRmt = 0;
+    118          	INT8U id0, id1, id2;
+    119          	
+    120          	if(WRCS_DownLoadGiveupTimerSet(NULL)) return tmpID;
+    121          	if(!DnrInsertCheck())
+    122          	{
+    123          		DnrLinkFailAllRst();
+    124          		OSTimeDly(500L);
+    125          		return tmpID;
+    126          	}
+    127          	////////////////////////////////////////////////////////////////////////////
+    128          	
+    129          	tmpDnr = MyDnrID ^ 1;
+    130          	tmpRmt = tmpID;
+    131          
+    132          	IsItRtnMyVALtoSysID(&id0, &id1, &id2, tmpDnr, tmpRmt);
+    133          	pBodyFrameTx(id0, id1, id2, NULL, NULL, StatusQue, DnrSer0, NULL);
+    134          
+    135          	tmpID++;
+    136          	return (tmpID%2);
+    137          }
+    138          
+    139          
+    140          INT8U IsItRealDnrInsert(void)
+    141          {
+    142          	if(IORUInsertCheck() && !BitRead(MySts->OTUInfo, mLinkFail)) return TRUE;
+    143          	return FALSE;
+    144          }
+    145          
+    146          
+    147          void DnrLinkFailCheck(void)
+    148          {
+    149          	if((++DnrLinkFailCnt > 20))
+    150          	{
+    151          		DnrLinkFailCnt = 30;
+    152          		BitSet(DnrSts[MyDnrID ^ 1][0].COTInfo, mLinkFail);
+    153          		BitSet(DnrSts[MyDnrID ^ 1][0].RTInfo, mLinkFail);
+    154          
+    155          		BitSet(DnrSts[MyDnrID ^ 1][1].COTInfo, mLinkFail);
+    156          		BitSet(DnrSts[MyDnrID ^ 1][1].RTInfo, mLinkFail);
+    157          
+    158          		DnrSts[MyDnrID ^ 1][0].DnrAlm.LinkFail = SET; 
+    159          		DnrSts[MyDnrID ^ 1][1].DnrAlm.LinkFail = SET; 
+    160          
+    161             	}
+    162          }
+    163          
+    164          void DnrLinkFailRst(void)
+    165          {
+    166          	DnrLinkFailCnt = 0;
+    167          
+    168          	//BitRst(DnrSts[MyDnrID ^ 1][0].COTInfo, mLinkFail);
+    169          	//BitRst(DnrSts[MyDnrID ^ 1][0].RTInfo, mLinkFail);
+    170          	//DnrSts[MyDnrID ^ 1][0].DnrAlm.LinkFail = RESET; 
+    171          }
+    172          
+    173          void DnrLinkFailAllRst(void)
+    174          {
+    175          	DnrLinkFailCnt = 0;
+    176          	BitRst(DnrSts[MyDnrID ^ 1][0].COTInfo, mLinkFail);
+    177          	BitRst(DnrSts[MyDnrID ^ 1][0].RTInfo, mLinkFail);
+    178          
+    179          	BitRst(DnrSts[MyDnrID ^ 1][1].COTInfo, mLinkFail);
+    180          	BitRst(DnrSts[MyDnrID ^ 1][1].RTInfo, mLinkFail);
+    181          
+    182          	DnrSts[MyDnrID ^ 1][0].DnrAlm.LinkFail = RESET; 
+    183          	DnrSts[MyDnrID ^ 1][1].DnrAlm.LinkFail = RESET; 
+    184          }
+    185          
+    186          
+    187          ////////////////////////////////////////////////////////////////////////////////
+    188          // End of Source File
+    189          /////////////////////////
+    190          
+
+   Maximum stack usage in bytes:
+
+     Function              .cstack
+     --------              -------
+     DnrCheckInstalltoNext     32
+     DnrInit                   16
+     DnrInsertCheck             0
+     DnrLinkFailAllRst          0
+     DnrLinkFailCheck           0
+     DnrLinkFailRst             0
+     DnrTask                   24
+     IsItRealDnrInsert          8
+
+
+   Section sizes:
+
+     Function/Label        Bytes
+     --------------        -----
+     DnrLinkFailCnt           1
+     DnrSer0B              6344
+     DnrSer1B
+     DnrSer0
+     DnrSer1
+     SDnr0sio
+     RDnr0sio
+     SDnr1sio
+     RDnr1sio
+     DNR0TaskStk
+     DNR1TaskStk
+     Dnr0SendBuff             4
+     DnrInit                188
+     DnrTask                 96
+     DnrInsertCheck         164
+     DnrCheckInstalltoNext  112
+     IsItRealDnrInsert       30
+     DnrLinkFailCheck       110
+     DnrLinkFailRst           8
+     DnrLinkFailAllRst       98
+     ??DataTable8             4
+     ??DataTable9             4
+     ??DataTable14            4
+     ??DataTable15            4
+     ??DataTable16            4
+
+ 
+     1 byte  in section .bss
+ 6 348 bytes in section .data
+   826 bytes in section .text
+ 
+   826 bytes of CODE memory
+ 6 349 bytes of DATA memory
+
+Errors: none
+Warnings: none

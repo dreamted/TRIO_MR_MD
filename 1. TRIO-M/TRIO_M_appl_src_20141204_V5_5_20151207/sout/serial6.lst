@@ -1,0 +1,357 @@
+###############################################################################
+#                                                                             #
+# IAR ANSI C/C++ Compiler V5.30.2.51295/W32 for ARM     18/May/2012  17:35:02 #
+# Copyright 1999-2009 IAR Systems AB.                                         #
+#                                                                             #
+#    Cpu mode     =  thumb                                                    #
+#    Endian       =  little                                                   #
+#    Source file  =  D:\Project\TRIO\3.F_W\TRIO_appl_src_20120516\lib\16c550\ #
+#                    serial6.c                                                #
+#    Command line =  D:\Project\TRIO\3.F_W\TRIO_appl_src_20120516\lib\16c550\ #
+#                    serial6.c -D NDEBUG -lcN D:\Project\TRIO\3.F_W\TRIO_appl #
+#                    _src_20120516\sout\ -o D:\Project\TRIO\3.F_W\TRIO_appl_s #
+#                    rc_20120516\sout\ --endian=little --cpu=Cortex-M3 -e     #
+#                    --warnings_are_errors --fpu=None --dlib_config           #
+#                    "C:\Program Files\IAR Systems\Embedded Workbench         #
+#                    5.4\arm\INC\DLib_Config_Normal.h" -I                     #
+#                    D:\Project\TRIO\3.F_W\TRIO_appl_src_20120516\include\    #
+#                    -I D:\Project\TRIO\3.F_W\TRIO_appl_src_20120516\lib_stm3 #
+#                    2\inc\ -I D:\Project\TRIO\3.F_W\TRIO_appl_src_20120516\l #
+#                    ib_stm32\src\ -I D:\Project\TRIO\3.F_W\TRIO_appl_src_201 #
+#                    20516\uC-CPU\ -I D:\Project\TRIO\3.F_W\TRIO_appl_src_201 #
+#                    20516\uC-LIB\ -I D:\Project\TRIO\3.F_W\TRIO_appl_src_201 #
+#                    20516\uCOS-II\Ports\ -I D:\Project\TRIO\3.F_W\TRIO_appl_ #
+#                    src_20120516\uCOS-II\Source\ -I                          #
+#                    D:\Project\TRIO\3.F_W\TRIO_appl_src_20120516\uC-Probe\   #
+#                    -I "C:\Program Files\IAR Systems\Embedded Workbench      #
+#                    5.4\arm\INC\" -Oh                                        #
+#    List file    =  D:\Project\TRIO\3.F_W\TRIO_appl_src_20120516\sout\serial #
+#                    6.lst                                                    #
+#    Object file  =  D:\Project\TRIO\3.F_W\TRIO_appl_src_20120516\sout\serial #
+#                    6.o                                                      #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\Project\TRIO\3.F_W\TRIO_appl_src_20120516\lib\16c550\serial6.c
+      1          /*******************************************************************************
+      2           *
+      3           * This module contains the function `7092 original header file, a function
+      4           * whole things  initializations - global, include function and so on
+      5           *
+      6           *
+      7           * Note that this function is called before the data segments are
+      8           * initialized, this means that this function cannot rely on the
+      9           * values of global or static variables.
+     10           *
+     11           *
+     12           *
+     13           * $Revision: 0.1 $
+     14           * $Revision date: 2007.04.__
+     15           * $Revision: 0.2 $
+     16           * $Revision date: 2007.10.__
+     17           *               : to check insert read register -> return value
+     18           * $Revision: 0.3 $
+     19           * $Revision date: 2008.03.07
+     20           *               : Ser5PutStrOpt Append
+     21           ******************************************************************************/
+     22          
+     23          #include <stdarg.h>
+     24          #include <stdlib.h>
+     25          #include <stdio.h>
+     26          #include <string.h>
+     27          
+     28          #include "ucos_ii.h"
+     29          #include "cpu.h"
+     30          
+     31          #include "stm32f10x_type.h"
+     32          #include "../include/uart16550ext.h"
+     33          #include "Serial6.h"
+     34          
+     35          
+     36          
+     37          unsigned long int USART1Printf( const char *format, ...);
+     38          unsigned char USART1PutChar(unsigned char Data);
+     39          
+     40          unsigned char Ser6Init(unsigned long int nBps, unsigned char _LCR, unsigned long int bAddr)
+     41          {
+     42          	INT8U ch = 0;
+     43          	INT8U rval = TRUE;
+     44              // CLK: 49.7664 Mhz
+     45          	UART6_base = bAddr;
+     46          
+     47          	U6LCR = 0x80;			// Baud rate select mode
+     48          	U6DLL = ch = (INT8U)(UART_CLOCK/(16L*nBps));
+     49          	USART1Printf("U6LCR: %02x \n", U6LCR);
+     50          	USART1Printf("U6DLL: %02x \n", U6DLL);
+     51          
+     52          	if(U6DLL != ch) rval = FALSE;
+     53          	U6DLM = 0x00;			//
+     54          	U6LCR = _LCR;			// Normal mode register
+     55          	if(U6LCR != _LCR) rval = FALSE;
+     56          	U6MCR = 0x0B;			// Here, Reserved
+     57          	U6FCR = 0x07;			// Reset FIFO, Tx Fifo Reset, Rx Fifo Reset
+     58          	U6FCR = 0x01;			// Fifo
+     59          
+     60          	U6IER = 0x05;			// Rx Interrupt Enable
+     61          	USART1Printf("U6IER: %02x \n", U6IER);
+     62          
+     63          	ch = U6MSR;
+     64          	ch = ch | 0x20 ;
+     65          	U6MSR = ch;
+     66          	ch = U6MCR;
+     67          	ch = ch | 0x01 ;		// DTR 1 set
+     68          	U6MCR = ch;
+     69          	if(U6MCR != ch) rval = FALSE;
+     70          
+     71          	////////////////////////////////////////////////////////////////
+     72          	if(!Tx6CharSem)
+     73          	{
+     74          		Tx6CharSem = OSSemCreate(1);
+     75          		USART1Printf("semipore created!\n");
+     76          	}
+     77          
+     78          	return rval;
+     79          }
+     80          
+     81          ////////////////////////////////////////////////////////////////////
+     82          void Ser6Handler(void)
+     83          {
+     84          	INT16S Reg = U6FCR & 0x0f;
+     85          
+     86          	if(Reg == 0x04)
+     87          	{
+     88          		Ser6RxBuff[Rx6WrCnt] = U6RBR;		// When the receive register is read, the RDR bit is automatically cleared.
+     89          		if(++Rx6WrCnt >= Ser6BuffLen) Rx6WrCnt = 0;
+     90          	}
+     91          	else if(Reg == 0x02)
+     92          	{
+     93          		while(1)
+     94          		{
+     95          			Reg = U6LSR & 0x60;
+     96          			//USART1PutChar(Reg);
+     97          			if(Reg != 0) break;
+     98          		}
+     99          
+    100          		Reg = Ser6TxGetByte();
+    101          		//USART1PutChar((INT8U)(Reg >> 8));
+    102          		//USART1PutChar((INT8U)(Reg >> 0));
+    103          		if(Reg != -1)
+    104          		{
+    105          			U6THR = (INT8U)Reg;
+    106          			//USART1PutChar((INT8U)(Reg >> 0));
+    107          			//U6IER |= (IER_TIE | IER_RIE);	// TXIE set
+    108          			//USART1PutChar((INT8U)U6IER);
+    109          		}
+    110          		else
+    111          		{
+    112          			///USART1PutChar('E');
+    113          			U6IER = 0x01;
+    114          		}
+    115          	}
+    116          	else
+    117          	{
+    118          		Reg  = U6LSR;
+    119          		Reg  = U6RBR;		// dummy하게 RD값을 읽는다(무시)
+    120          		Reg  = U6MSR;
+    121          		U6FCR = 0x07;		// fifo clear
+    122          	}
+    123          }
+    124          
+    125          ////////////////////////////////////////////////////////////////////////////////
+    126          
+    127          unsigned char Ser6PutChar(unsigned char Data)
+    128          {
+    129          	INT8U err;
+    130          	OSSemPend(Tx6CharSem, 0, &err );
+    131          	if(err != OS_NO_ERR ) return err;
+    132          
+    133          /////////////////////////////////////////////////////////////////////
+    134          	while((U6LSR & LSR_THRE) == 0);
+    135          	U6THR = Data;
+    136          /////////////////////////////////////////////////////////////////////
+    137          	OSSemPost(Tx6CharSem);
+    138          	return OS_NO_ERR;
+    139          }
+    140          
+    141          unsigned char Ser6PutToBuffer(unsigned char Data)
+    142          {
+    143          	INT8U err;
+    144          
+    145          	//WatchdogClear();
+    146          	OSSemPend(Tx6CharSem, 0, &err );
+    147          	//if(err != OS_NO_ERR ) return err;
+    148          
+    149          	Ser6TxBuff[Tx6WrCnt] = Data;
+    150          	if(++Tx6WrCnt >= Ser6BuffLen) Tx6WrCnt = 0;
+    151          	U6IER |= IER_TIE;	// TXIE set
+    152          ///////////////////////////////////////////////////
+    153          	OSSemPost(Tx6CharSem);
+    154          	return OS_NO_ERR;
+    155          }
+    156          
+    157          void Ser6PutStr(unsigned char *Str, unsigned short int Length, int iEn)
+    158          {
+    159          	unsigned char err;
+    160          	unsigned long int i;
+    161          
+    162          	OSSemPend(Tx6CharSem, 0, &err);
+    163          
+    164          	for(i = 0; i < Length; i++)
+    165          	{
+    166          		Ser6TxBuff[Tx6WrCnt++] = Str[i];
+    167          		Tx6WrCnt %= Ser6BuffLen;
+    168          	}
+    169          ///////////////////////////////////////////////////
+    170          	if(iEn)
+    171          	{
+    172          		U6IER |= IER_TIE;	// TXIE set
+    173          	}	
+    174          	OSSemPost(Tx6CharSem);
+    175          }
+    176          
+    177          
+    178          unsigned long int Ser6Printf( const char *format, ... )
+    179          {
+    180          	unsigned long int i, cnt;
+    181          	char buf[256];
+    182          	va_list argptr;
+    183          
+    184          	va_start(argptr, format);
+    185          	cnt = vsprintf(buf, format, argptr);
+    186          	va_end( argptr );
+    187          
+    188          	for(i = 0;;i++)
+    189          	{
+    190          		if(buf[i] == 0) break;
+    191          		if(buf[i] == '\n') Ser6PutToBuffer('\r');
+    192          		Ser6PutToBuffer(buf[i]);
+    193          	}
+    194          	return cnt;
+    195          }
+    196          
+    197          
+    198          signed short int Ser6RxGetByte(void)
+    199          {
+    200              INT16S RetVal = 0;
+    201          
+    202              if(Rx6RdCnt == Rx6WrCnt) return -1;
+    203          	RetVal = Ser6RxBuff[Rx6RdCnt];
+    204          	if(++Rx6RdCnt >= Ser6BuffLen ) Rx6RdCnt = 0;
+    205          
+    206          	return (RetVal & 0xff);
+    207          }
+    208          
+    209          signed short int Ser6TxGetByte(void)
+    210          {
+    211          	INT16S RetVal = 0;
+    212          
+    213          	if(Tx6RdCnt == Tx6WrCnt) return -1;
+    214          
+    215          	RetVal = Ser6TxBuff[Tx6RdCnt];
+    216          	if(++Tx6RdCnt >= Ser6BuffLen ) Tx6RdCnt = 0;
+    217          	return (RetVal & 0xff);
+    218          }
+    219          
+    220          unsigned char Ser6CheckByte(unsigned short int ByteCnt, unsigned short int *Recv)
+    221          {
+    222          	INT32U	i = 0, j = 0;
+    223          	BOOL	RetVal = TRUE;
+    224          
+    225          	*Recv = 0;
+    226          	i = (INT32U) Rx6RdCnt;
+    227          	j = (INT32U) Rx6WrCnt;
+    228          
+    229          	if		(i == j) RetVal = FALSE;
+    230          	else if (i < j)
+    231          	{
+    232          		*Recv = j - i;
+    233          		i = i + ByteCnt;
+    234          		if(i > j)   RetVal = FALSE;
+    235          	}
+    236          	else if (i > j)
+    237          	{
+    238          		*Recv = (Ser6BuffLen + j) - i;
+    239          		i = i + ByteCnt;
+    240          		j = j + Ser6BuffLen;
+    241          		if(i > j)   RetVal = FALSE;
+    242          	}
+    243          	return(RetVal);
+    244          }
+    245          
+    246          void Ser6BuffClear( void )
+    247          {
+    248          	Rx6RdCnt = 0;
+    249          	Rx6WrCnt = 0;
+    250          	Tx6RdCnt = 0;
+    251          	Tx6WrCnt = 0;
+    252          }
+    253          
+    254          signed short int Ser6TxCheckByte(void)
+    255          {
+    256          	if(Tx6RdCnt == Tx6WrCnt) return TRUE;
+    257          	else					 return FALSE;
+    258          }
+    259          
+    260          ////////////////////////////////////////////////////////////////////////////////
+    261          // End of Source File
+    262          /////////////////////
+    263          
+
+   Maximum stack usage in bytes:
+
+     Function        .cstack
+     --------        -------
+     Ser6BuffClear        0
+     Ser6CheckByte        8
+     Ser6Handler          8
+     Ser6Init            24
+     Ser6Printf         280
+     Ser6PutChar         16
+     Ser6PutStr          24
+     Ser6PutToBuffer     16
+     Ser6RxGetByte        0
+     Ser6TxCheckByte      0
+     Ser6TxGetByte        0
+
+
+   Section sizes:
+
+     Function/Label               Bytes
+     --------------               -----
+     Rx6RdCnt                       16
+     Rx6WrCnt
+     Tx6RdCnt
+     Tx6WrCnt
+     UART6_base
+     Tx6CharSem
+     Ser6RxBuff                   1024
+     Ser6TxBuff                   1024
+     Ser6Init                      188
+     Ser6Handler                    88
+     Ser6PutChar                    44
+     Ser6PutToBuffer                60
+     Ser6PutStr                     72
+     Ser6Printf                     56
+     Ser6RxGetByte                  38
+     ?Subroutine0                    6
+     Ser6TxGetByte                  38
+     Ser6CheckByte                  58
+     Ser6BuffClear                  14
+     Ser6TxCheckByte                18
+     ??DataTable9                    4
+     ??DataTable11                   4
+     ??DataTable14                   4
+     ?<Constant "U6LCR: %02x \n">   68
+
+ 
+ 2 064 bytes in section .bss
+    68 bytes in section .rodata
+   692 bytes in section .text
+ 
+   692 bytes of CODE  memory
+    68 bytes of CONST memory
+ 2 064 bytes of DATA  memory
+
+Errors: none
+Warnings: none

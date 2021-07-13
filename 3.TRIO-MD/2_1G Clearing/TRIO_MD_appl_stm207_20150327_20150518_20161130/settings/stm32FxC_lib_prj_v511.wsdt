@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<Workspace>
+  <ConfigDictionary>
+    
+    
+    
+  <CurrentConfigs><Project>stm32FxC_ucos_prj_v511/Release</Project><Project>stm32FxC_lib_prj_v511/Release</Project><Project>stm32F_cpulib_prj_v62/Release</Project></CurrentConfigs><CurrentProj>stm32FxC_ucos_prj_v511</CurrentProj><OverviewSelected>0</OverviewSelected></ConfigDictionary>
+  <Desktop>
+    <Static>
+      <Workspace>
+        <ColumnWidths>
+          
+          
+          
+          
+        <Column0>139</Column0><Column1>27</Column1><Column2>27</Column2><Column3>0</Column3></ColumnWidths>
+      </Workspace>
+      <Build>
+        
+        
+        
+        
+      <ColumnWidth0>20</ColumnWidth0><ColumnWidth1>843</ColumnWidth1><ColumnWidth2>225</ColumnWidth2><ColumnWidth3>56</ColumnWidth3></Build>
+    </Static>
+    <Windows>
+      
+      
+    <Wnd0>
+        <Tabs>
+          <Tab>
+            <Identity>TabID-23712-27415</Identity>
+            <TabName>Workspace</TabName>
+            <Factory>Workspace</Factory>
+            <Session>
+              
+            <NodeDict><ExpandedNode>&lt;ws&gt;</ExpandedNode><ExpandedNode>stm32F_cpulib_prj_v62</ExpandedNode><ExpandedNode>stm32FxC_lib_prj_v511</ExpandedNode><ExpandedNode>stm32FxC_lib_prj_v511/Output</ExpandedNode><ExpandedNode>stm32FxC_ucos_prj_v511</ExpandedNode><ExpandedNode>stm32FxC_ucos_prj_v511/Output</ExpandedNode><ExpandedNode>stm32FxC_ucos_prj_v511/[]version</ExpandedNode><ExpandedNode>stm32FxC_ucos_prj_v511/dev</ExpandedNode><ExpandedNode>stm32FxC_ucos_prj_v511/source</ExpandedNode></NodeDict></Session>
+          </Tab>
+        </Tabs>
+        
+      <SelectedTab>0</SelectedTab></Wnd0><Wnd1>
+        <Tabs>
+          <Tab>
+            <Identity>TabID-9827-27471</Identity>
+            <TabName>Build</TabName>
+            <Factory>Build</Factory>
+            <Session/>
+          </Tab>
+        </Tabs>
+        
+      <SelectedTab>0</SelectedTab></Wnd1></Windows>
+    <Editor>
+      
+      
+      
+      
+    <Pane><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\code\apl_dtu.c</Filename><XPos>0</XPos><YPos>813</YPos><SelStart>23497</SelStart><SelEnd>23497</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\include\aa_serial1.h</Filename><XPos>0</XPos><YPos>235</YPos><SelStart>9204</SelStart><SelEnd>9204</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\version.txt</Filename><XPos>0</XPos><YPos>30</YPos><SelStart>1638</SelStart><SelEnd>1638</SelEnd></Tab><ActiveTab>2</ActiveTab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\include\main.h</Filename><XPos>0</XPos><YPos>67</YPos><SelStart>2743</SelStart><SelEnd>2743</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\code\aa_protocol.c</Filename><XPos>0</XPos><YPos>2537</YPos><SelStart>99491</SelStart><SelEnd>99491</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\out\stm32FxC_ucos_prj_v511.map</Filename><XPos>0</XPos><YPos>1635</YPos><SelStart>107151</SelStart><SelEnd>107151</SelEnd></Tab></Pane><ActivePane>0</ActivePane><Sizes><Pane><X>1000000</X><Y>1000000</Y></Pane></Sizes><SplitMode>1</SplitMode></Editor>
+    <Positions>
+      
+      
+      
+      
+      
+    <Top><Row0><Sizes><Toolbar-0105c790><key>iaridepm.enu1</key></Toolbar-0105c790></Sizes></Row0></Top><Left><Row0><Sizes><Wnd0><Rect><Top>-2</Top><Left>-2</Left><Bottom>533</Bottom><Right>230</Right><x>-2</x><y>-2</y><xscreen>174</xscreen><yscreen>201</yscreen><sizeHorzCX>172790</sizeHorzCX><sizeHorzCY>258687</sizeHorzCY><sizeVertCX>230387</sizeVertCX><sizeVertCY>688546</sizeVertCY></Rect></Wnd0></Sizes></Row0></Left><Right><Row0><Sizes/></Row0></Right><Bottom><Row0><Sizes><Wnd1><Rect><Top>-2</Top><Left>-2</Left><Bottom>199</Bottom><Right>1009</Right><x>-2</x><y>-2</y><xscreen>1011</xscreen><yscreen>201</yscreen><sizeHorzCX>1003972</sizeHorzCX><sizeHorzCY>258687</sizeHorzCY><sizeVertCX>172790</sizeVertCX><sizeVertCY>258687</sizeVertCY></Rect></Wnd1></Sizes></Row0></Bottom><Float><Sizes/></Float></Positions>
+  </Desktop>
+</Workspace>
+
+

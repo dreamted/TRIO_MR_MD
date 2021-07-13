@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<project>
+  <fileVersion>2</fileVersion>
+  <fileChecksum>2526977398</fileChecksum>
+  <configuration>
+    <name>Debug</name>
+    <outputs>
+      <file>$PROJ_DIR$\lib\ext\lib_extdev_1208.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\lib_fsmc_sram_1208.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\lib_timer_1212.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\lib_extdev_1208.pbi</file>
+      <file>$PROJ_DIR$\lib\include\lib_extdevext.h</file>
+      <file>$PROJ_DIR$\lib\include\eepext.h</file>
+      <file>$PROJ_DIR$\lib\timer\lib_timer_1212.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\lib_24c64_1208.pbi</file>
+      <file>$PROJ_DIR$\lib\at24c64\lib_24c64_1208.h</file>
+      <file>$PROJ_DIR$\lib\include\lib_timerext.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\lib_24c64_1208.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\lib_timer_1212.o</file>
+      <file>$PROJ_DIR$\Debug\Exe\stm32FxC_lib_prj_v511.out</file>
+      <file>$PROJ_DIR$\Debug\Obj\lib_extdev_1208.o</file>
+      <file>$PROJ_DIR$\lib\fsmc\lib_fsmc_sram_1208.h</file>
+      <file>$PROJ_DIR$\lib\at24c64\lib_24c64_1208.c</file>
+      <file>$PROJ_DIR$\lib\fsmc\lib_fsmc_sram_1208.c</file>
+      <file>$PROJ_DIR$\lib\ext\lib_extdev_1208.c</file>
+      <file>$PROJ_DIR$\lib\timer\lib_timer_1212.c</file>
+      <file>$PROJ_DIR$\Debug\Obj\stm32FxC_lib_prj_v511.pbd</file>
+      <file>$PROJ_DIR$\Debug\Obj\lib_fsmc_sram_1208.o</file>
+    </outputs>
+    <file>
+      <name>[ROOT_NODE]</name>
+      <outputs>
+        <tool>
+          <name>ILINK</name>
+          <file> 12</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\lib\at24c64\lib_24c64_1208.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 10</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 7</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 5 8</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\lib\fsmc\lib_fsmc_sram_1208.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 20</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 1</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 14</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\lib\ext\lib_extdev_1208.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 13</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 3</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 0 4</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\lib\timer\lib_timer_1212.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 11</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 2</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 9 6</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\Debug\Obj\stm32FxC_lib_prj_v511.pbd</name>
+      <inputs>
+        <tool>
+          <name>BILINK</name>
+          <file> 7 3 1 2</file>
+        </tool>
+      </inputs>
+    </file>
+    <forcedrebuild>
+      <name>[MULTI_TOOL]</name>
+      <tool>ILINK</tool>
+    </forcedrebuild>
+  </configuration>
+  <configuration>
+    <name>Release</name>
+    <outputs>
+      <file>$PROJ_DIR$\STM32F2xx_StdPeriph_Driver_v1212\inc\stm32f2xx_rcc_1208.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\stdio.h</file>
+      <file>$PROJ_DIR$\STM32F2xx_StdPeriph_Driver_v1212\inc\stm32f2xx_pwr.h</file>
+      <file>$PROJ_DIR$\STM32F2xx_StdPeriph_Driver_v1212\inc\stm32f2xx_dcmi.h</file>
+      <file>$PROJ_DIR$\STM32F2xx_StdPeriph_Driver_v1212\inc\stm32f2xx_fsmc.h</file>
+      <file>$PROJ_DIR$\STM32F2xx_StdPeriph_Driver_v1212\inc\stm32f0xx_core.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\yvals.h</file>
+      <file>$PROJ_DIR$\STM32F2xx_StdPeriph_Driver_v1212\inc\stm32f2xx_main.h</file>
+      <file>$PROJ_DIR$\STM32F2xx_StdPeriph_Driver_v1212\inc\stm32f2xx_dac.h</file>
+      <file>$PROJ_DIR$\STM32F2xx_StdPeriph_Driver_v1212\inc\stm32f2xx_rtc.h</file>
+      <file>$PROJ_DIR$\out\lib_extdev_1208.pbi</file>
+      <file>$PROJ_DIR$\STM32F2xx_StdPeriph_Driver_v1212\stm32f2xx_conf.h</file>
+      <file>$PROJ_DIR$\STM32F2xx_StdPeriph_Driver_v1212\inc\stm32f2xx_tim.h</file>
+      <file>$PROJ_DIR$\out\lib_fsmc_sram_1208.pbi</file>
+      <file>$PROJ_DIR$\lib\ext\lib_extdev_1208.h</file>
+      <file>$PROJ_DIR$\STM32F2xx_StdPeriph_Driver_v1212\inc\stm32f2xx_syscfg.h</file>
+      <file>$PROJ_DIR$\STM32F2xx_StdPeriph_Driver_v1212\inc\stm32f2xx_flash_1208.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\DLib_Defaults.h</file>
+      <file>$PROJ_DIR$\STM32F2xx_StdPeriph_Driver_v1212\inc\stm32f2xx_rng.h</file>
+      <file>$PROJ_DIR$\out\lib_24c64_1208.o</file>
+      <file>$TOOLKIT_DIR$\inc\c\DLib_Product_string.h</file>
+      <file>$PROJ_DIR$\uCOS-II\Ports\os_cfg.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\stdarg.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\string.h</file>
+      <file>$PROJ_DIR$\STM32F2xx_StdPeriph_Driver_v1212\inc\stm32f2xx_i2c.h</file>
+      <file>$PROJ_DIR$\out\lib_fsmc_sram_1208.o</file>
+      <file>$PROJ_DIR$\out\lib_extdev_1208.o</file>
+      <file>$PROJ_DIR$\STM32F2xx_StdPeriph_Driver_v1212\stm32f2xx_1212.h</file>
+      <file>$PROJ_DIR$\STM32F2xx_StdPeriph_Driver_v1212\inc\stm32f2xx_hash.h</file>
+      <file>$PROJ_DIR$\uC-CPU\cpu.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\ycheck.h</file>
+      <file>$PROJ_DIR$\STM32F2xx_StdPeriph_Driver_v1212\inc\stm32f2xx_cryp.h</file>
+      <file>$PROJ_DIR$\STM32F2xx_StdPeriph_Driver_v1212\inc\stm32f2xx_gpio_1212.h</file>
+      <file>$PROJ_DIR$\uCOS-II\Source\ucos_ii.h</file>
+      <file>$PROJ_DIR$\STM32F2xx_StdPeriph_Driver_v1212\inc\stm32f2xx_iwdg.h</file>
+      <file>$PROJ_DIR$\STM32F2xx_StdPeriph_Driver_v1212\inc\stm32f2xx_spi.h</file>
+      <file>$PROJ_DIR$\lib\include\lib_extdevext.h</file>
+      <file>$PROJ_DIR$\lib\include\eepext.h</file>
+      <file>$PROJ_DIR$\lib\timer\lib_timer_1212.h</file>
+      <file>$PROJ_DIR$\lib\at24c64\lib_24c64_1208.h</file>
+      <file>$PROJ_DIR$\lib\include\lib_timerext.h</file>
+      <file>$PROJ_DIR$\lib\fsmc\lib_fsmc_sram_1208.h</file>
+      <file>$PROJ_DIR$\STM32F2xx_StdPeriph_Driver_v1212\inc\stm32f2xx_dma.h</file>
+      <file>$PROJ_DIR$\uCOS-II\Ports\os_cpu.h</file>
+      <file>$PROJ_DIR$\STM32F2xx_StdPeriph_Driver_v1212\stm32f0xx_type.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\ystdio.h</file>
+      <file>$PROJ_DIR$\STM32F2xx_StdPeriph_Driver_v1212\inc\stm32f2xx_exti.h</file>
+      <file>$PROJ_DIR$\out\lib_timer_1212.o</file>
+      <file>$PROJ_DIR$\out\lib_timer_1212.pbi</file>
+      <file>$TOOLKIT_DIR$\inc\c\xencoding_limits.h</file>
+      <file>$PROJ_DIR$\STM32F2xx_StdPeriph_Driver_v1212\inc\stm32f2xx_wwdg.h</file>
+      <file>$PROJ_DIR$\STM32F2xx_StdPeriph_Driver_v1212\inc\stm32f2xx_adc.h</file>
+      <file>$PROJ_DIR$\STM32F2xx_StdPeriph_Driver_v1212\inc\stm32f2xx_crc.h</file>
+      <file>$PROJ_DIR$\STM32F2xx_StdPeriph_Driver_v1212\inc\stm32f2xx_sdio.h</file>
+      <file>$PROJ_DIR$\STM32F2xx_StdPeriph_Driver_v1212\stm32f2xx_system.h</file>
+      <file>$PROJ_DIR$\out\lib_24c64_1208.pbi</file>
+      <file>$PROJ_DIR$\out\stm32FxC_lib_prj_v511.pbd</file>
+      <file>$TOOLKIT_DIR$\inc\c\stdlib.h</file>
+      <file>$PROJ_DIR$\STM32F2xx_StdPeriph_Driver_v1212\inc\stm32f2xx_can.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\DLib_Product.h</file>
+      <file>$PROJ_DIR$\STM32F2xx_StdPeriph_Driver_v1212\inc\stm32f2xx_nvic_1208.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\DLib_Threads.h</file>
+      <file>$PROJ_DIR$\STM32F2xx_StdPeriph_Driver_v1212\inc\stm32f2xx_dbgmcu.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\ysizet.h</file>
+      <file>$PROJ_DIR$\stm32F_devlib_prj_v62.a</file>
+      <file>$TOOLKIT_DIR$\inc\c\stdint.h</file>
+      <file>$PROJ_DIR$\STM32F2xx_StdPeriph_Driver_v1212\inc\stm32f0xx_macro.h</file>
+      <file>$PROJ_DIR$\STM32F2xx_StdPeriph_Driver_v1212\inc\stm32f2xx_usart.h</file>
+      <file>$PROJ_DIR$\lib\at24c64\lib_24c64_1208.c</file>
+      <file>$PROJ_DIR$\lib\fsmc\lib_fsmc_sram_1208.c</file>
+      <file>$PROJ_DIR$\lib\ext\lib_extdev_1208.c</file>
+      <file>$PROJ_DIR$\lib\timer\lib_timer_1212.c</file>
+    </outputs>
+    <file>
+      <name>[ROOT_NODE]</name>
+      <outputs>
+        <tool>
+          <name>IARCHIVE</name>
+          <file> 64</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\out\stm32FxC_lib_prj_v511.pbd</name>
+      <inputs>
+        <tool>
+          <name>BILINK</name>
+          <file> 55 10 13 48</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\lib\at24c64\lib_24c64_1208.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 19</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 55</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 37 39 27 65 30 6 17 59 49 61 1 63 45 57 23 20 22 33 21 43 29 44 5 66 11 51 58 52 31 8 62 3 42 46 16 4 28 32 24 34 2 0 18 9 53 35 15 12 67 50 60 7 54</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\lib\fsmc\lib_fsmc_sram_1208.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 25</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 13</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 41 27 65 30 6 17 59 49 61 1 63 45 57 23 20 22 33 21 43 29 44 5 66 11 51 58 52 31 8 62 3 42 46 16 4 28 32 24 34 2 0 18 9 53 35 15 12 67 50 60 7 54</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\lib\ext\lib_extdev_1208.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 26</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 10</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 14 27 65 30 6 17 59 49 61 1 63 45 57 23 20 22 33 21 43 29 44 5 66 11 51 58 52 31 8 62 3 42 46 16 4 28 32 24 34 2 0 18 9 53 35 15 12 67 50 60 7 54 36 41</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\lib\timer\lib_timer_1212.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 47</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 48</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 27 65 30 6 17 59 49 61 1 63 45 57 23 20 22 33 21 43 29 44 5 66 11 51 58 52 31 8 62 3 42 46 16 4 28 32 24 34 2 0 18 9 53 35 15 12 67 50 60 7 54 40 38</file>
+        </tool>
+      </inputs>
+    </file>
+  </configuration>
+</project>
+
+

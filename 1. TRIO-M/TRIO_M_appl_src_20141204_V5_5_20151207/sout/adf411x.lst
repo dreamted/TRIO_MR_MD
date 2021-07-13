@@ -1,0 +1,354 @@
+###############################################################################
+#                                                                             #
+#                                                       19/May/2017  23:29:24 #
+# IAR ANSI C/C++ Compiler V5.50.5.21995/W32 EVALUATION for ARM                #
+# Copyright (C) 1999-2010 IAR Systems AB.                                     #
+#                                                                             #
+#    Cpu mode     =  thumb                                                    #
+#    Endian       =  little                                                   #
+#    Source file  =  D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V5_5_ #
+#                    20151207\dev\adf411x\adf411x.c                           #
+#    Command line =  "D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V5_5 #
+#                    _20151207\dev\adf411x\adf411x.c" -D _MIMO_Type -D __2rd  #
+#                    -D __PLLEnToggle -lcN "D:\Project\TRIO\1.                #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\sout\" -o  #
+#                    "D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V5_5 #
+#                    _20151207\sout\" --endian=little --cpu=Cortex-M3 -e      #
+#                    --require_prototypes --warnings_are_errors --fpu=None    #
+#                    --dlib_config "D:\Program Files (x86)\IAR                #
+#                    Systems\Embedded Workbench 5.4                           #
+#                    Evaluation\arm\INC\DLib_Config_Normal.h" -I              #
+#                    "D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V5_5 #
+#                    _20151207\include\" -I "D:\Project\TRIO\1.               #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\lib_stm32\ #
+#                    inc\" -I "D:\Project\TRIO\1.                             #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\lib_stm32\ #
+#                    src\" -I "D:\Project\TRIO\1.                             #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\uC-CPU\"   #
+#                    -I "D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V #
+#                    5_5_20151207\uC-LIB\" -I "D:\Project\TRIO\1.             #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\uCOS-II\Po #
+#                    rts\" -I "D:\Project\TRIO\1.                             #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\uCOS-II\So #
+#                    urce\" -I "D:\Project\TRIO\1.                            #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\uC-Probe\" #
+#                     -I "D:\Program Files (x86)\IAR Systems\Embedded         #
+#                    Workbench 5.4 Evaluation\arm\INC\" -Oh                   #
+#    List file    =  D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V5_5_ #
+#                    20151207\sout\adf411x.lst                                #
+#    Object file  =  D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V5_5_ #
+#                    20151207\sout\adf411x.o                                  #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\dev\adf411x\adf411x.c
+      1          /*******************************************************************************
+      2           *
+      3           * This module contains the function HMS39C7092 original source file, a function
+      4           * whole things  initializations - global, include function and so on
+      5           *
+      6           *
+      7           * Note that this function is called before the data segments are
+      8           * initialized, this means that this function cannot rely on the
+      9           * values of global or static variables.
+     10           *
+     11           *
+     12           * Copyright 2006- bizistyle(bgyoon@hanafos.com) All rights reserved.
+     13           * - used for LMX2306/LMX2316/LMX411x
+     14           
+     15           * $Revision: 0.1 $
+     16           * $Revision date: 2006.08.__
+     17           *
+     18            ******************************************************************************/
+     19          #define PLL_C
+     20           
+     21          #include "../include/main.h"
+     22          
+     23          
+     24          #define __PRE		32
+     25          
+     26          
+     27          #define	Pll232x_debug
+     28          
+     29          void Pll411xCreate(_pPll411xStr ptr, 
+     30          						void (*SetClk)(), void (*RstClk)(), 
+     31          							void (*SetData)(), void (*RstData)(),
+     32          							  void (*SetEn)(), void (*RstEn)() )
+     33          {
+     34              ptr->SetClk = SetClk;
+     35              ptr->RstClk = RstClk;
+     36              ptr->SetData = SetData;
+     37              ptr->RstData = RstData;
+     38              ptr->SetEn = SetEn;
+     39              ptr->RstEn = RstEn;    
+     40          }
+     41          
+     42          void SetPllClkA(void)
+     43          {
+     44          	PLL_CLK = 1;
+     45          }
+     46          
+     47          void RstPllClkA(void)
+     48          {
+     49          	PLL_CLK = 0;
+     50          }
+     51          
+     52          void SetPllDataA(void)
+     53          {
+     54          	PLL_DATA = 1;
+     55          }
+     56          
+     57          void RstPllDataA(void)
+     58          {
+     59          	PLL_DATA = 0;
+     60          }
+     61          
+     62          #ifdef __PLLEnToggle
+     63          	void SetPllEnA(void)	// PLL IN1
+     64          	{
+     65          		PLL_EN1 = 0;
+     66          	}
+     67          
+     68          	void RstPllEnA(void)	// PLL IN1
+     69          	{
+     70          		PLL_EN1 = 1;
+     71          	}
+     72          
+     73          	void SetPllEnB(void)	// PLL IN1
+     74          	{
+     75          		PLL_EN2 = 0;
+     76          	}
+     77          
+     78          	void RstPllEnB(void)	// PLL IN1
+     79          	{
+     80          		PLL_EN2 = 1;
+     81          	}
+     82          
+     83          	void SetPllEnC(void)	// PLL IN1
+     84          	{
+     85          		PLL_EN3 = 0;
+     86          	}
+     87          
+     88          	void RstPllEnC(void)	// PLL IN1
+     89          	{
+     90          		PLL_EN3 = 1;
+     91          	}	
+     92          #else
+     93          	void SetPllEnA(void)	// PLL IN1
+     94          	{
+     95          		PLL_EN1 = 1;
+     96          	}
+     97          
+     98          	void RstPllEnA(void)	// PLL IN1
+     99          	{
+    100          		PLL_EN1 = 0;
+    101          	}
+    102          
+    103          	void SetPllEnB(void)	// PLL IN1
+    104          	{
+    105          		PLL_EN2 = 1;
+    106          	}
+    107          
+    108          	void RstPllEnB(void)	// PLL IN1
+    109          	{
+    110          		PLL_EN2 = 0;
+    111          	}
+    112          #endif
+    113          
+    114          
+    115          void Pll411xInit(INT32U rfrq, INT32U dRatio, _pPll411xStr ptr)	//rfrq: Reference Freq,  dRatio: dRatio: Devide Prescaler
+    116          {
+    117              if(ptr)
+    118              {
+    119          	    ptr->rfrq = rfrq;
+    120          	    ptr->dRatio = dRatio;
+    121          	    ptr->PR = rfrq/dRatio;
+    122          	}
+    123          }
+    124          
+    125          void Pll411x_Output(INT32U fvco, _pPll411xStr ptr)
+    126          {
+    127          	INT32U tMsb = (1 << 23);
+    128          	INT32U i = 0;
+    129           	SetpPCA9555SDAOutMode();
+    130          	SerPtr->printf("\nfvco[%u]", fvco);
+    131          
+    132          	fvco = fvco/ptr->dRatio;	// 1.8Ghz = 18000 -> 180 000 0000
+    133          	{
+    134          		_RCounterReg RCounter;
+    135          		_NCounterReg NCounter;
+    136          		_FUNCReg Func;
+    137          
+    138          		RCounter.Data = 0;				// init
+    139          		NCounter.Data = 0;				// init
+    140          		Func.Data = 0;
+    141          
+    142          		// Reference Counter
+    143          		RCounter.Bit.C = __RCounter;
+    144          		RCounter.Bit.R = ptr->PR;		// RefFreq / FreqStep
+    145          		RCounter.Bit.DLY = 0;			//RCounter.Bit.DLY = 1;
+    146          
+    147          	
+    148          
+    149          		// AB Counter
+    150          		NCounter.Bit.C = __NCounter;
+    151          		NCounter.Bit.A = fvco%__PRE;
+    152          		NCounter.Bit.B = fvco/__PRE;
+    153          		NCounter.Bit.CPGAIN = 0;	// NCounter.Bit.CPGAIN = 1;
+    154          
+    155          		// Function
+    156          		Func.Bit.C = __FUNCSet;
+    157          		Func.Bit.LD = __LDDIG;
+    158          		Func.Bit.POL = __POS;//__NEG;
+    159          		Func.Bit.CUR1SET = 7;
+    160          		Func.Bit.CUR2SET = 7;
+    161          		Func.Bit.PLVALUE = 2;	// 32/33
+    162          		
+    163          		#ifdef Pll232x_debug
+    164          		{
+    165          			SerPtr->printf("\nR Counter: %03x \n", RCounter.Grp.tot & 0xffffff);
+    166          			SerPtr->printf("N Counter: %03x \n", NCounter.Grp.tot & 0xffffff);
+    167          			SerPtr->printf("F Counter: %03x \n", Func.Grp.tot & 0xffffff);
+    168          			//OSTimeDly(100);
+    169          		}
+    170          		#endif
+    171          
+    172          		// R Counter Program modes
+    173          		
+    174          		ptr->SetEn();
+    175          		ForDelay(300);
+    176          		ptr->RstEn();
+    177          		ForDelay(300);
+    178          		for(i = 0; i < 24; i++)			
+    179          		{	
+    180          			if(RCounter.Grp.tot & tMsb)	ptr->SetData();// ExpioBitSet(PllData);
+    181          			else						ptr->RstData();// ExpioBitRst(PllData);
+    182          
+    183          			RCounter.Grp.tot <<= 1;
+    184          			ptr->SetClk();
+    185          			ForDelay(20);
+    186          			ptr->RstClk();
+    187          			ForDelay(20);
+    188          		}	
+    189          		
+    190          		ForDelay(300);
+    191          		ptr->SetEn();
+    192          		ForDelay(300);
+    193          
+    194          		// AB Counter Program modes	(5bit)
+    195          		ptr->RstEn();
+    196          		
+    197          		ForDelay(300);
+    198          //		ForDelay(20);
+    199          		for(i = 0; i < 24; i++) 		
+    200          		{	
+    201          			if(NCounter.Grp.tot & tMsb)	ptr->SetData();
+    202          			else					 	ptr->RstData();
+    203          
+    204          			NCounter.Grp.tot <<= 1; 
+    205          			ptr->SetClk();
+    206          			ForDelay(20);
+    207          			ptr->RstClk();
+    208          			ForDelay(20);
+    209          		}		
+    210          		
+    211          		ForDelay(300);
+    212          		ptr->SetEn();
+    213          		
+    214          		// Func Program modes	(5bit)
+    215          //		ForDelay(20);
+    216          		ForDelay(300);
+    217          		ptr->RstEn();
+    218          		ForDelay(300);
+    219          		for(i = 0; i < 24; i++) 		
+    220          		{	
+    221          			if(Func.Grp.tot & tMsb) 	ptr->SetData();
+    222          			else						ptr->RstData();
+    223          		
+    224          			Func.Grp.tot <<= 1; 
+    225          			ptr->SetClk();
+    226          			ForDelay(20);
+    227          			ptr->RstClk();
+    228          			ForDelay(20);
+    229          		}		
+    230          		
+    231          		ForDelay(300);
+    232          		ptr->SetEn();
+    233          //		ForDelay(20);
+    234          		ForDelay(300);
+    235          		ptr->RstEn();
+    236          //		ForDelay(20);
+    237          		ForDelay(300);
+    238          	}
+    239          }
+    240          
+    241          ////////////////////////////////////////////////////////////////////////////////
+    242          // End of Source File
+    243          /////////////////////
+    244          
+
+   Maximum stack usage in bytes:
+
+     Function       .cstack
+     --------       -------
+     Pll411xCreate      12
+     Pll411xInit         0
+     Pll411x_Output     32
+     RstPllClkA          0
+     RstPllDataA         0
+     RstPllEnA           0
+     RstPllEnB           0
+     RstPllEnC           0
+     SetPllClkA          0
+     SetPllDataA         0
+     SetPllEnA           0
+     SetPllEnB           0
+     SetPllEnC           0
+
+
+   Section sizes:
+
+     Function/Label           Bytes
+     --------------           -----
+     pLoApllB                   36
+     pLoBpllB                   36
+     pLoCpllB                   36
+     pLoApll                     4
+     pLoBpll                     4
+     pLoCpll                     4
+     Pll411xCreate              24
+     SetPllClkA                  4
+     ?Subroutine0               10
+     RstPllClkA                  4
+     ?Subroutine1               10
+     SetPllDataA                12
+     RstPllDataA                12
+     SetPllEnA                   2
+     RstPllEnA                   2
+     SetPllEnB                  12
+     RstPllEnB                  12
+     SetPllEnC                  12
+     RstPllEnC                  14
+     Pll411xInit                14
+     Pll411x_Output            372
+     ??DataTable8                4
+     ??DataTable8_1              4
+     ??DataTable8_2              4
+     ??DataTable8_3              4
+     ??DataTable8_4              4
+     ??DataTable8_5              4
+     ?<Constant "\nfvco[%u]">   72
+
+ 
+ 108 bytes in section .bss
+  12 bytes in section .data
+  72 bytes in section .rodata
+ 540 bytes in section .text
+ 
+ 540 bytes of CODE  memory
+  72 bytes of CONST memory
+ 120 bytes of DATA  memory
+
+Errors: none
+Warnings: none

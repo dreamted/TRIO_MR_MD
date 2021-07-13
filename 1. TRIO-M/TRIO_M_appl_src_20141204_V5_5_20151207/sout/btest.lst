@@ -1,0 +1,991 @@
+###############################################################################
+#                                                                             #
+#                                                       19/May/2017  23:29:26 #
+# IAR ANSI C/C++ Compiler V5.50.5.21995/W32 EVALUATION for ARM                #
+# Copyright (C) 1999-2010 IAR Systems AB.                                     #
+#                                                                             #
+#    Cpu mode     =  thumb                                                    #
+#    Endian       =  little                                                   #
+#    Source file  =  D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V5_5_ #
+#                    20151207\code\btest.c                                    #
+#    Command line =  "D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V5_5 #
+#                    _20151207\code\btest.c" -D _MIMO_Type -D __2rd -D        #
+#                    __PLLEnToggle -lcN "D:\Project\TRIO\1.                   #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\sout\" -o  #
+#                    "D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V5_5 #
+#                    _20151207\sout\" --endian=little --cpu=Cortex-M3 -e      #
+#                    --require_prototypes --warnings_are_errors --fpu=None    #
+#                    --dlib_config "D:\Program Files (x86)\IAR                #
+#                    Systems\Embedded Workbench 5.4                           #
+#                    Evaluation\arm\INC\DLib_Config_Normal.h" -I              #
+#                    "D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V5_5 #
+#                    _20151207\include\" -I "D:\Project\TRIO\1.               #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\lib_stm32\ #
+#                    inc\" -I "D:\Project\TRIO\1.                             #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\lib_stm32\ #
+#                    src\" -I "D:\Project\TRIO\1.                             #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\uC-CPU\"   #
+#                    -I "D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V #
+#                    5_5_20151207\uC-LIB\" -I "D:\Project\TRIO\1.             #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\uCOS-II\Po #
+#                    rts\" -I "D:\Project\TRIO\1.                             #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\uCOS-II\So #
+#                    urce\" -I "D:\Project\TRIO\1.                            #
+#                    TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\uC-Probe\" #
+#                     -I "D:\Program Files (x86)\IAR Systems\Embedded         #
+#                    Workbench 5.4 Evaluation\arm\INC\" -Oh                   #
+#    List file    =  D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V5_5_ #
+#                    20151207\sout\btest.lst                                  #
+#    Object file  =  D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V5_5_ #
+#                    20151207\sout\btest.o                                    #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\Project\TRIO\1. TRIO-M\TRIO_M_appl_src_20141204_V5_5_20151207\code\btest.c
+      1          
+      2          /*********************************************
+      3          * File Name          : exlib.c
+      4          * Author             : 
+      5          * Date First Issued  : 02/01/2008
+      6          * Description        : This file provides all the port/input/update firmware functions.
+      7          * $Revision: 0.1 $
+      8          * $Revision date: 2008.01.__
+      9          ********************************************************************************/
+     10          
+     11          #define TEST_C
+     12          
+     13          #include "../include/main.h"
+     14          
+     15          void TestInit(void)
+     16          {
+     17          	OSTaskCreate(TestTask, (void *)NULL, (OS_STK *)&TestTaskStk[TEST_START_STK_SIZE - 1], TEST_START_PRIO);
+     18          }
+     19          
+     20          void TestTask(void *p_arg)
+     21          {
+     22          	INT16U nCnt = 0;
+     23          	nCnt = nCnt;
+     24          	p_arg = p_arg;
+     25          
+     26          	tTestFlag = FALSE;
+     27          	
+     28          	OSTimeDly(10L);
+     29          
+     30          	while(1)
+     31          	{
+     32          		if(CheckSWConf() == 0x05 || iUser_Value2 == __ChangeDebug)
+     33          		{
+     34          			PrintLogo();
+     35          			PromptOut();
+     36          			
+     37          			while(CheckSWConf() == 0x05 || iUser_Value2 == __ChangeDebug)
+     38          			{
+     39          				if(SerPtr->CheckByte(1, &nCnt))
+     40          				{
+     41          					KeyProc(SerPtr->RxGetByte());
+     42          				}
+     43          				tTestFlag = TRUE;
+     44          
+     45          				if(TimeOverCheck(Timer_DebugCnt))
+     46          				{
+     47          					iUser_Value2 = 0;
+     48          				}
+     49          				OSTimeDly(10L);
+     50          			}
+     51          		}
+     52          
+     53          		tTestFlag = FALSE;
+     54          		OSTimeDly(100L*5L);
+     55          	}
+     56          }
+     57          
+     58          void KeyProc( char sbuf )
+     59          {
+     60          	INT16U nSize = sizeof(tRevData);
+     61          
+     62          	tRevData[tIndex%nSize] = sbuf;
+     63          	if( tRevData[tIndex%nSize] == 0x0D )			// Enter 입력
+     64          	{
+     65          		SerPtr->PutToBuffer('\r');
+     66          		SerPtr->PutToBuffer('\n');
+     67          		tRevData[tIndex%nSize] = '\0';
+     68          		OnCommand();
+     69          		tIndex = 0;
+     70          		return;
+     71          	}
+     72          	else if( tRevData[tIndex%nSize] == 0x08 )		// Back Space
+     73          	{
+     74          		if (tIndex == 0)
+     75          			return;
+     76          
+     77          		SerPtr->PutToBuffer(0x08);
+     78          		SerPtr->PutToBuffer(' ');
+     79          		SerPtr->PutToBuffer(0x08);
+     80          		tIndex--;
+     81          
+     82          		return;
+     83          	}
+     84          	SerPtr->PutToBuffer(tRevData[tIndex%nSize]);			// 입력 키 출력
+     85          	if(++tIndex >= nSize) tIndex = 0;
+     86          }
+     87          
+     88          INT16U tmpAddr = 0;
+     89          //#define EEP_TEST_ADDR	128
+     90          #define EEP_TEST_ADDR	64
+     91          
+     92          void OnCommand ( void )
+     93          {
+     94          	INT8U tdata = TRUE;
+     95          
+     96              tdata = tdata;
+     97              
+     98             	switch(tRevData[0])
+     99             	{
+    100          		case '?':
+    101          			PrintLogo();
+    102          		break;
+    103          		case 'O':
+    104          		case 'o':
+    105          			{
+    106          				char *tstmsg = "Dig Output";
+    107          				
+    108          				if(tTest.Output)
+    109          				{
+    110          					tdata = returnmsgTest(tstmsg);
+    111          				}
+    112          				if(tdata)
+    113          				{
+    114          					INT32U nFlag = 0;
+    115          					INT16U nCnt;
+    116          	
+    117          					SerPtr->printf("\n* [%s TEST START TimeOut 5Min]\n", tstmsg);
+    118          	
+    119          					TimerRegist(TimerTest, Time1Sec*60L*5L);
+    120          	
+    121          					while(1)
+    122          					{
+    123          						HwTestOutFunc(&nFlag);
+    124          	
+    125          						if(TimeOverCheck(TimerTest))
+    126          						{
+    127          							SerPtr->printf("%s test TimeOut\n", tstmsg);
+    128          							TimerRegist(TimerTest, Time1Sec);
+    129          							break;
+    130          						}
+    131          						if(SerPtr->CheckByte(1, &nCnt))
+    132          						{
+    133          							nCnt = SerPtr->RxGetByte();
+    134          							if(nCnt == 'C' || nCnt == 'c')
+    135          							{
+    136          								SerPtr->printf("%s test Canceled\n", tstmsg);
+    137          								break;
+    138          							}
+    139          							else if(nCnt == 'F' || nCnt == 'f')
+    140          							{
+    141          								INT32U cpu_sr;
+    142          
+    143          								OS_ENTER_CRITICAL();
+    144          								{
+    145          									EE_TABLE1 *ptr = (EE_TABLE1 *)RoadBackuptobuffer(vEE_TABLE1Addr);
+    146          
+    147          									tTest.Output = TRUE;
+    148          
+    149          									ptr->OutputTestBp = tTestOK;
+    150          									WriteBuffertoBackup(vEE_TABLE1Addr, sizeof(EE_TABLE1));									
+    151          								}
+    152          								OS_EXIT_CRITICAL();
+    153          								SerPtr->printf("%s test Finished\n", tstmsg);
+    154          								break;
+    155          							}
+    156          						}
+    157          
+    158          						OSTimeDly(300L);
+    159          					}
+    160          				}
+    161          			}
+    162          		break;
+    163          		
+    164          		case 'A':
+    165          		case 'a':
+    166          		{
+    167          			char *tstmsg = "ADC/RAM";
+    168          			if(tTest.Analogin)
+    169          			{
+    170          				tdata = returnmsgTest(tstmsg);
+    171          			}
+    172          			if(tdata)
+    173          			{
+    174          				INT16U nCnt;
+    175          
+    176          				SerPtr->printf("\n* [%s] TEST START TimeOut 5 Min]\n", tstmsg);
+    177          
+    178          				TimerRegist(TimerTest, Time1Sec*60L*5L);
+    179          
+    180          				while(1)
+    181          				{
+    182          					AdInputStatus();
+    183          
+    184          					if(TimeOverCheck(TimerTest))
+    185          					{
+    186          						SerPtr->printf("%s Test TimeOut\n", tstmsg);
+    187          
+    188          						TimerRegist(TimerTest, Time1Sec);
+    189          						break;
+    190          					}
+    191          					if(SerPtr->CheckByte(1, &nCnt))
+    192          					{
+    193          						nCnt = SerPtr->RxGetByte();
+    194          						if(nCnt == 'c' || nCnt == 'C')
+    195          						{
+    196          							SerPtr->printf("%s Test Canceled\n", tstmsg);
+    197          							break;
+    198          						}
+    199          						else if(nCnt == 'f' || nCnt == 'F')
+    200          						{
+    201          							INT32U cpu_sr;
+    202          							OS_ENTER_CRITICAL();
+    203          							{
+    204          								EE_TABLE1 *ptr = (EE_TABLE1 *)RoadBackuptobuffer(vEE_TABLE1Addr);
+    205          
+    206          								tTest.Analogin = TRUE;
+    207          								ptr->AnalogTestBp = tTestOK;
+    208          								WriteBuffertoBackup(vEE_TABLE1Addr, sizeof(EE_TABLE1));
+    209          							}
+    210          							OS_EXIT_CRITICAL();
+    211          							SerPtr->printf("%s Test Finished\n", tstmsg);
+    212          							break;
+    213          						}
+    214          					}
+    215          					OSTimeDly(2000L);
+    216          					/////////////////////////////////////////////////////////////
+    217          				}
+    218          			}
+    219          		}
+    220          		break;
+    221          
+    222          
+    223          		case 'I':
+    224          		case 'i':
+    225          		{
+    226          			char *tstmsg = "Dig Input";
+    227          			if(tTest.Input)
+    228          			{
+    229          				tdata = returnmsgTest(tstmsg);
+    230          			}
+    231          			if(tdata)
+    232          			{
+    233          				INT16U nCnt;
+    234          
+    235          				SerPtr->printf("\n* [%s TEST START TimeOut 5 Min]\n", tstmsg);
+    236          				TimerRegist(TimerTest, Time1Sec*60L*5L);
+    237          
+    238          				CurrentInputStatus(0);
+    239          				tinputStsOld = tinputSts;
+    240          
+    241          				while(1)
+    242          				{
+    243          					CurrentInputStatus(1);
+    244          
+    245          					if(TimeOverCheck(TimerTest))
+    246          					{
+    247          						SerPtr->printf("%s Test TimeOut\n", tstmsg);
+    248          						TimerRegist(TimerTest, Time1Sec);
+    249          						break;
+    250          					}
+    251          					if(SerPtr->CheckByte(1, &nCnt))
+    252          					{
+    253          						nCnt = SerPtr->RxGetByte();
+    254          						if(nCnt == 'c' || nCnt == 'C')
+    255          						{
+    256          							SerPtr->printf("%s Test Canceled\n", tstmsg);
+    257          							break;
+    258          						}
+    259          						else if(nCnt == 'f' || nCnt == 'F')
+    260          						{
+    261          							INT32U cpu_sr;
+    262          
+    263          							OS_ENTER_CRITICAL();
+    264          							{
+    265          								EE_TABLE1 *ptr = (EE_TABLE1 *)RoadBackuptobuffer(vEE_TABLE1Addr);
+    266          								
+    267          								tTest.Input = TRUE;
+    268          								ptr->InputTestBp = tTestOK;
+    269          								WriteBuffertoBackup(vEE_TABLE1Addr, sizeof(EE_TABLE1));
+    270          							}
+    271          							OS_EXIT_CRITICAL();
+    272          							SerPtr->printf("%s Test Finished\n", tstmsg);
+    273          							break;
+    274          						}
+    275          					}
+    276          					OSTimeDly(300L);
+    277          					/////////////////////////////////////////////////////////////
+    278          				}
+    279          			}
+    280          		}				
+    281          		break;
+    282          
+    283          		case 'C':
+    284          		case 'c':
+    285          			{
+    286          				char *tstmsg = "COM";
+    287          				if(tTest.Comm)
+    288          				{
+    289          					tdata = returnmsgTest(tstmsg);
+    290          				}
+    291          				if(tdata)
+    292          				{
+    293          					INT16U nCnt;
+    294          					
+    295          					SerPtr->printf("\n* [%s TEST START TimeOut 5Min]\n", tstmsg);
+    296          	
+    297          					TimerRegist(TimerTest, Time1Sec*60L*5L);
+    298          	
+    299          					while(1)
+    300          					{
+    301          						COMTestFunc();
+    302          
+    303          						if(TimeOverCheck(TimerTest))
+    304          						{
+    305          							SerPtr->printf("%s test Test TimeOut\n", tstmsg);
+    306          							TimerRegist(TimerTest, Time1Sec);
+    307          							break;
+    308          						}
+    309          	
+    310          						if(SerPtr->CheckByte(1, &nCnt))
+    311          						{
+    312          							nCnt = SerPtr->RxGetByte();
+    313          							if(nCnt == 'C' || nCnt == 'c')
+    314          							{
+    315          								SerPtr->printf("%s test Test Canceled\n", tstmsg);
+    316          								break;
+    317          							}
+    318          							else if(nCnt == 'F' || nCnt == 'f')
+    319          							{
+    320          								INT32U cpu_sr;
+    321          
+    322          								OS_ENTER_CRITICAL();
+    323          								{
+    324          									EE_TABLE1 *ptr = (EE_TABLE1 *)RoadBackuptobuffer(vEE_TABLE1Addr);
+    325          									tTest.Comm = TRUE;
+    326          									ptr->COMTestBp = tTestOK;
+    327          									WriteBuffertoBackup(vEE_TABLE1Addr, sizeof(EE_TABLE1));
+    328          								}
+    329          								OS_EXIT_CRITICAL();
+    330          								SerPtr->printf("%s Test Test Finished\n", tstmsg);
+    331          								break;
+    332          							}
+    333          						}
+    334          						OSTimeDly(2000L);
+    335          					}
+    336          				}
+    337          			}
+    338          		break;
+    339          		
+    340          		case 'G':
+    341          		case 'g':
+    342          			DownloadFlagClr();
+    343          			ForDelay(20L);
+    344          			DownLoadBootingJump();
+    345          		break;
+    346          		
+    347              	default:
+    348          		break;
+    349          
+    350          	}
+    351          	PromptOut();
+    352          }
+    353          
+    354          
+    355          void AdcPrintf(char *sptr, INT16U rawData, INT8U is_5V)
+    356          {
+    357          	INT16U Data;
+    358          	if(is_5V) 	Data = AdctoVolt5opamp(rawData);
+    359          	else		Data = AdctoVolt33V(rawData);
+    360          	
+    361          	SerPtr->printf(STARMSG);
+    362          	SerPtr->printf("%s: %d.%d[V], [raw:%04d]", sptr, Data/10, Data%10, rawData);
+    363          	SerPtr->printf(ENTMSG);
+    364          }
+    365          
+    366          
+    367          INT8U returnmsgTest(char *str)
+    368          {
+    369          	SerPtr->printf("%s이 수행되어 있습니다. 계속 진행하시겠습니까?[Y]es, [C]ancel\n", str);
+    370          	return WaringMssageReturn();
+    371          }
+    372          
+    373          INT8U WaringMssageReturn(void)
+    374          {
+    375          	INT16U nCnt;
+    376          
+    377          	TimerRegist(TimerTest, Time1Sec*5L);
+    378          
+    379          	while(1)
+    380          	{
+    381          		if(TimeOverCheck(TimerTest))
+    382          		{
+    383          			TimerRegist(TimerTest, Time1Sec*5L);
+    384          			return TRUE;
+    385          		}
+    386          		if(SerPtr->CheckByte(1, &nCnt))
+    387          		{
+    388          			nCnt = SerPtr->RxGetByte();
+    389          			if(nCnt == 'C' || nCnt == 'c')
+    390          			{
+    391          				SerPtr->printf("CANCEL TEST \n");
+    392          				return FALSE;
+    393          			}
+    394          			else return TRUE;
+    395          		}
+    396          		OSTimeDly(10L);
+    397          	}
+    398          }
+    399          
+    400          void PrintLogo(void)
+    401          {
+    402          	EE_TABLE1 *ptr = vEE_TABLE1;
+    403          
+    404          	
+    405          	if(ptr->OutputTestBp == tTestOK)		tTest.Output = TRUE;
+    406          	else									tTest.Output = FALSE;
+    407          
+    408          	if(ptr->InputTestBp == tTestOK)  		tTest.Input = TRUE;
+    409          	else									tTest.Input = FALSE;
+    410          
+    411          	if(ptr->COMTestBp == tTestOK)  			tTest.Comm = TRUE;
+    412          	else								    tTest.Comm = FALSE;
+    413          
+    414          	if(ptr->AnalogTestBp == tTestOK)  		tTest.Analogin = TRUE;
+    415          	else								    tTest.Analogin = FALSE;
+    416          
+    417          	if(ptr->eepromBp == tTestOK)  			tTest.eeprom = TRUE;
+    418          	else								    tTest.eeprom = FALSE;
+    419          
+    420          	SerPtr->printf("\n\n");
+    421          	PrintStar();
+    422          	SerPtr->printf("* %s VER:%d.%d\n", BoardTestMode, (TRIO_M_SystemVer >> 4)& 0x0f,  TRIO_M_SystemVer & 0x0f);
+    423          
+    424          	SerPtr->printf("    -COMMAND 1st-\n");
+    425          	SerPtr->printf("*  ?        : help(this message)\n");
+    426              SerPtr->printf("*  C        : com test              [%s]\n", testResult[tTest.Comm]);
+    427          	SerPtr->printf("*  O        : output test           [%s]\n", testResult[tTest.Output]);
+    428          	SerPtr->printf("*  I        : input test            [%s]\n", testResult[tTest.Input]);
+    429              SerPtr->printf("*  A        : ADC/RAM               [%s]\n", testResult[tTest.Analogin]);
+    430              SerPtr->printf("*  F        : EERROM                [%s]\n", testResult[tTest.eeprom]);
+    431          	SerPtr->printf("*  G        : compulsory boot(eeprom)\n");
+    432          	PrintStar();
+    433          }
+    434          
+    435          void PrintStar(void)
+    436          {
+    437          	SerPtr->printf("*******************************************************************************\n");
+    438          }
+    439          
+    440          void PromptOut(void)
+    441          {
+    442          	SerPtr->printf("TRIO >>");
+    443          }
+    444          
+    445          
+    446          INT32U comtstcnt = 0;
+    447          
+    448          void COMTestFunc(void)
+    449          {
+    450          	INT16U Recv;
+    451          
+    452          	{
+    453          		pUSART1.printf(STARMSG);
+    454          		pUSART1.printf("통신시험 Ser4[MODEM] 시험을 체크하여 주세요     ");
+    455          		pUSART4.BuffClear();
+    456          		pUSART4.PutToBuffer(comtstcnt & 0x0f);		
+    457          
+    458          		OSTimeDly(100L);
+    459          
+    460          		if(pUSART4.CheckByte(1, &Recv))
+    461          		{
+    462          			if( pUSART4.RxGetByte() == (comtstcnt & 0x0f)// &&
+    463          				//pUSART3.RxGetByte() == 'b' &&
+    464          				//pUSART3.RxGetByte() == 'i' &&
+    465          				//pUSART3.RxGetByte() == 'z' &&
+    466          				//pUSART3.RxGetByte() == 'i'
+    467          				)
+    468          						pUSART1.printf("[OK]");
+    469          			else		pUSART1.printf("[FAIL 1]");
+    470          		}
+    471          		else pUSART1.printf("[FAIL 2]: %d", Recv);
+    472          		pUSART1.printf(ENTMSG);
+    473          	}
+    474          		
+    475          
+    476          	pUSART1.printf(ENTMSG);
+    477          	pUSART1.printf(ENTMSG);
+    478          	comtstcnt++;
+    479          }
+    480          
+    481          
+    482          void AdInputStatus(void)
+    483          {
+    484          ////////////////////////////////////////////////////////////////////////////////
+    485          	PrintStar();
+    486          	{
+    487          		SerPtr->printf("[2G]    : FwdOut[%04d],RvsOut [%04d]  [LTE]: FwdOut[%04d],RvsOut [%04d]\n",ADC_DATA[FwdOutAvgVolt_2G],ADC_DATA[RvsOutVolt_2G],ADC_DATA[FwdOutAvgVolt_LTE],ADC_DATA[RvsOutVolt_LTE]);	
+    488          		SerPtr->printf("CDMALTE : FwdIn [%04d],FwdOut [%04d]  RvsIn [%04d],RvsOut [%04d]\n",ADC_DATA[FwdInVolt_CDMALTE],ADC_DATA[FwdOutAvgVolt_CDMALTE],ADC_DATA[RvsInVolt_CDMALTE],ADC_DATA[RvsOutVolt_CDMALTE]);
+    489          		SerPtr->printf("3G      : FwdIn [%04d],FwdOut [%04d]  RvsIn [%04d],RvsOut [%04d]\n",ADC_DATA[FwdInVolt_3G],ADC_DATA[FwdOutAvgVolt_3G],ADC_DATA[RvsInVolt_3G],ADC_DATA[RvsOutVolt_3G]);
+    490          		SerPtr->printf("LTE_A1  : FwdOut[%04d],RvsOut [%04d]  LTE_A2  : FwdOut[%04d],RvsOut [%04d]\n",ADC_DATA[FwdOutAvgVolt_LTE_A1],ADC_DATA[RvsOutVolt_LTE_A1],ADC_DATA[FwdOutAvgVolt_LTE_A2],ADC_DATA[RvsOutVolt_LTE_A2]);	
+    491          		SerPtr->printf("LTE_A   : FwdIn [%04d],FwdOut [%04d]  RvsIn [%04d],RvsOut [%04d]\n",ADC_DATA[FwdInVolt_LTE_A],ADC_DATA[FwdOutAvgVolt_LTE_A],ADC_DATA[RvsInVolt_LTE_A],ADC_DATA[RvsOutVolt_LTE_A]);
+    492          		SerPtr->printf("LTE_1   : FwdIn [%04d],FwdOut [%04d]  RvsIn [%04d],RvsOut [%04d]\n",ADC_DATA[Fwd1InVolt_LTE],ADC_DATA[Fwd1OutAvgVolt_LTE],ADC_DATA[Rvs1InVolt_LTE],ADC_DATA[Rvs1OutVolt_LTE]);
+    493          		SerPtr->printf("LTE_A1_1: FwdOut[%04d],RvsOut [%04d]  LTE_A2_1: FwdOut[%04d],RvsOut [%04d]\n",ADC_DATA[Fwd1OutAvgVolt_LTE_A1],ADC_DATA[Rvs1OutVolt_LTE_A1],ADC_DATA[Fwd1OutAvgVolt_LTE_A2],ADC_DATA[Rvs1OutVolt_LTE_A2]);	
+    494          		SerPtr->printf("LTE_A_1 : FwdOut[%04d],RvsOut [%04d]  RvsIn [%04d],RvsOut [%04d]\n",ADC_DATA[FwdInVolt_LTE_A_1],ADC_DATA[FwdOutAvgVolt_LTE_A_1],ADC_DATA[RvsInVolt_LTE_A_1],ADC_DATA[RvsOutVolt_LTE_A_1]);	
+    495          		SerPtr->printf("Temp[%04d],DCOutVolt [%04d],PSUDCVolt [%04d]\n",ADC_DATA[Curr_Temp],ADC_DATA[DCOutVolt],ADC_DATA[PSUDCVolt]);	
+    496          	    
+    497          		OSTimeDly(30L);
+    498          	}
+    499          	PrintStar();
+    500          	SerPtr->printf("\n\n");
+    501          }
+    502          
+    503          
+    504          void CurrentInputStatus(INT8U vcheck)
+    505          {
+    506          	INT8U tcnt = 0;
+    507          	INT8U tval = FALSE;
+    508              tcnt = tcnt;
+    509          
+    510          	if(!vcheck)PrintStar();
+    511          	{
+    512          		tval += DigitalInputDiplay(tcnt++, PLLAlarm_CDMALTE, STARMSG, NULL, vcheck);
+    513          		tval += DigitalInputDiplay(tcnt++, PLLAlarm_LTE_A1_0, PHAMSG, NULL, vcheck);
+    514          		tval += DigitalInputDiplay(tcnt++, PLLAlarm_LTE_A2_0, PHAMSG, ENTMSG, vcheck);
+    515          		
+    516          		tval += DigitalInputDiplay(tcnt++, PLLAlarm_WCDMA, STARMSG, NULL, vcheck);
+    517          		tval += DigitalInputDiplay(tcnt++, PLLAlarm_LTE_1, PHAMSG, NULL, vcheck);
+    518          		tval += DigitalInputDiplay(tcnt++, PLLAlarm_LTE_A1_1, PHAMSG, ENTMSG, vcheck);
+    519          
+    520          		tval += DigitalInputDiplay(tcnt++, PLLAlarm_LTE_A2_1, STARMSG, NULL, vcheck);
+    521          		tval += DigitalInputDiplay(tcnt++, AC_Alarm, PHAMSG, NULL, vcheck);
+    522          		tval += DigitalInputDiplay(tcnt++, RRTYPE, PHAMSG, ENTMSG, vcheck);
+    523          
+    524          
+    525          	}
+    526          
+    527          	if(!vcheck)PrintStar();
+    528          	if(vcheck)
+    529          	{
+    530          		if(tval) SerPtr->printf("\n");
+    531          	}
+    532          }
+    533          
+    534          INT32U vstrval = 0;
+    535          INT8S vstr[64];
+    536          
+    537          void HwTestOutFunc(INT32U *nFlag)
+    538          {
+    539          	INT32U MaxValue = 0xFFFF;
+    540          	INT8U Data = *nFlag;
+    541          	INT8U  i = 0;
+    542          
+    543              MaxValue = MaxValue;
+    544              Data = Data;
+    545          
+    546          ///////////////////////////////////////////////////////////
+    547          //	Dig_Reset	
+    548          	GreenLED_CDMA		= 0;
+    549          	RedLED_CDMA			= 0;
+    550          	GreenLED_WCDMA		= 0;
+    551          	RedLED_WCDMA		= 0;
+    552          	GreenLED_LTE 		= 0;
+    553          	RedLED_LTE			= 0;
+    554          	GreenLED_LTE_A1_0	= 0;
+    555          	RedLED_LTE_A1_0		= 0;
+    556          	GreenLED_LTE_A2_0	= 0;
+    557          	RedLED_LTE_A2_0		= 0;	
+    558          	GreenLED_LTE_1 		= 0;
+    559          	RedLED_LTE_1 		= 0;
+    560          	GreenLED_LTE_A1_1	= 0;
+    561          	RedLED_LTE_A1_1		= 0;
+    562          	
+    563          	GreenLED_LTE_A2_1	= 0;
+    564          	RedLED_LTE_A2_1		= 0;
+    565          	
+    566          	AmpOnOff_CDMA		= 0;
+    567          	AmpOnOff_LTE_0		= 0;
+    568          	AmpOnOff_LTE_A1_0	= 0;
+    569          	AmpOnOff_LTE_A2_0	= 0;
+    570          	AmpOnOff_WCDMA		= 0;
+    571          	AmpOnOff_LTE_1		= 0;
+    572          	AmpOnOff_LTE_A2_1	= 0;
+    573          	AmpOnOff_LTE_A1_1	= 0;
+    574          	SMS_PWR = 0;
+    575          
+    576          	PCA9555BitRst(_15M_Switch_LTE,		&AttnCS1Val); 
+    577          
+    578          	for(i = 0;i < Att_SelMax ; i++)
+    579          	{
+    580          		AttnDataOutput(i, ~0);
+    581          	}
+    582          
+    583          	switch(Data)
+    584          	{
+    585          		case 0:
+    586          			GreenLED_CDMA	= 1;
+    587          		break;
+    588          		
+    589          		case 1:
+    590          			RedLED_CDMA		= 1;
+    591          		break;
+    592          
+    593          		case 2:
+    594          			GreenLED_LTE 	= 1;
+    595          		break;
+    596          		
+    597          		case 3:
+    598          			RedLED_LTE		= 1;
+    599          		break;			
+    600          		
+    601          		case 4:
+    602          			GreenLED_LTE_A2_0	= 1;
+    603          		break;
+    604          		
+    605          		case 5:
+    606          			RedLED_LTE_A2_0		= 1;
+    607          		break;	
+    608          		
+    609          
+    610          		case 6:
+    611          			GreenLED_LTE_A1_0	= 1;
+    612          		break;
+    613          		
+    614          		case 7:
+    615          			RedLED_LTE_A1_0		= 1;
+    616          		break;	
+    617          		
+    618          		case 8:
+    619          			GreenLED_WCDMA	= 1;
+    620          		break;
+    621          		
+    622          		case 9:
+    623          			RedLED_WCDMA	= 1;
+    624          		break;			
+    625          		
+    626          		case 10:
+    627          			GreenLED_LTE_1		= 1;
+    628          		break;
+    629          		
+    630          		case 11:
+    631          			RedLED_LTE_1 		= 1;
+    632          		break;			
+    633          		
+    634          		case 12:
+    635          			GreenLED_LTE_A2_1	= 1;
+    636          		break;
+    637          		
+    638          		case 13:
+    639          			RedLED_LTE_A2_1		= 1;
+    640          		break;	
+    641          
+    642          
+    643          		case 14:
+    644          			GreenLED_LTE_A1_1	= 1;
+    645          		break;
+    646          		
+    647          		case 15:
+    648          			RedLED_LTE_A1_1		= 1;
+    649          		break;	
+    650          
+    651          		
+    652          		case 16:
+    653          			AmpOnOff_CDMA		= 1;
+    654          		break;
+    655          		
+    656          		case 17:
+    657          			AmpOnOff_LTE_0		= 1;
+    658          		
+    659          		break;
+    660          		
+    661          		case 18:
+    662          			AmpOnOff_LTE_A1_0 	= 1;
+    663          		break;
+    664          		
+    665          		case 19:
+    666          			AmpOnOff_LTE_A2_0 	= 1;
+    667          		break;
+    668          		
+    669          		case 20:
+    670          			AmpOnOff_WCDMA 		= 1;
+    671          		break;
+    672          		
+    673          	
+    674          		case 21:
+    675          			AmpOnOff_LTE_1		= 1;
+    676          		break;
+    677          		
+    678          		case 22:
+    679          			AmpOnOff_LTE_A2_1	= 1;
+    680          		break;
+    681          		
+    682          		case 23:
+    683          			AmpOnOff_LTE_A1_1	= 1;
+    684          		break;
+    685          
+    686          		case 24:
+    687          			for(i = 0;i < Att_SelMax ; i++)
+    688          			{
+    689          				AttnDataOutput(i, ~1);
+    690          			}
+    691          		break;
+    692          
+    693          		case 25:
+    694          			for(i = 0;i < Att_SelMax ; i++)
+    695          			{
+    696          				AttnDataOutput(i, ~2);
+    697          			}
+    698          		break;
+    699          
+    700          		case 26:
+    701          			for(i = 0;i < Att_SelMax ; i++)
+    702          			{
+    703          				AttnDataOutput(i, ~4);
+    704          			}
+    705          		break;
+    706          
+    707          		case 27:
+    708          			for(i = 0;i < Att_SelMax ; i++)
+    709          			{
+    710          				AttnDataOutput(i, ~8);
+    711          			}
+    712          		break;
+    713          
+    714          		case 28:
+    715          			for(i = 0;i < Att_SelMax ; i++)
+    716          			{
+    717          				AttnDataOutput(i, ~16);
+    718          			}
+    719          		break;
+    720          
+    721          		case 29:
+    722          			for(i = 0;i < Att_SelMax ; i++)
+    723          			{
+    724          				AttnDataOutput(i, ~32);
+    725          			}
+    726          		break;
+    727          
+    728           		case 30:
+    729          			MaxValue = Data;
+    730          			//BuzzShort();
+    731          		break;
+    732          	}
+    733          
+    734          	
+    735          	*nFlag = *nFlag + 1;
+    736          
+    737          	if(*nFlag >= MaxValue) *nFlag = 0;
+    738          
+    739          }
+    740          
+    741          INT32U DigitalInputDiplay(INT8U num, INT8U ival,
+    742          							INT8U *fmsg, INT8U *emsg,
+    743          							INT8U vcheck)
+    744          {
+    745          	INT32U temp = FALSE;
+    746          	INT8U *currentptr = (INT8U *)&tinputSts;
+    747          	INT8U *beforeptr = (INT8U *)&tinputStsOld;
+    748          
+    749          	// first
+    750          	if(!vcheck)
+    751          	{
+    752          		if(fmsg != NULL) SerPtr->printf("%s", fmsg);	// start // phase mssage
+    753          	}
+    754          
+    755          	currentptr[num] = ival;
+    756          
+    757          	{
+    758          		if( (vcheck && (beforeptr[num] != currentptr[num]) ) )
+    759          		{
+    760          			SerPtr->printf("%02d. ", num);
+    761          			SerPtr->printf("%s", tDisplay[num]);
+    762          			{
+    763          				if(ival) SerPtr->printf(OFFMSG);
+    764          				else	 SerPtr->printf(ONMSG);
+    765          			}
+    766          			temp = TRUE;
+    767          		}
+    768          		else if(!vcheck)
+    769          		{
+    770          			SerPtr->printf("%s", tDisplay[num]);
+    771          			{
+    772          				if(ival) SerPtr->printf(OFFMSG);
+    773          				else	 SerPtr->printf(ONMSG);
+    774          			}
+    775          		}
+    776          	}
+    777          
+    778          ////////////////////////////////////////////////////////////////////////////////
+    779          	if(vcheck)
+    780          	{
+    781          		if(temp)
+    782          		{
+    783          			OSTimeDly(1L);
+    784          			SerPtr->printf(ENTMSG);
+    785          		}
+    786          	}
+    787          	else
+    788          	{
+    789          		if(emsg)
+    790          		{
+    791          			OSTimeDly(1L);
+    792          			SerPtr->printf(ENTMSG);
+    793          		}
+    794          	}
+    795          
+    796          	beforeptr[num] = currentptr[num];
+    797          	return (INT32U)temp;
+    798          }
+    799          
+    800          ///////////////////////////////////////////////////////////////////////////////
+    801          // End of Source File
+    802          ////////////////////////
+    803          
+
+   Maximum stack usage in bytes:
+
+     Function           .cstack
+     --------           -------
+     AdInputStatus          24
+     AdcPrintf              24
+     COMTestFunc            24
+     CurrentInputStatus     48
+     DigitalInputDiplay     32
+     HwTestOutFunc          40
+     KeyProc                24
+     OnCommand              40
+     PrintLogo              24
+     PrintStar               8
+     PromptOut               8
+     TestInit                8
+     TestTask               24
+     WaringMssageReturn     16
+     returnmsgTest           8
+
+
+   Section sizes:
+
+     Function/Label                                 Bytes
+     --------------                                 -----
+     TestTaskStk                                    1024
+     tIndex                                            1
+     tTestFlag                                         1
+     tRevData                                         64
+     tTest
+     testResult
+     tinputStsOld                                     52
+     tinputSts                                        88
+     tDisplay
+     TestInit                                         16
+     TestTask                                        128
+     KeyProc                                         132
+     tmpAddr                                           2
+     OnCommand                                       898
+     AdcPrintf                                        64
+     ?Subroutine0                                     10
+     returnmsgTest                                    22
+     WaringMssageReturn                               98
+     PrintLogo                                       282
+     PrintStar                                         6
+     ?Subroutine1                                     10
+     PromptOut                                         4
+     comtstcnt                                         4
+     COMTestFunc                                     130
+     AdInputStatus                                   238
+     CurrentInputStatus                              272
+     vstrval                                           4
+     vstr                                             64
+     HwTestOutFunc                                   684
+     DigitalInputDiplay                              172
+     ??DataTable7                                      4
+     ??DataTable8                                      4
+     ??DataTable8_1                                    4
+     ??DataTable8_2                                    4
+     ??DataTable9                                      4
+     ??DataTable9_1                                    4
+     ??DataTable9_2                                    4
+     ??DataTable9_3                                    4
+     ??DataTable11                                     4
+     ??DataTable11_1                                   4
+     ??DataTable11_2                                   4
+     ??DataTable11_3                                   4
+     ??DataTable11_4                                   4
+     ??DataTable11_5                                   4
+     ??DataTable11_6                                   4
+     ??DataTable11_7                                   4
+     ??DataTable11_8                                   4
+     ??DataTable11_9                                   4
+     ??DataTable11_10                                  4
+     ??DataTable11_11                                  4
+     ??DataTable11_12                                  4
+     ??DataTable11_13                                  4
+     ??DataTable11_14                                  4
+     ??DataTable11_15                                  4
+     ??DataTable11_16                                  4
+     ??DataTable11_17                                  4
+     ??DataTable11_18                                  4
+     ??DataTable11_19                                  4
+     ??DataTable11_20                                  4
+     ??DataTable11_21                                  4
+     ??DataTable11_22                                  4
+     ??DataTable11_23                                  4
+     ??DataTable11_24                                  4
+     ??DataTable11_25                                  4
+     ??DataTable11_26                                  4
+     ??DataTable11_27                                  4
+     ??DataTable11_28                                  4
+     ??DataTable11_29                                  4
+     ??DataTable11_30                                  4
+     ??DataTable11_31                                  4
+     ??DataTable11_32                                  4
+     ??DataTable11_33                                  4
+     ??DataTable11_34                                  4
+     ??DataTable11_35                                  4
+     ??DataTable11_36                                  4
+     ??DataTable11_37                                  4
+     ??DataTable11_38                                  4
+     ?<Constant "NON TESTED">                         12
+     ?<Constant "    TESTED">                         12
+     ?<Constant "PLL_CDMALTE  :">                     16
+     ?<Constant "PLL_LTE_A1   :">                     16
+     ?<Constant "PLL_LTE_A2   :">                     16
+     ?<Constant "PLL_WCDMA    :">                     16
+     ?<Constant "PLL_LTE_1    :">                     16
+     ?<Constant "PLL_LTE_A1_1 :">                     16
+     ?<Constant "PLL_LTE_A2_1 :">                     16
+     ?<Constant "AC_Alarm     :">                     16
+     ?<Constant "Insert       :">                     16
+     ?<Constant "Dig Output">                        332
+     ?<Constant "COM">                                 4
+     ?<Constant "* ">                                  4
+     ?<Constant "%s: %d.%d[V], [raw:%04d]">           28
+     ?<Constant "\n">                                  2
+     ?<Constant "%s\300\314 \274\366\307\340\265\30   64
+     ?<Constant "CANCEL TEST \n">                     16
+     ?<Constant "\n\n">                                4
+     ?<Constant "* %s VER:%d.%d\n">                  364
+     ?<Constant "*********************...">           84
+     ?<Constant "TRIO >>">                             8
+     ?<Constant "\305\353\275\305\275\303\307\350 S   88
+     ?<Constant "[2G]    : FwdOut[%04d...">          616
+     ?<Constant ", ">                                  4
+     ?<Constant "%s">                                  4
+     ?<Constant "%02d. ">                             24
+
+ 
+ 1 152 bytes in section .bss
+   152 bytes in section .data
+ 1 814 bytes in section .rodata
+ 3 354 bytes in section .text
+ 
+ 3 354 bytes of CODE  memory
+ 1 814 bytes of CONST memory
+ 1 304 bytes of DATA  memory
+
+Errors: none
+Warnings: none

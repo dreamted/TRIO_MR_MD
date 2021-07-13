@@ -1,0 +1,206 @@
+###############################################################################
+#                                                                             #
+# IAR ANSI C/C++ Compiler V6.30.1.53127/W32 for ARM     07/Jan/2014  16:08:55 #
+# Copyright 1999-2011 IAR Systems AB.                                         #
+#                                                                             #
+#    Cpu mode     =  thumb                                                    #
+#    Endian       =  little                                                   #
+#    Source file  =  C:\Project\TRIO\2차버전\3.F_W\appl_stm207_20131104 -     #
+#                    복사본\STM32F2xx_StdPeriph_Driver_v1212\src\stm32f2xx_ma #
+#                    in.c                                                     #
+#    Command line =  "C:\Project\TRIO\2차버전\3.F_W\appl_stm207_20131104 -    #
+#                    복사본\STM32F2xx_StdPeriph_Driver_v1212\src\stm32f2xx_ma #
+#                    in.c" -D NDEBUG -lC "C:\Project\TRIO\2차버전\3.F_W\appl_ #
+#                    stm207_20131104 - 복사본\STM32F2xx_StdPeriph_Driver_v121 #
+#                    2\ewarm\sout\" -o "C:\Project\TRIO\2차버전\3.F_W\appl_st #
+#                    m207_20131104 - 복사본\STM32F2xx_StdPeriph_Driver_v1212\ #
+#                    ewarm\sout\" --endian=little --cpu=Cortex-M3 -e          #
+#                    --fpu=None --dlib_config "C:\Program Files (x86)\IAR     #
+#                    Systems\Embedded Workbench 6.0_2\arm\INC\c\DLib_Config_N #
+#                    ormal.h" -I "C:\Project\TRIO\2차버전\3.F_W\appl_stm207_2 #
+#                    0131104 - 복사본\STM32F2xx_StdPeriph_Driver_v1212\ewarm\ #
+#                    ..\" -I "C:\Project\TRIO\2차버전\3.F_W\appl_stm207_20131 #
+#                    104 - 복사본\STM32F2xx_StdPeriph_Driver_v1212\ewarm\..\i #
+#                    nc\" -I "C:\Project\TRIO\2차버전\3.F_W\appl_stm207_20131 #
+#                    104 - 복사본\STM32F2xx_StdPeriph_Driver_v1212\ewarm\..\. #
+#                    .\uC-CPU\" -I "C:\Project\TRIO\2차버전\3.F_W\appl_stm207 #
+#                    _20131104 - 복사본\STM32F2xx_StdPeriph_Driver_v1212\ewar #
+#                    m\..\..\uC-LIB\" -I "C:\Project\TRIO\2차버전\3.F_W\appl_ #
+#                    stm207_20131104 - 복사본\STM32F2xx_StdPeriph_Driver_v121 #
+#                    2\ewarm\..\..\uCOS-II\Ports\" -I                         #
+#                    "C:\Project\TRIO\2차버전\3.F_W\appl_stm207_20131104 -    #
+#                    복사본\STM32F2xx_StdPeriph_Driver_v1212\ewarm\..\..\uCOS #
+#                    -II\Source\" -Oh                                         #
+#    List file    =  C:\Project\TRIO\2차버전\3.F_W\appl_stm207_20131104 -     #
+#                    복사본\STM32F2xx_StdPeriph_Driver_v1212\ewarm\sout\stm32 #
+#                    f2xx_main.lst                                            #
+#    Object file  =  C:\Project\TRIO\2차버전\3.F_W\appl_stm207_20131104 -     #
+#                    복사본\STM32F2xx_StdPeriph_Driver_v1212\ewarm\sout\stm32 #
+#                    f2xx_main.o                                              #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+C:\Project\TRIO\2차버전\3.F_W\appl_stm207_20131104 - 복사본\STM32F2xx_StdPeriph_Driver_v1212\src\stm32f2xx_main.c
+      1          /*
+      2          *********************************************************************************************************
+      3          *                                              EXAMPLE CODE
+      4          *
+      5          *                          (c) Copyright 2003-2007; Micrium, Inc.; Weston, FL
+      6          *
+      7          *               All rights reserved.  Protected by international copyright laws.
+      8          *               Knowledge of the source code may NOT be used to develop a similar product.
+      9          *               Please help us continue to provide the Embedded community with the finest
+     10          *               software available.  Your honesty is greatly appreciated.
+     11          *********************************************************************************************************
+     12          */
+     13          #define __STM32F10x_EXT_MAIN
+     14          
+     15          #include "stm32f2xx_1212.h"
+
+   \                                 In section iram, align 4
+   \   __absolute OS_STK MainTaskStk[128]
+   \                     MainTaskStk:
+   \   00000000                      DS8 512
+     16          
+     17          
+     18          /*******************************************************************************
+     19          *                                                main()
+     20          *
+     21          * Description : This is the standard entry point for C code.  It is assumed that your code will call
+     22          *               main() once you have performed all necessary initialization.
+     23          *
+     24          * Arguments   : none
+     25          *
+     26          * Returns     : none
+     27          ********************************************************************************/
+     28          void __RESETPRIMASK(void);
+     29          
+
+   \                                 In section .text, align 4, keep-with-next
+     30          int  main (void)
+     31          {
+   \                     main:
+   \   00000000   0xB580             PUSH     {R7,LR}
+     32          //    CPU_IntDis();	// Disable all interrupts until we are ready to accept them
+     33          #ifndef OS_INCLUDED
+     34          	mainTask(NULL);
+     35          #else	
+     36              OSInit();			// Initialize "uC/OS-II, The Real-Time Kernel"
+   \   00000002   0x.... 0x....      BL       OSInit
+     37          	OSTaskCreate(mainTask, (void *)NULL, (OS_STK *)&MainTaskStk[OS_TASK_STK_SIZE - 1], MAIN_START_PRIO);
+   \   00000006   0x2300             MOVS     R3,#+0
+   \   00000008   0x4A04             LDR.N    R2,??main_0
+   \   0000000A   0x2100             MOVS     R1,#+0
+   \   0000000C   0x4804             LDR.N    R0,??main_0+0x4
+   \   0000000E   0x.... 0x....      BL       OSTaskCreate
+     38              OSStart();			// Start multitasking (i.e. give control to uC/OS-II)
+   \   00000012   0x.... 0x....      BL       OSStart
+     39          #endif	/* OS_INCLUDED */
+     40          
+     41          }
+   \   00000016   0x2000             MOVS     R0,#+0
+   \   00000018   0xBD02             POP      {R1,PC}          ;; return
+   \   0000001A   0xBF00             Nop      
+   \                     ??main_0:
+   \   0000001C   0x........         DC32     MainTaskStk+0x1FC
+   \   00000020   0x........         DC32     mainTask
+     42          
+     43          /*
+     44          *********************************************************************************************************
+     45          *                                   APPLICATION-DEFINED HOOKS
+     46          *
+     47          * Description: These functions are called by the hooks in os_cpu_c.c.
+     48          *
+     49          * Returns    : none
+     50          *********************************************************************************************************
+     51          */
+     52          #if defined(OS_INCLUDED)
+     53          
+     54          
+     55          #if (OS_APP_HOOKS_EN > 0)
+     56          void  App_TaskCreateHook (OS_TCB *ptcb)
+     57          {
+     58          #if (uC_PROBE_OS_PLUGIN > 0) && (OS_PROBE_HOOKS_EN > 0)
+     59              OSProbe_TaskCreateHook(ptcb);
+     60          #endif
+     61          }
+     62          
+     63          
+     64          void  App_TaskDelHook (OS_TCB *ptcb)
+     65          {
+     66              (void)ptcb;
+     67          }
+     68          
+     69          #if OS_VERSION >= 251
+     70          void  App_TaskIdleHook (void)
+     71          {
+     72          }
+     73          #endif
+     74          
+     75          
+     76          void  App_TaskStatHook (void)
+     77          {
+     78          }
+     79          
+     80          
+     81          #if OS_TASK_SW_HOOK_EN > 0
+     82          void  App_TaskSwHook (void)
+     83          {
+     84          #if (uC_PROBE_OS_PLUGIN > 0) && (OS_PROBE_HOOKS_EN > 0)
+     85              OSProbe_TaskSwHook();
+     86          #endif
+     87          }
+     88          #endif
+     89          
+     90          
+     91          #if OS_VERSION >= 204
+     92          void  App_TCBInitHook (OS_TCB *ptcb)
+     93          {
+     94              (void)ptcb;
+     95          }
+     96          #endif
+     97          
+     98          
+     99          #if OS_TIME_TICK_HOOK_EN > 0
+    100          void  App_TimeTickHook (void)
+    101          {
+    102          #if (uC_PROBE_OS_PLUGIN > 0) && (OS_PROBE_HOOKS_EN > 0)
+    103              OSProbe_TickHook();
+    104          #endif
+    105          }
+    106          #endif
+    107          #endif
+    108          
+    109          #endif /* OS_INCLUDED */
+    110          
+    111          ////////////////////////////////////////////////////////////////////////////////
+    112          // End of Sourece File
+    113          
+
+   Maximum stack usage in bytes:
+
+   .cstack Function
+   ------- --------
+        8  main
+             8 -> OSInit
+             8 -> OSStart
+             8 -> OSTaskCreate
+
+
+   Section sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+     512  MainTaskStk
+      36  main
+
+ 
+  36 bytes in section .text
+ 512 bytes in section iram
+ 
+  36 bytes of CODE memory
+ 512 bytes of DATA memory
+
+Errors: none
+Warnings: none

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<Workspace>
+  <ConfigDictionary>
+    
+  <CurrentConfigs><Project>stm32FxC_lib_prj_v511/Release</Project><Project>stm32FxC_cpulib_prj_v511/Debug</Project><Project>stm32FxC_ucos_prj_v511/Release</Project></CurrentConfigs><CurrentProj>stm32FxC_lib_prj_v511</CurrentProj><OverviewSelected>0</OverviewSelected></ConfigDictionary>
+  <Desktop>
+    <Static>
+      <Workspace>
+        <ColumnWidths>
+          
+          
+          
+          
+        <Column0>318</Column0><Column1>4</Column1><Column2>27</Column2><Column3>1242260</Column3></ColumnWidths>
+      <PreferedWindows><Position>1</Position><ScreenPosX>0</ScreenPosX><ScreenPosY>0</ScreenPosY><Windows/></PreferedWindows></Workspace>
+      <Build>
+        
+        
+        
+        
+      <PreferedWindows><Position>3</Position><ScreenPosX>0</ScreenPosX><ScreenPosY>0</ScreenPosY><Windows/></PreferedWindows><ColumnWidth0>20</ColumnWidth0><ColumnWidth1>875</ColumnWidth1><ColumnWidth2>233</ColumnWidth2><ColumnWidth3>58</ColumnWidth3></Build>
+    <Debug-Log><PreferedWindows><Position>3</Position><ScreenPosX>0</ScreenPosX><ScreenPosY>0</ScreenPosY><Windows><Window><Factory>Build</Factory></Window></Windows></PreferedWindows></Debug-Log></Static>
+    <Windows>
+      
+      
+    <Wnd2><Tabs><Tab><Identity>TabID-20710-13611</Identity><TabName>Workspace</TabName><Factory>Workspace</Factory><Session><NodeDict><ExpandedNode>&lt;ws></ExpandedNode><ExpandedNode>stm32FxC_cpulib_prj_v511</ExpandedNode><ExpandedNode>stm32FxC_lib_prj_v511</ExpandedNode><ExpandedNode>stm32FxC_ucos_prj_v511</ExpandedNode><ExpandedNode>stm32FxC_ucos_prj_v511/Output</ExpandedNode><ExpandedNode>stm32FxC_ucos_prj_v511/WRCS</ExpandedNode><ExpandedNode>stm32FxC_ucos_prj_v511/dev</ExpandedNode><ExpandedNode>stm32FxC_ucos_prj_v511/lib</ExpandedNode><ExpandedNode>stm32FxC_ucos_prj_v511/source</ExpandedNode></NodeDict></Session></Tab></Tabs><SelectedTab>0</SelectedTab></Wnd2><Wnd3><Tabs><Tab><Identity>TabID-9439-13618</Identity><TabName>Build</TabName><Factory>Build</Factory><Session/></Tab></Tabs><SelectedTab>0</SelectedTab></Wnd3></Windows>
+    <Editor>
+      
+      
+      
+      
+    <Pane><Tab><Factory>TextEditor</Factory><Filename>C:\user\project\GSI-DDR\fw\DDR_OTRU_20100127_W_Single_Test(4)\dev\extint\extint_v0903.c</Filename><XPos>0</XPos><YPos>379</YPos><SelStart>10164</SelStart><SelEnd>10164</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>C:\user\project\GSI-CFR\fw\appl_src_20100208\sout\stm32FxC_ucos_prj_v511.map</Filename><XPos>0</XPos><YPos>526</YPos><SelStart>33513</SelStart><SelEnd>33513</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>C:\user\project\GSI-CFR\fw\appl_src_20100208\init\stm32f10x_flash_VCT6.icf</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>174</SelStart><SelEnd>174</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>C:\user\project\GSI-CFR\fw\appl_src_20100208\stm32FxC_ucos_prj_v511.out</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>C:\user\project\GSI-CFR\fw\appl_src_20100208\stm32FxC_cpulib_gsi_20100114.a</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>C:\user\project\GSI-CFR\fw\appl_src_20100208\code\main.c</Filename><XPos>0</XPos><YPos>346</YPos><SelStart>9937</SelStart><SelEnd>9937</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>C:\user\project\SKT-Beacon\fw\appl_ucos_201000315\code\c_Paucomm.c</Filename><XPos>0</XPos><YPos>179</YPos><SelStart>4798</SelStart><SelEnd>4798</SelEnd></Tab><ActiveTab>6</ActiveTab></Pane><ActivePane>0</ActivePane><Sizes><Pane><X>1000000</X><Y>1000000</Y></Pane></Sizes><SplitMode>1</SplitMode></Editor>
+    <Positions>
+      
+      
+      
+      
+      
+    <Top><Row0><Sizes><Toolbar-00af9588><key>iaridepm.enu1</key></Toolbar-00af9588></Sizes></Row0></Top><Left><Row0><Sizes><Wnd2><Rect><Top>-2</Top><Left>-2</Left><Bottom>726</Bottom><Right>369</Right><x>-2</x><y>-2</y><xscreen>267</xscreen><yscreen>227</yscreen><sizeHorzCX>160168</sizeHorzCX><sizeHorzCY>227912</sizeHorzCY><sizeVertCX>222555</sizeVertCX><sizeVertCY>730924</sizeVertCY></Rect></Wnd2></Sizes></Row0></Left><Right><Row0><Sizes/></Row0></Right><Bottom><Row0><Sizes><Wnd3><Rect><Top>-2</Top><Left>-2</Left><Bottom>225</Bottom><Right>1669</Right><x>-2</x><y>-2</y><xscreen>1671</xscreen><yscreen>227</yscreen><sizeHorzCX>1002400</sizeHorzCX><sizeHorzCY>227912</sizeHorzCY><sizeVertCX>160168</sizeVertCX><sizeVertCY>227912</sizeVertCY></Rect></Wnd3></Sizes></Row0></Bottom><Float><Sizes/></Float></Positions>
+  </Desktop>
+</Workspace>
+
+

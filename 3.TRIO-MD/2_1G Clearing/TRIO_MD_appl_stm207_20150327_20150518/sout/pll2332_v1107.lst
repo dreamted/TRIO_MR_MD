@@ -1,0 +1,284 @@
+###############################################################################
+#                                                                             #
+# IAR ANSI C/C++ Compiler V5.50.0.51878/W32 for ARM     21/Aug/2012  10:55:21 #
+# Copyright (C) 1999-2010 IAR Systems AB.                                     #
+#                                                                             #
+#    Cpu mode     =  thumb                                                    #
+#    Endian       =  little                                                   #
+#    Source file  =  C:\user\project\FR-SSR\fw\appl_ssr_20120717\dev\pll2332\ #
+#                    pll2332_v1107.c                                          #
+#    Command line =  C:\user\project\FR-SSR\fw\appl_ssr_20120717\dev\pll2332\ #
+#                    pll2332_v1107.c -lcN C:\user\project\FR-SSR\fw\appl_ssr_ #
+#                    20120717\sout\ -lB C:\user\project\FR-SSR\fw\appl_ssr_20 #
+#                    120717\sout\ -o C:\user\project\FR-SSR\fw\appl_ssr_20120 #
+#                    717\sout\ --endian=little --cpu=Cortex-M3 -e             #
+#                    --require_prototypes --fpu=None --dlib_config            #
+#                    "C:\compiler\ewarm 5.5\arm\INC\DLib_Config_Normal.h" -I  #
+#                    C:\user\project\FR-SSR\fw\appl_ssr_20120717\include\ -I  #
+#                    C:\user\project\FR-SSR\fw\appl_ssr_20120717\lib_stm32\in #
+#                    c\ -I C:\user\project\FR-SSR\fw\appl_ssr_20120717\lib_st #
+#                    m32\src\ -I C:\user\project\FR-SSR\fw\appl_ssr_20120717\ #
+#                    uC-CPU\ -I C:\user\project\FR-SSR\fw\appl_ssr_20120717\u #
+#                    C-LIB\ -I C:\user\project\FR-SSR\fw\appl_ssr_20120717\uC #
+#                    OS-II\Ports\ -I C:\user\project\FR-SSR\fw\appl_ssr_20120 #
+#                    717\uCOS-II\Source\ -I C:\user\project\FR-SSR\fw\appl_ss #
+#                    r_20120717\uC-Probe\ -I "C:\compiler\ewarm               #
+#                    5.5\arm\INC\" -Oh                                        #
+#    List file    =  C:\user\project\FR-SSR\fw\appl_ssr_20120717\sout\pll2332 #
+#                    _v1107.lst                                               #
+#    Object file  =  C:\user\project\FR-SSR\fw\appl_ssr_20120717\sout\pll2332 #
+#                    _v1107.o                                                 #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+C:\user\project\FR-SSR\fw\appl_ssr_20120717\dev\pll2332\pll2332_v1107.c
+      1          #define PLL_C
+      2          
+      3          #include "../include/main.h"
+      4          //#include "../include/pll2332.h"
+      5          //#define Pll233x_debug
+      6          
+      7          #define __IFPRE			16
+      8          #define __RFPRE			64
+      9          
+     10          
+     11          void Pll2322Create(_pPll2332Str ptr, 
+     12          						void (*SetClk)(), void (*RstClk)(), 
+     13          							void (*SetData)(), void (*RstData)(),
+     14          							  void (*SetEn)(), void (*RstEn)() )
+     15          {
+     16              ptr->SetPllClk = SetClk;
+     17              ptr->RstPllClk = RstClk;
+     18              ptr->SetPllData = SetData;
+     19              ptr->RstPllData = RstData;
+     20              ptr->SetPllEn = SetEn;
+     21              ptr->RstPllEn = RstEn;    
+     22          }
+     23          
+     24          
+     25          void Pll2332Init(INT32U rfrq, INT32U dRatio, _pPll2332Str ptr)	//rfrq: Reference Freq,  dRatio: dRatio: Devide Prescaler
+     26          {
+     27          	ptr->rfrq = rfrq;
+     28          	ptr->dRatio = dRatio;
+     29          	ptr->PR = rfrq/dRatio;
+     30          
+     31          	ptr->IFfvco = 0;
+     32          	ptr->RFfvco = 0;
+     33          }
+     34          
+     35          
+     36          void Pll2332_IFOutput(INT32U fvco, _pPll2332Str ptr)
+     37          {
+     38          	INT32U tMsb = (1 << 21);
+     39          	INT32U i = 0;
+     40          	//INT32U cpu_sr;
+     41          
+     42          	if(ptr->IFfvco == fvco) return;
+     43          	
+     44          
+     45          	fvco = fvco/ptr->dRatio;
+     46          	{
+     47          		_RCounterReg RCounter;
+     48          		_NCounterReg NCounter;
+     49          
+     50          		RCounter.Data = 0;				// init
+     51          		NCounter.Data = 0;				// init
+     52          		
+     53          		RCounter.Bit.C = __IFRCounter;
+     54          		RCounter.Bit.R = ptr->PR;
+     55          		RCounter.Bit.POL = __POS;
+     56          		RCounter.Bit.ICPO = __ICPOLOW;
+     57          		RCounter.Bit.TRI = __NOR;
+     58          		RCounter.Bit.LD = __LDNO;
+     59          
+     60          		NCounter.Bit.C = __IFNCounter;
+     61          		NCounter.Bit.A = fvco%__IFPRE;
+     62          		NCounter.Bit.B = fvco/__IFPRE;
+     63          		NCounter.Bit.PR = __n233x_IF_PR16;
+     64          		NCounter.Bit.PWEN = __PWDN;
+     65          
+     66          		#ifdef Pll233x_debug
+     67          		{
+     68          			SerPtr->printf("IF R Counter: %03x \n", RCounter.Grp.tot & 0xffffff);
+     69          			SerPtr->printf("IF N Counter: %03x \n", NCounter.Grp.tot & 0xffffff);
+     70          			OSTimeDly(100);
+     71          		}
+     72          		#endif
+     73          		//OS_ENTER_CRITICAL();
+     74          		
+     75          		ptr->RstPllEn();
+     76          
+     77          		for(i = 0; i < 22; i++)			// R Counter Program modes	(5bit)
+     78          		{	
+     79          			if(RCounter.Grp.tot & tMsb)	ptr->SetPllData();
+     80          			else						ptr->RstPllData();
+     81          
+     82          			RCounter.Grp.tot <<= 1;
+     83          			ptr->SetPllClk();
+     84          			ptr->RstPllClk();
+     85          		}	
+     86          
+     87          	 	ptr->SetPllEn();
+     88          		ptr->RstPllEn();
+     89          
+     90          		for(i = 0; i < 22; i++) 		// R Counter Program modes	(5bit)
+     91          		{	
+     92          			if(NCounter.Grp.tot & tMsb)	ptr->SetPllData();
+     93          			else					 	ptr->RstPllData();
+     94          
+     95          			NCounter.Grp.tot <<= 1; 
+     96          			ptr->SetPllClk();
+     97          			ptr->RstPllClk();
+     98          		}		
+     99          	 	ptr->SetPllEn();
+    100          		ptr->RstPllEn();
+    101          		
+    102          		//OS_EXIT_CRITICAL();
+    103          	}
+    104          	////////////////////////////////////////////////////////////	
+    105          }
+    106          
+    107          void Pll2332_RFOutput(INT32U fvco, _pPll2332Str ptr)
+    108          {
+    109          	INT32U tMsb = (1 << 21);
+    110          	INT32U i = 0;
+    111          	//INT32U cpu_sr;
+    112          
+    113          	if(ptr->RFfvco == fvco) return;
+    114          
+    115          	fvco = fvco/ptr->dRatio;
+    116          	{
+    117          		_RCounterReg RCounter;
+    118          		_NCounterReg NCounter;
+    119          
+    120          		RCounter.Data = 0;				// init
+    121          		NCounter.Data = 0;				// init
+    122          		
+    123          		RCounter.Bit.C = __RFRCounter;
+    124          		RCounter.Bit.R = ptr->PR;
+    125          		RCounter.Bit.POL = __POS;
+    126          		RCounter.Bit.ICPO = __ICPOHIG;
+    127          		RCounter.Bit.TRI = __NOR;
+    128          		RCounter.Bit.LD = __LDNO;
+    129          
+    130          		NCounter.Bit.C = __RFNCounter;
+    131          		NCounter.Bit.A = fvco%__RFPRE;
+    132          		NCounter.Bit.B = fvco/__RFPRE;
+    133          		NCounter.Bit.PR = __n2332_RF_PR_64;
+    134          		NCounter.Bit.PWEN = __PWUP;
+    135          
+    136          		#ifdef Pll233x_debug
+    137          		{
+    138          			SerPtr->printf("RF R Counter: %03x \n", RCounter.Grp.tot & 0xffffff);
+    139          			SerPtr->printf("RF N Counter: %03x \n", NCounter.Grp.tot & 0xffffff);
+    140          			OSTimeDly(100);
+    141          		}
+    142          		#endif
+    143          		//OS_ENTER_CRITICAL();
+    144          		
+    145          		ptr->RstPllEn();
+    146          		
+    147          		for(i = 0; i < 22; i++)			// R Counter Program modes	(5bit)
+    148          		{	
+    149          			if(RCounter.Grp.tot & tMsb)	ptr->SetPllData();
+    150          			else						ptr->RstPllData();
+    151          
+    152          			RCounter.Grp.tot <<= 1;
+    153          			
+    154          			ptr->SetPllClk();
+    155          			ptr->RstPllClk();
+    156          		}	
+    157          		ptr->SetPllEn();
+    158          		ptr->RstPllEn();
+    159          
+    160          		for(i = 0; i < 22; i++) 		//N Counter Program modes	(5bit)
+    161          		{	
+    162          			if(NCounter.Grp.tot & tMsb)	ptr->SetPllData();
+    163          			else					 	ptr->RstPllData();
+    164          
+    165          			NCounter.Grp.tot <<= 1; 
+    166          
+    167          			ptr->SetPllClk();
+    168          			ptr->RstPllClk();
+    169          		}		
+    170          		ptr->SetPllEn();
+    171          		ptr->RstPllEn();
+    172          		
+    173          		//OS_EXIT_CRITICAL();
+    174          	}
+    175          	////////////////////////////////////////////////////////////	
+    176          }
+    177          
+    178          void SetPllClk(void)
+    179          {
+    180          	_ATTN_CLK = 1;
+    181          
+    182          #if PLL_DEFINE	
+    183          	ForDelay(PLL_DELAY);
+    184          #endif
+    185          }
+    186          
+    187          void RstPllClk(void)
+    188          {
+    189          	_ATTN_CLK = 0;
+    190          #if PLL_DEFINE	
+    191          	ForDelay(PLL_DELAY);
+    192          #endif
+    193          }
+    194          
+    195          void SetPllData(void)
+    196          {
+    197          	_ATTN_DATA = 1;
+    198          #if PLL_DEFINE	
+    199          	ForDelay(PLL_DELAY);
+    200          #endif
+    201          }
+    202          
+    203          void RstPllData(void)
+    204          {
+    205          	_ATTN_DATA = 0;
+    206          #if PLL_DEFINE	
+    207          	ForDelay(PLL_DELAY);
+    208          #endif
+    209          }
+    210          
+    211          void SetPllEnA(void)	// PLL IN1
+    212          {
+    213          	//_2G_PLL_LE = 1;
+    214          #if PLL_DEFINE	
+    215          	ForDelay(PLL_DELAY);
+    216          #endif
+    217          }
+    218          
+    219          void RstPllEnA(void)	// PLL IN1
+    220          {
+    221          	//_2G_PLL_LE = 0;
+    222          #if PLL_DEFINE	
+    223          	ForDelay(PLL_DELAY);
+    224          #endif
+    225          }
+    226          
+    227          void SetPllEnB(void)	// PLL IN2
+    228          {
+    229          	//_3G_PLL_LE = 1;
+    230          #ifdef PLL_DEFINE	
+    231          	ForDelay(PLL_DELAY);
+    232          #endif
+    233          }
+    234          
+    235          void RstPllEnB(void)	// PLL IN2
+    236          {
+    237          	//_3G_PLL_LE = 0;
+    238          #ifdef PLL_DEFINE	
+    239          	ForDelay(PLL_DELAY);
+    240          #endif
+    241          }
+    242          
+    243          ////////////////////////////////////////////////////////////////////////////////
+    244          // End of Source File
+    245          /////////////////////
+    246          
+
+Errors: 36
+Warnings: none

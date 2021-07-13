@@ -1,0 +1,1220 @@
+###############################################################################
+#                                                                             #
+# IAR ANSI C/C++ Compiler V5.50.0.51878/W32 for ARM     23/Aug/2012  00:33:45 #
+# Copyright (C) 1999-2010 IAR Systems AB.                                     #
+#                                                                             #
+#    Cpu mode     =  thumb                                                    #
+#    Endian       =  little                                                   #
+#    Source file  =  C:\user\project\FR-SSR\fw\appl_ssr_20120717\dev\ad9362\A #
+#                    D9362_v1207.c                                            #
+#    Command line =  C:\user\project\FR-SSR\fw\appl_ssr_20120717\dev\ad9362\A #
+#                    D9362_v1207.c -lcN C:\user\project\FR-SSR\fw\appl_ssr_20 #
+#                    120717\sout\ -lB C:\user\project\FR-SSR\fw\appl_ssr_2012 #
+#                    0717\sout\ -o C:\user\project\FR-SSR\fw\appl_ssr_2012071 #
+#                    7\sout\ --endian=little --cpu=Cortex-M3 -e               #
+#                    --require_prototypes --fpu=None --dlib_config            #
+#                    "C:\compiler\ewarm 5.5\arm\INC\DLib_Config_Normal.h" -I  #
+#                    C:\user\project\FR-SSR\fw\appl_ssr_20120717\include\ -I  #
+#                    C:\user\project\FR-SSR\fw\appl_ssr_20120717\lib_stm32\in #
+#                    c\ -I C:\user\project\FR-SSR\fw\appl_ssr_20120717\lib_st #
+#                    m32\src\ -I C:\user\project\FR-SSR\fw\appl_ssr_20120717\ #
+#                    uC-CPU\ -I C:\user\project\FR-SSR\fw\appl_ssr_20120717\u #
+#                    C-LIB\ -I C:\user\project\FR-SSR\fw\appl_ssr_20120717\uC #
+#                    OS-II\Ports\ -I C:\user\project\FR-SSR\fw\appl_ssr_20120 #
+#                    717\uCOS-II\Source\ -I C:\user\project\FR-SSR\fw\appl_ss #
+#                    r_20120717\uC-Probe\ -I "C:\compiler\ewarm               #
+#                    5.5\arm\INC\" -Oh                                        #
+#    List file    =  C:\user\project\FR-SSR\fw\appl_ssr_20120717\sout\AD9362_ #
+#                    v1207.lst                                                #
+#    Object file  =  C:\user\project\FR-SSR\fw\appl_ssr_20120717\sout\AD9362_ #
+#                    v1207.o                                                  #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+C:\user\project\FR-SSR\fw\appl_ssr_20120717\dev\ad9362\AD9362_v1207.c
+      1          /*!
+      2          *********************************************************************************************************
+      3          *              	- AD9362 CODE
+      4          *
+      5          *              	-(c) Copyright 2007-2012;
+      6          *
+      7          *              	-All rights reserved.  Protected by international copyright laws.
+      8          *              	-Knowledge of the source code may NOT be used to develop a similar product.
+      9          *              	-Please help us continue to provide the Embedded community with the finest
+     10          *              	-software available.  Your honesty is greatly appreciated.
+     11          *
+     12          * 				-file 		: iapd.c
+     13          * 				-author		: Yoon Byong-Gyu, bgyoon@naver.com
+     14          * 				-date		: 2012.05.
+     15          *********************************************************************************************************
+     16          */
+     17          #define AD9362_C
+     18          
+     19          #include "../include/main.h"
+     20          
+     21          INT8U AD9362Init(INT8U ch, INT8U IsItReset)
+     22          {
+     23          
+     24          	union __ADDR_0x000{
+     25          		INT8U Data;
+     26          		struct{
+     27          			INT8U SoftRst		:1; 	// 0: NORMAL,	1: RESET
+     28          			INT8U SPIType		:1; 	// 0: 4-Wire,	1: 3-Wire
+     29          			INT8U LSBFirst		:1; 	// 0: MSB,		1: LSB
+     30          		};
+     31          	} tmp;
+     32          
+     33          	tmp.SoftRst = IsItReset;
+     34          	tmp.SPIType = RESET;
+     35          	tmp.LSBFirst = RESET;
+     36          
+     37          	WriteFPGAs(ch, ADDR_SPICONF, &tmp.Data, 1);
+     38          
+     39          	return tmp.Data;
+     40          }
+     41          
+     42          //#define AD9362_DEBUG
+     43          
+     44          
+     45          void AD9362InitSet(INT8U ch, INT8U type)
+     46          {
+     47          	INT8U *ptr;
+     48          	INT16U i = 0;
+     49          	INT8U rRegData = 0;
+     50          	
+     51          	switch(ch)
+     52          	{
+     53          		case SPI_3G_TX_CH:
+     54          			ptr = (INT8U *)vEE_3G_TX;
+     55          		break;
+     56          
+     57          		case SPI_3G_RX_CH:
+     58          			ptr = (INT8U *)vEE_3G_RX;
+     59          		break;
+     60          
+     61          		case SPI_4G_TX_CH:
+     62          			     if(type == LTE_10MHz)	ptr = (INT8U *)vEE_4G_TX_10MHz;
+     63          			else if(type == LTE_15MHz)	ptr = (INT8U *)vEE_4G_TX_15MHz;
+     64          			else if(type == LTE_20MHz)	ptr = (INT8U *)vEE_4G_TX_20MHz;
+     65          		break;
+     66          
+     67          		case SPI_4G_RX_CH:
+     68          			     if(type == LTE_10MHz)	ptr = (INT8U *)vEE_4G_RX_10MHz;
+     69          			else if(type == LTE_15MHz)	ptr = (INT8U *)vEE_4G_RX_15MHz;
+     70          			else if(type == LTE_20MHz)	ptr = (INT8U *)vEE_4G_RX_20MHz;
+     71          		break;
+     72          	}
+     73          
+     74          	
+     75          	for(i = 0; i < sizeAD9362Set; i++)
+     76          	{
+     77          		if(AD9362SetAddr[i] != 0x064 && AD9362SetAddr[i] != 0x0F4)
+     78          		{
+     79          			if(AD9362SetAddr[i] == 0x0A3)
+     80          			{
+     81          				WriteAD9362(ch, AD9362SetAddr[i], rRegData & 0xc0);
+     82          #ifdef AD9362_DEBUG
+     83          				SerPtr->printf("SPIWrite   %03x,%02x\n", AD9362SetAddr[i], rRegData & 0xc0);
+     84          #endif
+     85          			}
+     86          			else {
+     87          				WriteAD9362(ch, AD9362SetAddr[i], *ptr);
+     88          #ifdef AD9362_DEBUG
+     89          				SerPtr->printf("SPIWrite   %03x,%02x\n", AD9362SetAddr[i], *ptr);
+     90          #endif
+     91          			}
+     92          			ptr++;
+     93          		}
+     94          		else{
+     95          			WriteAD9362(ch, AD9362SetAddr[i], 0x00);
+     96          #ifdef AD9362_DEBUG
+     97          			SerPtr->printf("SPIWrite   %03x,%02x\n", AD9362SetAddr[i], 0x00);
+     98          #endif
+     99          		}
+    100          		
+    101          		switch(i)
+    102          		{
+    103          			case 0:
+    104          			case 9:
+    105                  	case 29:
+    106          			case 799:
+    107          				OSTimeDly(20);
+    108          #ifdef AD9362_DEBUG
+    109          				SerPtr->printf("wait 20ms\n");
+    110          #endif
+    111          			break;
+    112          
+    113          			case 30:
+    114          			case 801:
+    115          			case 1570:
+    116          			case 1575:
+    117          			case 1585:			// Setup AuxADC
+    118          			case 1591:			// Setup Control Outs
+    119          			case 1593:			// Setup GPO
+    120          			case 1604:
+    121          			case 1618:
+    122          			case 1621:
+    123          			case 1634:
+    124          			case 1645:
+    125          			case 1774:
+    126          			case 2416:
+    127          			case 2435:
+    128          			case 2439:
+    129          			case 2446:
+    130          			case 2448:
+    131          			case 2456:
+    132          			case 2509:
+    133          			case 2530:
+    134          			case 2534:
+    135          			case 2544:
+    136          			case 2546:
+    137          				OSTimeDly(1);	// wait 1ms
+    138          #ifdef AD9362_DEBUG
+    139          				if(i == 1593) SerPtr->printf("// Setup GPO\n");
+    140          				if(i == 1634) SerPtr->printf("// Setup Synthesizer \n");
+    141          				if(i == 1774) SerPtr->printf("// Program Rx Gain Tables with GainTable800MHz.csv \n");
+    142          				if(i == 2416) SerPtr->printf("// Setup Rx Manual Gain Registers \n");
+    143          				if(i == 2435) SerPtr->printf("// RX Baseband Filter Tuning (Real BW: 7.000000 MHz) 3dB Filter \n");
+    144          				if(i == 2446) SerPtr->printf("// TX Baseband Filter Tuning (Real BW: 7.000000 MHz) 3dB Filter \n");
+    145          				if(i == 2456) SerPtr->printf("// TX Secondary Filter Calibration Setup:  Real Bandwidth \n");
+    146          				if(i == 2530) SerPtr->printf("// Set Tx Attenuation: Tx1: 10.00 dB,  Tx2: 10.00 dB \n");
+    147          				if(i == 2534) SerPtr->printf("// Setup RSSI and Power Measurement Duration Registers \n");
+    148          				if(i == 2546) SerPtr->printf("// END\n");
+    149          				
+    150          				SerPtr->printf("wait 1ms\n");
+    151          #endif
+    152          			break;
+    153          			
+    154          			case 25:
+    155          			{
+    156          				INT8U ret = TRUE;
+    157          				INT8U cnt = 20;
+    158          				INT8U tmp;
+    159          #ifdef AD9362_DEBUG
+    160          				if(i == 25)	SerPtr->printf("wait 0x05E lock\n");
+    161          #endif
+    162          				while(ret && cnt--)
+    163          				{
+    164          					tmp = ReadAD9362(ch, 0x05E);
+    165          					if(BitRead(tmp, 7)) ret = FALSE;
+    166          					OSTimeDly(200L);
+    167          				}
+    168          			}
+    169          			break;
+    170          
+    171          			case 1622:
+    172          			{
+    173          				INT8U ret = TRUE;
+    174          				INT8U cnt = 20;
+    175          				INT8U tmp;
+    176          #ifdef AD9362_DEBUG
+    177          				if(i == 1622)	SerPtr->printf("wait 0x244 lock\n");
+    178          #endif
+    179          				while(ret && cnt--)
+    180          				{
+    181          					tmp = ReadAD9362(ch, 0x244);
+    182          					if(BitRead(tmp, 7)) ret = FALSE;
+    183          					OSTimeDly(200L);
+    184          				}
+    185          			}
+    186          			break;
+    187          
+    188          			case 1623:
+    189          			{
+    190          				INT8U ret = TRUE;
+    191          				INT8U cnt = 20;
+    192          				INT8U tmp;
+    193          #ifdef AD9362_DEBUG
+    194          				SerPtr->printf("wait 0x284 lock\n");
+    195          				SerPtr->printf("Setup Synthesizer\n");
+    196          #endif
+    197          				while(ret && cnt--)
+    198          				{
+    199          					tmp = ReadAD9362(ch, 0x284);
+    200          					if(BitRead(tmp, 7)) ret = FALSE;
+    201          					OSTimeDly(200L);
+    202          				}
+    203          			}
+    204          			break;
+    205          
+    206          			case 1657:
+    207          			{
+    208          				INT8U ret = TRUE;
+    209          				INT8U cnt = 20;
+    210          				INT8U tmp;
+    211          #ifdef AD9362_DEBUG
+    212          				SerPtr->printf("wait 0x247[1] lock\n");
+    213          #endif
+    214          				while(ret && cnt--)
+    215          				{
+    216          					tmp = ReadAD9362(ch, 0x247);
+    217          					if(BitRead(tmp, 1)) ret = FALSE;
+    218          					OSTimeDly(200L);
+    219          				}
+    220          			}
+    221          			{
+    222          				INT8U ret = TRUE;
+    223          				INT8U cnt = 20;
+    224          				INT8U tmp;
+    225          #ifdef AD9362_DEBUG
+    226          				SerPtr->printf("wait 0x287[1] lock\n");
+    227          #endif
+    228          				while(ret && cnt--)
+    229          				{
+    230          					tmp = ReadAD9362(ch, 0x287);
+    231          					if(BitRead(tmp, 1)) ret = FALSE;
+    232          					OSTimeDly(200L);
+    233          				}
+    234          			}
+    235          #ifdef AD9362_DEBUG
+    236          				SerPtr->printf("// Program Mixer GM Sub-table \n");
+    237          #endif
+    238          
+    239          			break;
+    240          			case 2444:
+    241          			{
+    242          				INT8U ret = TRUE;
+    243          				INT8U cnt = 20;
+    244          				INT8U tmp;
+    245          #ifdef AD9362_DEBUG
+    246          				SerPtr->printf("(Done when 0x016[7]==0)\n");
+    247          #endif
+    248          				while(ret && cnt--)
+    249          				{
+    250          					tmp = ReadAD9362(ch, 0x016);
+    251          					if(!BitRead(tmp, 7)) ret = FALSE;
+    252          					OSTimeDly(10);
+    253          				}
+    254          			}
+    255          			break;
+    256          			case 2450:
+    257          			{
+    258          				INT8U ret = TRUE;
+    259          				INT8U cnt = 20;
+    260          				INT8U tmp;
+    261          #ifdef AD9362_DEBUG
+    262          				SerPtr->printf("(Done when 0x016[6]==0)\n");
+    263          #endif
+    264          				while(ret && cnt--)
+    265          				{
+    266          					tmp = ReadAD9362(ch, 0x016);
+    267          					if(!BitRead(tmp, 6)) ret = FALSE;
+    268          					OSTimeDly(10);
+    269          				}
+    270          			}		
+    271          			break;
+    272          			case 2451:
+    273          #ifdef AD9362_DEBUG
+    274          				if(i == 2451) SerPtr->printf("// RX TIA Setup:  Setup values scale based on RxBBF calibration \n");
+    275          #endif
+    276          				{
+    277          					INT8U tmp = 0;
+    278          					tmp = ReadAD9362(ch, 0x1EB);
+    279                              tmp = tmp;
+    280          #ifdef AD9362_DEBUG
+    281          					SerPtr->printf("// Read RXBBF C3(MSB) = %02x\n", tmp);
+    282          #endif
+    283          					tmp = ReadAD9362(ch, 0x1EC);
+    284          #ifdef AD9362_DEBUG
+    285          					SerPtr->printf("// Read RXBBF C3(LSB) = %02x\n", tmp);
+    286          #endif
+    287          					tmp = ReadAD9362(ch, 0x1E6);
+    288          #ifdef AD9362_DEBUG
+    289          					SerPtr->printf("// Read RXBBF R2346 = %02x\n", tmp);
+    290          #endif
+    291          				}
+    292          			break;
+    293          
+    294          			case 2459:
+    295          				{
+    296          					INT8U tmp = 0;
+    297          					tmp = ReadAD9362(ch, 0x1EB);
+    298                              tmp = tmp;
+    299          #ifdef AD9362_DEBUG
+    300          					SerPtr->printf("// Read RXBBF C3(MSB) = %02x\n", tmp);
+    301          #endif
+    302          					tmp = ReadAD9362(ch, 0x1EC);
+    303          #ifdef AD9362_DEBUG
+    304          					SerPtr->printf("// Read RXBBF C3(LSB) = %02x\n", tmp);
+    305          #endif
+    306          					tmp = ReadAD9362(ch, 0x1E6);
+    307          #ifdef AD9362_DEBUG
+    308          					SerPtr->printf("// Read RXBBF R2346 = %02x\n", tmp);
+    309          #endif
+    310          				}
+    311          #ifdef AD9362_DEBUG
+    312          				if(i == 2459) SerPtr->printf("// ADC Setup:  Tune ADC Performance based on RX analog filter tune \n");
+    313          #endif
+    314          			break;
+    315          
+    316          			case 2499:
+    317          				//if(i == 2499) SerPtr->printf("// Tx Quadrature Calibration Settings \n");
+    318          				rRegData = ReadAD9362(ch, 0x0A3);
+    319          			break;
+    320          
+    321          			case 2513:
+    322          			{
+    323          				INT8U ret = TRUE;
+    324          				INT8U cnt = 20;
+    325          				INT8U tmp;
+    326          #ifdef AD9362_DEBUG
+    327          				SerPtr->printf("(Done when 0x016[0]==0)\n");
+    328          #endif
+    329          				while(ret && cnt--)
+    330          				{
+    331          					tmp = ReadAD9362(ch, 0x016);
+    332          					if(!BitRead(tmp, 0)) ret = FALSE;
+    333          					OSTimeDly(10);
+    334          				}
+    335          			}
+    336          			break;
+    337          			
+    338          			case 2520:
+    339          			{
+    340          				INT8U ret = TRUE;
+    341          				INT8U cnt = 20;
+    342          				INT8U tmp;
+    343          #ifdef AD9362_DEBUG
+    344          				SerPtr->printf("(Done when 0x016[1]==0)\n");
+    345          #endif
+    346          				while(ret && cnt--)
+    347          				{
+    348          					tmp = ReadAD9362(ch, 0x016);
+    349          					if(!BitRead(tmp, 1)) ret = FALSE;
+    350          					OSTimeDly(10);
+    351          				}
+    352          			}
+    353          			break;
+    354          			
+    355          			case 2521:
+    356          			{
+    357          				INT8U ret = TRUE;
+    358          				INT8U cnt = 20;
+    359          				INT8U tmp;
+    360          #ifdef AD9362_DEBUG
+    361          				SerPtr->printf("(Done when 0x016[4]==0)\n");
+    362          #endif
+    363          				while(ret && cnt--)
+    364          				{
+    365          					tmp = ReadAD9362(ch, 0x016);
+    366          					if(!BitRead(tmp, 4)) ret = FALSE;
+    367          					OSTimeDly(10);
+    368          				}
+    369          			}
+    370          			break;
+    371          
+    372          		}
+    373          			
+    374          	}
+    375          	switch(ch)
+    376          	{
+    377          		case SPI_3G_TX_CH:
+    378          			SerPtr->printf("3G TX AD9362 INIT END\n");
+    379          		break;
+    380          
+    381          		case SPI_3G_RX_CH:
+    382          			SerPtr->printf("3G RX AD9362 INIT END\n");
+    383          		break;
+    384          
+    385          		case SPI_4G_TX_CH:
+    386          			SerPtr->printf("4G TX AD9362 INIT END\n");
+    387          		break;
+    388          
+    389          		case SPI_4G_RX_CH:
+    390          			SerPtr->printf("4G RX AD9362 INIT END\n");
+    391          		break;
+    392          	}
+    393          	
+    394          	OSTimeDly(20L);
+    395          }
+    396          
+    397          
+    398          INT8U AD9362TxOn(INT8U ch, INT8U TxOn)
+    399          {
+    400          	union __ADDR_0x014{
+    401          		INT8U Data;
+    402          		struct{
+    403          			INT8U ToAlert		:1;
+    404          			INT8U AutoGainLock	:1;
+    405          			INT8U ForceAlertSts	:1;
+    406          			INT8U LvlMode		:1;
+    407          			
+    408          			INT8U EnENSMpin		:1;
+    409          			INT8U TxOn			:1;
+    410          			INT8U RxOn			:1;
+    411          			INT8U EnRxDataPort	:1;
+    412          			
+    413          		};
+    414          	} tmp;
+    415          	tmp.Data = 0x09;
+    416          	tmp.TxOn = TxOn;
+    417          	WriteAD9362(ch, ADDR_ENSMCFG1, tmp.Data);
+    418              
+    419              return tmp.Data;
+    420          }
+    421          
+    422          
+    423          
+    424          INT8U AD9362TxEnable(INT8U ch, INT8U Tx1En, INT8U Tx2En)
+    425          {
+    426          	union __ADDR_0x002{
+    427          		INT8U Data;
+    428          		struct{
+    429          			INT8U TxFIREn		:2;
+    430          			INT8U THB1En		:1;
+    431          			INT8U THB2En		:1;
+    432          			
+    433          			INT8U THB3En		:2;
+    434          			INT8U Tx1En			:1;
+    435          			INT8U Tx2En			:1;
+    436          		};
+    437          	} tmp;
+    438          
+    439          	ReadFPGAs(ch, ADDR_TXEN, &tmp.Data, 1);
+    440          
+    441          	tmp.Tx1En = Tx1En;
+    442          	tmp.Tx2En = Tx2En;
+    443          
+    444          	WriteFPGAs(ch, ADDR_TXEN, &tmp.Data, 1);
+    445          
+    446          	return tmp.Data;
+    447          }
+    448          
+    449          INT8U AD9362TxFilterSet(INT8U ch, INT8U THB3En, INT8U THB2En, INT8U THB1En, INT8U TxFIREn)
+    450          {
+    451          	union __ADDR_0x002{
+    452          		INT8U Data;
+    453          		struct{
+    454          			INT8U TxFIREn		:2;
+    455          			INT8U THB1En		:1;
+    456          			INT8U THB2En		:1;
+    457          			
+    458          			INT8U THB3En		:2;
+    459          			INT8U Tx1En			:1;
+    460          			INT8U Tx2En			:1;
+    461          			
+    462          		};
+    463          	} tmp;
+    464          
+    465          	ReadFPGAs(ch, ADDR_TXEN, &tmp.Data, 1);
+    466          
+    467          	tmp.TxFIREn = TxFIREn;
+    468          	tmp.THB1En = THB1En;
+    469          	tmp.THB2En = THB2En;
+    470          	tmp.THB3En = THB3En;
+    471          
+    472          	WriteFPGAs(ch, ADDR_TXEN, &tmp.Data, 1);
+    473          
+    474          	return tmp.Data;
+    475          }
+    476          
+    477          
+    478          INT8U AD9362RxEnable(INT8U ch, INT8U Rx1En, INT8U Rx2En)
+    479          {
+    480          	union __ADDR_0x003{
+    481          		INT8U Data;
+    482          		struct{
+    483          			INT8U RxFIREn		:2;
+    484          			INT8U RHB1En		:1;
+    485          			INT8U RHB2En		:1;
+    486          			
+    487          			INT8U RHB3En		:2;
+    488          			INT8U Rx1En			:1;
+    489          			INT8U Rx2En			:1;
+    490          		};
+    491          	} tmp;
+    492          	
+    493          	ReadFPGAs(ch, ADDR_RXEN, &tmp.Data, 1);
+    494          
+    495          	tmp.Rx1En = Rx1En;
+    496          	tmp.Rx2En = Rx2En;
+    497          
+    498          	WriteFPGAs(ch, ADDR_RXEN, &tmp.Data, 1);
+    499          
+    500          	return tmp.Data;
+    501          }
+    502          
+    503          INT8U AD9362RxFilterSet(INT8U ch, INT8U RHB3En, INT8U RHB2En, INT8U RHB1En, INT8U RxFIREn)
+    504          {
+    505          	union __ADDR_0x003{
+    506          		INT8U Data;
+    507          		struct{
+    508          			INT8U RxFIREn		:2;
+    509          			INT8U RHB1En		:1;
+    510          			INT8U RHB2En		:1;
+    511          			
+    512          			INT8U RHB3En		:2;
+    513          			INT8U Rx1En 		:1;
+    514          			INT8U Rx2En 		:1;
+    515          		};
+    516          	} tmp;
+    517          	
+    518          	ReadFPGAs(ch, ADDR_RXEN, &tmp.Data, 1);
+    519          
+    520          	tmp.RxFIREn = RxFIREn;
+    521          	tmp.RHB1En = RHB1En;
+    522          	tmp.RHB2En = RHB2En;
+    523          	tmp.RHB3En = RHB3En;
+    524          
+    525          	WriteFPGAs(ch, ADDR_RXEN, &tmp.Data, 1);
+    526          
+    527          	return tmp.Data;
+    528          }
+    529          
+    530          
+    531          
+    532          
+    533          INT8U AD9362InOutSelect(INT8U ch, INT8U Tx_AEn,
+    534          								  INT8U Rx_ANEn, INT8U Rx_APEn,
+    535          								  INT8U Rx_BNEn, INT8U Rx_BPEn,
+    536          								  INT8U Rx_CNEn, INT8U Rx_CPEn)
+    537          {
+    538          	union __ADDR_0x004{
+    539          		INT8U Data;
+    540          		struct{
+    541          			INT8U Rx_ANEn		:1;
+    542          			INT8U Rx_APEn		:1;
+    543          			INT8U Rx_BNEn		:1;
+    544          			INT8U Rx_BPEn		:1;
+    545          			
+    546          			INT8U Rx_CNEn		:1;
+    547          			INT8U Rx_CPEn		:1;
+    548          			INT8U Tx_2AEn		:1;
+    549          		};
+    550          	} tmp;
+    551          	
+    552          	ReadFPGAs(ch, ADDR_INPUTSEL, &tmp.Data, 1);
+    553          
+    554          	tmp.Rx_ANEn = Rx_ANEn;
+    555          	tmp.Rx_APEn = Rx_APEn;
+    556          	tmp.Rx_BNEn = Rx_BNEn;
+    557          	tmp.Rx_BPEn = Rx_BPEn;
+    558          	tmp.Rx_CNEn = Rx_CNEn;
+    559          	tmp.Rx_CPEn = Rx_CPEn;
+    560          	
+    561          	tmp.Tx_2AEn = Tx_AEn;
+    562          
+    563          	WriteFPGAs(ch, ADDR_INPUTSEL, &tmp.Data, 1);
+    564          
+    565          	return tmp.Data;
+    566          }
+    567          
+    568          void AD9362CLKSelect(INT8U ch, INT8U type)
+    569          {
+    570          	{
+    571          		union __ADDR_0x009{
+    572          			INT8U Data;
+    573          			struct{
+    574          				INT8U BBPLLEn			:1;
+    575          				INT8U DCXOEn			:1;
+    576          				INT8U DigPwrUp			:1;
+    577          				INT8U BBPLLForceLock	:1;
+    578          				
+    579          				INT8U XOBypass			:1;
+    580          				INT8U BypassBBPLL		:1;
+    581          			};
+    582          		} tmp;
+    583          		
+    584          		ReadFPGAs(ch, ADDR_CLKEN, &tmp.Data, 1);
+    585          
+    586          		tmp.BBPLLEn = SET;
+    587          		if(type == XTALN)
+    588          		{
+    589          			tmp.DCXOEn = SET;
+    590          			tmp.XOBypass = SET;
+    591          		}
+    592          		else if(type == REFCLK)
+    593          		{
+    594          			tmp.DCXOEn = RESET;
+    595          			tmp.XOBypass = RESET;
+    596          		}
+    597          		else if(type == DCXOCLK)
+    598          		{
+    599          			tmp.DCXOEn = SET;
+    600          			tmp.XOBypass = RESET;
+    601          		}
+    602          		WriteFPGAs(ch, ADDR_CLKEN, &tmp.Data, 1);
+    603          	}
+    604          
+    605          	{
+    606          		union __ADDR_0x2AB{
+    607          			INT8U Data;
+    608          			struct{
+    609          				INT8U RxRefDiv			:1;
+    610          				INT8U RxrefRstBar		:1;
+    611          				INT8U RefclkPwrDn		:1;
+    612          			};
+    613          		} tmp;
+    614          		
+    615          		ReadFPGAs(ch, ADDR_REFDIV1, &tmp.Data, 1);
+    616          
+    617          			 if(type == XTALN) 	tmp.RefclkPwrDn = SET;
+    618          		else if(type == REFCLK) tmp.RefclkPwrDn = RESET;
+    619          		else if(type == DCXOCLK)tmp.RefclkPwrDn = SET;
+    620          
+    621          		WriteFPGAs(ch, ADDR_REFDIV1, &tmp.Data, 1);
+    622          	}
+    623          }
+    624          
+    625          
+    626          INT8U AD8362BPPLLWrite(INT8U ch, INT32U fLo)
+    627          {
+    628          	{
+    629          #define BPPLLx1			0x00
+    630          #define BPPLLd2			0x01
+    631          #define BPPLLd4			0x02
+    632          #define BPPLLx2			0x03
+    633          
+    634          		union __ADDR_0x045{
+    635          			INT8U Data;
+    636          			struct{
+    637          				INT8U RefClkSclaer		:2;
+    638          				INT8U PFDClkEdge		:1;
+    639          				INT8U PFDRstDelay		:2;
+    640          				
+    641          				INT8U RefClkInv			:1;
+    642          				INT8U FBClkInv			:1;
+    643          				INT8U PLLFBInv			:1;
+    644          			};
+    645          		} tmp;
+    646          		
+    647          		ReadFPGAs(ch, ADDR_BBCLKCTRL, &tmp.Data, 1);
+    648          		tmp.RefClkSclaer = BPPLLx2;
+    649          		WriteFPGAs(ch, ADDR_BBCLKCTRL, &tmp.Data, 1);	// Set BBPLL reflclk scale to REFCLK * 2
+    650          	}
+    651          
+    652          	WriteAD9362(ch, 0x046, 0x03);	// Set BBPLL Loop Filter Charge Pump current
+    653          	WriteAD9362(ch, 0x048, 0xE8);	// Set BBPLL Loop Filter C1, R1
+    654          	WriteAD9362(ch, 0x049, 0x5B);	// Set BBPLL Loop Filter R2, C2, C1
+    655          	WriteAD9362(ch, 0x04A, 0x35);	// Set BBPLL Loop Filter C3,R2
+    656          	WriteAD9362(ch, 0x04B, 0xE0);	// Allow calibration to occur and set cal count to 1024 for max accuracy
+    657          	WriteAD9362(ch, 0x04E, 0x10);	// Set calibration clock to REFCLK/4 for more accuracy
+    658          	{
+    659          		unsigned long int PLL_INT = 0;
+    660          		unsigned long int PLL_MOD = 0;
+    661          		
+    662          		INT8U tmp;
+    663          		
+    664          		PLL_INT = fLo/AD9362BPPRefClk;
+    665          		PLL_MOD = (unsigned int)((((float)fLo / (float)AD9362BPPRefClk) - (float)PLL_INT)* 2088960); 
+    666          //		tmp1	= ((float)fLo / (float)AD9362BPPRefClk);
+    667          //		SerPtr->printf("%d, %d %f, \n", PLL_INT, PLL_MOD, tmp1);
+    668          		tmp = PLL_INT;
+    669          		WriteFPGAs(ch, ADDR_BBINT, &tmp, 1);
+    670          		tmp = (PLL_MOD >> 16) & 0xff;
+    671          		WriteFPGAs(ch, ADDR_BBMOD1, &tmp, 1);
+    672          		tmp = (PLL_MOD >> 8) & 0xff;
+    673          		WriteFPGAs(ch, ADDR_BBMOD2, &tmp, 1);
+    674          		tmp = (PLL_MOD >> 0) & 0xff;
+    675          		WriteFPGAs(ch, ADDR_BBMOD3, &tmp, 1);
+    676          
+    677          	}
+    678          
+    679          	{
+    680          		union __ADDR_0x03F{
+    681          			INT8U Data;
+    682          			struct{
+    683          				INT8U BBPLLRstBar		:1;
+    684          				INT8U BBPLLSDMBypass	:1;
+    685          				INT8U InitBBFOCAL		:1;
+    686          				INT8U BBPLLSDMClkEnBar	:1;
+    687          				
+    688          				INT8U SDMSIFData		:4;
+    689          			};
+    690          		} tmp;
+    691          		
+    692          		ReadFPGAs(ch, ADDR_SDMCTRL1, &tmp.Data, 1);
+    693          		tmp.BBPLLRstBar = SET;
+    694          		tmp.InitBBFOCAL = SET;
+    695          		WriteFPGAs(ch, ADDR_SDMCTRL1, &tmp.Data, 1);	// Start BBPLL Calibration
+    696          
+    697          		ReadFPGAs(ch, ADDR_SDMCTRL1, &tmp.Data, 1);
+    698          		tmp.InitBBFOCAL = RESET;
+    699          		WriteFPGAs(ch, ADDR_SDMCTRL1, &tmp.Data, 1); 	// Clear BBPLL start calibration bit
+    700          	}
+    701          
+    702          	WriteAD9362(ch, 0x04C, 0x86);	// Increase BBPLL KV and phase margin
+    703          	WriteAD9362(ch, 0x04D, 0x01);	// Increase BBPLL KV and phase margin
+    704          	WriteAD9362(ch, 0x04D, 0x05);	// Increase BBPLL KV and phase margin
+    705          
+    706          	{
+    707          		union __ADDR_0x05E{
+    708          			INT8U Data;
+    709          			struct{
+    710          				INT8U 				:7;
+    711          				INT8U BBPLLLock		:1;
+    712          			};
+    713          		} tmp;
+    714          		INT8U rtry = 100;
+    715          		
+    716          		tmp.BBPLLLock = 0;
+    717          		while(!tmp.BBPLLLock && rtry--)
+    718          		{
+    719          			ReadFPGAs(ch, 0x05E, &tmp.Data, 1); // Check BBPLL locked status  (0x05E[7]==1 is locked)
+    720          			OSTimeDly(100L);
+    721          		}
+    722          
+    723          		return tmp.BBPLLLock;
+    724          	}
+    725          }
+    726          
+    727          INT8U AD9362RxLOPLLCtrl(INT8U ch, INT64U fLo, INT32U offset)
+    728          {
+    729          	unsigned long long int FrfVCO;
+    730          	unsigned int Fref = AD9362RefClk;
+    731          	unsigned int VCODivider = 0;	
+    732          	int i = 0;
+    733          	INT8U multiplier = 0;
+    734          
+    735          
+    736          	VCODivider = (ReadAD9362(ch, ADDR_RFPLLDIVIDER) & 0x03);
+    737          
+    738          	for(i = 0, multiplier = 1; i < VCODivider + 1; i++)
+    739          	{
+    740          		multiplier = multiplier*2;		
+    741          	}
+    742          
+    743          	FrfVCO = fLo*multiplier;
+    744          
+    745          	{
+    746          		INT8U A_Div = 0;
+    747          		union __ADDR_0x2AB {
+    748          			INT8U Data;
+    749          			struct {
+    750          				INT8U RxRefDiv1			:1;
+    751          				INT8U RxRefRstBar		:1;
+    752          				INT8U RefClkInPwrDn		:1;
+    753          			};
+    754          		} A_2AB;
+    755          
+    756          		union __ADDR_0x2AC {
+    757          			INT8U Data;
+    758          			struct {
+    759          				INT8U TxRefFBDelay		:2;
+    760          				INT8U TxRefDiv			:2;
+    761          
+    762          				INT8U TxRefRstBar		:1;
+    763          				INT8U RxRefFBDelay		:2;
+    764          				INT8U RxRefDiv0			:1;
+    765          			};
+    766          		} A_2AC;
+    767          
+    768          		A_2AB.Data = ReadAD9362(ch, ADDR_REFDIV1);
+    769          		A_2AC.Data = ReadAD9362(ch, ADDR_REFDIV2);
+    770          
+    771          		if(A_2AB.RxRefDiv1) BitSet(A_Div, 1);
+    772          		if(A_2AC.RxRefDiv0) BitSet(A_Div, 0);
+    773          
+    774          		     if(A_Div == 0)	Fref = Fref * 1;
+    775          		else if(A_Div == 1)	Fref = Fref / 2;
+    776          		else if(A_Div == 2)	Fref = Fref / 4;
+    777          		else				Fref = Fref * 2;
+    778          		
+    779          	}
+    780          
+    781          	{
+    782          		unsigned long int PLL_INT = 0;
+    783          		unsigned long int PLL_MOD = 0;
+    784          		
+    785          		PLL_INT = FrfVCO/Fref;
+    786          		PLL_MOD = (unsigned int)((((double)FrfVCO / (double)Fref) - (float)PLL_INT)* 8388593);
+    787          		PLL_MOD += offset;
+    788          
+    789          		WriteAD9362(ch, ADDR_RXFRAC0, (PLL_MOD >>  0) & 0xff);
+    790          		WriteAD9362(ch, ADDR_RXFRAC1, (PLL_MOD >>  8)& 0xff);
+    791          		WriteAD9362(ch, ADDR_RXFRAC2, (PLL_MOD >> 16) & 0xff);
+    792          		
+    793          		WriteAD9362(ch, ADDR_RXINT1, (PLL_INT >> 8) & 0xff);
+    794          		WriteAD9362(ch, ADDR_RXINT0, (PLL_INT >> 0) & 0xff);
+    795          
+    796          	//SerPtr->printf("PLL_INT = %d \n", PLL_INT);
+    797          	//SerPtr->printf("0x231 = %02x, 0x232 = %02x \n", PLL_INT & 0xFF, (PLL_INT >> 8) & 0x07); 
+    798          	//SerPtr->printf("0x233 = %02x, 0x234 = %02x 0x235 = %02x\n", PLL_MOD & 0xFF, (PLL_MOD >> 8) & 0xFF, (PLL_MOD >> 16)& 0xFF); 
+    799          
+    800          	}
+    801          
+    802          	{
+    803          		INT8U tmp = 0;
+    804          		INT8U rtry = 100;
+    805          		
+    806          		while(rtry--)
+    807          		{
+    808          			tmp = ReadAD9362(ch, 0x247); // Check BBPLL locked status  (0x05E[7]==1 is locked)
+    809          			if(BitRead(tmp, 1)) break;
+    810          			OSTimeDly(20L);
+    811          		}
+    812          		return (!BitRead(tmp, 1));
+    813          	}
+    814          }
+    815          
+    816          INT8U AD9362TxLOPLLCtrl(INT8U ch, INT64U fLo, INT32U offset)
+    817          {
+    818          
+    819          	unsigned long long int FrfVCO;
+    820          	unsigned int Fref = AD9362RefClk;
+    821          	unsigned int VCODivider = ((ReadAD9362(ch, ADDR_RFPLLDIVIDER) >> 4) & 0x03);
+    822          	
+    823          	int i = 0;
+    824          	INT8U multiplier = 0;
+    825          	
+    826          	for(i = 0, multiplier = 1; i < VCODivider + 1; i++)
+    827          	{
+    828          		multiplier = multiplier*2;		
+    829          	}
+    830          
+    831          	FrfVCO = fLo*multiplier;
+    832          
+    833          	{
+    834          		INT8U A_Div = 0;
+    835          
+    836          		union __ADDR_0x2AC {
+    837          			INT8U Data;
+    838          			struct {
+    839          				INT8U TxRefFBDelay		:2;
+    840          				INT8U TxRefDiv			:2;
+    841          
+    842          				INT8U TxRefRstBar		:1;
+    843          				INT8U RxRefFBDelay		:2;
+    844          				INT8U RxRefDiv0			:1;
+    845          			};
+    846          		} A_2AC;
+    847          
+    848          		A_2AC.Data = ReadAD9362(ch, ADDR_REFDIV2);
+    849          
+    850          		A_Div = A_2AC.TxRefDiv;
+    851          		
+    852          		     if(A_Div == 0)	Fref = Fref * 1;
+    853          		else if(A_Div == 1)	Fref = Fref / 2;
+    854          		else if(A_Div == 2)	Fref = Fref / 4;
+    855          		else				Fref = Fref * 2;
+    856          		
+    857          	}
+    858          
+    859          	{
+    860          		unsigned long int PLL_INT = 0;
+    861          		unsigned long int PLL_MOD = 0;
+    862          		
+    863          		PLL_INT = FrfVCO/Fref;
+    864          		PLL_MOD = (unsigned int)((((double)FrfVCO / (double)Fref) - (float)PLL_INT)* 8388593);
+    865          		PLL_MOD += offset;
+    866          		
+    867          		WriteAD9362(ch, ADDR_TXFRAC0, (PLL_MOD >>  0) & 0xff);
+    868          		WriteAD9362(ch, ADDR_TXFRAC1, (PLL_MOD >>  8)& 0xff);
+    869          		WriteAD9362(ch, ADDR_TXFRAC2, (PLL_MOD >> 16) & 0xff);
+    870          		
+    871          		WriteAD9362(ch, ADDR_TXINT1, (PLL_INT >> 8) & 0xff);
+    872          		WriteAD9362(ch, ADDR_TXINT0, (PLL_INT >> 0) & 0xff);
+    873          	}
+    874          
+    875          	{
+    876          		INT8U tmp = 0;
+    877          		INT8U rtry = 100;
+    878          		
+    879          		while(rtry--)
+    880          		{
+    881          			tmp = ReadAD9362(ch, 0x287); // Check BBPLL locked status  (0x05E[7]==1 is locked)
+    882          			if(BitRead(tmp, 1)) break;
+    883          			OSTimeDly(20L);
+    884          		}
+    885          		return (!BitRead(tmp, 1));
+    886          	}
+    887          }
+    888          
+    889          
+    890          void AD9362BPPLLCtrl(INT8U ch, INT8U ADCDiv, INT8U DACDiv2En)
+    891          {
+    892          	union __ADDR_0x00A{
+    893          		INT8U Data;
+    894          		struct{
+    895          			INT8U BBPLLDiv			:3;
+    896          			INT8U DACDiv2En			:1;
+    897          			
+    898          			INT8U CLKOutEn			:1;
+    899          			INT8U CLKOutSel			:3;
+    900          		};
+    901          	} tmp;
+    902          	
+    903          	ReadFPGAs(ch, ADDR_BPPLL, &tmp.Data, 1);
+    904          
+    905          	tmp.BBPLLDiv = ADCDiv;
+    906          	tmp.DACDiv2En = DACDiv2En;
+    907          
+    908          	WriteFPGAs(ch, ADDR_BPPLL, &tmp.Data, 1);
+    909          
+    910          }
+    911          
+    912          void AD9362RxFilterConf(INT8U ch, INT8U NoOfTabs)
+    913          {
+    914          	union __ADDR_0x0F5{
+    915          		INT8U Data;
+    916          		struct{
+    917          			INT8U 					:1;
+    918          			INT8U StarRxClk 		:1;
+    919          			INT8U WriteRx			:1;
+    920          			INT8U Rx1Sel			:1;
+    921          
+    922          			INT8U Rx2Sel			:1;
+    923          			INT8U NoOfTabs			:3;
+    924          		};
+    925          	} tmp;
+    926          
+    927          	ReadFPGAs(ch, ADDR_RXFILTER, &tmp.Data, 1);
+    928          
+    929          	tmp.NoOfTabs = NoOfTabs;
+    930          
+    931          	WriteFPGAs(ch, ADDR_RXFILTER, &tmp.Data, 1);
+    932          	
+    933          
+    934          }
+    935          
+    936          
+    937          
+    938          void AD9362RxFilterGain(INT8U ch, INT8U Gain)
+    939          {
+    940          	union __ADDR_0x0F6{
+    941          		INT8U Data;
+    942          		struct{
+    943          			INT8U Gain			:2;
+    944          		};
+    945          	} tmp;
+    946          
+    947          	tmp.Data = 0;
+    948          	
+    949          	tmp.Gain = Gain;
+    950          
+    951          	WriteFPGAs(ch, ADDR_RXFILTERGAIN, &tmp.Data, 1);
+    952          }
+    953          
+    954          
+    955          void AD9362TxFilterConf(INT8U ch, INT8U NoOfTabs, INT8U Gain)
+    956          {
+    957          	union __ADDR_0x065{
+    958          		INT8U Data;
+    959          		struct{
+    960          			INT8U Gain				:1;
+    961          			INT8U StarTxClk			:1;
+    962          			INT8U WriteTx			:1;
+    963          			INT8U Tx1Sel			:1;
+    964          
+    965          			INT8U Tx2Sel			:1;
+    966          			INT8U NoOfTabs			:3;
+    967          		};
+    968          	} tmp;
+    969          
+    970          	ReadFPGAs(ch, ADDR_TXFILTER, &tmp.Data, 1);
+    971          
+    972          	tmp.NoOfTabs = NoOfTabs;
+    973          
+    974          	WriteFPGAs(ch, ADDR_TXFILTER, &tmp.Data, 1);
+    975          	
+    976          
+    977          }
+    978          void AD9362DCXOSet(INT8U ch, INT8U Coarse, INT16U Fine)
+    979          {
+    980          	INT8U tmp;
+    981          
+    982          	tmp = Coarse;
+    983          	//SerPtr->printf("1. %02x \n", tmp);
+    984          	WriteFPGAs(ch, ADDR_DCXOCOAR, &tmp, 1);
+    985          
+    986          	tmp = (Fine >> 5);
+    987          	//SerPtr->printf("2. %02x \n", tmp);
+    988          	WriteFPGAs(ch, ADDR_DCXOFINE2, &tmp, 1);
+    989          	
+    990          	tmp = (Fine >> 0) & 0x1f;
+    991          	//SerPtr->printf("3. %02x \n", tmp);
+    992          	WriteFPGAs(ch, ADDR_DCXOFINE2, &tmp, 1);
+    993          }
+    994          
+    995          void AD9362Rx1GainSet(INT8U ch, INT8U gain)
+    996          {
+    997          	INT8U tmp = gain + 5;	
+    998          	WriteAD9362(ch, ADDR_RX1MANGAIN, tmp);
+    999          }
+   1000          
+   1001          void AD9362Rx2GainSet(INT8U ch, INT8U gain)
+   1002          {
+   1003          	INT8U tmp = gain + 5;	
+   1004          	WriteAD9362(ch, ADDR_RX2MANGAIN, tmp);
+   1005          }
+   1006          
+   1007          void AD9362Tx1AttnSet(INT8U ch, INT16U Tx1Attn)	// 0.25/dB
+   1008          {
+   1009          
+   1010          	WriteAD9362(ch, ADDR_TX1ATTN0, (Tx1Attn >> 0) & 0xff);
+   1011          	WriteAD9362(ch, ADDR_TX1ATTN1, (Tx1Attn >> 8) & 0x01);
+   1012          }
+   1013          
+   1014          void AD9362Tx2AttnSet(INT8U ch, INT16U Tx2Attn)	// 0.25/dB
+   1015          {
+   1016          
+   1017          	WriteAD9362(ch, ADDR_TX2ATTN0, (Tx2Attn >> 0) & 0xff);
+   1018          	WriteAD9362(ch, ADDR_TX2ATTN1, (Tx2Attn >> 8) & 0x01);
+   1019          }
+   1020          
+   1021          
+   1022          INT8U AD9362GetRssi(INT8U ch, INT8U isItRx2)
+   1023          {
+   1024          	INT16U Addr = ADDR_RX1POWER;
+   1025          	if(isItRx2) Addr =  ADDR_RX2POWER;
+   1026          
+   1027          	return (ReadAD9362(ch, Addr));
+   1028          }
+   1029          
+   1030          
+   1031          void AD9362Tx12AllSel(INT8U ch, INT8U Tx1TTx2)
+   1032          {
+   1033          	union __ADDR_0x079{
+   1034          		INT8U Data;
+   1035          		struct{
+   1036          			INT8U Tx1Attn			:5;
+   1037          			INT8U TPCModeTx1		:1;
+   1038          			INT8U Tx1TTx2			:1;
+   1039          		};
+   1040          	} tmp;
+   1041          
+   1042          	ReadFPGAs(ch, ADDR_TX1DIGATTN, &tmp.Data, 1);
+   1043          
+   1044          	tmp.Tx1TTx2 = Tx1TTx2;
+   1045          
+   1046          	WriteFPGAs(ch, ADDR_TX1DIGATTN, &tmp.Data, 1);
+   1047          }
+   1048          
+   1049          void AD9362TxAttnUpdateEn(INT8U ch, INT8U iEn)
+   1050          {
+   1051          	union __ADDR_0x07C{
+   1052          		INT8U Data;
+   1053          		struct{
+   1054          			INT8U Tx2Attn			:5;
+   1055          			INT8U TPCModeTx2		:1;
+   1056          			INT8U UpdateTPAttn		:1;
+   1057          		};
+   1058          	} tmp;
+   1059          
+   1060          	ReadFPGAs(ch, ADDR_TX2DIGATTN, &tmp.Data, 1);
+   1061          
+   1062          	tmp.UpdateTPAttn = iEn;
+   1063          
+   1064          	WriteFPGAs(ch, ADDR_TX2DIGATTN, &tmp.Data, 1);
+   1065          }
+   1066          
+   1067          
+   1068          
+   1069          void WriteAD9362(INT8U OPCODE, INT16U ADDR, INT8U DATA)
+   1070          {
+   1071          	WriteFPGAs(OPCODE, ADDR, (INT8U *)&DATA, 1);
+   1072          }
+   1073          
+   1074          INT8U ReadAD9362(INT8U OPCODE, INT16U ADDR)
+   1075          {
+   1076          	INT8U DATA;
+   1077          	
+   1078          	ReadFPGAs(OPCODE, ADDR, (INT8U *)&DATA, 1);
+   1079          
+   1080          	return DATA;
+   1081          }
+   1082          
+   1083          //////////////////////////////////////////////////////////////////////////////
+   1084          // End of Source File
+   1085          ////////////////////////
+   1086          
+
+   Maximum stack usage in bytes:
+
+     Function             .cstack
+     --------             -------
+     AD8362BPPLLWrite         40
+     AD9362BPPLLCtrl          24
+     AD9362CLKSelect          24
+     AD9362DCXOSet            24
+     AD9362GetRssi            16
+     AD9362InOutSelect        40
+     AD9362Init                8
+     AD9362InitSet            40
+     AD9362Rx1GainSet          8
+     AD9362Rx2GainSet          8
+     AD9362RxEnable           24
+     AD9362RxFilterConf       16
+     AD9362RxFilterGain        8
+     AD9362RxFilterSet        32
+     AD9362RxLOPLLCtrl        40
+     AD9362Tx12AllSel         16
+     AD9362Tx1AttnSet         16
+     AD9362Tx2AttnSet         16
+     AD9362TxAttnUpdateEn     16
+     AD9362TxEnable           24
+     AD9362TxFilterConf       16
+     AD9362TxFilterSet        32
+     AD9362TxLOPLLCtrl        40
+     AD9362TxOn               16
+     ReadAD9362                8
+     WriteAD9362               8
+
+
+   Section sizes:
+
+     Function/Label       Bytes
+     --------------       -----
+     AD9362SetAddr        5192
+     AD9362Init             24
+     ?Subroutine0            6
+     AD9362InitSet        1158
+     AD9362TxOn             40
+     AD9362TxEnable         60
+     ?Subroutine1           12
+     AD9362TxFilterSet      94
+     ?Subroutine2           14
+     AD9362RxEnable         58
+     AD9362RxFilterSet      92
+     AD9362InOutSelect     166
+     AD9362CLKSelect       132
+     ?Subroutine3           10
+     AD8362BPPLLWrite      464
+     AD9362RxLOPLLCtrl     338
+     ?Subroutine4           50
+     AD9362TxLOPLLCtrl     320
+     AD9362BPPLLCtrl        56
+     AD9362RxFilterConf     36
+     ?Subroutine5            8
+     AD9362RxFilterGain     18
+     ?Subroutine6            6
+     AD9362TxFilterConf     34
+     AD9362DCXOSet          60
+     AD9362Rx1GainSet       16
+     AD9362Rx2GainSet       18
+     AD9362Tx1AttnSet       38
+     AD9362Tx2AttnSet       38
+     AD9362GetRssi          30
+     AD9362Tx12AllSel       40
+     AD9362TxAttnUpdateEn   40
+     WriteAD9362             8
+     ReadAD9362             10
+     ??DataTable2            4
+     ??DataTable2_1          4
+     ??DataTable2_2          4
+     ??DataTable2_3          4
+     ??DataTable2_4          4
+     ??DataTable2_5          4
+     ??DataTable2_6          4
+     ??DataTable2_7          4
+     ??DataTable2_8          4
+     ??DataTable2_9          4
+     ??DataTable2_10         4
+     ??DataTable2_11         4
+     ??DataTable2_12         4
+     ??DataTable2_13         4
+     ??DataTable2_14         4
+     ??DataTable2_15         4
+     ??DataTable2_16         4
+     ??DataTable2_17         4
+
+ 
+ 5 192 bytes in section .rodata
+ 3 566 bytes in section .text
+ 
+ 3 566 bytes of CODE  memory
+ 5 192 bytes of CONST memory
+
+Errors: none
+Warnings: none

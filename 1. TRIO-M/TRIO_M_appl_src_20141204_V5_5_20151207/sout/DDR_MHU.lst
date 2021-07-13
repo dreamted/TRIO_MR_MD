@@ -1,0 +1,113 @@
+###############################################################################
+#                                                                             #
+# IAR ANSI C/C++ Compiler V5.30.2.51295/W32 for ARM     13/Apr/2012  04:52:02 #
+# Copyright 1999-2009 IAR Systems AB.                                         #
+#                                                                             #
+#    Cpu mode     =  thumb                                                    #
+#    Endian       =  little                                                   #
+#    Source file  =  D:\Project\TRIO\3.F_W\TRIO_appl_src_20120413\code\DDR_MH #
+#                    U.C                                                      #
+#    Command line =  D:\Project\TRIO\3.F_W\TRIO_appl_src_20120413\code\DDR_MH #
+#                    U.C -D _MIMO_Type -lcN D:\Project\TRIO\3.F_W\TRIO_appl_s #
+#                    rc_20120413\sout\ -o D:\Project\TRIO\3.F_W\TRIO_appl_src #
+#                    _20120413\sout\ --endian=little --cpu=Cortex-M3 -e       #
+#                    --require_prototypes --warnings_are_errors --fpu=None    #
+#                    --dlib_config "C:\Program Files\IAR Systems\Embedded     #
+#                    Workbench 5.4\arm\INC\DLib_Config_Normal.h" -I           #
+#                    D:\Project\TRIO\3.F_W\TRIO_appl_src_20120413\include\    #
+#                    -I D:\Project\TRIO\3.F_W\TRIO_appl_src_20120413\lib_stm3 #
+#                    2\inc\ -I D:\Project\TRIO\3.F_W\TRIO_appl_src_20120413\l #
+#                    ib_stm32\src\ -I D:\Project\TRIO\3.F_W\TRIO_appl_src_201 #
+#                    20413\uC-CPU\ -I D:\Project\TRIO\3.F_W\TRIO_appl_src_201 #
+#                    20413\uC-LIB\ -I D:\Project\TRIO\3.F_W\TRIO_appl_src_201 #
+#                    20413\uCOS-II\Ports\ -I D:\Project\TRIO\3.F_W\TRIO_appl_ #
+#                    src_20120413\uCOS-II\Source\ -I                          #
+#                    D:\Project\TRIO\3.F_W\TRIO_appl_src_20120413\uC-Probe\   #
+#                    -I "C:\Program Files\IAR Systems\Embedded Workbench      #
+#                    5.4\arm\INC\" -Oh                                        #
+#    List file    =  D:\Project\TRIO\3.F_W\TRIO_appl_src_20120413\sout\DDR_MH #
+#                    U.lst                                                    #
+#    Object file  =  D:\Project\TRIO\3.F_W\TRIO_appl_src_20120413\sout\DDR_MH #
+#                    U.o                                                      #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\Project\TRIO\3.F_W\TRIO_appl_src_20120413\code\DDR_MHU.C
+      1          /******************** (C) COPYRIGHT 2008 STMicroelectronics ********************
+      2          * File Name          : fsmc_sram.h
+      3          * Author             : MCD Application Team
+      4          * Version            : V2.0.2
+      5          * Date               : 07/11/2008
+      6          * Description        : Header for fsmc_sram.c file.
+      7          ********************************************************************************
+      8          * THE PRESENT FIRMWARE WHICH IS FOR GUIDANCE ONLY AIMS AT PROVIDING CUSTOMERS
+      9          * WITH CODING INFORMATION REGARDING THEIR PRODUCTS IN ORDER FOR THEM TO SAVE TIME.
+     10          * AS A RESULT, STMICROELECTRONICS SHALL NOT BE HELD LIABLE FOR ANY DIRECT,
+     11          * INDIRECT OR CONSEQUENTIAL DAMAGES WITH RESPECT TO ANY CLAIMS ARISING FROM THE
+     12          * CONTENT OF SUCH FIRMWARE AND/OR THE USE MADE BY CUSTOMERS OF THE CODING
+     13          * INFORMATION CONTAINED HEREIN IN CONNECTION WITH THEIR PRODUCTS.
+     14          *******************************************************************************/
+     15          #define FSK_C
+     16          
+     17          #include "../include/main.h"
+     18          
+     19          void FskInit(void)
+     20          {
+     21          #if 1
+     22           	SmsSer->CheckByte 	= pUSART4.CheckByte;
+     23          	SmsSer->RxGetByte 	= pUSART4.RxGetByte;
+     24          	SmsSer->PutStr 		= pUSART4.PutStr;
+     25          	SmsSer->TxCheckByte = pUSART4.TxCheckByte;
+     26          
+     27          	SmsSer->TimerRx 	= TimerFSKRx;
+     28          	SmsSer->TimerEndWait = TimerFSKEndWait;
+     29          	
+     30          	SmsSer->WRCSRecv 	= &RFsksksio;
+     31          	SmsSer->WRCSSend 	= &SFsksksio;
+     32          	SmsSer->Sem = OSSemCreate(1);
+     33          	
+     34          	OSTaskCreate(FSKTask, (void *)NULL, (OS_STK *)&FSKTaskStk[FSK_START_STK_SIZE - 1], FSKTASK_PRIO);
+     35          #endif
+     36          }
+     37          
+     38          
+     39          
+     40          
+     41          void FSKTask(void *pdata)
+     42          {
+     43          #if 1
+     44          
+     45          	__ProtocolPtr *nPtr = (__ProtocolPtr *)FskSer;
+     46          
+     47          	pdata = pdata;
+     48          	OSTimeDly(500L);
+     49          
+     50          	BcMdemDebug(TRUE, (INT32S *)NULL);
+     51          	while(1)
+     52          	{
+     53          		nPtr->WRCSRecv->cBody = 0;
+     54          	
+     55          //		if(!tTestFlag)
+     56          		{
+     57          			INT16U Recv;
+     58          
+     59          			if(pUSART4.CheckByte(1, &Recv))
+     60          			{
+     61          				USART1PutChar(pUSART4.RxGetByte());
+     62          			}
+     63          		}
+     64          		WRCS_DownLoadGiveupTimerChk(nPtr);
+     65          		OSTimeDly(10L);
+     66          
+     67          	}
+     68          #endif    
+     69          }
+     70          
+     71          ////////////////////////////////////////////////////////////////////////////////
+     72          // End of Source File
+     73          //////////////////////
+     74          
+
+Errors: 1
+Warnings: none

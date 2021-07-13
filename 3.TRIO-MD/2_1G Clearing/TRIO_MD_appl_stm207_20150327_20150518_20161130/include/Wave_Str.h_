@@ -1,0 +1,171 @@
+#pragma pack(1)
+
+typedef   struct {
+	// 알람 Flag
+	INT8U WaveAlarm[2];
+	INT8U WaveAlarm_len;
+
+	INT8U  fRxTxAlarm ;		// Forward 	0
+	INT8U  fEcIo;			// Reverse 	1
+
+	// 알람 발생
+	union {
+		INT8U Data;
+		struct {
+				INT8U Sp2					:1;
+				INT8U AdjLowLimitAlarm		:1;
+				INT8U AdjHiLimitAlarm		:1;
+				INT8U TxLowLimitAlarm		:1;
+				INT8U TxHiLimitAlarm		:1;
+				INT8U RxLowLimitAlarm		:1;
+				INT8U RxHiLimitAlarm		:1;
+				INT8U Sp1					:1;
+		} Bit;
+	} RxTxAlarm;
+
+	union {
+		INT8U Data;
+		struct {
+			INT8U Sp2					:1;
+			INT8U EcIo_6th				:1;
+			INT8U EcIo_5th				:1;
+			INT8U EcIo_4th				:1;
+			INT8U EcIo_3th				:1;
+			INT8U EcIo_2nd				:1;
+			INT8U EcIo_1st				:1;
+			INT8U Sp1					:1;
+		} Bit;
+	} EcIo;
+
+	INT8U MasterPNH;
+	INT8U MasterPNL;
+
+	INT8U  RxTxAlarmNew;
+	INT8U  RxTxAlarmFlg;
+	INT8U  RxTxAlarmOld;
+
+
+	INT8U  EcIoThresNew;
+	INT8U  EcIoThres;
+
+	INT8U  EcIoThresFlg;
+	INT8U  EcIoThresOld;
+	INT8U  PnChangeCnt;
+} _WaveAlarm;
+
+
+typedef struct {	
+	/*0x0c03*/	
+	INT8U RxMaxVal_AID[2];
+	INT8U RxMaxVal_len;
+	INT8U RxMaxVal[2];
+
+	/*0x0c04*/	
+	INT8U RxMinVal_AID[2];
+	INT8U RxMinVal_len;
+	INT8U RxMinVal[2];
+
+	/*0x0c05*/	
+	INT8U TxMaxVal_AID[2];
+	INT8U TxMaxVal_len;
+	INT8U TxMaxVal[2];
+
+	/*0x0c06*/	
+	INT8U TxMinVal_AID[2];
+	INT8U TxMinVal_len;
+	INT8U TxMinVal[2];
+
+	/*0x0c07*/	
+	INT8U AdjMaxVal_AID[2];
+	INT8U AdjMaxVal_len;
+	INT8U AdjMaxVal[2];
+
+	/*0x0c08*/	
+	INT8U AdjMinVal_AID[2];
+	INT8U AdjMinVal_len;
+	INT8U AdjMinVal[2];
+
+	/*0x0c09*/	
+	INT8U EcIo_AID[2];
+	INT8U EcIo_len;
+	INT8U EcIo;
+
+	/*0x0c11*/	
+	INT8U AR_Mode_AID[2];
+	INT8U AR_Mode_len;
+	INT8U AR_Mode[2];
+
+	/*0x0c12*/	
+	INT8U Radio_ReportTime_AID[2];
+	INT8U Radio_ReportTime_len;
+	INT8U Radio_ReportTime[2];
+
+	/*0x0c13*/	
+	INT8U Radio_ReportPeriod_AID[2];
+	INT8U Radio_ReportPeriod_len;
+	INT8U Radio_ReportPeriod[2];
+
+	/*0x0c14*/	
+	INT8U TestStn_AID[2];
+	INT8U TestStn_len;
+	INT8U TestStn[11];
+}_WaveCtrl  ;
+
+
+typedef struct {	
+	/*0x0c0b*/	
+	INT8U FAAdjVal_AID[2];
+	INT8U FAAdjVal_len;
+	INT8U FAAdjVal[2];
+
+	/*0x0c0c*/	
+	INT8U FAFerVal_AID[2];
+	INT8U FAFerVal_len;
+	INT8U FAFerVal;
+}_WaveNormalStatus  ;
+
+typedef struct {	
+	/*0x0c00*/	
+	INT8U SMS_TxRetry_AID[2];
+	INT8U SMS_TxRetry_len;
+	INT8U SMS_TxRetry;
+
+	/*0x0c01*/	
+	INT8U ActChannel_AID[2];
+	INT8U ActChannel_len;
+	INT8U ActChannel[2];
+	
+	/*0x0c02*/	
+	INT8U OneFAStatus_AID[2];
+	INT8U OneFAStatus_len;
+	INT8U OneFAStatus;
+
+	/*0x0c0a*/	
+	INT8U FARxVal_AID[2];
+	INT8U FARxVal_len;
+	INT8S FARxVal[2];
+
+	/*0x0c0d*/	
+	INT8U PN_Val_AID[2];
+	INT8U PN_Val_len;
+	INT8U PN_Val[12];
+
+	/*0x0c0e*/	
+	INT8U EcIo_AID[2];
+	INT8U EcIo_Val_len;
+	INT8U EcIo_Val[6];
+		
+	_WaveNormalStatus	WaveNormalStatus;
+	
+	/*0x092e*/	
+	INT8U ReportHours_AID[2];
+	INT8U ReportHours_len;
+	INT8U PresentHour;
+	INT8U PresentMin;
+} _WaveSts;
+
+#pragma pack()
+////////////////////////////////////////////////////////////////////////////////
+// End of Header File
+//////////////////////
+

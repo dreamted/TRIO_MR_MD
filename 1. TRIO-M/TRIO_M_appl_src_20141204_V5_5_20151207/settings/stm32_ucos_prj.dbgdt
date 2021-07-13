@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<Project>
+  <Desktop>
+    <Static>
+      <Debug-Log/>
+      <Workspace>
+        <ColumnWidths>
+          
+          
+          
+          
+        <Column0>231</Column0><Column1>27</Column1><Column2>27</Column2><Column3>27</Column3></ColumnWidths>
+      </Workspace>
+      <Disassembly>
+        
+        
+        
+      <PreferedWindows><Position>2</Position><ScreenPosX>0</ScreenPosX><ScreenPosY>0</ScreenPosY><Windows/></PreferedWindows><MixedMode>1</MixedMode><CodeCovEnabled>0</CodeCovEnabled><CodeCovShow>0</CodeCovShow></Disassembly>
+      <Build>
+        
+        
+        
+        
+      <ColumnWidth0>20</ColumnWidth0><ColumnWidth1>916</ColumnWidth1><ColumnWidth2>244</ColumnWidth2><ColumnWidth3>61</ColumnWidth3></Build>
+    <Watch><Format><struct_types/><watch_formats/></Format></Watch><QuickWatch><Column0>100</Column0><Column1>100</Column1><Column2>100</Column2><Column3>100</Column3></QuickWatch><STACK2><PreferedWindows><Position>1</Position><ScreenPosX>0</ScreenPosX><ScreenPosY>0</ScreenPosY><Windows/></PreferedWindows></STACK2><Register><PreferedWindows><Position>2</Position><ScreenPosX>0</ScreenPosX><ScreenPosY>0</ScreenPosY><Windows/></PreferedWindows></Register><Memory><FindDirection>1</FindDirection><FindAsHex>0</FindAsHex></Memory></Static>
+    <Windows>
+      
+      
+      
+    <Wnd0>
+        <Tabs>
+          <Tab>
+            <Identity>TabID-20769-14913</Identity>
+            <TabName>Debug Log</TabName>
+            <Factory>Debug-Log</Factory>
+            <Session/>
+          </Tab>
+          <Tab>
+            <Identity>TabID-20246-14923</Identity>
+            <TabName>Build</TabName>
+            <Factory>Build</Factory>
+            <Session/>
+          </Tab>
+        </Tabs>
+        
+      <SelectedTab>0</SelectedTab></Wnd0><Wnd2>
+        <Tabs>
+          <Tab>
+            <Identity>TabID-31517-14916</Identity>
+            <TabName>Workspace</TabName>
+            <Factory>Workspace</Factory>
+            <Session>
+              
+            <NodeDict><ExpandedNode>stm32_ucos_prj</ExpandedNode><ExpandedNode>stm32_ucos_prj/lib</ExpandedNode><ExpandedNode>stm32_ucos_prj/source</ExpandedNode></NodeDict></Session>
+          </Tab>
+        </Tabs>
+        
+      <SelectedTab>0</SelectedTab></Wnd2><Wnd3><Tabs><Tab><Identity>TabID-23349-7580</Identity><TabName>Quick Watch</TabName><Factory>QuickWatch</Factory><Session><Expression/></Session></Tab></Tabs><SelectedTab>0</SelectedTab></Wnd3><Wnd8><Tabs><Tab><Identity>TabID-27302-7711</Identity><TabName>Disassembly</TabName><Factory>Disassembly</Factory><Session/></Tab></Tabs><SelectedTab>0</SelectedTab></Wnd8><Wnd9><Tabs><Tab><Identity>TabID-6423-16049</Identity><TabName>Memory</TabName><Factory>Memory</Factory><Session><ZoneNumber>0</ZoneNumber><SelectionAnchor>536871392</SelectionAnchor><SelectionEnd>536871392</SelectionEnd><UnitsPerGroup>4</UnitsPerGroup><EndianMode>0</EndianMode><DataCovEnabled>0</DataCovEnabled><DataCovShown>0</DataCovShown><HScroll>0</HScroll><VScroll>33554457</VScroll></Session></Tab></Tabs><SelectedTab>0</SelectedTab></Wnd9></Windows>
+    <Editor>
+      
+      
+      
+      
+    <Pane><Tab><Factory>TextEditor</Factory><Filename>C:\user\project\sk-fcu\fw\stm32_ucos_v0.1_20080216\lib\at24c64\eep_24c64_v0.1.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>C:\user\project\sk-fcu\fw\stm32_ucos_v0.1_20080216\include\protocol.h</Filename><XPos>0</XPos><YPos>330</YPos><SelStart>9988</SelStart><SelEnd>9988</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>C:\user\project\sk-fcu\fw\stm32_ucos_v0.1_20080216\lib\uart3\usart3_v0.1.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>418</SelStart><SelEnd>418</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>C:\user\project\sk-fcu\fw\stm32_ucos_v0.1_20080216\lib\uart3\usart3_v0.1.h</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>872</SelStart><SelEnd>872</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>C:\user\project\sk-fcu\fw\stm32_ucos_v0.1_20080216\lib\uart1\usart1_v0.1.c</Filename><XPos>0</XPos><YPos>220</YPos><SelStart>3504</SelStart><SelEnd>3504</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>C:\user\project\sk-fcu\fw\stm32_ucos_v0.1_20080216\lib\uart2\usart2_v0.1.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>653</SelStart><SelEnd>653</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>C:\user\project\sk-fcu\fw\stm32_ucos_v0.1_20080216\code\expio.c</Filename><XPos>0</XPos><YPos>90</YPos><SelStart>2919</SelStart><SelEnd>2919</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>C:\user\project\sk-fcu\fw\stm32_ucos_v0.1_20080216\lib_stm32\inc\stm32f10x_nvic.h</Filename><XPos>0</XPos><YPos>34</YPos><SelStart>1885</SelStart><SelEnd>2014</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>C:\user\project\sk-fcu\fw\stm32_ucos_v0.1_20080216\lib\keybuzz\Keybuz5key.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>C:\user\project\sk-fcu\fw\stm32_ucos_v0.1_20080216\lib_stm32\src\stm32f10x_tim1.c</Filename><XPos>0</XPos><YPos>799</YPos><SelStart>33309</SelStart><SelEnd>33309</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>C:\user\project\sk-fcu\fw\stm32_ucos_v0.1_20080216\lib_stm32\inc\stm32f10x_tim1.h</Filename><XPos>0</XPos><YPos>897</YPos><SelStart>42231</SelStart><SelEnd>42231</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>C:\user\project\sk-fcu\fw\stm32_ucos_v0.1_20080216\lib_stm32\src\stm32f10x_tim.c</Filename><XPos>0</XPos><YPos>412</YPos><SelStart>17761</SelStart><SelEnd>17761</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>C:\user\project\sk-fcu\fw\stm32_ucos_v0.1_20080216\lib_stm32\inc\stm32f10x_tim.h</Filename><XPos>0</XPos><YPos>449</YPos><SelStart>24137</SelStart><SelEnd>24137</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>C:\user\project\sk-fcu\fw\stm32_ucos_v0.1_20080216\lib_stm32\src\stm32f10x_spi.c</Filename><XPos>0</XPos><YPos>159</YPos><SelStart>7775</SelStart><SelEnd>7775</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>C:\user\project\sk-fcu\fw\stm32_ucos_v0.1_20080216\lib_stm32\inc\stm32f10x_spi.h</Filename><XPos>0</XPos><YPos>168</YPos><SelStart>8143</SelStart><SelEnd>8143</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>C:\user\project\sk-fcu\fw\stm32_ucos_v0.1_20080216\lib_stm32\src\stm32f10x_rtc.c</Filename><XPos>0</XPos><YPos>30</YPos><SelStart>2919</SelStart><SelEnd>2919</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>C:\user\project\sk-fcu\fw\stm32_ucos_v0.1_20080216\lib_stm32\inc\stm32f10x_rtc.h</Filename><XPos>0</XPos><YPos>37</YPos><SelStart>3071</SelStart><SelEnd>3071</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>C:\user\project\sk-fcu\fw\stm32_ucos_v0.1_20080216\lib_stm32\src\stm32f10x_pwr.c</Filename><XPos>0</XPos><YPos>96</YPos><SelStart>6162</SelStart><SelEnd>6162</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>C:\user\project\sk-fcu\fw\stm32_ucos_v0.1_20080216\lib_stm32\inc\stm32f10x_pwr.h</Filename><XPos>0</XPos><YPos>98</YPos><SelStart>4851</SelStart><SelEnd>4851</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>C:\user\project\sk-fcu\fw\stm32_ucos_v0.1_20080216\lib_stm32\inc\stm32f10x_exti.h</Filename><XPos>0</XPos><YPos>36</YPos><SelStart>2335</SelStart><SelEnd>2335</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>C:\user\project\sk-fcu\fw\stm32_ucos_v0.1_20080216\lib_stm32\inc\stm32f10x_dma.h</Filename><XPos>0</XPos><YPos>195</YPos><SelStart>11876</SelStart><SelEnd>11876</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>C:\user\project\sk-fcu\fw\stm32_ucos_v0.1_20080216\lib_stm32\inc\stm32f10x_can.h</Filename><XPos>0</XPos><YPos>26</YPos><SelStart>1583</SelStart><SelEnd>1583</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>C:\user\project\sk-fcu\fw\stm32_ucos_v0.1_20080216\lib_stm32\src\stm32f10x_dma.c</Filename><XPos>0</XPos><YPos>211</YPos><SelStart>9662</SelStart><SelEnd>9662</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>C:\user\project\sk-fcu\fw\stm32_ucos_v0.1_20080216\lib_stm32\src\stm32f10x_can.c</Filename><XPos>0</XPos><YPos>357</YPos><SelStart>14949</SelStart><SelEnd>14949</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>C:\user\project\sk-fcu\fw\stm32_ucos_v0.1_20080216\lib_stm32\src\stm32f10x_bkp.c</Filename><XPos>0</XPos><YPos>90</YPos><SelStart>5109</SelStart><SelEnd>5109</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>C:\user\project\sk-fcu\fw\stm32_ucos_v0.1_20080216\lib_stm32\inc\stm32f10x_bkp.h</Filename><XPos>0</XPos><YPos>106</YPos><SelStart>4337</SelStart><SelEnd>4337</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>C:\user\project\sk-fcu\fw\stm32_ucos_v0.1_20080216\code\sio.c</Filename><XPos>0</XPos><YPos>111</YPos><SelStart>3542</SelStart><SelEnd>3542</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>C:\user\project\sk-fcu\fw\stm32_ucos_v0.1_20080216\sout\stm32_ucos_prj.map</Filename><XPos>0</XPos><YPos>2727</YPos><SelStart>222</SelStart><SelEnd>222</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>C:\user\project\sk-fcu\fw\stm32_ucos_v0.1_20080216\uCOS-II\Source\ucos_ii.h</Filename><XPos>0</XPos><YPos>1600</YPos><SelStart>70063</SelStart><SelEnd>70063</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>C:\user\project\sk-fcu\fw\stm32_ucos_v0.1_20080216\include\sio.h</Filename><XPos>0</XPos><YPos>29</YPos><SelStart>1862</SelStart><SelEnd>1862</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>C:\user\project\sk-fcu\fw\stm32_ucos_v0.1_20080216\lib_stm32\src\stm32f10x_flash.c</Filename><XPos>0</XPos><YPos>110</YPos><SelStart>4861</SelStart><SelEnd>4861</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>C:\user\project\sk-fcu\fw\stm32_ucos_v0.1_20080216\code\app_vect.c</Filename><XPos>0</XPos><YPos>134</YPos><SelStart>9576</SelStart><SelEnd>9576</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>C:\user\project\sk-fcu\fw\stm32_ucos_v0.1_20080216\code\btest.c</Filename><XPos>0</XPos><YPos>74</YPos><SelStart>1818</SelStart><SelEnd>1818</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>C:\user\project\sk-fcu\fw\stm32_ucos_v0.1_20080216\include\main.h</Filename><XPos>0</XPos><YPos>51</YPos><SelStart>2672</SelStart><SelEnd>2672</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>C:\user\project\sk-fcu\fw\stm32_ucos_v0.1_20080216\include\exlib.h</Filename><XPos>0</XPos><YPos>136</YPos><SelStart>5027</SelStart><SelEnd>5027</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>C:\user\project\sk-fcu\fw\stm32_ucos_v0.1_20080216\code\download.c</Filename><XPos>0</XPos><YPos>72</YPos><SelStart>2417</SelStart><SelEnd>2417</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>C:\user\project\sk-fcu\fw\stm32_ucos_v0.1_20080216\code\exlib.c</Filename><XPos>0</XPos><YPos>184</YPos><SelStart>5026</SelStart><SelEnd>5026</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>C:\user\project\sk-fcu\fw\stm32_ucos_v0.1_20080216\include\includes.h</Filename><XPos>0</XPos><YPos>26</YPos><SelStart>1594</SelStart><SelEnd>1594</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>C:\user\project\sk-fcu\fw\stm32_ucos_v0.1_20080216\uCOS-II\Ports\os_cpu_a.asm</Filename><XPos>0</XPos><YPos>197</YPos><SelStart>10007</SelStart><SelEnd>10007</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>C:\user\project\sk-fcu\fw\stm32_ucos_v0.1_20080216\lib_stm32\src\stm32f10x_nvic.c</Filename><XPos>0</XPos><YPos>550</YPos><SelStart>17629</SelStart><SelEnd>17629</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>C:\user\project\sk-fcu\fw\stm32_ucos_v0.1_20080216\STM32_Flash.xcl</Filename><XPos>0</XPos><YPos>85</YPos><SelStart>4294</SelStart><SelEnd>4294</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>C:\user\project\sk-fcu\fw\stm32_ucos_v0.1_20080216\code\main.c</Filename><XPos>0</XPos><YPos>382</YPos><SelStart>11051</SelStart><SelEnd>11051</SelEnd></Tab><ActiveTab>41</ActiveTab><Tab><Factory>TextEditor</Factory><Filename>C:\user\project\sk-fcu\fw\stm32_ucos_v0.1_20080216\lib\timer\timer_v0.1.c</Filename><XPos>0</XPos><YPos>102</YPos><SelStart>2808</SelStart><SelEnd>2808</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>C:\user\project\sk-fcu\fw\stm32_ucos_v0.1_20080216\lib_stm32\src\cortexm3_macro.s</Filename><XPos>0</XPos><YPos>239</YPos><SelStart>9196</SelStart><SelEnd>9196</SelEnd></Tab></Pane><ActivePane>0</ActivePane><Sizes><Pane><X>1000000</X><Y>1000000</Y></Pane></Sizes><SplitMode>1</SplitMode></Editor>
+    <Positions>
+      
+      
+      
+      
+      
+    <Top><Row0><Sizes><Toolbar-003be7a0><key>iaridepm1</key></Toolbar-003be7a0></Sizes></Row0><Row1><Sizes><Toolbar-098afd58><key>debuggergui1</key></Toolbar-098afd58></Sizes></Row1></Top><Left><Row0><Sizes><Wnd2><Rect><Top>-2</Top><Left>-2</Left><Bottom>508</Bottom><Right>305</Right><x>-2</x><y>-2</y><xscreen>135</xscreen><yscreen>199</yscreen><sizeHorzCX>102041</sizeHorzCX><sizeHorzCY>204522</sizeHorzCY><sizeVertCX>232048</sizeVertCX><sizeVertCY>524152</sizeVertCY></Rect></Wnd2></Sizes></Row0></Left><Right><Row0><Sizes><Wnd3><Rect><Top>-2</Top><Left>-2</Left><Bottom>508</Bottom><Right>174</Right><x>-2</x><y>-2</y><xscreen>189</xscreen><yscreen>201</yscreen><sizeHorzCX>142857</sizeHorzCX><sizeHorzCY>206578</sizeHorzCY><sizeVertCX>133031</sizeVertCX><sizeVertCY>524152</sizeVertCY></Rect></Wnd3></Sizes></Row0><Row1><Sizes><Wnd8><Rect><Top>-2</Top><Left>172</Left><Bottom>508</Bottom><Right>524</Right><x>172</x><y>-2</y><xscreen>189</xscreen><yscreen>201</yscreen><sizeHorzCX>142857</sizeHorzCX><sizeHorzCY>206578</sizeHorzCY><sizeVertCX>266062</sizeVertCX><sizeVertCY>524152</sizeVertCY></Rect></Wnd8></Sizes></Row1></Right><Bottom><Row0><Sizes><Wnd0><Rect><Top>-2</Top><Left>-2</Left><Bottom>197</Bottom><Right>1325</Right><x>-2</x><y>-2</y><xscreen>1327</xscreen><yscreen>199</yscreen><sizeHorzCX>1003023</sizeHorzCX><sizeHorzCY>204522</sizeHorzCY><sizeVertCX>102041</sizeVertCX><sizeVertCY>204522</sizeVertCY></Rect></Wnd0></Sizes></Row0><Row1><Sizes><Wnd9><Rect><Top>195</Top><Left>-2</Left><Bottom>396</Bottom><Right>1325</Right><x>-2</x><y>195</y><xscreen>1327</xscreen><yscreen>201</yscreen><sizeHorzCX>1003023</sizeHorzCX><sizeHorzCY>206578</sizeHorzCY><sizeVertCX>142857</sizeVertCX><sizeVertCY>206578</sizeVertCY></Rect></Wnd9></Sizes></Row1></Bottom><Float><Sizes/></Float></Positions>
+  </Desktop>
+</Project>
+
+

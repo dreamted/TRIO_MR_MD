@@ -1,0 +1,258 @@
+###############################################################################
+#                                                                             #
+# IAR ANSI C/C++ Compiler V5.30.2.51295/W32 for ARM     18/May/2012  17:35:02 #
+# Copyright 1999-2009 IAR Systems AB.                                         #
+#                                                                             #
+#    Cpu mode     =  thumb                                                    #
+#    Endian       =  little                                                   #
+#    Source file  =  D:\Project\TRIO\3.F_W\TRIO_appl_src_20120516\lib\keybuzz #
+#                    \Keybuz5key_v0901.c                                      #
+#    Command line =  D:\Project\TRIO\3.F_W\TRIO_appl_src_20120516\lib\keybuzz #
+#                    \Keybuz5key_v0901.c -D NDEBUG -lcN                       #
+#                    D:\Project\TRIO\3.F_W\TRIO_appl_src_20120516\sout\ -o    #
+#                    D:\Project\TRIO\3.F_W\TRIO_appl_src_20120516\sout\       #
+#                    --endian=little --cpu=Cortex-M3 -e                       #
+#                    --warnings_are_errors --fpu=None --dlib_config           #
+#                    "C:\Program Files\IAR Systems\Embedded Workbench         #
+#                    5.4\arm\INC\DLib_Config_Normal.h" -I                     #
+#                    D:\Project\TRIO\3.F_W\TRIO_appl_src_20120516\include\    #
+#                    -I D:\Project\TRIO\3.F_W\TRIO_appl_src_20120516\lib_stm3 #
+#                    2\inc\ -I D:\Project\TRIO\3.F_W\TRIO_appl_src_20120516\l #
+#                    ib_stm32\src\ -I D:\Project\TRIO\3.F_W\TRIO_appl_src_201 #
+#                    20516\uC-CPU\ -I D:\Project\TRIO\3.F_W\TRIO_appl_src_201 #
+#                    20516\uC-LIB\ -I D:\Project\TRIO\3.F_W\TRIO_appl_src_201 #
+#                    20516\uCOS-II\Ports\ -I D:\Project\TRIO\3.F_W\TRIO_appl_ #
+#                    src_20120516\uCOS-II\Source\ -I                          #
+#                    D:\Project\TRIO\3.F_W\TRIO_appl_src_20120516\uC-Probe\   #
+#                    -I "C:\Program Files\IAR Systems\Embedded Workbench      #
+#                    5.4\arm\INC\" -Oh                                        #
+#    List file    =  D:\Project\TRIO\3.F_W\TRIO_appl_src_20120516\sout\Keybuz #
+#                    5key_v0901.lst                                           #
+#    Object file  =  D:\Project\TRIO\3.F_W\TRIO_appl_src_20120516\sout\Keybuz #
+#                    5key_v0901.o                                             #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\Project\TRIO\3.F_W\TRIO_appl_src_20120516\lib\keybuzz\Keybuz5key_v0901.c
+      1          /*********************************************
+      2          * File Name          : usart1_vx.x.c
+      3          * Author             : 
+      4          * Date First Issued  : 01/17/2008
+      5          * Description        : This file provides all the USART0 firmware functions.
+      6          * $Revision: 0.1 $
+      7          * $Revision date: 2008.01.__
+      8          ********************************************************************************/
+      9          
+     10          #define	KEYBUZ_C
+     11          
+     12          
+     13          #include <stdarg.h>
+     14          #include <stdlib.h>
+     15          #include <stdio.h>
+     16          
+     17          #include "stm32f10x_conf.h"
+     18          #include "../include/KeyBuzExt.h"
+     19          #include "KeyBuz5Key_v0901.h"
+     20          
+     21          
+     22          void KeyBuzInit (INT16U bAddr)
+     23          {
+     24          	m5KeySts->mFirstKey = 0;
+     25          	m5KeySts->mKeyRDIndex = 0;
+     26          	m5KeySts->mKeyWRIndex = 0;
+     27          	m5KeySts->mKeyDebounce = 0;
+     28          	m5KeySts->mKEYCSPtr = bAddr;
+     29          
+     30          
+     31          	TIM1_Init(550L);	// 550Hz freq Set
+     32          	TIM1_OC1Init(__TIM1_PWM2, 50L); // 50: 50%
+     33          	BuzzPortOff();
+     34          }
+     35          
+     36          signed char KeyDetecting(void)
+     37          {
+     38          	INT8U	keyCnt = 0;
+     39          	INT8U rtmpval = 0;
+     40          
+     41          	rtmpval = (INT8U)(~(ExpioReadData(m5KeySts->mKEYCSPtr)) & keyMASK);
+     42          
+     43          	if(rtmpval)
+     44          	{
+     45          		keyCnt++;
+     46          		m5KeySts->mFirstKey = rtmpval;
+     47          	}
+     48          
+     49          	if(keyCnt == TRUE)
+     50          	{
+     51          		if(m5KeySts->mPrevKey != m5KeySts->mFirstKey) m5KeySts->mKeyDebounce = 0;
+     52          		else
+     53          		{
+     54          			m5KeySts->mKeyDebounce++;
+     55          		}
+     56          		m5KeySts->mPrevKey = m5KeySts->mFirstKey;
+     57          
+     58          		if( m5KeySts->mKeyDebounce == DebouncedMin)
+     59          		{
+     60          			switch(m5KeySts->mPrevKey)
+     61          			{
+     62          				case keyMENU:
+     63          				case keyUP:
+     64          				case keyDOWN:
+     65          				case keyENTR:
+     66          				case keyESC:
+     67          					m5KeySts->mKeyBuffer[m5KeySts->mKeyWRIndex] = (INT8U)m5KeySts->mPrevKey;
+     68          				break;
+     69          				default: return -1;
+     70          			}
+     71          
+     72          			{
+     73          				signed char rval = m5KeySts->mKeyBuffer[m5KeySts->mKeyWRIndex];
+     74          
+     75          				m5KeySts->mKeyWRIndex++;
+     76          				m5KeySts->mKeyWRIndex %= KeyBufferNum;
+     77          
+     78          				return rval;
+     79          			}
+     80          		}
+     81          		else if(m5KeySts->mKeyDebounce >= DebouncedMax)
+     82          		{
+     83          			m5KeySts->mKeyDebounce = 0;
+     84          		}
+     85          	}
+     86          	else if(!keyCnt) m5KeySts->mKeyDebounce = 0;
+     87          
+     88          	return -1;
+     89          }
+     90          
+     91          INT8U IsKey5Pushed(INT8U DataNum)
+     92          {
+     93          	INT8U retValue = 0;
+     94          
+     95          	if(m5KeySts->mKeyWRIndex - m5KeySts->mKeyRDIndex == 0) retValue = 0;
+     96          	else if(m5KeySts->mKeyWRIndex - m5KeySts->mKeyRDIndex > 0){
+     97          		retValue = m5KeySts->mKeyWRIndex - m5KeySts->mKeyRDIndex;
+     98          		if( retValue < DataNum ) retValue = 0;
+     99          	}
+    100          	else if(m5KeySts->mKeyWRIndex - m5KeySts->mKeyRDIndex < 0){
+    101          		retValue = (KeyBufferNum + m5KeySts->mKeyWRIndex) - m5KeySts->mKeyRDIndex;
+    102          		if( retValue < DataNum ) retValue = 0;
+    103          	}
+    104          
+    105          	return retValue;
+    106          }
+    107          
+    108          INT8U ReadKey5Buffer(void)
+    109          {
+    110          	INT8U retValue = 0;
+    111          
+    112          	retValue = m5KeySts->mKeyBuffer[m5KeySts->mKeyRDIndex++];
+    113          	m5KeySts->mKeyRDIndex = m5KeySts->mKeyRDIndex%KeyBufferNum;
+    114          
+    115          	return retValue;
+    116          }
+    117          
+    118          void Key5BufferClear(void)
+    119          {
+    120          	m5KeySts->mKeyWRIndex = 0;
+    121          	m5KeySts->mKeyRDIndex = 0;
+    122          }
+    123          
+    124          //==========================================================================
+    125          //	NAME:		BuzzShort, BuzMedium, BuzLong
+    126          //	FUNCTION:		WRITE TO BUZZER TIMER
+    127          //	INPUTS:		None
+    128          //	OUTPUTS:		None
+    129          //==========================================================================
+    130          void CheckBuzzTimer(void)
+    131          {
+    132          //=======================================================//
+    133          	if ( BuzzTimer != 0 )
+    134              {
+    135              	BuzzTimer--;    	/* The Buzzer Timer Timer */
+    136          	}
+    137          	else
+    138          	{
+    139          		BuzzPortOff();
+    140          	}
+    141          	//=======================================================//
+    142          }
+    143          
+    144          void BuzzPortOff(void)
+    145          {
+    146          	TIM1->CCER.Bit.CC1E = DISABLE;
+    147          }
+    148          
+    149          
+    150          void BuzzShort(void)
+    151          {
+    152          	BuzzTimer = 70;
+    153          	TIM1->CCER.Bit.CC1E = ENABLE;
+    154          }
+    155          
+    156          void BuzzMedium(void)
+    157          {
+    158          	BuzzTimer = 250;
+    159          	TIM1->CCER.Bit.CC1E = ENABLE;
+    160          }
+    161          
+    162          void BuzzLong(void)
+    163          {
+    164          	BuzzTimer = 255;
+    165          	TIM1->CCER.Bit.CC1E = ENABLE;
+    166          }
+    167          
+    168          ////////////////////////////////////////////////////////////////////////////////
+    169          // End of Source File
+    170          /////////////////////
+    171          
+
+   Maximum stack usage in bytes:
+
+     Function        .cstack
+     --------        -------
+     BuzzLong             0
+     BuzzMedium           0
+     BuzzPortOff          0
+     BuzzShort            0
+     CheckBuzzTimer       0
+     IsKey5Pushed         8
+     Key5BufferClear      0
+     KeyBuzInit           8
+     KeyDetecting         8
+     ReadKey5Buffer       8
+
+
+   Section sizes:
+
+     Function/Label  Bytes
+     --------------  -----
+     m5KeyStsB         12
+     m5KeySts           4
+     BuzzTimer          1
+     KeyBuzInit        54
+     KeyDetecting     136
+     IsKey5Pushed      46
+     ReadKey5Buffer    34
+     Key5BufferClear   14
+     CheckBuzzTimer    16
+     ?Subroutine1      12
+     BuzzPortOff        2
+     BuzzShort          4
+     ?Subroutine0      14
+     BuzzMedium         6
+     BuzzLong           6
+     ??DataTable5       4
+     ??DataTable9       4
+     ??DataTable11      4
+
+ 
+  13 bytes in section .bss
+   4 bytes in section .data
+ 356 bytes in section .text
+ 
+ 356 bytes of CODE memory
+  17 bytes of DATA memory
+
+Errors: none
+Warnings: none
